@@ -1,0 +1,6 @@
+# python=3.11
+flask
+flask-socketio
+samplerate
+numpy
+zhipuai
