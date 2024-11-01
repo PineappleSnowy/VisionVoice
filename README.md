@@ -10,8 +10,6 @@
 
 4. 不需要在 css 目录下给文件添加 _css 后缀。
 
-### 后端代码
+### 项目开发
 
-1. agent_files 文件夹需要修改。
-
-2. 后端代码中，agent_files文件夹需要修改。
+1. requirements.txt 要加上版本号。

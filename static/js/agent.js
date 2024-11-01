@@ -4,11 +4,11 @@ var flag_board = 0;
 document.getElementById('send-button').addEventListener('click', function () {
     var input = document.getElementById('agent-chat-textarea');
     var message = input.value.trim();
-    message = message.replace(/(\r\n|\n|\r)/gm,'')
+    message = message.replace(/(\r\n|\n|\r)/gm, '')
     if (message || image_impt) {
         addMessage(message);
         input.value = ''; // 清空输入框
-        if(flag_board === 1){
+        if (flag_board === 1) {
             document.getElementById('more_function_button_2').click();
         }
     }
@@ -16,7 +16,7 @@ document.getElementById('send-button').addEventListener('click', function () {
     image_impt = null;
 });
 
-const socket=io();
+const socket = io();
 function addMessage(message) {
     var index = 0;
     var messagebackground = document.getElementById('chat-container');
@@ -61,7 +61,7 @@ function addMessage(message) {
                 socket.emit("agent_stream_audio", { "index": index, "answer": jsonString })
                 index += 1;
                 bubble_2.textContent += jsonString;
-                                                                                                                                                                                                                                                                                                    
+
                 // 继续读取下一个数据
                 return reader.read().then(processText);
             });
@@ -76,10 +76,10 @@ function addMessage(message) {
 }
 
 //捕捉用户选择的图像
-document.getElementById('photo').addEventListener('change',function(e){
+document.getElementById('photo').addEventListener('change', function (e) {
     var file = e.target.files[0];
     var reader = new FileReader();
-    reader.onload = function(event) {
+    reader.onload = function (event) {
         image_impt = event.target.result;
         console.log('我执行了');
         document.getElementById('photo').value = '';
@@ -165,7 +165,7 @@ document.getElementById('agent-chat-textarea').addEventListener(
 //     }
 // )
 
-document.getElementById('decorate_photo').addEventListener('click',function(){
+document.getElementById('decorate_photo').addEventListener('click', function () {
     document.getElementById('photo').click();
 })
 

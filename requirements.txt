@@ -1,6 +1,7 @@
-# python=3.11
-flask
-flask-socketio
-samplerate
-numpy
-zhipuai
+# python=3.11.5
+Flask==3.0.3
+Flask-SocketIO==5.4.1
+Flask-CORS==5.0.0
+samplerate==0.2.1
+zhipuai==2.1.5.20230904
+flask-jwt-extended==4.6.0

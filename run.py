@@ -3,13 +3,20 @@
 """
 
 # 第三方库
-from flask import Flask, stream_with_context, render_template, request, Flask
+from flask import Flask, stream_with_context, render_template, request, jsonify
 from flask_socketio import SocketIO
+from flask_cors import CORS
 import numpy as np
 import samplerate
 import json
 import platform
 from zhipuai import ZhipuAI
+from flask_jwt_extended import (
+    create_access_token,
+    verify_jwt_in_request,
+    get_jwt_identity,
+    JWTManager,
+)
 
 # 自定义函数
 from agent_files.agent_speech_rec import speech_rec
@@ -18,10 +25,33 @@ from agent_files.agent_speech_synthesis import agent_audio_generate
 # ----- 加载全局应用 -----
 app = Flask(__name__)
 socketio = SocketIO(app)
-
+JWTManager(app)
+CORS(app)
+app.config["JWT_SECRET_KEY"] = "s96cae35ce8a9b0244178bf28e4966c2ce1b83"  # 设置 JWT 密钥
 
 # ----- 路由 -----
+
+
+# 使用 verify_jwt_in_request 进行 JWT 验证
+@app.before_request
+def before_request():
+    # 排除 GET 请求的 JWT 验证
+    if request.path == "/agent/chat_stream" or request.path == "/agent/upload_audio":
+        try:
+            verify_jwt_in_request()
+        except Exception as e:
+            return (
+                jsonify({"message": "Token无效或过期!", "code": 401, "error": str(e)}),
+                401,
+            )
+
+
 @app.route("/", methods=["GET"])
+def index():
+    return render_template("index.html")
+
+
+@app.route("/agent", methods=["GET"])
 def Agent():
     """智能体根路由"""
     global response_all, messages
@@ -52,6 +82,24 @@ def square():
 def mine():
     """我的路由"""
     return render_template("mine.html")
+
+
+@app.route("/verify-token", methods=["POST"])
+def verify_token():
+    """
+    验证登录用户的 token 是否有效
+    """
+    try:
+        # 验证 token 是否有效
+        verify_jwt_in_request()
+        print("token 有效")
+        # 获取当前 token 对应的用户
+        current_user = get_jwt_identity()
+        print("当前用户：", current_user)
+        return jsonify({"valid": True, "user": current_user}), 200
+    # 如果token无效，返回错误信息
+    except:
+        return jsonify({"valid": False, "message": "token 无效或已过期!"}), 400
 
 
 # ----- 加载全局变量 -----
@@ -123,6 +171,81 @@ def find_pause(str_seek):
 
 
 # ----- 处理前端请求的路由 -----
+@app.post("/register")
+def register():
+    """注册路由"""
+    data = request.get_json()
+    username = data.get("username")
+    password = data.get("password")
+
+    print("注册信息：\n用户名：{}\n密码：{}".format(username, password))
+
+    # 验证用户名和密码格式
+    if not username or not password:
+        return jsonify({"message": "用户名和密码不能为空", "code": 400}), 400
+
+    if len(username) < 3 or len(password) < 6:
+        return (
+            jsonify({"message": "用户名长度至少3位,密码长度至少6位", "code": 400}),
+            400,
+        )
+
+    try:
+        # 读取现有用户
+        with open("./static/user.json", "r+", encoding="utf-8") as f:
+            users = json.load(f)
+
+            # 检查用户名是否存在
+            if any(user["username"] == username for user in users):
+                return jsonify({"message": "用户名已存在", "code": 400}), 400
+
+            users.append({"username": username, "password": password})
+
+            print("用户注册成功：\n用户名：{}\n密码：{}".format(username, password))
+
+            # 写回文件
+            f.seek(0)
+            json.dump(users, f, indent=4, ensure_ascii=False)
+            f.truncate()
+
+        return jsonify({"message": "注册成功", "code": 200}), 200
+
+    except Exception as e:
+        return jsonify({"message": f"注册失败: {str(e)}", "code": 500}), 500
+
+
+@app.post("/login")
+def login():
+    """
+    对比 static 文件夹下的 user.json 里面的用户信息，如果匹配则设置 local token，返回给前端
+    """
+    # 读取用户信息
+    with open("./static/user.json", "r", encoding="utf-8") as f:
+        users = json.load(f)
+
+    # 获取前端传来的用户名和密码
+    data = request.get_json()
+    username = data.get("username")
+    password = data.get("password")
+
+    print("登录信息：\n用户名：{}\n密码：{}".format(username, password))
+
+    # 对比用户信息
+    for user in users:
+        print(user["username"], user["password"])
+        if user["username"] == username and user["password"] == password:
+            print("登录成功")
+            # 设置 local token
+            access_token = create_access_token(identity=username)
+            return (
+                jsonify(
+                    {"message": "登录成功", "code": 200, "access_token": access_token}
+                ),
+                200,
+            )
+    return jsonify({"message": "账号或密码错误", "code": 400}), 400
+
+
 @app.get("/agent/chat_stream")
 def agent_chat_stream():
     """
