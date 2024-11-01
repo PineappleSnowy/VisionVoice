@@ -5,51 +5,107 @@
         "chat_history": [
             {
                 "role": "user",
-                "content": "今天的戏份辛苦了"
+                "content": "5LuK5aSp55qE5oiP5Lu96L6b6Ium5LqG"
             },
             {
                 "role": "assistant",
-                "content": "（微笑）谢谢关心，你也辛苦了"
+                "content": "77yI5b6u56yR77yJ6LCi6LCi5YWz5b+D77yM5L2g5Lmf6L6b6Ium5LqG"
             },
             {
                 "role": "user",
-                "content": "记得上周那场雨戏吗？"
+                "content": "6K6w5b6X5LiK5ZGo6YKj5Zy66Zuo5oiP5ZCX77yf"
             },
             {
                 "role": "assistant",
-                "content": "记得，那天雨很大，你还把伞给了我"
+                "content": "6K6w5b6X77yM6YKj5aSp6Zuo5b6I5aSn77yM5L2g6L+Y5oqK5Lye57uZ5LqG5oiR"
             },
             {
                 "role": "user",
-                "content": "其实那天的便当是我准备的"
+                "content": "5YW25a6e6YKj5aSp55qE5L6/5b2T5piv5oiR5YeG5aSH55qE"
             },
             {
                 "role": "assistant",
-                "content": "（惊讶）原来是你？难怪那天的便当特别合我胃口"
+                "content": "77yI5oOK6K6277yJ5Y6f5p2l5piv5L2g77yf6Zq+5oCq6YKj5aSp55qE5L6/5b2T54m55Yir5ZCI5oiR6IOD5Y+j"
             },
             {
                 "role": "user",
-                "content": "我偷偷问了副导演你喜欢吃什么"
+                "content": "5oiR5YG35YG36Zeu5LqG5Ymv5a+85ryU5L2g5Zac5qyi5ZCD5LuA5LmI"
             },
             {
                 "role": "assistant",
-                "content": "（感动）你这么用心，我都不知道该说什么好了"
+                "content": "77yI5oSf5Yqo77yJ5L2g6L+Z5LmI55So5b+D77yM5oiR6YO95LiN55+l6YGT6K+l6K+05LuA5LmI5aW95LqG"
             },
             {
                 "role": "user",
-                "content": "因为我喜欢你"
+                "content": "5Zug5Li65oiR5Zac5qyi5L2g"
             },
             {
                 "role": "assistant",
-                "content": "（微微脸红）我...其实我也一直很在意你"
+                "content": "77yI5b6u5b6u6IS457qi77yJ5oiRLi4u5YW25a6e5oiR5Lmf5LiA55u05b6I5Zyo5oSP5L2g"
             },
             {
                 "role": "user",
-                "content": "要不要一起去吃个晚饭？"
+                "content": "6KaB5LiN6KaB5LiA6LW35Y675ZCD5Liq5pma6aWt77yf"
             },
             {
                 "role": "assistant",
-                "content": "好啊，正好我知道附近有家不错的餐厅"
+                "content": "5aW95ZWK77yM5q2j5aW95oiR55+l6YGT6ZmE6L+R5pyJ5a625LiN6ZSZ55qE6aSQ5Y6F"
+            },
+            {
+                "role": "user",
+                "content": "77yI6LWw5Y675LqG6aSQ5Y6F77yJ"
+            },
+            {
+                "role": "assistant",
+                "content": "77yI5p2l5Yiw6aSQ5Y6F77yJ6L+Z6YeM55qE5pyN5Yqh5ZGY5oiR6K6k6K+G77yM5Y+v5Lul6K6p5LuW5Lus57uZ5oiR5Lus55WZ5Liq5a6J6Z2Z54K555qE6KeS6JC9Cg=="
+            },
+            {
+                "role": "user",
+                "content": "5Zev77yI6ZqP5ZCO5oiR5Lus6LWw5Yiw5LqG5a6J6Z2Z55qE6KeS6JC977yJ"
+            },
+            {
+                "role": "assistant",
+                "content": "77yI5a6z576e77yJ5L2g5o6o6I2Q5LiA5LiL77yM5L2g5p2l6L+H6L+Z5ZCX77yfCg=="
+            },
+            {
+                "role": "user",
+                "content": "5rKh5pyJ6K+2"
+            },
+            {
+                "role": "assistant",
+                "content": "77yI5oOK6K6277yJ6YKj5L2g5oCO5LmI55+l6YGT6L+Z6YeM55qE6aWt6I+c5aW95ZCDCg=="
+            },
+            {
+                "role": "user",
+                "content": "5oiR5LiN55+l6YGT5ZOH"
+            },
+            {
+                "role": "assistant",
+                "content": "77yI5L+P55qu77yJ6K+277yM6aqX5L2g55qE77yM5oiR55+l6YGT77yM5L2g5Zac5qyi5oiR77yM5a+55LiN5a+5Cg=="
+            },
+            {
+                "role": "user",
+                "content": "77yI6IS456iN56iN5pyJ5Lqb57qi5pmV77yJ6L+Z5oiR5LiN5piv5ZKM5L2g6K+06L+H5LqG5Zib"
+            },
+            {
+                "role": "assistant",
+                "content": "77yI56yR77yJ6L+Z6YO96KKr5L2g5Y+R546w5LqGCg=="
+            },
+            {
+                "role": "user",
+                "content": "5L2g5b+Y5LqG5ZCX"
+            },
+            {
+                "role": "assistant",
+                "content": "77yI5bCP5YKy5aiH77yJ5ZO877yM5bCx5piv5pio5aSp55qE5LqL5oOF77yM5oiR5oCO5LmI5Y+v6IO96L+Y6K6w5b6XCg=="
+            },
+            {
+                "role": "user",
+                "content": "5L2g5bGF54S25b+Y5LqG77yM5ZGc5ZGc5ZGcfg=="
+            },
+            {
+                "role": "assistant",
+                "content": "77yI5rip5p+U77yJ5aW95ZWm77yM5oCO5LmI5Lya5b+Y5LqG5ZGi77yM5oiR6K6w5b6XCg=="
             }
         ]
     }

@@ -59,7 +59,7 @@ def Agent():
     """智能体根路由"""
     global response_all, messages
     response_all = ""
-    messages = [messages[0]]
+    messages = []
     return render_template("agent.html")
 
 
@@ -96,26 +96,12 @@ with open("./static/api.json", "r", encoding="utf-8") as f:
 
 # 当前操作系统
 current_os = platform.system()
-
-# 获取当前用户
-
-background_info = "（旁白：苏梦远主演了陆星辰导演的一部音乐题材电影，在拍摄期间，两人因为一场戏的表现有分歧。） 导演，关于这场戏，我觉得可以尝试从角色的内心情感出发，让表现更加真实。"
-# with open("./static/user.json", "r", encoding="utf-8") as f:
-#     users = json.load(f)
-#     current_user = get_jwt_identity()
-#     for user in users:
-#         if user["username"] == current_user:
-#             messages = user.get("chat_history", [])
-#             break
-
-messages = [{"role": "assistant", "content": background_info}]
-
-response_all = ""
-
 # 偏置，因为断句会导致句子总数发生变化，这引入了偏置
 bias = 0
 # 带人类断句的回答，字典，以序号:回答形式保存，避免语序错误
 ideal_answers = dict()
+# 聊天记录最大长度
+MAX_HISTORY = 50
 
 
 # ----- 预定义函数 -----
@@ -123,7 +109,7 @@ def predict(responses):
     """
     生成器函数，用于大模型流式输出
     """
-    global response_all
+    global response_all, messages
     response_all = ""
 
     # 大模型流式输出
@@ -136,6 +122,22 @@ def predict(responses):
             text = "我听不懂你在说什么\n"
         response_all += text
         yield text
+
+    messages.append({"role": "assistant", "content": response_all})
+
+    # 对聊天记录进行编码
+    encoded_messages = [encode_message_content(msg.copy()) for msg in messages]
+
+    # 更新用户聊天记录
+    with open("./static/user.json", "r+", encoding="utf-8") as f:
+        users = json.load(f)
+        for user in users:
+            if user["username"] == current_user:
+                user["chat_history"] = encoded_messages
+                break
+        f.seek(0)
+        json.dump(users, f, indent=4, ensure_ascii=False)
+        f.truncate()
 
 
 def change_sample_rate(input_file, target_sample_rate, ori_sample_rate):
@@ -163,6 +165,27 @@ def find_pause(str_seek):
         index_list.append(index)
     aim_index = max(index_list)
     return aim_index
+
+
+def encode_message_content(message):
+    """对消息内容进行 Base64 编码"""
+    if isinstance(message, dict) and "content" in message:
+        content = message["content"]
+        encoded_content = base64.b64encode(content.encode("utf-8")).decode("utf-8")
+        message["content"] = encoded_content
+    return message
+
+
+def decode_message_content(message):
+    """对消息内容进行 Base64 解码"""
+    if isinstance(message, dict) and "content" in message:
+        encoded_content = message["content"]
+        try:
+            decoded_content = base64.b64decode(encoded_content).decode("utf-8")
+            message["content"] = decoded_content
+        except:
+            pass  # 如果解码失败则保持原样
+    return message
 
 
 # ----- 处理前端请求的路由 -----
@@ -267,7 +290,12 @@ def get_chat_history():
             users = json.load(f)
             for user in users:
                 if user["username"] == current_user:
-                    return jsonify(user.get("chat_history", [])), 200
+                    encoded_chat_history = user.get("chat_history", [])
+                    decoded_chat_history = [
+                        decode_message_content(msg.copy())
+                        for msg in encoded_chat_history
+                    ]
+                    return jsonify(decoded_chat_history), 200
 
         return jsonify([]), 200
     except Exception as e:
@@ -279,44 +307,38 @@ def agent_chat_stream():
     """
     大模型前端流式输出路由
     """
-    global bias, ideal_answers, response_all
+    global bias, ideal_answers, response_all, messages, current_user
     # 人类断句相关参数初始化
     bias = 0
     ideal_answers = dict()
 
     user_talk = request.args.get("query")
     current_user = get_jwt_identity()
-    
-    # 从用户聊天记录获取历史消息
+
+    # 从用户聊天记录获取历史消息，如果没有则初始化
+    background_info = "（旁白：苏梦远主演了陆星辰导演的一部音乐题材电影，在拍摄期间，两人因为一场戏的表现有分歧。） 导演，关于这场戏，我觉得可以尝试从角色的内心情感出发，让表现更加真实。"
+
+    # 读取用户的加密聊天记录
     with open("./static/user.json", "r", encoding="utf-8") as f:
         users = json.load(f)
         for user in users:
             if user["username"] == current_user:
                 if "chat_history" not in user:
-                    user["chat_history"] = [{"role": "assistant", "content": background_info}]
-                messages = user["chat_history"]
+                    user["chat_history"] = [
+                        {"role": "assistant", "content": background_info}
+                    ]
+                encoded_chat_history = user["chat_history"]
                 break
 
-    # 添加新的消息
-    if response_all:
-        messages.append({"role": "assistant", "content": response_all})
+    # 对聊天记录进行解码
+    messages = [decode_message_content(msg.copy()) for msg in encoded_chat_history]
+
+    # 添加用户消息
     messages.append({"role": "user", "content": user_talk})
-    
+
     # 限制消息历史长度
-    MAX_HISTORY = 50
     if len(messages) > MAX_HISTORY:
         messages = messages[-MAX_HISTORY:]
-    
-    # 更新用户聊天记录
-    with open("./static/user.json", "r+", encoding="utf-8") as f:
-        users = json.load(f)
-        for user in users:
-            if user["username"] == current_user:
-                user["chat_history"] = messages
-                break
-        f.seek(0)
-        json.dump(users, f, indent=4, ensure_ascii=False)
-        f.truncate()
 
     # 调用大模型
     responses = client.chat.completions.create(
@@ -330,7 +352,7 @@ def agent_chat_stream():
         messages=messages,
         stream=True,
     )
-    
+
     generate = predict(responses)
     return app.response_class(
         stream_with_context(generate), mimetype="text/event-stream"
@@ -401,31 +423,6 @@ def agent_handle_audio_stream(data):
             {"index": data["index"] - data["bias"], "audio_chunk": audio_chunk},
         )
 
-
-def encode_message_content(message):
-    """对消息内容进行 Base64 编码"""
-    if isinstance(message, dict) and "content" in message:
-        content = message["content"]
-        encoded_content = base64.b64encode(content.encode('utf-8')).decode('utf-8')
-        message["content"] = encoded_content
-    return message
-
-# 在更新用户聊天记录时进行编码
-messages = [encode_message_content(msg) for msg in messages]
-
-def decode_message_content(message):
-    """对消息内容进行 Base64 解码"""
-    if isinstance(message, dict) and "content" in message:
-        encoded_content = message["content"]
-        try:
-            decoded_content = base64.b64decode(encoded_content).decode('utf-8')
-            message["content"] = decoded_content
-        except:
-            pass  # 如果解码失败则保持原样
-    return message
-
-# 在读取用户聊天记录时进行解码
-messages = [decode_message_content(msg) for msg in messages]
 
 if __name__ == "__main__":
     # 根据操作系统选择服务器启动方式
