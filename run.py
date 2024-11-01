@@ -84,24 +84,6 @@ def mine():
     return render_template("mine.html")
 
 
-@app.route("/verify-token", methods=["POST"])
-def verify_token():
-    """
-    验证登录用户的 token 是否有效
-    """
-    try:
-        # 验证 token 是否有效
-        verify_jwt_in_request()
-        print("token 有效")
-        # 获取当前 token 对应的用户
-        current_user = get_jwt_identity()
-        print("当前用户：", current_user)
-        return jsonify({"valid": True, "user": current_user}), 200
-    # 如果token无效，返回错误信息
-    except:
-        return jsonify({"valid": False, "message": "token 无效或已过期!"}), 400
-
-
 # ----- 加载全局变量 -----
 # 加载 api_key
 with open("./static/api.json", "r", encoding="utf-8") as f:
@@ -244,6 +226,24 @@ def login():
                 200,
             )
     return jsonify({"message": "账号或密码错误", "code": 400}), 400
+
+
+@app.route("/verify-token", methods=["POST"])
+def verify_token():
+    """
+    验证登录用户的 token 是否有效
+    """
+    try:
+        # 验证 token 是否有效
+        verify_jwt_in_request()
+        print("token 有效")
+        # 获取当前 token 对应的用户
+        current_user = get_jwt_identity()
+        print("当前用户：", current_user)
+        return jsonify({"valid": True, "user": current_user}), 200
+    # 如果token无效，返回错误信息
+    except:
+        return jsonify({"valid": False, "message": "token 无效或已过期!"}), 400
 
 
 @app.get("/agent/chat_stream")

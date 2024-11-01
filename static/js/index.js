@@ -1,6 +1,13 @@
-const login_button = document.getElementById("login_button");
+/**
+ * @fileoverview 主页模块
+ * @description 该模块用于处理主页的登录和注册功能
+ * @author Yang-ZhiHang
+ */
 
-// 使用 SHA-256 加密密码
+const login_button = document.getElementById("login_button");
+const register_button = document.getElementById("register_button");
+
+// SHA-256 加密密码
 async function sha256(message) {
     const msgBuffer = new TextEncoder().encode(message);
     const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
@@ -9,6 +16,7 @@ async function sha256(message) {
     return hashHex;
 }
 
+// 登录
 login_button.addEventListener("click", () => {
     const username = document.getElementById("username").value;
     const password = document.getElementById("password").value;
@@ -26,10 +34,15 @@ login_button.addEventListener("click", () => {
         })
             .then(response => response.json())
             .then(data => {
-                console.log(data);
-                localStorage.setItem('token', data.access_token);
-                window.location.href = '/agent';
-                alert(data.message);
+                if (data.code === 200) {
+                    localStorage.setItem('token', data.access_token);
+                    localStorage.setItem('user', data.user);
+                    localStorage.setItem('islogin', 1);
+                    alert(data.message);
+                    window.location.href = '/agent';
+                } else {
+                    alert(data.message);
+                }
             }).catch(error => {
                 console.error('Error:', error);
                 alert('登录失败，请重试');
@@ -37,6 +50,7 @@ login_button.addEventListener("click", () => {
     });
 });
 
+// 注册
 register_button.addEventListener("click", () => {
     const username = document.getElementById("username").value;
     const password = document.getElementById("password").value;
@@ -54,7 +68,6 @@ register_button.addEventListener("click", () => {
         })
             .then(response => response.json())
             .then(data => {
-                console.log(data);
                 alert(data.message);
             }).catch(error => {
                 console.error('Error:', error);
@@ -63,8 +76,9 @@ register_button.addEventListener("click", () => {
     });
 });
 
+// 检查是否处于登录状态
 document.addEventListener("DOMContentLoaded", () => {
-    if (localStorage.getItem('isLogin') === '1') {
+    if (localStorage.getItem('islogin') === '1') {
         window.location.href = '/agent';
     }
 });
