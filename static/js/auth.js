@@ -2,7 +2,6 @@
  * @fileoverview Token验证模块
  * @description 该模块用于验证用户登录 token 的有效性，并返回相应的验证结果
  * @author Yang-ZhiHang
- * @version 1.0.0
  */
 
 document.addEventListener("DOMContentLoaded", verifyToken);

@@ -1,6 +1,7 @@
 var image_impt = null;
 var flag_board = 0;
 
+// 在 DOM 加载完成后获取聊天记录
 document.addEventListener('DOMContentLoaded', function() {
     loadChatHistory();
 });
