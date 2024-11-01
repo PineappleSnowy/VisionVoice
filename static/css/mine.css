@@ -3,7 +3,7 @@ body{
     height: 100vh;
     margin: 0;
     padding: 0;
-    background-image: url(../src/agent_img/bgi.png);
+    background-image: url(../images/background.png);
     background-size: cover;
 }
 
@@ -50,7 +50,7 @@ h1{
 }
 
 #user-image{
-    background-image: url(../src/mine_img/水晶宫殿.jpeg);
+    background-image: url(../images/avatar_default.jpeg);
     width: 100px;
     height: 100px;
     background-size: cover;

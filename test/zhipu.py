@@ -1,3 +1,6 @@
+"""
+该文件用于测试智谱AI角色扮演大模型的调用。
+"""
 from zhipuai import ZhipuAI
 import json
 
