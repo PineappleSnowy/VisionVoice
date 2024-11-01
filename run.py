@@ -17,6 +17,7 @@ from flask_jwt_extended import (
     get_jwt_identity,
     JWTManager,
 )
+import base64
 
 # 自定义函数
 from agent_files.agent_speech_rec import speech_rec
@@ -41,7 +42,9 @@ def before_request():
             verify_jwt_in_request()
         except Exception as e:
             return (
-                jsonify({"message": "Token无效或过期!", "code": 401, "error": str(e)}),
+                jsonify(
+                    {"message": "Token has expired!", "code": 401, "error": str(e)}
+                ),
                 401,
             )
 
@@ -94,7 +97,17 @@ with open("./static/api.json", "r", encoding="utf-8") as f:
 # 当前操作系统
 current_os = platform.system()
 
+# 获取当前用户
+
 background_info = "（旁白：苏梦远主演了陆星辰导演的一部音乐题材电影，在拍摄期间，两人因为一场戏的表现有分歧。） 导演，关于这场戏，我觉得可以尝试从角色的内心情感出发，让表现更加真实。"
+# with open("./static/user.json", "r", encoding="utf-8") as f:
+#     users = json.load(f)
+#     current_user = get_jwt_identity()
+#     for user in users:
+#         if user["username"] == current_user:
+#             messages = user.get("chat_history", [])
+#             break
+
 messages = [{"role": "assistant", "content": background_info}]
 
 response_all = ""
@@ -105,7 +118,7 @@ bias = 0
 ideal_answers = dict()
 
 
-# 预定义函数
+# ----- 预定义函数 -----
 def predict(responses):
     """
     生成器函数，用于大模型流式输出
@@ -198,9 +211,7 @@ def register():
 
 @app.post("/login")
 def login():
-    """
-    对比 static 文件夹下的 user.json 里面的用户信息，如果匹配则设置 local token，返回给前端
-    """
+    """登录路由"""
     # 读取用户信息
     with open("./static/user.json", "r", encoding="utf-8") as f:
         users = json.load(f)
@@ -243,39 +254,83 @@ def verify_token():
         return jsonify({"valid": True, "user": current_user}), 200
     # 如果token无效，返回错误信息
     except:
-        return jsonify({"valid": False, "message": "token 无效或已过期!"}), 400
+        return jsonify({"valid": False, "message": "token has expired!"}), 400
 
 
-@app.get("/agent/chat_stream")
+@app.route("/get-chat-history")
+def get_chat_history():
+    try:
+        verify_jwt_in_request()
+        current_user = get_jwt_identity()
+
+        with open("./static/user.json", "r", encoding="utf-8") as f:
+            users = json.load(f)
+            for user in users:
+                if user["username"] == current_user:
+                    return jsonify(user.get("chat_history", [])), 200
+
+        return jsonify([]), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 401
+
+
+@app.route("/agent/chat_stream")
 def agent_chat_stream():
     """
     大模型前端流式输出路由
     """
-    global bias, ideal_answers
+    global bias, ideal_answers, response_all
     # 人类断句相关参数初始化
     bias = 0
     ideal_answers = dict()
 
     user_talk = request.args.get("query")
+    current_user = get_jwt_identity()
+    
+    # 从用户聊天记录获取历史消息
+    with open("./static/user.json", "r", encoding="utf-8") as f:
+        users = json.load(f)
+        for user in users:
+            if user["username"] == current_user:
+                if "chat_history" not in user:
+                    user["chat_history"] = [{"role": "assistant", "content": background_info}]
+                messages = user["chat_history"]
+                break
+
+    # 添加新的消息
     if response_all:
-        messages.append(
-            {"role": "assistant", "content": response_all},
-        )
-    messages.append(
-        {"role": "user", "content": user_talk},
-    )
-    print(messages)
+        messages.append({"role": "assistant", "content": response_all})
+    messages.append({"role": "user", "content": user_talk})
+    
+    # 限制消息历史长度
+    MAX_HISTORY = 50
+    if len(messages) > MAX_HISTORY:
+        messages = messages[-MAX_HISTORY:]
+    
+    # 更新用户聊天记录
+    with open("./static/user.json", "r+", encoding="utf-8") as f:
+        users = json.load(f)
+        for user in users:
+            if user["username"] == current_user:
+                user["chat_history"] = messages
+                break
+        f.seek(0)
+        json.dump(users, f, indent=4, ensure_ascii=False)
+        f.truncate()
+
+    # 调用大模型
     responses = client.chat.completions.create(
-        model="charglm-3",  # 填写需要调用的模型名称
+        model="charglm-3",
         meta={
-            "user_info": "我是陆星辰，是一个男性，是一位知名导演，也是苏梦远的合作导演。我擅长拍摄音乐题材的电影。苏梦远对我的态度是尊敬的，并视我为良师益友。",
-            "bot_info": "苏梦远，本名苏远心，是一位当红的国内女歌手及演员。在参加选秀节目后，凭借独特的嗓音及出众的舞台魅力迅速成名，进入娱乐圈。她外表美丽动人，但真正的魅力在于她的才华和勤奋。苏梦远是音乐学院毕业的优秀生，善于创作，拥有多首热门原创歌曲。除了音乐方面的成就，她还热衷于慈善事业，积极参加公益活动，用实际行动传递正能量。在工作中，她对待工作非常敬业，拍戏时总是全身心投入角色，赢得了业内人士的赞誉和粉丝的喜爱。虽然在娱乐圈，但她始终保持低调、谦逊的态度，深得同行尊重。在表达时，苏梦远喜欢使用“我们”和“一起”，强调团队精神。",
+            "user_info": "我是陆星辰，是一个男性...",
+            "bot_info": "苏梦远，本名苏远心...",
             "bot_name": "苏梦远",
             "user_name": "陆星辰",
         },
         messages=messages,
         stream=True,
     )
+    
     generate = predict(responses)
     return app.response_class(
         stream_with_context(generate), mimetype="text/event-stream"
@@ -347,10 +402,41 @@ def agent_handle_audio_stream(data):
         )
 
 
+def encode_message_content(message):
+    """对消息内容进行 Base64 编码"""
+    if isinstance(message, dict) and "content" in message:
+        content = message["content"]
+        encoded_content = base64.b64encode(content.encode('utf-8')).decode('utf-8')
+        message["content"] = encoded_content
+    return message
+
+# 在更新用户聊天记录时进行编码
+messages = [encode_message_content(msg) for msg in messages]
+
+def decode_message_content(message):
+    """对消息内容进行 Base64 解码"""
+    if isinstance(message, dict) and "content" in message:
+        encoded_content = message["content"]
+        try:
+            decoded_content = base64.b64decode(encoded_content).decode('utf-8')
+            message["content"] = decoded_content
+        except:
+            pass  # 如果解码失败则保持原样
+    return message
+
+# 在读取用户聊天记录时进行解码
+messages = [decode_message_content(msg) for msg in messages]
+
 if __name__ == "__main__":
     # 根据操作系统选择服务器启动方式
     # if current_os == 'Windows':
-    socketio.run(app, port=80, host="0.0.0.0", allow_unsafe_werkzeug=True, debug=True)
+    socketio.run(
+        app,
+        port=80,
+        host="0.0.0.0",
+        allow_unsafe_werkzeug=True,
+        debug=True,  # 调试模式（开发环境）
+    )
     # else:
     # socketio.run(app, port=443, host='0.0.0.0', allow_unsafe_werkzeug=True,
     # ssl_context=('/ssl/cert.pem', '/ssl/cert.key'))

@@ -1,22 +1,56 @@
 [
     {
-        "username": "admin",
-        "password": "123456"
-    },
-    {
-        "username": "user",
-        "password": "123456"
-    },
-    {
-        "username": "123",
-        "password": "96cae35ce8a9b0244178bf28e4966c2ce1b8385723a96a6b838858cdd6ca0a1e"
-    },
-    {
-        "username": "1234",
-        "password": "96cae35ce8a9b0244178bf28e4966c2ce1b8385723a96a6b838858cdd6ca0a1e"
-    },
-    {
         "username": "23009201384",
-        "password": "96cae35ce8a9b0244178bf28e4966c2ce1b8385723a96a6b838858cdd6ca0a1e"
+        "password": "96cae35ce8a9b0244178bf28e4966c2ce1b8385723a96a6b838858cdd6ca0a1e",
+        "chat_history": [
+            {
+                "role": "user",
+                "content": "今天的戏份辛苦了"
+            },
+            {
+                "role": "assistant",
+                "content": "（微笑）谢谢关心，你也辛苦了"
+            },
+            {
+                "role": "user",
+                "content": "记得上周那场雨戏吗？"
+            },
+            {
+                "role": "assistant",
+                "content": "记得，那天雨很大，你还把伞给了我"
+            },
+            {
+                "role": "user",
+                "content": "其实那天的便当是我准备的"
+            },
+            {
+                "role": "assistant",
+                "content": "（惊讶）原来是你？难怪那天的便当特别合我胃口"
+            },
+            {
+                "role": "user",
+                "content": "我偷偷问了副导演你喜欢吃什么"
+            },
+            {
+                "role": "assistant",
+                "content": "（感动）你这么用心，我都不知道该说什么好了"
+            },
+            {
+                "role": "user",
+                "content": "因为我喜欢你"
+            },
+            {
+                "role": "assistant",
+                "content": "（微微脸红）我...其实我也一直很在意你"
+            },
+            {
+                "role": "user",
+                "content": "要不要一起去吃个晚饭？"
+            },
+            {
+                "role": "assistant",
+                "content": "好啊，正好我知道附近有家不错的餐厅"
+            }
+        ]
     }
 ]

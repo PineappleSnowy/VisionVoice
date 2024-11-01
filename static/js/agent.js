@@ -1,6 +1,60 @@
 var image_impt = null;
 var flag_board = 0;
 
+document.addEventListener('DOMContentLoaded', function() {
+    loadChatHistory();
+});
+
+/**
+ * @function loadChatHistory
+ * @description 加载聊天记录
+ */
+function loadChatHistory() {
+    const messagebackground = document.getElementById('chat-container');
+    
+    fetch('/get-chat-history', {
+        headers: {
+            "Authorization": `Bearer ${localStorage.getItem('token')}`
+        }
+    })
+    .then(response => response.json())
+    .then(history => {
+        history.forEach(msg => {
+            if(msg.role === 'user') {
+                // 创建用户消息
+                var messagesContainer_user = document.createElement('div');
+                messagesContainer_user.className = 'chat-messages-user';
+                var bubble = document.createElement('div');
+                bubble.className = 'chat-bubble';
+                var image_user = document.createElement('div');
+                image_user.className = 'chat-image-user';
+                bubble.textContent = msg.content;
+                
+                messagebackground.appendChild(messagesContainer_user);
+                messagesContainer_user.appendChild(bubble);
+                messagesContainer_user.appendChild(image_user);
+            } else if(msg.role === 'assistant') {
+                // 创建机器人消息
+                var image_bot = document.createElement('div');
+                image_bot.className = 'chat-image-bot';
+                var messagesContainer_bot = document.createElement('div');
+                messagesContainer_bot.className = 'chat-messages-bot';
+                var bubble_2 = document.createElement('div');
+                bubble_2.className = 'chat-bubble';
+                bubble_2.textContent = msg.content;
+                
+                messagesContainer_bot.appendChild(image_bot);
+                messagesContainer_bot.appendChild(bubble_2);
+                messagebackground.appendChild(messagesContainer_bot);
+            }
+        });
+        messagebackground.scrollTop = messagebackground.scrollHeight;
+    })
+    .catch(error => {
+        console.error('Error loading chat history:', error);
+    });
+}
+
 document.getElementById('send-button').addEventListener('click', function () {
     var input = document.getElementById('agent-chat-textarea');
     var message = input.value.trim();
@@ -17,7 +71,14 @@ document.getElementById('send-button').addEventListener('click', function () {
 });
 
 const socket = io();
+
+/**
+ * @function addMessage
+ * @description 添加用户或者机器人的消息
+ * @param {string} message 消息内容
+ */
 function addMessage(message) {
+    const token = localStorage.getItem('token');
     var index = 0;
     var messagebackground = document.getElementById('chat-container');
     var messagesContainer_user = document.createElement('div');
@@ -46,7 +107,11 @@ function addMessage(message) {
     var bubble_2 = document.createElement('div');
     bubble_2.className = 'chat-bubble';
     // bubble_2.textContent = message;
-    fetch(`/agent/chat_stream?query=${message}`)
+    fetch(`/agent/chat_stream?query=${message}`, {
+        headers: {
+            "Authorization": `Bearer ${token}`
+        }
+    })
         .then(response => {
             let reader = response.body.getReader();
 

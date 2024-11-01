@@ -36,7 +36,6 @@ login_button.addEventListener("click", () => {
             .then(data => {
                 if (data.code === 200) {
                     localStorage.setItem('token', data.access_token);
-                    localStorage.setItem('user', data.user);
                     localStorage.setItem('islogin', 1);
                     alert(data.message);
                     window.location.href = '/agent';
@@ -78,7 +77,7 @@ register_button.addEventListener("click", () => {
 
 // 检查是否处于登录状态
 document.addEventListener("DOMContentLoaded", () => {
-    if (localStorage.getItem('islogin') === '1') {
+    if (localStorage.getItem('islogin') === '1' && localStorage.getItem('token')) {
         window.location.href = '/agent';
     }
 });
