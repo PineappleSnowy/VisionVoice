@@ -5,18 +5,18 @@
     <title>智能聊天 - 视界之声</title>
     <meta
       name="viewport"
-      content="width=device-width, initial-scale=0.7, maximum-scale=0.7, user-scalable=0"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0 user-scalable=no"
     />
     <link rel="stylesheet" href="../static/css/agent.css" />
     <link rel="icon" href="../static/images/star.png" />
   </head>
 
   <body>
-    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
     <div id="main_page">
       <div id="chat-container">
         <!-- 聊天消息将在这里显示 -->
       </div>
+      <!-- 下部功能区 -->
       <div id="chat-input-container">
         <textarea id="agent-chat-textarea" placeholder="输入消息..."></textarea>
         <button id="send-button">
@@ -51,5 +51,6 @@
     </div>
     <script src="../static/js/auth.js"></script>
     <script src="../static/js/agent.js"></script>
+    <script src="../static/js/socket.io.min.js"></script>
   </body>
 </html>
