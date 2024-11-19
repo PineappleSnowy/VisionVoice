@@ -19,6 +19,10 @@
       </div>
       <!-- 下部功能区 -->
       <div id="chat-input-container">
+        <div class="pause"></div>
+        <a id="phone-button" href="/phone">
+          <img src="../static/images/phone.png" id="phone_icon" />
+        </a>
         <textarea id="agent-chat-textarea" placeholder="输入消息..."></textarea>
         <button id="send-button">
           <img src="../static/images/arrow_right.png" id="arrow_right" />
@@ -50,7 +54,10 @@
         <a href="/mine">我的</a>
       </div>
     </div>
+    <div id="microphone" class="voice"></div>
+    <audio id="audioPlayer" controls autoplay style="display: none"></audio>
     <script src="../static/js/auth.js"></script>
     <script src="../static/js/agent.js"></script>
+    <script src="../static/js/audio.js"></script>
   </body>
 </html>

@@ -1,5 +1,4 @@
-// document.write(window.innerWidth,"a",window.innerHeight);//412 * 784
-//定义基准rem
+//定义基准 rem
 const html = document.querySelector('html');
 html.style.fontSize = window.innerWidth * 100 / 412 + 'px';
 
@@ -17,13 +16,18 @@ const audio = document.querySelector('#audio');
 const waveShape = document.querySelector('#waveShape');
 let videoChat = false;
 let isFrontCamera = false;
+let mediaRecorder;
+let audioChunks = [];
+let silenceTimer;
+const SILENCE_THRESHOLD = 50; // 静音阈值
+const SILENCE_DURATION = 2000; // 静音持续时间阈值(2秒)
 
 goBack.addEventListener('click', () => {
-    window.location.href = './index.html';
+    window.location.href = '/agent';
 });
 
 hangUp.addEventListener('click', () => {
-    window.location.href = './index.html';
+    window.location.href = '/agent';
 });
 
 openCamera.addEventListener('click', async () => {
@@ -93,32 +97,121 @@ toggleCamera.addEventListener('click', async () => {
     }
 });
 
+// 初始化音频分析器
+async function initAudioAnalyser(stream) {
+    const audioContext = new AudioContext();
+    const analyser = audioContext.createAnalyser();
+    const microphone = audioContext.createMediaStreamSource(stream);
+    microphone.connect(analyser);
+    analyser.fftSize = 2048;
+    const bufferLength = analyser.frequencyBinCount;
+    const dataArray = new Float32Array(bufferLength);
+    
+    return {
+        analyser,
+        dataArray
+    };
+}
+
+// 检测音量
+function detectSilence(analyser, dataArray) {
+    analyser.getFloatTimeDomainData(dataArray);
+    let sum = 0;
+    for(let i = 0; i < dataArray.length; i++) {
+        sum += Math.abs(dataArray[i]);
+    }
+    const average = sum / dataArray.length;
+    const db = 20 * Math.log10(average);
+    return db < SILENCE_THRESHOLD;
+}
+
+/**
+ * @description 在页面加载完成后初始化音频分析器
+ */
 window.onload = async () => {
     try {
         audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-
-        // audio.srcObject = audioStream;
-        vudio = new window.Vudio(audioStream, waveShape, {
-            effect: 'waveform', // 当前只有'waveform'这一个效果，还有lighting效果
-            accuracy: 16, // 精度,实际表现为波形柱的个数，范围16-16348，必须为2的N次方
-            width: window.innerWidth * 100 / 412 * 1.5, // canvas宽度，会覆盖canvas标签中定义的宽度
-            height: window.innerWidth * 100 / 412 * 1, // canvas高度，会覆盖canvas标签中定义的高度
-            waveform: {
-                maxHeight: 80, // 最大波形高度
-                minHeight: 0, // 最小波形高度
-                spacing: 5, // 波形间隔
-                color: '#000', // 波形颜色，可以传入数组以生成渐变色
-                shadowBlur: 0, // 阴影模糊半径
-                shadowColor: '#f00', // 阴影颜色
-                fadeSide: true, // 渐隐两端
-                horizontalAlign: 'center', // 水平对齐方式，left/center/right
-                verticalAlign: 'middle', // 垂直对齐方式 top/middle/bottom
-                radius: 20 //添加属性，设置圆角
-            }
+        const { analyser, dataArray } = await initAudioAnalyser(audioStream);
         
+        // 创建媒体录制器
+        mediaRecorder = new MediaRecorder(audioStream);
+
+        // 当媒体录制器有数据可用时，将数据添加到音频数据列表中
+        mediaRecorder.ondataavailable = (event) => {
+            console.log('[phone.js][ondataavailable] event: %s', event);
+            audioChunks.push(event.data);
+        };
+
+        // 当媒体录制器停止时，将音频数据上传到后端
+        mediaRecorder.onstop = async () => {
+            const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+            const formData = new FormData();
+            formData.append('audio_data', audioBlob);
+            formData.append('sample_rate', '16000');
+            
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch('/agent/upload_audio', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+            } catch (error) {
+                console.log('[phone.js][onstop] error: %s', error.message);
+            }
+            
+            audioChunks = [];
+            
+            // 重新开始录音
+            mediaRecorder.start();
+        };
+        
+        // 开始录音并检测静音
+        mediaRecorder.start();
+        
+        // 定期检查是否静音
+        function checkSilence() {
+            if(detectSilence(analyser, dataArray)) {
+                if(!silenceTimer) {
+                    silenceTimer = setTimeout(() => {
+                        mediaRecorder.stop();
+                        silenceTimer = null;
+                    }, SILENCE_DURATION);
+                }
+            } else {
+                if(silenceTimer) {
+                    clearTimeout(silenceTimer);
+                    silenceTimer = null;
+                }
+            }
+            requestAnimationFrame(checkSilence);
+        }
+        
+        checkSilence();
+        
+        // 初始化音频可视化
+        vudio = new window.Vudio(audioStream, waveShape, {
+            effect: 'waveform',
+            accuracy: 16,
+            width: window.innerWidth * 100 / 412 * 1.5,
+            height: window.innerWidth * 100 / 412 * 1,
+            waveform: {
+                maxHeight: 80,
+                minHeight: 0,
+                spacing: 5,
+                color: '#000',
+                shadowBlur: 0,
+                shadowColor: '#f00',
+                fadeSide: true,
+                horizontalAlign: 'center',
+                verticalAlign: 'middle',
+                radius: 20
+            }
         });
         vudio.dance();
-    }catch(err) {
+    } catch(err) {
         alert(err);
     }
 };

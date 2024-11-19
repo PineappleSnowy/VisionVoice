@@ -16,8 +16,8 @@ async function sha256(message) {
     return hashHex;
 }
 
-// 登录
-login_button.addEventListener("click", () => {
+// 登录处理函数
+const handleLogin = () => {
     const username = document.getElementById("username").value;
     const password = document.getElementById("password").value;
 
@@ -39,14 +39,30 @@ login_button.addEventListener("click", () => {
                     localStorage.setItem('islogin', 1);
                     alert(data.message);
                     window.location.href = '/agent';
-                } else {
-                    alert(data.message);
                 }
             }).catch(error => {
                 console.error('Error:', error);
                 alert('登录失败，请重试');
             });
     });
+};
+
+// 防止重复触发的标志
+let touchStarted = false;
+
+// 添加 touchstart 事件
+login_button.addEventListener("tap", (e) => {
+    touchStarted = true;
+    handleLogin();
+    e.preventDefault(); // 阻止默认行为
+});
+
+// 修改 click 事件
+login_button.addEventListener("click", (e) => {
+    if (!touchStarted) { // 只有在没有触发 touchstart 的情况下才执行
+        handleLogin();
+    }
+    touchStarted = false;
 });
 
 // 注册
@@ -81,3 +97,4 @@ document.addEventListener("DOMContentLoaded", () => {
         window.location.href = '/agent';
     }
 });
+

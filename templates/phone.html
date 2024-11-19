@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0 user-scalable=no">
     <title>与智能体通话</title>
     <link rel="stylesheet" href="../static/css/phone.css">
+    <script src="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/socket.io/4.4.1/socket.io.min.js"></script>
     <!-- 引入fa字体图标和音频可视化库 -->
     <script src="https://kit.fontawesome.com/11023f265d.js" crossorigin="anonymous"></script>
     <script src="../static/js/vudio.js"></script>
@@ -24,7 +25,10 @@
         <i class="fa-solid fa-video openCamera"></i>
         <i class="fa-solid fa-phone-slash hangUp"></i>
     </div>
-    
+    <div id="microphone" class="voice"></div>
+    <audio id="audioPlayer" controls autoplay style="display: none"></audio>
     <script src="../static/js/phone.js"></script>
+    <script src="../static/js/audio.js"></script>
+    <script src="../static/js/auth.js"></script>
 </body>
 </html>

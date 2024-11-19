@@ -1,6 +1,8 @@
 var image_impt = null;
 var flag_board = 0;
 
+const socket = io();
+
 // 在 DOM 加载完成后获取聊天记录
 document.addEventListener('DOMContentLoaded', function() {
     loadChatHistory();
@@ -71,14 +73,13 @@ document.getElementById('send-button').addEventListener('click', function () {
     image_impt = null;
 });
 
-const socket = io();
-
 /**
  * @function addMessage
  * @description 添加用户或者机器人的消息
  * @param {string} message 消息内容
  */
 function addMessage(message) {
+    console.log('[agent.js][addMessage] message: %s', message);
     const token = localStorage.getItem('token');
     var index = 0;
     var messagebackground = document.getElementById('chat-container');
@@ -124,6 +125,7 @@ function addMessage(message) {
                 }
                 let jsonString = new TextDecoder().decode(value); // 将字节流转换为字符串
 
+                // console.log('[agent.js][addMessage] agent_stream_audio: %s', jsonString);
                 socket.emit("agent_stream_audio", { "index": index, "answer": jsonString })
                 index += 1;
                 bubble_2.textContent += jsonString;
@@ -140,6 +142,15 @@ function addMessage(message) {
     messagebackground.appendChild(messagesContainer_bot);
     messagebackground.scrollTop = messagebackground.scrollHeight;
 }
+
+const pauseDiv = document.querySelector('.pause');
+pauseDiv.addEventListener('click', function () {
+    audioPlayer.pause()
+    audioList = [];
+    audioIndex = 0;
+    console.log('audio pause');
+    pauseDiv.style.backgroundImage = `url('${'./static/images/pause_inactive.png'}')`;
+});
 
 //捕捉用户选择的图像
 document.getElementById('photo').addEventListener('change', function (e) {
