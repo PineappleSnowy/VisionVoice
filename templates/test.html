@@ -7,7 +7,7 @@
     <title>Document</title>
     <script src="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/socket.io/4.4.1/socket.io.min.js"></script>
     <script src="../static/js/vudio.js"></script>
-    <script src="../static/js/voice.js"></script>
+    <script src="../static/js/recorder.js"></script>
     <style>
 
     </style>
@@ -63,7 +63,7 @@
     }
 
     // 静音阈值(单位:分贝)
-    const SILENCE_THRESHOLD = 50;
+    const SILENCE_THRESHOLD = -30;
 
     /**
      * @function detectSilence
@@ -86,10 +86,10 @@
     window.onload = async () => {
         // 获取状态显示元素
         const statusElement = document.getElementById('recordingStatus');
-        let isRecording = false;
 
         // 获取音频流
-        let audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        let audioStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+        console.log("[test.html][window.onload] 创建 getUserMedia 音频流成功...");
 
         // 初始化音频分析器
         const { analyser, dataArray } = await initAudioAnalyser(audioStream);
@@ -100,74 +100,63 @@
         // 音频数据列表
         let audioChunks = [];
 
-        // 当媒体录制器有数据可用时，将数据添加到音频数据列表中
-        mediaRecorder.ondataavailable = (event) => {
-            console.log('[phone.js][ondataavailable] event: %s', event);
-            audioChunks.push(event.data);
-        };
-
-        // 当媒体录制器停止时，将音频数据上传到后端
-        mediaRecorder.onstop = async () => {
-            statusElement.textContent = '录音信息：录音完成';
-            statusElement.style.backgroundColor = '#90EE90';
-            const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-            const formData = new FormData();
-            formData.append('audio_data', audioBlob);
-            formData.append('sample_rate', '16000');
-
-            try {
-                const token = localStorage.getItem('token');
-                // 上传音频数据，激活 agent_speech_rec 事件
-                fetch('/agent/upload_audio', {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-            } catch (error) {
-                console.log('[phone.js][onstop] error: %s', error.message);
-            }
-
-            // 清空音频数据列表
-            audioChunks = [];
-        };
-
         // 静音定时器
         let silenceTimer;
 
-        // 静音持续时间阈值(2秒)
+        // 静音持续时间阈值（单位：毫秒）
         const SILENCE_DURATION = 2000;
 
-        // 定期检查是否静音
+        // 是否录制完毕
+        let recordingFinished = false;
+
+        // 检测用户是否停止讲话
         function checkSilence() {
+            // console.log('[phone.js][checkSilence] 检测用户讲话事件...');
+
+            // 如果用户停止讲话，则设置短暂的静音等待
             if (detectSilence(analyser, dataArray)) {
+
+                // 如果静音定时器不存在，则设置静音定时器
                 if (!silenceTimer) {
                     silenceTimer = setTimeout(() => {
-                        mediaRecorder.stop();
-                        silenceTimer = null;
-                        isRecording = false;
-                        setTimeout(() => {
-                            statusElement.textContent = '录音信息：等待说话...';
-                            statusElement.style.backgroundColor = '#f0f0f0';
-                        }, 2000);
+                        stopRecording();
+
+                        // 创建 WAV blob 并传递给 createDownloadLink
+                        rec.exportWAV(upload_audio);
+
+                        // 是否录制完毕
+                        recordingFinished = true;
+
                     }, SILENCE_DURATION);
                 }
-            } else {
+                if (statusElement.textContent != '录音信息：等待说话...') {
+                    console.log('[test.html][checkSilence] 用户停止讲话...');
+                    statusElement.textContent = '录音信息：等待说话...';
+                    statusElement.style.backgroundColor = '#f0f0f0';
+                }
+            }
+            // 如果用户正在讲话，则设置录音状态
+            else {
                 if (silenceTimer) {
                     clearTimeout(silenceTimer);
                     silenceTimer = null;
                 }
-                if (!isRecording) {
-                    isRecording = true;
-                    statusElement.textContent = '录音信息：正在录音...';
+                if (!recordingFinished) {
+                    continueRecording();
+                } else {
+                    startRecording();
+                    recordingFinished = false;
+                }
+                if (statusElement.textContent != '录音信息：正在讲话...') {
+                    console.log('[test.html][checkSilence] 用户正在讲话...');
+                    statusElement.textContent = '录音信息：正在讲话...';
                     statusElement.style.backgroundColor = '#FFB6C1';
                 }
             }
-            requestAnimationFrame(checkSilence);
         }
 
-        checkSilence();
+        // 使用 setInterval，每 333ms 检查一次
+        setInterval(checkSilence, 333);
 
         // ----- 音频波形可视化 start -----
         const waveShape = document.querySelector('#waveShape');
@@ -194,10 +183,72 @@
         // ----- 音频波形可视化 end -----
 
 
+        /* 处理音频录制 start 
+        ------------------------------------------------------------*/
+
+        function startRecording() {
+
+            // 创建新的音频上下文，这是Web Audio API的核心对象
+            audioContext = new AudioContext();
+
+            // 将麦克风的音频流(stream)转换为音频源节点
+            input = audioContext.createMediaStreamSource(audioStream);
+
+            // 创建一个新的 Recorder 实例，用于录制音频
+            // numChannels: 1 表示使用单声道录音，用于减少文件大小
+            rec = new Recorder(input, { numChannels: 1 })
+
+            // 启动录制过程
+            rec.record()
+
+            // console.log("[voice.js][startRecording] Recording start.");
+        }
+
+        function continueRecording() {
+
+            // 启动录制过程
+            rec.record()
+
+        }
+
+        function stopRecording() {
+            console.log("[test.html][stopRecording] 停止录音...");
+            // 告诉录制器停止录制
+            rec.stop();
+
+            // 停止麦克风访问
+            // audioStream.getAudioTracks()[0].stop();
+
+            // console.log("[voice.js][stopRecording] Recording stop.");
+        }
+
+
+        function upload_audio(blob) {
+            var xhr = new XMLHttpRequest();
+            xhr.onload = function (e) {
+                if (this.readyState === 4) {
+                    console.log("[test.html][upload_audio] response:", e.target.responseText);
+                }
+            };
+            var fd = new FormData();
+            fd.append("audio_data", blob, "recorded_audio.wav");
+            var sampleRate = audioContext.sampleRate;
+            fd.append("sample_rate", sampleRate);
+            const token = localStorage.getItem('token');
+            console.log("[test.html][upload_audio] 上传音频数据...");
+            xhr.open("POST", "/agent/upload_audio", true);
+            xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+            xhr.send(fd);
+        }
+        /* 处理音频录制 end 
+        ------------------------------------------------------------*/
+
         // 开始录音
         statusElement.textContent = '录音信息：开始录音...';
-        mediaRecorder.start();
+        // mediaRecorder.start();
+        startRecording();
     }
+
 
     /* 处理音频播放 start 
     ------------------------------------------------------------*/

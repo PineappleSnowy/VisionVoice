@@ -403,6 +403,8 @@ def agent_upload_audio():
     # 语音识别
     rec_result = speech_rec(resampled_audio_data)
 
+    print("语音识别结果：", rec_result)
+    
     # 语音识别结果发送到前端
     socketio.emit("agent_speech_rec", {"rec_result": rec_result})
 
