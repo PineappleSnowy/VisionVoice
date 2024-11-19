@@ -1,3 +1,9 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
 html::-webkit-scrollbar {
     display: none;
 }
@@ -172,20 +178,31 @@ p {
 
 #agent-chat-textarea{
     display: flex;
-    min-height: 40px;
-    max-height: 100px;
+    min-height: 20px;
+    max-height: 50px;
     overflow-y: auto;
     resize: none;
     width: auto;
     position: absolute;
     bottom: 0;
-    scrollbar-width: none;
     right: 1px;
     left: 1px;
-    background-color: #211f1f;
+    background-color: rgba(33, 31, 31, 0.8);
     color: #fff;
-    border-radius: 8px;
-    padding-right: 100px;
+    border-radius: 10px 10px 0 0;
+    padding: 10px 100px 10px 15px;
+    font-size: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+    line-height: 1.5;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+#agent-chat-textarea:focus {
+    outline: none;
+    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.2);
 }
 .phone {
     display: flex;
@@ -209,6 +226,7 @@ p {
     position: absolute;
     top: 10%;
     width: 100%;
+    padding: 10px;
     height: 70%;
     flex-direction: column;
     background-color: rgba(red, green, blue, 0);
@@ -256,7 +274,6 @@ p {
     background-image: url('../images/user.png');
     width: 40px;
     height: 40px;
-    padding: 5px;
     background-size: cover;
     border-radius: 5px;
 }
@@ -364,3 +381,34 @@ p {
 .slide-down{
     animation: slidedown 0.5s ease-in-out forwards;
 }
+
+#phone-button {
+  position: absolute;
+  left: 0px;
+  top: -35px;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#phone_icon {
+  width: 24px;
+  height: 24px;
+}
+
+.pause {
+    width: 60px;
+    height: 60px;
+    position: absolute;
+    bottom: 185px;
+    left: 10px;
+    cursor: pointer;
+    background-image: url(../images/pause_inactive.png);
+    background-size: cover;
+  }

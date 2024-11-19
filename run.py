@@ -3,6 +3,7 @@
 """
 
 # 第三方库
+from datetime import timedelta
 from flask import Flask, stream_with_context, render_template, request, jsonify
 from flask_socketio import SocketIO
 from flask_cors import CORS
@@ -92,6 +93,12 @@ def mine():
     return render_template("mine.html")
 
 
+@app.route("/phone", methods=["GET"])
+def phone():
+    """电话路由"""
+    return render_template("phone.html")
+
+
 # ----- 加载全局变量 -----
 # 加载 api_key
 with open("./static/api.json", "r", encoding="utf-8") as f:
@@ -154,6 +161,7 @@ def change_sample_rate(input_file, target_sample_rate, ori_sample_rate):
     with open(input_file, "rb") as speech_file:
         audio_data = speech_file.read()
         audio_data = np.frombuffer(audio_data, dtype=np.int16)
+
     resampled_audio_data = samplerate.resample(audio_data, ratio, converter)
 
     return resampled_audio_data.astype(np.int16).tobytes()
@@ -257,7 +265,7 @@ def login():
         if user["username"] == username and user["password"] == password:
             print("登录成功")
             # 设置 local token
-            access_token = create_access_token(identity=username)
+            access_token = create_access_token(identity=username, expires_delta=timedelta(hours=1))
             return (
                 jsonify(
                     {"message": "登录成功", "code": 200, "access_token": access_token}
@@ -350,7 +358,7 @@ def agent_chat_stream():
         model="charglm-3",
         meta={
             "user_info": "我是陆星辰，是一个男性...",
-            "bot_info": "苏梦远，本名苏远心...",
+            "bot_info": "苏梦远，本名苏远心...（结尾一定要有句号等结尾符号）",
             "bot_name": "苏梦远",
             "user_name": "陆星辰",
         },
@@ -373,13 +381,16 @@ def agent_upload_audio():
         return "No file part in the request", 400
 
     file = request.files["audio_data"]
-    # 前端音频采样率
+
+    # 前端原始文件的音频采样率
     ori_sample_rate = int(request.form.get("sample_rate"))
+
     if file.filename == "":
-        return "No selected file", 400
+        return "file is empty", 400
 
     # 保存文件为.wav格式
     file.save("agent_files/audio.wav")
+
     # 修改采样率
     resampled_audio_data = change_sample_rate(
         "agent_files/audio.wav", 16000, ori_sample_rate
@@ -387,17 +398,24 @@ def agent_upload_audio():
 
     # 语音识别
     rec_result = speech_rec(resampled_audio_data)
+
     # 语音识别结果发送到前端
     socketio.emit("agent_speech_rec", {"rec_result": rec_result})
 
-    return "File uploaded successfully and processed", 200
+    return jsonify({"message": "File uploaded successfully and processed"}), 200
 
 
 # ----- socket 监听函数 -----
 @socketio.on("agent_stream_audio")
 def agent_handle_audio_stream(data):
     """
-    处理前端发来的大模型响应token并以人类断句的方式合成音频再发往前端
+    处理音频流路由。
+
+    Args:
+        data: 包含大模型响应token的数据。
+
+    Description:
+        处理前端发来的大模型响应token，以人类断句的方式合成音频再发往前端。
     """
     global bias
     # 寻找最后一次断句下标
@@ -421,8 +439,16 @@ def agent_handle_audio_stream(data):
         if bad_answer:
             ideal_answers[data["index"] - bias + 1] = bad_answer
         data["bias"] = bias
+
+        # 发送合成的语音到前端，对音频进行播放
+        input_text = ideal_answers[data["index"] - bias]
+        # print('data["index"] - data["bias"]:', data["index"] - data["bias"])
+        # print('data["index"]', data["index"])
+        # print('data["bias"]:', data["bias"])
         audio_chunk = agent_audio_generate(ideal_answers[data["index"] - bias])
         # 发送合成的语音到前端
+        print("TTS 处理完毕:", input_text)
+        
         socketio.emit(
             "agent_play_audio_chunk",
             {"index": data["index"] - data["bias"], "audio_chunk": audio_chunk},

@@ -9,7 +9,11 @@
     />
     <link rel="stylesheet" href="../static/css/agent.css" />
     <link rel="icon" href="../static/images/star.png" />
+<<<<<<< HEAD
     <script src="https://kit.fontawesome.com/11023f265d.js" crossorigin="anonymous"></script>
+=======
+    <script src="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/socket.io/4.4.1/socket.io.min.js"></script>
+>>>>>>> 98ca672cbe7759555d3b94e67985d29307396462
   </head>
 
   <body>
@@ -20,12 +24,22 @@
       
       <!-- 下部功能区 -->
       <div id="chat-input-container">
+<<<<<<< HEAD
         <a href="/phone" class="phone" tabindex="0" aria-label="与智能体通话">
           <i class="fa-solid fa-phone"></i>
         </a>
         <textarea id="agent-chat-textarea" placeholder="输入消息..." aria-label="输入消息"></textarea>
         <button id="send-button" tabindex="0" aria-label="发送消息">
           <img src="../static/images/arrow_right.png" id="arrow_right" alt="发送消息" />
+=======
+        <div class="pause"></div>
+        <a id="phone-button" href="/phone">
+          <img src="../static/images/phone.png" id="phone_icon" />
+        </a>
+        <textarea id="agent-chat-textarea" placeholder="输入消息..."></textarea>
+        <button id="send-button">
+          <img src="../static/images/arrow_right.png" id="arrow_right" />
+>>>>>>> 98ca672cbe7759555d3b94e67985d29307396462
         </button>
         <button id="more_function_button" tabindex="0" aria-label="更多功能1">
           <img
@@ -56,8 +70,10 @@
         <a href="/mine" tabindex="0" aria-label="我的">我的</a>
       </div>
     </div>
+    <div id="microphone" class="voice"></div>
+    <audio id="audioPlayer" controls autoplay style="display: none"></audio>
     <script src="../static/js/auth.js"></script>
     <script src="../static/js/agent.js"></script>
-    <script src="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/socket.io/4.4.1/socket.io.min.js"></script>
+    <script src="../static/js/audio.js"></script>
   </body>
 </html>
