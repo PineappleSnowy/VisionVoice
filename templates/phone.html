@@ -10,19 +10,19 @@
     <script src="../static/js/vudio.js"></script>
 </head>
 <body>
-    <i class="fa-solid fa-chevron-left goBack"></i>
-    <i class="fa-solid fa-repeat toggleCamera" style="display: none;"></i>
-    <video autoplay style="display: none;">您的浏览器不支持视频通话</video>
+    <i class="fa-solid fa-chevron-left goBack" tabindex="0" aria-label="返回主页"></i>
+    <i class="fa-solid fa-repeat toggleCamera" style="display: none;" tabindex="0" aria-label="切换摄像头"></i>
+    <video autoplay style="display: none;" aria-label="视频通话窗口">您的浏览器不支持视频通话</video>
     <div class="container">
-        <img src="../static/images/bot.png" alt="智能体头像">
+        <img src="../static/images/bot.png" alt="智能体头像" aria-label="智能体头像">
     </div>
 
     <!-- 控件部分 -->
     <div class="controller">
-        <canvas id="waveShape"></canvas>
-        <audio autoplay id="audio"></audio>
-        <i class="fa-solid fa-video openCamera"></i>
-        <i class="fa-solid fa-phone-slash hangUp"></i>
+        <canvas id="waveShape" aria-label="音频波形图"></canvas>
+        <audio autoplay id="audio" aria-label="通话音频"></audio>
+        <i class="fa-solid fa-video openCamera" tabindex="0" aria-label="打开摄像头"></i>
+        <i class="fa-solid fa-phone-slash hangUp" tabindex="0" aria-label="挂断电话"></i>
     </div>
     
     <script src="../static/js/phone.js"></script>

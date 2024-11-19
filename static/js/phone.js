@@ -19,11 +19,11 @@ let videoChat = false;
 let isFrontCamera = false;
 
 goBack.addEventListener('click', () => {
-    window.location.href = './index.html';
+    window.location.href = '/agent';
 });
 
 hangUp.addEventListener('click', () => {
-    window.location.href = './index.html';
+    window.location.href = '/agent';
 });
 
 openCamera.addEventListener('click', async () => {

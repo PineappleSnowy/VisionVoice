@@ -2,6 +2,10 @@ html {
   /* 只是占个位置，不然less会编译出空选择器 */
   font-size: 16px;
 }
+html::-webkit-scrollbar {
+  display: none;
+}
+
 html body {
   margin: 0;
   padding: 0;
