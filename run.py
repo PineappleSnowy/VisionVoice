@@ -93,12 +93,6 @@ def mine():
     return render_template("mine.html")
 
 
-@app.route("/phone", methods=["GET"])
-def phone():
-    """电话路由"""
-    return render_template("phone.html")
-
-
 # ----- 加载全局变量 -----
 # 加载 api_key
 with open("./static/api.json", "r", encoding="utf-8") as f:
@@ -460,7 +454,7 @@ if __name__ == "__main__":
     # if current_os == 'Windows':
     socketio.run(
         app,
-        port=80,
+        port=5000,
         host="0.0.0.0",
         allow_unsafe_werkzeug=True,
         debug=True,  # 调试模式（开发环境）

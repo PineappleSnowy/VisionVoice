@@ -204,22 +204,7 @@ p {
     border-color: rgba(255, 255, 255, 0.2);
     box-shadow: 0 2px 15px rgba(0, 0, 0, 0.2);
 }
-.phone {
-    display: flex;
-    width: 50px;
-    height: 50px;
-    position: fixed;
-    bottom: 100px;
-    left: 10px;
-    font-size: 30px;
-    background-color: #44498c;
-    justify-content: center;
-    align-items: center;
-    border-radius: 25px;
-}
-.phone i{
-    color: white;
-}
+
 
 #chat-container{
     display: flex;
@@ -384,10 +369,10 @@ p {
 
 #phone-button {
   position: absolute;
-  left: 0px;
-  top: -35px;
-  width: 40px;
-  height: 40px;
+  left: 10px;
+  top: -50px;
+  width: 50px;
+  height: 50px;
   border: none;
   border-radius: 50%;
   background: transparent;
@@ -398,8 +383,8 @@ p {
 }
 
 #phone_icon {
-  width: 24px;
-  height: 24px;
+  width: 40px;
+  height: 40px;
 }
 
 .pause {
