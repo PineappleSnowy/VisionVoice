@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/socket.io/4.4.1/socket.io.min.js"></script>
+    <script src="../static/js/vudio.js"></script>
+    <script src="../static/js/voice.js"></script>
+    <style>
+
+    </style>
+</head>
+
+<body>
+    <!-- 音频波形可视化 -->
+    <canvas id="waveShape"></canvas>
+
+    <!-- 麦克风按钮 -->
+    <div id="microphone" style="display: none;"></div>
+
+    <!-- 音频播放容器 -->
+    <audio id="audioPlayer" controls autoplay style="display: none"></audio>
+
+    <!-- 添加录音状态显示 -->
+    <div id="recordingStatus"
+        style="position: fixed; top: 20px; right: 20px; padding: 10px; background-color: #f0f0f0; border-radius: 5px;">
+        录音信息
+    </div>
+
+    <!-- 添加音频播放状态显示 -->
+    <div id="audioPlayingStatus"
+        style="position: fixed; top: 80px; right: 20px; padding: 10px; background-color: #f0f0f0; border-radius: 5px;">
+        音频播放信息
+    </div>
+
+    <!-- 录音结果显示 -->
+    <div id="recordingResult">
+        录音结果...
+    </div>
+</body>
+<script>
+    /**
+     * @function initAudioAnalyser
+     * @description 初始化音频分析器
+     * @param {MediaStream} stream 音频流
+     * @returns {Object} 音频分析器和数据数组
+     */
+    async function initAudioAnalyser(stream) {
+        const audioContext = new AudioContext();
+        const analyser = audioContext.createAnalyser();
+        const microphone = audioContext.createMediaStreamSource(stream);
+        microphone.connect(analyser);
+        analyser.fftSize = 2048;
+        const bufferLength = analyser.frequencyBinCount;
+        const dataArray = new Float32Array(bufferLength);
+
+        return {
+            analyser,
+            dataArray
+        };
+    }
+
+    // 静音阈值(单位:分贝)
+    const SILENCE_THRESHOLD = 50;
+
+    /**
+     * @function detectSilence
+     * @description 检测用户是否已经停止讲话
+     * @param {AnalyserNode} analyser 音频分析器
+     * @param {Float32Array} dataArray 数据数组
+     * @returns {Boolean} 用户是否已经停止讲话
+     */
+    function detectSilence(analyser, dataArray) {
+        analyser.getFloatTimeDomainData(dataArray);
+        let sum = 0;
+        for (let i = 0; i < dataArray.length; i++) {
+            sum += Math.abs(dataArray[i]);
+        }
+        const average = sum / dataArray.length;
+        const db = 20 * Math.log10(average);
+        return db < SILENCE_THRESHOLD;
+    }
+
+    window.onload = async () => {
+        // 获取状态显示元素
+        const statusElement = document.getElementById('recordingStatus');
+        let isRecording = false;
+
+        // 获取音频流
+        let audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+        // 初始化音频分析器
+        const { analyser, dataArray } = await initAudioAnalyser(audioStream);
+
+        // 创建媒体录制器
+        let mediaRecorder = new MediaRecorder(audioStream);
+
+        // 音频数据列表
+        let audioChunks = [];
+
+        // 当媒体录制器有数据可用时，将数据添加到音频数据列表中
+        mediaRecorder.ondataavailable = (event) => {
+            console.log('[phone.js][ondataavailable] event: %s', event);
+            audioChunks.push(event.data);
+        };
+
+        // 当媒体录制器停止时，将音频数据上传到后端
+        mediaRecorder.onstop = async () => {
+            statusElement.textContent = '录音信息：录音完成';
+            statusElement.style.backgroundColor = '#90EE90';
+            const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+            const formData = new FormData();
+            formData.append('audio_data', audioBlob);
+            formData.append('sample_rate', '16000');
+
+            try {
+                const token = localStorage.getItem('token');
+                // 上传音频数据，激活 agent_speech_rec 事件
+                fetch('/agent/upload_audio', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+            } catch (error) {
+                console.log('[phone.js][onstop] error: %s', error.message);
+            }
+
+            // 清空音频数据列表
+            audioChunks = [];
+        };
+
+        // 静音定时器
+        let silenceTimer;
+
+        // 静音持续时间阈值(2秒)
+        const SILENCE_DURATION = 2000;
+
+        // 定期检查是否静音
+        function checkSilence() {
+            if (detectSilence(analyser, dataArray)) {
+                if (!silenceTimer) {
+                    silenceTimer = setTimeout(() => {
+                        mediaRecorder.stop();
+                        silenceTimer = null;
+                        isRecording = false;
+                        setTimeout(() => {
+                            statusElement.textContent = '录音信息：等待说话...';
+                            statusElement.style.backgroundColor = '#f0f0f0';
+                        }, 2000);
+                    }, SILENCE_DURATION);
+                }
+            } else {
+                if (silenceTimer) {
+                    clearTimeout(silenceTimer);
+                    silenceTimer = null;
+                }
+                if (!isRecording) {
+                    isRecording = true;
+                    statusElement.textContent = '录音信息：正在录音...';
+                    statusElement.style.backgroundColor = '#FFB6C1';
+                }
+            }
+            requestAnimationFrame(checkSilence);
+        }
+
+        checkSilence();
+
+        // ----- 音频波形可视化 start -----
+        const waveShape = document.querySelector('#waveShape');
+        let vudio;
+        vudio = new window.Vudio(audioStream, waveShape, {
+            effect: 'waveform',
+            accuracy: 16,
+            width: window.innerWidth * 100 / 412 * 1.5,
+            height: window.innerWidth * 100 / 412 * 1,
+            waveform: {
+                maxHeight: 80,
+                minHeight: 0,
+                spacing: 5,
+                color: '#000',
+                shadowBlur: 0,
+                shadowColor: '#f00',
+                fadeSide: true,
+                horizontalAlign: 'center',
+                verticalAlign: 'middle',
+                radius: 20
+            }
+        });
+        vudio.dance();
+        // ----- 音频波形可视化 end -----
+
+
+        // 开始录音
+        statusElement.textContent = '录音信息：开始录音...';
+        mediaRecorder.start();
+    }
+
+    /* 处理音频播放 start 
+    ------------------------------------------------------------*/
+
+    // 创建 socket 连接
+    const socket = io();
+
+    // 保存音频数据的列表
+    var audioList = [];
+
+    // 当前播放的音频索引
+    var audioIndex = 0;
+
+    // 获取音频播放器元素
+    const audioPlayer = document.getElementById('audioPlayer');
+
+    // 获取音频播放状态显示元素
+    const audioPlayingStatus = document.getElementById('audioPlayingStatus');
+
+    // 播放下一个音频
+    function playNextAudio() {
+        if (audioList[audioIndex] != undefined) {
+            pauseDiv.style.backgroundImage = `url('${'./static/images/pause.png'}')`;
+            var audioBlob = new Blob([audioList[audioIndex]], { type: 'audio/mp3' });
+            var audioURL = URL.createObjectURL(audioBlob);
+
+            audioPlayer.src = audioURL;
+
+            try {
+                audioPlayingStatus.textContent = '音频播放信息：音频片段开始播放...';
+                console.log('音频播放信息：音频片段开始播放...');
+                audioPlayer.play();
+            } catch (error) {
+                audioPlayingStatus.textContent = '音频播放信息：音频片段播放失败.';
+                console.log('音频播放信息：音频片段播放失败.');
+                console.log('错误信息：', error);
+            }
+        } else {
+            console.log('undefined audioIndex: %d', audioIndex);
+        }
+    }
+
+    // 监听音频播放结束事件
+    audioPlayer.onended = function () {
+        audioIndex++;
+        pauseDiv.style.backgroundImage = `url('${'./static/images/pause_inactive.png'}')`;
+        playNextAudio();
+    };
+
+    // 监听后端发送的 agent_play_audio_chunk 事件
+    socket.on('agent_play_audio_chunk', function (data) {
+        var index = data['index'];
+        var audioData = data['audio_chunk']; // 后端发送的音频数据
+
+        // 将音频数据添加到音频列表
+        audioList[index] = audioData;
+
+        // 如果当前没有音频正在播放，开始播放
+        if (audioPlayer.paused) {
+            audioPlayer.pause();
+            playNextAudio();
+        }
+    });
+
+    // 获取录音结果显示元素
+    const recordingResult = document.getElementById('recordingResult');
+
+    // 监听后端发送的 agent_speech_rec 语音识别事件
+    socket.on('agent_speech_rec', function (data) {
+        var rec_result = data['rec_result'];
+        console.log('[audio.js][socket.on][agent_speech_rec] rec_result: %s', rec_result);
+        recordingResult.textContent = rec_result;
+    })
+    /* 处理音频播放 end
+    ------------------------------------------------------------*/
+</script>
+
+</html>

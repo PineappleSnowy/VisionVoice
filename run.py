@@ -23,6 +23,7 @@ import base64
 # 自定义函数
 from agent_files.agent_speech_rec import speech_rec
 from agent_files.agent_speech_synthesis import agent_audio_generate
+from lib.debugger import *
 
 # ----- 加载全局应用 -----
 app = Flask(__name__)
@@ -53,6 +54,11 @@ def before_request():
 @app.route("/", methods=["GET"])
 def index():
     return render_template("index.html")
+
+
+@app.route("/test", methods=["GET"])
+def test():
+    return render_template("test.html")
 
 
 @app.route("/agent", methods=["GET"])
@@ -260,7 +266,9 @@ def login():
         if user["username"] == username and user["password"] == password:
             print("登录成功")
             # 设置 local token
-            access_token = create_access_token(identity=username, expires_delta=timedelta(hours=1))
+            access_token = create_access_token(
+                identity=username, expires_delta=timedelta(hours=1)
+            )
             return (
                 jsonify(
                     {"message": "登录成功", "code": 200, "access_token": access_token}
@@ -353,7 +361,7 @@ def agent_chat_stream():
         model="charglm-3",
         meta={
             "user_info": "我是陆星辰，是一个男性...",
-            "bot_info": "苏梦远，本名苏远心...（结尾一定要有句号等结尾符号）",
+            "bot_info": "苏梦远，本名苏远心...（说话的结尾一定有句号等结尾符号）",
             "bot_name": "苏梦远",
             "user_name": "陆星辰",
         },
@@ -372,6 +380,7 @@ def agent_upload_audio():
     """
     接收前端发来的音频的路由
     """
+    info("run.py", "agent_upload_audio", "开始音频处理...")
     if "audio_data" not in request.files:
         return "No file part in the request", 400
 
@@ -443,7 +452,7 @@ def agent_handle_audio_stream(data):
         audio_chunk = agent_audio_generate(ideal_answers[data["index"] - bias])
         # 发送合成的语音到前端
         print("TTS 处理完毕:", input_text)
-        
+
         socketio.emit(
             "agent_play_audio_chunk",
             {"index": data["index"] - data["bias"], "audio_chunk": audio_chunk},

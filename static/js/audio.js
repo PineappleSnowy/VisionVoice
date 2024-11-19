@@ -56,7 +56,7 @@ socket.on('agent_play_audio_chunk', function (data) {
 });
 
 
-// 监听后端发送的 agent_speech_rec 语音识别事件
+// 监听后端发送的 agent_speech_rec 语音识别事件（agent.js 未使用）
 socket.on('agent_speech_rec', function (data) {
     var rec_result = data['rec_result'];
     console.log('[audio.js][socket.on][agent_speech_rec] rec_result: %s', rec_result);

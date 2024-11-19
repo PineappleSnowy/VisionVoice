@@ -58,6 +58,7 @@ function loadChatHistory() {
     });
 }
 
+// 发送消息按钮
 document.getElementById('send-button').addEventListener('click', function () {
     var input = document.getElementById('agent-chat-textarea');
     var message = input.value.trim();
@@ -108,7 +109,6 @@ function addMessage(message) {
     messagesContainer_bot.className = 'chat-messages-bot';
     var bubble_2 = document.createElement('div');
     bubble_2.className = 'chat-bubble';
-    // bubble_2.textContent = message;
     fetch(`/agent/chat_stream?query=${message}`, {
         headers: {
             "Authorization": `Bearer ${token}`
