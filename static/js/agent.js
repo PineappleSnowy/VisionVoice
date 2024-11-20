@@ -4,7 +4,7 @@ var flag_board = 0;
 const socket = io();
 
 // 在 DOM 加载完成后获取聊天记录
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     loadChatHistory();
 });
 
@@ -14,50 +14,55 @@ document.addEventListener('DOMContentLoaded', function() {
  */
 function loadChatHistory() {
     const messagebackground = document.getElementById('chat-container');
-    
+
     fetch('/get-chat-history', {
         headers: {
             "Authorization": `Bearer ${localStorage.getItem('token')}`
         }
     })
-    .then(response => response.json())
-    .then(history => {
-        history.forEach(msg => {
-            if(msg.role === 'user') {
-                // 创建用户消息
-                var messagesContainer_user = document.createElement('div');
-                messagesContainer_user.className = 'chat-messages-user';
-                var bubble = document.createElement('div');
-                bubble.className = 'chat-bubble';
-                var image_user = document.createElement('div');
-                image_user.className = 'chat-image-user';
-                bubble.textContent = msg.content;
-                
-                messagebackground.appendChild(messagesContainer_user);
-                messagesContainer_user.appendChild(bubble);
-                messagesContainer_user.appendChild(image_user);
-            } else if(msg.role === 'assistant') {
-                // 创建机器人消息
-                var image_bot = document.createElement('div');
-                image_bot.className = 'chat-image-bot';
-                var messagesContainer_bot = document.createElement('div');
-                messagesContainer_bot.className = 'chat-messages-bot';
-                var bubble_2 = document.createElement('div');
-                bubble_2.className = 'chat-bubble';
-                bubble_2.textContent = msg.content;
-                
-                messagesContainer_bot.appendChild(image_bot);
-                messagesContainer_bot.appendChild(bubble_2);
-                messagebackground.appendChild(messagesContainer_bot);
+        .then(response => response.json())
+        .then(history => {
+            if (history.length > 0) {
+                history.forEach(msg => {
+                    if (msg.role === 'user') {
+                        // 创建用户消息
+                        var messagesContainer_user = document.createElement('div');
+                        messagesContainer_user.className = 'chat-messages-user';
+                        var bubble = document.createElement('div');
+                        bubble.className = 'chat-bubble';
+                        var image_user = document.createElement('div');
+                        image_user.className = 'chat-image-user';
+                        bubble.textContent = msg.content;
+
+                        messagebackground.appendChild(messagesContainer_user);
+                        messagesContainer_user.appendChild(bubble);
+                        messagesContainer_user.appendChild(image_user);
+                    } else if (msg.role === 'assistant') {
+                        // 创建机器人消息
+                        var image_bot = document.createElement('div');
+                        image_bot.className = 'chat-image-bot';
+                        var messagesContainer_bot = document.createElement('div');
+                        messagesContainer_bot.className = 'chat-messages-bot';
+                        var bubble_2 = document.createElement('div');
+                        bubble_2.className = 'chat-bubble';
+                        bubble_2.textContent = msg.content;
+
+                        messagesContainer_bot.appendChild(image_bot);
+                        messagesContainer_bot.appendChild(bubble_2);
+                        messagebackground.appendChild(messagesContainer_bot);
+                    }
+                });
+                messagebackground.scrollTop = messagebackground.scrollHeight;
+            } else {
+                messagebackground.innerHTML = '<div class="chat-messages-user"><div class="chat-bubble">您还没有聊天记录</div></div>';
             }
+        })
+        .catch(error => {
+            console.error('Error loading chat history:', error);
         });
-        messagebackground.scrollTop = messagebackground.scrollHeight;
-    })
-    .catch(error => {
-        console.error('Error loading chat history:', error);
-    });
 }
 
+// 发送消息按钮
 document.getElementById('send-button').addEventListener('click', function () {
     var input = document.getElementById('agent-chat-textarea');
     var message = input.value.trim();
@@ -108,7 +113,6 @@ function addMessage(message) {
     messagesContainer_bot.className = 'chat-messages-bot';
     var bubble_2 = document.createElement('div');
     bubble_2.className = 'chat-bubble';
-    // bubble_2.textContent = message;
     fetch(`/agent/chat_stream?query=${message}`, {
         headers: {
             "Authorization": `Bearer ${token}`
@@ -128,7 +132,11 @@ function addMessage(message) {
                 // console.log('[agent.js][addMessage] agent_stream_audio: %s', jsonString);
                 socket.emit("agent_stream_audio", { "index": index, "answer": jsonString })
                 index += 1;
-                bubble_2.textContent += jsonString;
+
+                // 如果当前不是结束标志，则将文本添加到气泡中
+                if (!(jsonString == "<END>")) {
+                    bubble_2.textContent += jsonString;
+                }
 
                 // 继续读取下一个数据
                 return reader.read().then(processText);
@@ -169,13 +177,13 @@ document.getElementById('photo').addEventListener('change', function (e) {
             },
             body: JSON.stringify({ image: image_impt })
         })
-        .then(response => response.json())
-        .then(data => {
-            console.log('图片上传成功:', data);
-        })
-        .catch(error => {
-            console.error('图片上传失败:', error);
-        });
+            .then(response => response.json())
+            .then(data => {
+                console.log('图片上传成功:', data);
+            })
+            .catch(error => {
+                console.error('图片上传失败:', error);
+            });
     };
     reader.readAsDataURL(file);
 })

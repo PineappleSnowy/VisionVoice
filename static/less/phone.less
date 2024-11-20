@@ -1,7 +1,7 @@
-@white: #f7f7f7;
+// out: ../css/phone.css
+
 html {
-    /* 只是占个位置，不然less会编译出空选择器 */
-    font-size: 16px;
+    font-size: var(--font-size);
 
     body {
         margin: 0;
@@ -24,15 +24,15 @@ html {
             z-index: 2;
         }
 
-        .controller{
+        .controller {
             position: fixed;
             width: 100vw;
             height: 2.6rem;
             left: 0;
             bottom: 0;
-            background-color: @white;
+            background-color: white;
 
-            canvas{
+            canvas {
                 display: block;
                 position: absolute;
                 left: 1.31rem;
@@ -40,30 +40,35 @@ html {
                 width: 1.5rem;
                 height: 1rem;
             }
-            .openCamera{
+
+            .openCamera {
                 position: absolute;
                 left: 0.9rem;
                 bottom: 0.63rem;
                 font-size: 0.5rem;
             }
-            .hangUp{
+
+            .hangUp {
                 position: absolute;
                 right: 0.9rem;
                 bottom: 0.63rem;
                 font-size: 0.5rem;
             }
         }
-        video{
+
+        video {
             position: fixed;
             width: 100vw;
             height: 5.24rem;
             z-index: -1;
         }
+
         .container {
             width: 100vw;
             height: 100vh;
             transition: transform 0.3s ease;
-            background-color: @white;
+            background-color: white;
+
             img {
                 position: absolute;
                 width: 1.5rem;
@@ -74,10 +79,11 @@ html {
                 top: 1.7rem;
                 left: 1.31rem;
             }
-            
-            
+
+
         }
-        .container.shifted{
+
+        .container.shifted {
             transform: translateY(6.34rem);
             border-top-left-radius: 0.1rem;
             border-top-right-radius: 0.1rem;

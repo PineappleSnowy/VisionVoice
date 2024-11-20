@@ -1,4 +1,9 @@
+# 缓存文件
 *.pyc
 **/__pycache__
+
+# 虚拟环境
 .venv
+
+# ide 默认配置文件
 .idea
