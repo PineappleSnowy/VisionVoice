@@ -158,8 +158,24 @@ document.getElementById('photo').addEventListener('change', function (e) {
     var reader = new FileReader();
     reader.onload = function (event) {
         image_impt = event.target.result;
-        console.log('我执行了');
+        console.log('用户上传图片');
         document.getElementById('photo').value = '';
+
+        // 将图片数据发送到后端
+        fetch('/agent/upload_image', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ image: image_impt })
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('图片上传成功:', data);
+        })
+        .catch(error => {
+            console.error('图片上传失败:', error);
+        });
     };
     reader.readAsDataURL(file);
 })

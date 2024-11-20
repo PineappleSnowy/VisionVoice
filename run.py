@@ -3,6 +3,7 @@
 """
 
 # 第三方库
+import os
 from datetime import timedelta
 from flask import Flask, stream_with_context, render_template, request, jsonify
 from flask_socketio import SocketIO
@@ -29,7 +30,8 @@ app = Flask(__name__)
 socketio = SocketIO(app)
 JWTManager(app)
 CORS(app)
-app.config["JWT_SECRET_KEY"] = "s96cae35ce8a9b0244178bf28e4966c2ce1b83"  # 设置 JWT 密钥
+# 设置 JWT 密钥
+app.config["JWT_SECRET_KEY"] = "s96cae35ce8a9b0244178bf28e4966c2ce1b83"
 
 # ----- 路由 -----
 
@@ -44,7 +46,8 @@ def before_request():
         except Exception as e:
             return (
                 jsonify(
-                    {"message": "Token has expired!", "code": 401, "error": str(e)}
+                    {"message": "Token has expired!",
+                        "code": 401, "error": str(e)}
                 ),
                 401,
             )
@@ -68,11 +71,6 @@ def Agent():
 def chat():
     """消息路由"""
     return render_template("chat.html")
-
-@app.route("/phone", methods=["GET"])
-def phone():
-    """通话路由"""
-    return render_template("phone.html")
 
 
 @app.route("/create", methods=["GET"])
@@ -184,7 +182,8 @@ def encode_message_content(message):
     """对消息内容进行 Base64 编码"""
     if isinstance(message, dict) and "content" in message:
         content = message["content"]
-        encoded_content = base64.b64encode(content.encode("utf-8")).decode("utf-8")
+        encoded_content = base64.b64encode(
+            content.encode("utf-8")).decode("utf-8")
         message["content"] = encoded_content
     return message
 
@@ -265,7 +264,8 @@ def login():
         if user["username"] == username and user["password"] == password:
             print("登录成功")
             # 设置 local token
-            access_token = create_access_token(identity=username, expires_delta=timedelta(hours=1))
+            access_token = create_access_token(
+                identity=username, expires_delta=timedelta(hours=1))
             return (
                 jsonify(
                     {"message": "登录成功", "code": 200, "access_token": access_token}
@@ -344,7 +344,8 @@ def agent_chat_stream():
                 break
 
     # 对聊天记录进行解码
-    messages = [decode_message_content(msg.copy()) for msg in encoded_chat_history]
+    messages = [decode_message_content(msg.copy())
+                for msg in encoded_chat_history]
 
     # 添加用户消息
     messages.append({"role": "user", "content": user_talk})
@@ -370,6 +371,29 @@ def agent_chat_stream():
     return app.response_class(
         stream_with_context(generate), mimetype="text/event-stream"
     )
+
+
+@app.route("/agent/upload_image", methods=["POST"])
+def upload_image():
+    """
+    接收前端发来的图片的路由
+    """
+    data = request.get_json()
+    if 'image' not in data:
+        return jsonify({"error": "No image data in the request"}), 400
+
+    image_data = data['image']
+
+    # 去掉base64前缀
+    if image_data.startswith('data:image'):
+        image_data = image_data.split(',')[1]
+
+    # 将图片保存为文件
+    image_path = os.path.join('.cache', 'uploaded_image.png')
+    with open(image_path, 'wb') as f:
+        f.write(base64.b64decode(image_data))
+
+    return jsonify({"message": "Image uploaded successfully"}), 200
 
 
 @app.route("/agent/upload_audio", methods=["POST"])
@@ -427,10 +451,11 @@ def agent_handle_audio_stream(data):
         else:
             ideal_answers[data["index"] - bias] = data["answer"]
         bias += 1
-        socketio.emit("agent_play_audio_chunk", {"index": -1, "audio_chunk": ""})
+        socketio.emit("agent_play_audio_chunk", {
+                      "index": -1, "audio_chunk": ""})
     else:
         good_answer = data["answer"][: aim + 1]
-        bad_answer = data["answer"][aim + 1 :]
+        bad_answer = data["answer"][aim + 1:]
         if (data["index"] - bias) in ideal_answers:
             ideal_answers[data["index"] - bias] += good_answer
         else:
@@ -448,10 +473,11 @@ def agent_handle_audio_stream(data):
         audio_chunk = agent_audio_generate(ideal_answers[data["index"] - bias])
         # 发送合成的语音到前端
         print("TTS 处理完毕:", input_text)
-        
+
         socketio.emit(
             "agent_play_audio_chunk",
-            {"index": data["index"] - data["bias"], "audio_chunk": audio_chunk},
+            {"index": data["index"] - data["bias"],
+                "audio_chunk": audio_chunk},
         )
 
 
