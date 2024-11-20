@@ -214,4 +214,10 @@ window.onload = async () => {
     } catch(err) {
         alert(err);
     }
+
+    // 检查 URL 参数，决定是否自动开启摄像头
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('camera') === 'on') {
+        openCamera.click();
+    }
 };
