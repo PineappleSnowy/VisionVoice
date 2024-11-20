@@ -22,6 +22,7 @@ function loadChatHistory() {
     })
     .then(response => response.json())
     .then(history => {
+        if (history.length > 0) {
         history.forEach(msg => {
             if(msg.role === 'user') {
                 // 创建用户消息
@@ -49,9 +50,12 @@ function loadChatHistory() {
                 messagesContainer_bot.appendChild(image_bot);
                 messagesContainer_bot.appendChild(bubble_2);
                 messagebackground.appendChild(messagesContainer_bot);
-            }
-        });
-        messagebackground.scrollTop = messagebackground.scrollHeight;
+                }
+            });
+            messagebackground.scrollTop = messagebackground.scrollHeight;
+        } else {
+            messagebackground.innerHTML = '<div class="chat-messages-user"><div class="chat-bubble">您还没有聊天记录</div></div>';
+        }
     })
     .catch(error => {
         console.error('Error loading chat history:', error);

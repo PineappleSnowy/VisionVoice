@@ -93,8 +93,23 @@ register_button.addEventListener("click", () => {
 
 // 检查是否处于登录状态
 document.addEventListener("DOMContentLoaded", () => {
-    if (localStorage.getItem('islogin') === '1' && localStorage.getItem('token')) {
-        window.location.href = '/agent';
+    if (localStorage.getItem('islogin') === '1') {
+        const token = localStorage.getItem('token');
+        fetch('/verify-token', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.valid) {
+                    window.location.href = '/agent';
+                } else {
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('islogin');
+                }
+            });
     }
 });
 

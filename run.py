@@ -136,6 +136,9 @@ def predict(responses):
         response_all += text
         yield text
 
+    # 结束标志
+    yield "<END>"
+
     messages.append({"role": "assistant", "content": response_all})
 
     # 对聊天记录进行编码
@@ -324,14 +327,19 @@ def verify_token():
         return jsonify({"valid": True, "user": current_user}), 200
     # 如果token无效，返回错误信息
     except:
-        return jsonify({"valid": False, "message": "token has expired!"}), 400
+        return jsonify({"valid": False, "message": "token has expired!"}), 200
 
 
-@app.route("/get-chat-history")
+@app.route("/get-chat-history", methods=["GET"])
 def get_chat_history():
     try:
         verify_jwt_in_request()
         current_user = get_jwt_identity()
+        success(
+            "run.py",
+            "get_chat_history",
+            "token 有效，当前用户：" + current_user + "，开始获取聊天记录...",
+        )
 
         with open("./static/user.json", "r", encoding="utf-8") as f:
             users = json.load(f)
@@ -342,10 +350,12 @@ def get_chat_history():
                         decode_message_content(msg.copy())
                         for msg in encoded_chat_history
                     ]
+                    success("run.py", "get_chat_history", "获取聊天记录成功")
                     return jsonify(decoded_chat_history), 200
 
         return jsonify([]), 200
     except Exception as e:
+        error("run.py", "get_chat_history", "获取聊天记录失败: " + str(e))
         return jsonify({"error": str(e)}), 401
 
 
@@ -461,10 +471,16 @@ def agent_stream_audio(data: dict[str, int | str]):
         将前端发来的大模型响应 token 持续添加到句子中，当发现断句符号时，断句符号之前的句子合成音频发往前端。
     """
     global bias, ideal_answers
-    info("run.py", "agent_stream_audio", ideal_answers)
+    # info("run.py", "agent_stream_audio", ideal_answers)
+
+    # 如果 token 内容是 <END>，则表示大模型响应已经结束
+    if "<END>" in data["answer"]:
+        pause_index = 0
+        data["answer"] = ""
 
     # 寻找 token 中的断句下标
-    pause_index = find_pause(data["answer"])
+    else:
+        pause_index = find_pause(data["answer"])
 
     # 找不到任何断句符号的时候，持续将 token 积累到句子中，直到变成有断句符号的完整句子
     if pause_index == -1:
@@ -490,7 +506,7 @@ def agent_stream_audio(data: dict[str, int | str]):
             ideal_answers[data["index"] - bias] = good_answer
 
         # 将断句符号之后的句子添加到理想回答中
-        if bad_answer:
+        if bad_answer or bad_answer != "<END>":
             ideal_answers[data["index"] - bias + 1] = bad_answer
         data["bias"] = bias
 

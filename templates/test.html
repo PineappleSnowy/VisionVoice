@@ -68,7 +68,7 @@
     }
 
     // 静音阈值(单位:分贝)
-    const SILENCE_THRESHOLD = -50;
+    const SILENCE_THRESHOLD = -40;
 
     /**
      * @function detectSilence
@@ -326,6 +326,10 @@
     let index = 0;
     socket.on('agent_speech_recognition_finished', function (data) {
         const rec_result = data['rec_result'];
+        if (!rec_result) {
+            console.log('[test.html][socket.on][agent_speech_recognition_finished] rec_result is empty.');
+            return;
+        }
         const token = localStorage.getItem('token');
         console.log('[test.html][socket.on][agent_speech_recognition_finished] rec_result: %s', rec_result);
         recordingResult.textContent += rec_result;
@@ -351,7 +355,10 @@
                     // console.log('[agent.js][addMessage] agent_stream_audio: %s', jsonString);
                     socket.emit("agent_stream_audio", { "index": index, "answer": jsonString })
                     index += 1;
-                    modelOutputResult.textContent += jsonString;
+
+                    if (!jsonString.includes("<END>")) {
+                        modelOutputResult.textContent += jsonString;
+                    }
 
                     // 继续读取下一个数据
                     return reader.read().then(processText);

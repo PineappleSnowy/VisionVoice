@@ -3,6 +3,7 @@ import sys
 import json
 import os
 from lib.debugger import *
+import re
 
 with open("./static/api.json", "r", encoding="utf-8") as f:
     data = json.load(f)
@@ -38,7 +39,7 @@ AUE = 3
 # 用户唯一标识
 CUID = "123456PYTHON"
 # 语音合成的请求地址
-TTS_URL = "https://tsn.baidu.com/text: 2audio"
+TTS_URL = "https://tsn.baidu.com/text2audio"
 
 # FORMATS = {3: "mp3", 4: "pcm", 5: "pcm", 6: "wav"}
 # FORMAT = FORMATS[AUE]
@@ -58,7 +59,7 @@ init_params = {
     "ctp": 1,
 }  # lan ctp 固定参数
 
-with open("./settings/audio_settings.json", "w", encoding="utf-8") as f:
+with open("./configs/audio_settings.json", "w", encoding="utf-8") as f:
     json.dump(init_params, f, ensure_ascii=False, indent=4)
 
 
@@ -106,15 +107,26 @@ def fetch_token() -> str:
 
 
 def agent_audio_generate(text: str) -> str:
+    """
+    根据文本生成音频
+    """
     token = fetch_token()
     info("agent_speech_synthesis.py", "agent_audio_generate", "输入:" + text)
-    tex = quote_plus(text)
+
+    # 利用正则匹配去除括号及括号中的内容
+    if "（" in text and "）" in text:
+        text = re.sub(r"\（.*?\）", "", text)
+    if "(" in text and ")" in text:
+        text = re.sub(r"\(.*?\)", "", text)
+
+    # 对文本进行 URL 编码
+    text = quote_plus(text)
 
     if os.path.exists(
-        "./settings/audio_settings.json"
+        "./configs/audio_settings.json"
     ):  # 此处路径没有问题, app 启动后, 运行程序路径不在此文件
         try:
-            with open("./settings/audio_settings.json", "r", encoding="utf-8") as f:
+            with open("./configs/audio_settings.json", "r", encoding="utf-8") as f:
                 params = json.load(f)
                 f.close()
         except Exception as e:
@@ -123,7 +135,7 @@ def agent_audio_generate(text: str) -> str:
         print("TTS 输出失败：配置文件丢失")
         exit(0)
 
-    params.update({"tok": token, "tex": tex})
+    params.update({"tok": token, "tex": text})
 
     # print('语音请求参数:', params)
     data = urlencode(params)
