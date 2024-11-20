@@ -14,13 +14,13 @@ body {
     padding: 0;
     height: 100vh;
     overflow: hidden;
-}  
+}
 
 p {
     font-size: 20px;
 }
 
-#main_page{
+#main_page {
     display: flex;
     width: 100%;
     height: 100%;
@@ -42,7 +42,7 @@ p {
     left: 0;
     right: 0;
     bottom: 0;
-  }
+}
 
 #navbar a {
     text-decoration: none;
@@ -52,17 +52,17 @@ p {
     border-radius: 5px;
     transition: background-color 0.3s ease;
 }
-  
+
 #navbar a:hover {
     background-color: #211f1f;
 }
 
-#chat-input-container{
+#chat-input-container {
     position: absolute;
     bottom: 45px;
     width: 100%;
     height: 50px;
-    display: flex; 
+    display: flex;
     justify-content: right;
     border: 0;
     padding: 0;
@@ -71,98 +71,98 @@ p {
 #send-button {
     display: flex;
     position: relative;
-    top: 10px;
+    top: 5px;
     padding: 10px;
     font-size: 16px;
     background-color: #007bff;
     color: white;
     border: none;
     cursor: pointer;
-    width: 30px;
+    width: 35px;
     display: inline-block;
     vertical-align: bottom;
-    height: 30px;
+    height: 35px;
     border-radius: 90px;
-    right: 1px;
+    right: 14px;
 }
 
 #send-button:hover {
     background-color: #0056b3;
 }
 
-#send-button #arrow_right{
+#send-button #arrow_right {
     display: flex;
     position: absolute;
-    top: 5px;
-    right: 5px;
-    width: 20px;
-    height: 20px;
+    top: 3px;
+    right: 3px;
+    width: 28px;
+    height: 28px;
 }
 
-#more_function_button{
+#more_function_button {
     display: none;
     position: relative;
-    top: 10px;
+    top: 5px;
     padding: 10px;
     font-size: 16px;
     background-color: #007bff;
     color: white;
     border: none;
     cursor: pointer;
-    width: 30px;
+    width: 35px;
     display: inline-block;
     vertical-align: bottom;
-    height: 30px;
+    height: 35px;
     border-radius: 90px;
-    right: 1px;
+    right: 8px;
 }
 
 #more_function_button:hover {
     background-color: #0056b3;
 }
 
-#more_function_button #more_function_start{
+#more_function_button #more_function_start {
     display: flex;
     position: absolute;
     top: 5px;
     right: 5px;
-    width: 20px;
-    height: 20px;
+    width: 25px;
+    height: 25px;
 }
 
-#more_function_button_2{
-    display: flex;
+#more_function_button_2 {
+    display: none;
     position: relative;
-    top: 10px;
+    top: 5px;
     padding: 10px;
     font-size: 16px;
     background-color: #007bff;
     color: white;
     border: none;
     cursor: pointer;
-    width: 30px;
+    width: 35px;
     display: inline-block;
     vertical-align: bottom;
-    height: 30px;
+    height: 35px;
     border-radius: 90px;
-    right: 1px;
+    right: 8px;
 }
 
 #more_function_button_2:hover {
     background-color: #0056b3;
 }
 
-#more_function_button_2 #more_function_end{
+#more_function_button_2 #more_function_end {
     display: flex;
     position: absolute;
-    top: 5px;
-    right: 5px;
-    width: 20px;
-    height: 20px;
+    top: 2px;
+    right: 2px;
+    width: 30px;
+    height: 30px;
 }
 
 
-#agent-chat-textarea{
+#agent-chat-textarea {
     display: flex;
     min-height: 20px;
     max-height: 50px;
@@ -170,7 +170,7 @@ p {
     resize: none;
     width: auto;
     position: absolute;
-    bottom: 0;
+    bottom: 5px;
     right: 1px;
     left: 1px;
     background-color: rgba(33, 31, 31, 0.8);
@@ -191,21 +191,21 @@ p {
     box-shadow: 0 2px 15px rgba(0, 0, 0, 0.2);
 }
 
-#chat-container{
+#chat-container {
     display: flex;
     position: absolute;
-    top: 10%;
+    top: 0%;
     width: 100%;
     padding: 10px;
-    height: 70%;
+    height: 90%;
     flex-direction: column;
     background-color: rgba(red, green, blue, 0);
     overflow: auto;
     scrollbar-width: none;
 }
-    
 
-.chat-messages-user{
+
+.chat-messages-user {
     display: flex;
     flex-direction: row;
     position: relative;
@@ -215,7 +215,7 @@ p {
     justify-content: right;
 }
 
-.chat-messages-bot{
+.chat-messages-bot {
     display: flex;
     flex-direction: row;
     position: relative;
@@ -237,7 +237,7 @@ p {
     align-self: flex-end;
 }
 
-.chat-image-user{
+.chat-image-user {
     background-image: url('../images/user.png');
     width: 40px;
     height: 40px;
@@ -245,7 +245,7 @@ p {
     border-radius: 5px;
 }
 
-.chat-image-bot{
+.chat-image-bot {
     background-image: url('../images/bot.png');
     width: 40px;
     height: 40px;
@@ -253,12 +253,12 @@ p {
     border-radius: 5px;
 }
 
-#star{
+#star {
     height: 30px;
     width: 30px;
 }
 
-#flicker{
+#flicker {
     display: flex;
     position: absolute;
     margin: 0;
@@ -269,7 +269,7 @@ p {
     background-size: cover;
 }
 
-#more_function_board{
+#more_function_board {
     width: auto;
     height: 200px;
     position: absolute;
@@ -280,7 +280,7 @@ p {
     display: flex;
 }
 
-#more_function_board #function_1{
+#more_function_board #function_1 {
     display: flex;
     position: relative;
     top: 50px;
@@ -297,7 +297,7 @@ p {
     background-color: #726c6c;
 }
 
-#photo{
+#photo {
     display: flex;
     position: relative;
     top: 10px;
@@ -307,7 +307,7 @@ p {
     border-radius: 5px;
 }
 
-#decorate_photo{
+#decorate_photo {
     display: flex;
     position: absolute;
     top: 10px;
@@ -319,63 +319,65 @@ p {
     background-color: #4b4242;
 }
 
-#decorate_photo:hover{
+#decorate_photo:hover {
     background-color: #726c6c;
 }
 
-@keyframes slideup{
+@keyframes slideup {
     from {
         transform: translateY(0px);
     }
+
     to {
         transform: translateY(-150px);
     }
 }
 
-@keyframes slidedown{
+@keyframes slidedown {
     from {
-        transform:translateY(-150px);
+        transform: translateY(-150px);
     }
+
     to {
         transform: translateY(0px);
     }
 }
 
-.slide-up{
+.slide-up {
     animation: slideup 0.5s ease-in-out forwards;
 }
 
-.slide-down{
+.slide-down {
     animation: slidedown 0.5s ease-in-out forwards;
 }
 
 #phone-button {
-  position: absolute;
-  left: 0px;
-  top: -35px;
-  width: 40px;
-  height: 40px;
-  border: none;
-  border-radius: 50%;
-  background: transparent;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    position: absolute;
+    left: 3px;
+    bottom: 55px;
+    width: 50px;
+    height: 50px;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 #phone_icon {
-  width: 24px;
-  height: 24px;
+    width: 50px;
+    height: 50px;
 }
 
 .pause {
-    width: 60px;
-    height: 60px;
+    width: 50px;
+    height: 50px;
     position: absolute;
-    bottom: 185px;
-    left: 10px;
+    bottom: 60px;
+    right: 10px;
     cursor: pointer;
     background-image: url(../images/pause_inactive.png);
     background-size: cover;
-  }
+}
