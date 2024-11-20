@@ -37,7 +37,12 @@
 
     <!-- 录音结果显示 -->
     <div id="recordingResult">
-        录音结果...
+        用户输入：
+    </div>
+
+    <!-- 大模型输出结果 -->
+    <div id="modelOutputResult">
+        大模型输出：
     </div>
 </body>
 <script>
@@ -63,7 +68,7 @@
     }
 
     // 静音阈值(单位:分贝)
-    const SILENCE_THRESHOLD = -30;
+    const SILENCE_THRESHOLD = -50;
 
     /**
      * @function detectSilence
@@ -224,15 +229,15 @@
 
 
         function upload_audio(blob) {
-            var xhr = new XMLHttpRequest();
+            const xhr = new XMLHttpRequest();
             xhr.onload = function (e) {
                 if (this.readyState === 4) {
-                    console.log("[test.html][upload_audio] response:", e.target.responseText);
+                    // console.log("[test.html][upload_audio] response:", e.target.responseText);
                 }
             };
-            var fd = new FormData();
+            const fd = new FormData();
             fd.append("audio_data", blob, "recorded_audio.wav");
-            var sampleRate = audioContext.sampleRate;
+            const sampleRate = audioContext.sampleRate;
             fd.append("sample_rate", sampleRate);
             const token = localStorage.getItem('token');
             console.log("[test.html][upload_audio] 上传音频数据...");
@@ -271,22 +276,21 @@
     // 播放下一个音频
     function playNextAudio() {
         if (audioList[audioIndex] != undefined) {
-            pauseDiv.style.backgroundImage = `url('${'./static/images/pause.png'}')`;
             var audioBlob = new Blob([audioList[audioIndex]], { type: 'audio/mp3' });
             var audioURL = URL.createObjectURL(audioBlob);
 
             audioPlayer.src = audioURL;
 
             try {
-                audioPlayingStatus.textContent = '音频播放信息：音频片段开始播放...';
-                console.log('音频播放信息：音频片段开始播放...');
+                audioPlayingStatus.textContent = '音频播放信息：开始播放音频...';
+                // console.log('音频播放信息：开始播放音频...');
                 audioPlayer.play();
             } catch (error) {
                 audioPlayingStatus.textContent = '音频播放信息：音频片段播放失败.';
-                console.log('音频播放信息：音频片段播放失败.');
-                console.log('错误信息：', error);
+                console.log('音频播放信息：音频片段播放失败.', error);
             }
         } else {
+            audioPlayingStatus.textContent = '音频播放信息：音频片段播放结束.';
             console.log('undefined audioIndex: %d', audioIndex);
         }
     }
@@ -294,7 +298,6 @@
     // 监听音频播放结束事件
     audioPlayer.onended = function () {
         audioIndex++;
-        pauseDiv.style.backgroundImage = `url('${'./static/images/pause_inactive.png'}')`;
         playNextAudio();
     };
 
@@ -316,11 +319,47 @@
     // 获取录音结果显示元素
     const recordingResult = document.getElementById('recordingResult');
 
+    // 获取大模型输出结果显示元素
+    const modelOutputResult = document.getElementById('modelOutputResult');
+
     // 监听后端发送的 agent_speech_rec 语音识别事件
-    socket.on('agent_speech_rec', function (data) {
-        var rec_result = data['rec_result'];
-        console.log('[audio.js][socket.on][agent_speech_rec] rec_result: %s', rec_result);
-        recordingResult.textContent = rec_result;
+    let index = 0;
+    socket.on('agent_speech_recognition_finished', function (data) {
+        const rec_result = data['rec_result'];
+        const token = localStorage.getItem('token');
+        console.log('[test.html][socket.on][agent_speech_recognition_finished] rec_result: %s', rec_result);
+        recordingResult.textContent += rec_result;
+        // socket.emit("agent_stream_audio", { "index": index, "answer": rec_result })
+        // index += 1;
+
+        fetch(`/agent/chat_stream?query=${rec_result}`, {
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        })
+            .then(response => {
+                let reader = response.body.getReader();
+
+                // 逐块读取并处理数据
+                return reader.read().then(function processText({ done, value }) {
+                    if (done) {
+                        // console.log('Stream complete');
+                        return;
+                    }
+                    let jsonString = new TextDecoder().decode(value); // 将字节流转换为字符串
+
+                    // console.log('[agent.js][addMessage] agent_stream_audio: %s', jsonString);
+                    socket.emit("agent_stream_audio", { "index": index, "answer": jsonString })
+                    index += 1;
+                    modelOutputResult.textContent += jsonString;
+
+                    // 继续读取下一个数据
+                    return reader.read().then(processText);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching stream:', error);
+            });
     })
     /* 处理音频播放 end
     ------------------------------------------------------------*/

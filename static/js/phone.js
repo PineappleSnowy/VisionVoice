@@ -1,7 +1,3 @@
-//定义基准 rem
-const html = document.querySelector('html');
-html.style.fontSize = window.innerWidth * 100 / 412 + 'px';
-
 let stream;
 let audioStream;
 let vudio;

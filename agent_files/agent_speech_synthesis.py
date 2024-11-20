@@ -2,6 +2,7 @@
 import sys
 import json
 import os
+from lib.debugger import *
 
 with open("./static/api.json", "r", encoding="utf-8") as f:
     data = json.load(f)
@@ -27,9 +28,9 @@ if IS_PY3:
 # 精品音库：度逍遥=5003，度小鹿=5118，度博文=106，度小童=110，度小萌=111，度米朵=103，度小娇=5，默认为度小美
 PER = 5118
 # 语速，取值0-15，默认为5中语速
-SPD = 5
+SPD = 8
 # 音调，取值0-15，默认为5中语调
-PIT = 6
+PIT = 7
 # 音量，取值0-9，默认为5中音量
 VOL = 9
 # 下载的文件格式, 3:mp3(default) 4:pcm-16k 5:pcm-8k 6:wav
@@ -37,7 +38,7 @@ AUE = 3
 # 用户唯一标识
 CUID = "123456PYTHON"
 # 语音合成的请求地址
-TTS_URL = "https://tsn.baidu.com/text2audio"
+TTS_URL = "https://tsn.baidu.com/text: 2audio"
 
 # FORMATS = {3: "mp3", 4: "pcm", 5: "pcm", 6: "wav"}
 # FORMAT = FORMATS[AUE]
@@ -71,7 +72,7 @@ TOKEN_URL = "http://aip.baidubce.com/oauth/2.0/token"
 SCOPE = "audio_tts_post"  # 有此scope表示有tts能力，没有请在网页里勾选
 
 
-def fetch_token():
+def fetch_token() -> str:
     params = {
         "grant_type": "client_credentials",
         "client_id": api_key,
@@ -104,10 +105,10 @@ def fetch_token():
 """  TOKEN end """
 
 
-def agent_audio_generate(TEXT):
+def agent_audio_generate(text: str) -> str:
     token = fetch_token()
-    print("TTS 输入:", TEXT)
-    tex = quote_plus(TEXT)
+    info("agent_speech_synthesis.py", "agent_audio_generate", "输入:" + text)
+    tex = quote_plus(text)
 
     if os.path.exists(
         "./settings/audio_settings.json"
@@ -126,7 +127,6 @@ def agent_audio_generate(TEXT):
 
     # print('语音请求参数:', params)
     data = urlencode(params)
-    # print('test on Web Browser' + TTS_URL + '?' + data)
 
     req = Request(TTS_URL, data.encode("utf-8"))
     try:
