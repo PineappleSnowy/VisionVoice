@@ -318,12 +318,10 @@ def agent_chat_stream():
     """
     大模型前端流式输出路由
     """
-    global bias, ideal_answers, response_all, messages, current_user
-    # 人类断句相关参数初始化
-    bias = 0
-    ideal_answers = dict()
+    global response_all, messages, current_user
 
     user_talk = request.args.get("query")
+    selected_model = request.args.get("model", "defaultModel")  # 获取选择的模型
     current_user = get_jwt_identity()
 
     # 从用户聊天记录获取历史消息，如果没有则初始化
@@ -352,12 +350,20 @@ def agent_chat_stream():
     if len(messages) > MAX_HISTORY:
         messages = messages[-MAX_HISTORY:]
 
+    # 根据选择的模型调用大模型
+    if selected_model == "model1":
+        model_name = "charglm-3"
+    elif selected_model == "model2":
+        model_name = "charglm-3"
+    else:
+        model_name = "charglm-3"
+
     # 调用大模型
     responses = client.chat.completions.create(
-        model="charglm-3",
+        model=model_name,
         meta={
             "user_info": "我是陆星辰，是一个男性...",
-            "bot_info": "苏梦远，本名苏远心...（结尾一定要有句号等结尾符号）",
+            "bot_info": "苏梦远，本名苏远心...（说话的结尾一定有句号等结尾符号）",
             "bot_name": "苏梦远",
             "user_name": "陆星辰",
         },

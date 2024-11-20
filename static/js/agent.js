@@ -1,11 +1,19 @@
 var image_impt = null;
 var flag_board = 0;
 
+var selectedModel = 'defaultModel'; // 默认模型
+
+function selectChatModel(model) {
+    selectedModel = model;
+    localStorage.setItem('selectedModel', model); // 将选择的模型存储到本地存储
+}
+
 const socket = io();
 
 // 在 DOM 加载完成后获取聊天记录
 document.addEventListener('DOMContentLoaded', function() {
     loadChatHistory();
+    selectedModel = localStorage.getItem('selectedModel') || 'defaultModel'; // 从本地存储中获取选择的模型
 });
 
 /**
@@ -101,15 +109,14 @@ function addMessage(message) {
     messagesContainer_user.appendChild(bubble);
     messagesContainer_user.appendChild(image_user);
 
-    //机器人响应
+    // 机器人响应
     var image_bot = document.createElement('div');
     image_bot.className = 'chat-image-bot';
     var messagesContainer_bot = document.createElement('div');
     messagesContainer_bot.className = 'chat-messages-bot';
     var bubble_2 = document.createElement('div');
     bubble_2.className = 'chat-bubble';
-    // bubble_2.textContent = message;
-    fetch(`/agent/chat_stream?query=${message}`, {
+    fetch(`/agent/chat_stream?query=${message}&model=${selectedModel}`, {
         headers: {
             "Authorization": `Bearer ${token}`
         }
@@ -128,7 +135,11 @@ function addMessage(message) {
                 // console.log('[agent.js][addMessage] agent_stream_audio: %s', jsonString);
                 socket.emit("agent_stream_audio", { "index": index, "answer": jsonString })
                 index += 1;
-                bubble_2.textContent += jsonString;
+
+                // 如果当前不是结束标志，则将文本添加到气泡中
+                if (!(jsonString == "<END>")) {
+                    bubble_2.textContent += jsonString;
+                }
 
                 // 继续读取下一个数据
                 return reader.read().then(processText);

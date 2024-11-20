@@ -11,7 +11,7 @@
 <body>
     <div class="header">视界之声</div>
     <div class="message-list">
-        <div class="message-item" onclick="window.location.href='/agent'">
+        <div class="message-item" data-model="model1" onclick="selectChatModel('model1'); window.location.href='/agent'">
             <img src="../static/images/user.png" alt="头像" class="avatar">
             <div class="content">
                 <div class="name">生活助手</div>
@@ -19,11 +19,10 @@
             </div>
             <div class="buttons">
                 <button class="button phone" onclick="event.stopPropagation(); window.location.href='/phone'"></button>
-                <button class="button video"
-                    onclick="event.stopPropagation(); window.location.href='/phone?camera=on'"></button>
+                <button class="button video" onclick="event.stopPropagation(); window.location.href='/phone?camera=on'"></button>
             </div>
         </div>
-        <div class="message-item" onclick="window.location.href='/agent'">
+        <div class="message-item" data-model="model2" onclick="selectChatModel('model2'); window.location.href='/agent'">
             <img src="../static/images/bot.png" alt="头像" class="avatar">
             <div class="content">
                 <div class="name">心灵树洞</div>
@@ -31,8 +30,7 @@
             </div>
             <div class="buttons">
                 <button class="button phone" onclick="event.stopPropagation(); window.location.href='/phone'"></button>
-                <button class="button video"
-                    onclick="event.stopPropagation(); window.location.href='/phone?camera=on'"></button>
+                <button class="button video" onclick="event.stopPropagation(); window.location.href='/phone?camera=on'"></button>
             </div>
         </div>
         <!-- 可以继续添加更多消息项 -->
