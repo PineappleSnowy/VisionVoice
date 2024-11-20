@@ -7,3 +7,6 @@
 
 # ide 默认配置文件
 .idea
+
+# less源文件
+**/*.less
