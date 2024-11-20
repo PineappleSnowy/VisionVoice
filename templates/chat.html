@@ -24,7 +24,7 @@
 
         .message-list {
             width: 100%;
-            max-width: 600px;
+            max-width: 800px;
             margin: 0 auto;
             background-color: #1e1e1e;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
@@ -35,8 +35,10 @@
             align-items: center;
             padding: 10px;
             border-bottom: 1px solid #333;
-            cursor: pointer; /* 添加鼠标指针样式 */
-            transition: background-color 0.3s ease; /* 添加过渡效果 */
+            cursor: pointer;
+            /* 添加鼠标指针样式 */
+            transition: background-color 0.3s ease;
+            /* 添加过渡效果 */
         }
 
         .message-item:last-child {
@@ -44,11 +46,13 @@
         }
 
         .message-item:hover {
-            background-color: #333; /* 鼠标悬停时的背景颜色 */
+            background-color: #333;
+            /* 鼠标悬停时的背景颜色 */
         }
 
         .message-item:active {
-            background-color: #555; /* 被点击时的背景颜色 */
+            background-color: #555;
+            /* 被点击时的背景颜色 */
         }
 
         .avatar {
@@ -118,10 +122,14 @@
         #navbar a {
             text-decoration: none;
             color: inherit;
-            margin: 0 10px;
-            padding: 5px 10px;
+            margin: 0px 5px;
+            padding: 10px 20px;
             border-radius: 5px;
             transition: background-color 0.3s ease;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         #navbar a:hover {
@@ -129,8 +137,12 @@
         }
 
         #navbar img {
-            width: 24px;
-            height: 24px;
+            width: 35px;
+            /* 增加图片的宽度 */
+            height: 35px;
+            /* 增加图片的高度 */
+            margin-right: 0;
+            /* 移除图片与文字之间的间距 */
         }
     </style>
 </head>
@@ -146,7 +158,8 @@
             </div>
             <div class="buttons">
                 <button class="button phone" onclick="event.stopPropagation(); window.location.href='/phone'"></button>
-                <button class="button video" onclick="event.stopPropagation(); window.location.href='/camera'"></button>
+                <button class="button video"
+                    onclick="event.stopPropagation(); window.location.href='/phone?camera=on'"></button>
             </div>
         </div>
         <div class="message-item" onclick="window.location.href='/agent'">
@@ -157,7 +170,8 @@
             </div>
             <div class="buttons">
                 <button class="button phone" onclick="event.stopPropagation(); window.location.href='/phone'"></button>
-                <button class="button video" onclick="event.stopPropagation(); window.location.href='/camera'"></button>
+                <button class="button video"
+                    onclick="event.stopPropagation(); window.location.href='/phone?camera=on'"></button>
             </div>
         </div>
         <!-- 可以继续添加更多消息项 -->
