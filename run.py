@@ -565,7 +565,7 @@ if __name__ == "__main__":
     # if current_os == 'Windows':
     socketio.run(
         app,
-        port=5000,
+        port=80,
         host="0.0.0.0",
         allow_unsafe_werkzeug=True,
         debug=True,  # 调试模式（开发环境）
