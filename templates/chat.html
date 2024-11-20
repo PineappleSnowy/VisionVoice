@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>微信消息列表</title>
+    <title>视界之声-消息列表</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -35,10 +35,20 @@
             align-items: center;
             padding: 10px;
             border-bottom: 1px solid #333;
+            cursor: pointer; /* 添加鼠标指针样式 */
+            transition: background-color 0.3s ease; /* 添加过渡效果 */
         }
 
         .message-item:last-child {
             border-bottom: none;
+        }
+
+        .message-item:hover {
+            background-color: #333; /* 鼠标悬停时的背景颜色 */
+        }
+
+        .message-item:active {
+            background-color: #555; /* 被点击时的背景颜色 */
         }
 
         .avatar {
@@ -68,18 +78,15 @@
         }
 
         .button {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 5px 10px;
-            border: none;
-            border-radius: 4px;
-            background-color: #007bff;
-            color: #fff;
-            cursor: pointer;
-            background-size: 20px 20px;
+            width: 60px;
+            height: 60px;
+            border: 2px solid #ffffff;
+            border-radius: 10px;
+            background-color: #2c2c2c;
+            background-size: 30px 30px;
             background-repeat: no-repeat;
-            background-position: center left 5px;
+            background-position: center;
+            cursor: pointer;
         }
 
         .button.phone {
@@ -90,19 +97,15 @@
             background-image: url('../static/images/camera.png');
         }
 
-        .button span {
-            margin-left: 25px;
-        }
-
         .button:hover {
-            background-color: #0056b3;
+            background-color: #1a1a1a;
         }
 
         #navbar {
             display: flex;
             justify-content: center;
             align-items: center;
-            background-color: #1e1e1e;
+            background-color: #525255;
             color: #fff;
             height: 50px;
             padding: 0;
@@ -110,7 +113,6 @@
             left: 0;
             right: 0;
             bottom: 0;
-            border-top: 1px solid #333;
         }
 
         #navbar a {
@@ -123,7 +125,7 @@
         }
 
         #navbar a:hover {
-            background-color: #2c2a2a;
+            background-color: #211f1f;
         }
 
         #navbar img {
@@ -136,26 +138,26 @@
 <body>
     <div class="header">视界之声</div>
     <div class="message-list">
-        <div class="message-item">
+        <div class="message-item" onclick="window.location.href='/agent'">
             <img src="../static/images/user.png" alt="头像" class="avatar">
             <div class="content">
                 <div class="name">生活助手</div>
                 <div class="description">环境识别、帮我寻物、辅助避障</div>
             </div>
             <div class="buttons">
-                <button class="button phone"><span>电话</span></button>
-                <button class="button video"><span>视频</span></button>
+                <button class="button phone" onclick="event.stopPropagation(); window.location.href='/phone'"></button>
+                <button class="button video" onclick="event.stopPropagation(); window.location.href='/camera'"></button>
             </div>
         </div>
-        <div class="message-item">
+        <div class="message-item" onclick="window.location.href='/agent'">
             <img src="../static/images/bot.png" alt="头像" class="avatar">
             <div class="content">
                 <div class="name">心灵树洞</div>
                 <div class="description">今天心情怎么样啊？</div>
             </div>
             <div class="buttons">
-                <button class="button phone"><span>电话</span></button>
-                <button class="button video"><span>视频</span></button>
+                <button class="button phone" onclick="event.stopPropagation(); window.location.href='/phone'"></button>
+                <button class="button video" onclick="event.stopPropagation(); window.location.href='/camera'"></button>
             </div>
         </div>
         <!-- 可以继续添加更多消息项 -->
