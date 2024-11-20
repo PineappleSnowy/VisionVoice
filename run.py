@@ -47,8 +47,7 @@ def before_request():
         except Exception as e:
             return (
                 jsonify(
-                    {"message": "Token has expired!",
-                        "code": 401, "error": str(e)}
+                    {"message": "Token has expired!", "code": 401, "error": str(e)}
                 ),
                 401,
             )
@@ -73,10 +72,12 @@ def chat():
     """消息路由"""
     return render_template("chat.html")
 
+
 @app.route("/phone", methods=["GET"])
 def phone():
     """消息路由"""
     return render_template("phone.html")
+
 
 @app.route("/create", methods=["GET"])
 def create():
@@ -105,10 +106,6 @@ with open("./static/api.json", "r", encoding="utf-8") as f:
 
 # 当前操作系统
 current_os = platform.system()
-# 偏置，因为断句会导致文字总数发生变化，这引入了偏置
-bias = 0
-# 带人类断句的回答，字典，以序号:回答形式保存，避免语序错误
-ideal_answers = dict()
 # 聊天记录最大长度
 MAX_HISTORY = 50
 
@@ -212,8 +209,7 @@ def encode_message_content(message):
     """对消息内容进行 Base64 编码"""
     if isinstance(message, dict) and "content" in message:
         content = message["content"]
-        encoded_content = base64.b64encode(
-            content.encode("utf-8")).decode("utf-8")
+        encoded_content = base64.b64encode(content.encode("utf-8")).decode("utf-8")
         message["content"] = encoded_content
     return message
 
@@ -382,8 +378,7 @@ def agent_chat_stream():
                 break
 
     # 对聊天记录进行解码
-    messages = [decode_message_content(msg.copy())
-                for msg in encoded_chat_history]
+    messages = [decode_message_content(msg.copy()) for msg in encoded_chat_history]
 
     # 添加用户消息
     messages.append({"role": "user", "content": user_talk})
@@ -397,7 +392,7 @@ def agent_chat_stream():
         model="charglm-3",
         meta={
             "user_info": "我是陆星辰，是一个男性...",
-            "bot_info": "苏梦远，本名苏远心...（说话的结尾一定有句号等结尾符号）",
+            "bot_info": "苏梦远，本名苏远心...",
             "bot_name": "苏梦远",
             "user_name": "陆星辰",
         },
@@ -417,18 +412,18 @@ def upload_image():
     接收前端发来的图片的路由
     """
     data = request.get_json()
-    if 'image' not in data:
+    if "image" not in data:
         return jsonify({"error": "No image data in the request"}), 400
 
-    image_data = data['image']
+    image_data = data["image"]
 
     # 去掉base64前缀
-    if image_data.startswith('data:image'):
-        image_data = image_data.split(',')[1]
+    if image_data.startswith("data:image"):
+        image_data = image_data.split(",")[1]
 
     # 将图片保存为文件
-    image_path = os.path.join('.cache', 'uploaded_image.png')
-    with open(image_path, 'wb') as f:
+    image_path = os.path.join(".cache", "uploaded_image.png")
+    with open(image_path, "wb") as f:
         f.write(base64.b64decode(image_data))
 
     return jsonify({"message": "Image uploaded successfully"}), 200
@@ -477,6 +472,10 @@ def agent_upload_audio():
     return jsonify({"message": "File uploaded successfully and processed"}), 200
 
 
+# 是否结束标志
+is_streaming: bool = False
+
+
 # ----- socket 监听函数 -----
 @socketio.on("agent_stream_audio")
 def agent_stream_audio(data: dict[str, int | str]):
@@ -491,13 +490,33 @@ def agent_stream_audio(data: dict[str, int | str]):
     Description:
         将前端发来的大模型响应 token 持续添加到句子中，当发现断句符号时，断句符号之前的句子合成音频发往前端。
     """
-    global bias, ideal_answers
-    # info("run.py", "agent_stream_audio", ideal_answers)
+    global is_streaming, ideal_answers, bias
+
+    if not is_streaming:
+        is_streaming = True
+
+        # 偏置，因为断句会导致文字总数发生变化，这引入了偏置
+        bias = 0
+
+        # 带人类断句的回答，字典，以序号:回答形式保存，避免语序错误
+        ideal_answers = {}
+
+    info("run.py", "agent_stream_audio", ideal_answers)
 
     # 如果 token 内容是 <END>，则表示大模型响应已经结束
     if "<END>" in data["answer"]:
-        pause_index = 0
-        data["answer"] = ""
+
+        # 设置结束标志
+        is_streaming = False
+
+        # 根据文本合成音频
+        audio_chunk = agent_audio_generate(ideal_answers[data["index"] - bias])
+
+        socketio.emit(
+            "agent_play_audio_chunk",
+            {"audio_index": data["index"] - bias, "audio_chunk": audio_chunk},
+        )
+        return
 
     # 寻找 token 中的断句下标
     else:
@@ -511,33 +530,33 @@ def agent_stream_audio(data: dict[str, int | str]):
             ideal_answers[data["index"] - bias] = data["answer"]
         bias += 1
 
-        # 发送空音频到前端
-        # index: -1 表示这是一个占位响应
-        socketio.emit("agent_play_audio_chunk", {"index": -1, "audio_chunk": ""})
+        return
 
     # 找到断句符号
     else:
         good_answer = data["answer"][: pause_index + 1]
         bad_answer = data["answer"][pause_index + 1 :]
 
-        # 将断句符号之前的句子添加到理想回答中
+        # 将断句符号之前的文字添加到句子中
         if (data["index"] - bias) in ideal_answers:
             ideal_answers[data["index"] - bias] += good_answer
         else:
             ideal_answers[data["index"] - bias] = good_answer
 
-        # 将断句符号之后的句子添加到理想回答中
-        if bad_answer or bad_answer != "<END>":
+        # 将断句符号之后的文字添加到句子中
+        if bad_answer:
             ideal_answers[data["index"] - bias + 1] = bad_answer
+
+        # 此处需要提前将偏置保存到 data 中，否则在此次 socket 发送消息之前，bias 会因为下次的请求而发生变化
         data["bias"] = bias
 
         # 根据文本合成音频
-        audio_chunk = agent_audio_generate(ideal_answers[data["index"] - bias])
-
+        audio_chunk = agent_audio_generate(ideal_answers[data["index"] - data["bias"]])
+        info("run.py", "agent_stream_audio", data["index"] - data["bias"], color="red")
+        
         socketio.emit(
             "agent_play_audio_chunk",
-            {"index": data["index"] - data["bias"],
-                "audio_chunk": audio_chunk},
+            {"audio_index": data["index"] - data["bias"], "audio_chunk": audio_chunk},
         )
 
 
@@ -546,7 +565,7 @@ if __name__ == "__main__":
     # if current_os == 'Windows':
     socketio.run(
         app,
-        port=5000,
+        port=80,
         host="0.0.0.0",
         allow_unsafe_werkzeug=True,
         debug=True,  # 调试模式（开发环境）

@@ -118,9 +118,20 @@ def agent_audio_generate(text: str) -> str:
         text = re.sub(r"\（.*?\）", "", text)
     if "(" in text and ")" in text:
         text = re.sub(r"\(.*?\)", "", text)
+    
+    if "（" in text and "）" not in text:
+        return ""
+    if "）" in text and "（" not in text:
+        return ""
+
+    # 去除换行符
+    text = text.replace("\n", "")
+
+    if len(text) == 0:
+        return ""
 
     # 对文本进行 URL 编码
-    text = quote_plus(text)
+    url_encoded_text = quote_plus(text)
 
     if os.path.exists(
         "./configs/audio_settings.json"
@@ -135,7 +146,7 @@ def agent_audio_generate(text: str) -> str:
         print("TTS 输出失败：配置文件丢失")
         exit(0)
 
-    params.update({"tok": token, "tex": text})
+    params.update({"tok": token, "tex": url_encoded_text})
 
     # print('语音请求参数:', params)
     data = urlencode(params)
@@ -148,6 +159,7 @@ def agent_audio_generate(text: str) -> str:
     except URLError as err:
         print("asr http response http code : " + str(err.code))
 
+    success("agent_speech_synthesis.py", "agent_audio_generate", "音频 '{}' 生成成功".format(text))
     return result_str
 
 
