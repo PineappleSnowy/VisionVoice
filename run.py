@@ -72,6 +72,10 @@ def chat():
     """消息路由"""
     return render_template("chat.html")
 
+@app.route("/phone", methods=["GET"])
+def phone():
+    """消息路由"""
+    return render_template("phone.html")
 
 @app.route("/create", methods=["GET"])
 def create():

@@ -1,14 +1,33 @@
 <!DOCTYPE html>
 <html>
-<head>
+  <head>
     <meta charset="UTF-8" />
-    <title>聊天 - 视界之声</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="../static/css/chat.css">
+    <title>智能聊天 - 视界之声</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0 user-scalable=no"
+    />
+    <link rel="stylesheet" href="../static/css/chat.css" />
     <link rel="icon" href="../static/images/star.png" />
-</head>
-<body>
-    <div id="more_function_board"></div>
-    <script src="../static/js/chat.js"></script>
-</body>
+    <script src="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/socket.io/4.4.1/socket.io.min.js"></script>
+  </head>
+
+  <body>
+    <div id="main_page">
+      <!-- 下部功能区 -->
+      <div id="chat-input-container">
+      <div id="navbar">
+        <a href="/agent">首页</a>
+        <a href="/chat">消息</a>
+        <a href="/create">
+          <img src="../static/images/star.png" id="star" />
+        </a>
+        <a href="/square">广场</a>
+        <a href="/mine">我的</a>
+      </div>
+    </div>
+    <script src="../static/js/auth.js"></script>
+    <script src="../static/js/agent.js"></script>
+    <script src="../static/js/audio.js"></script>
+  </body>
 </html>
