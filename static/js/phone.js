@@ -238,9 +238,10 @@ window.onload = async () => {
                 console.log('[phone.js][playNextAudio] 音频片段播放失败.', error);
             }
         } else {
-            if (vudio.paused) {
+            // 如果波形图动画处于暂停状态，则开始播放
+            if (vudio.paused()) {
+                // console.log('[phone.js][playNextAudio] 波形暂停信息', vudio.paused());
                 vudio.dance();
-                console.log('[phone.js][playNextAudio] 波形图动画开始');
             }
             console.log('[phone.js][playNextAudio] undefined audioIndex: %d', audioIndex);
         }
@@ -260,10 +261,10 @@ window.onload = async () => {
         // 将音频数据添加到音频列表
         audioList[index] = audioData;
 
-        // 停止波形图动画
-        if (vudio.dance) {
+        // 如果波形图动画正在播放，则暂停
+        if (!vudio.paused()) {
+            // console.log('[phone.js][socket.on][agent_play_audio_chunk] 波形暂停信息', vudio.paused());
             vudio.pause();
-            console.log('[phone.js][socket.on][agent_play_audio_chunk] 波形图动画暂停');
         }
 
         // 如果当前没有音频正在播放，开始播放
@@ -281,11 +282,11 @@ window.onload = async () => {
     socket.on('agent_speech_recognition_finished', function (data) {
         const rec_result = data['rec_result'];
         if (!rec_result) {
-            console.log('[test.html][socket.on][agent_speech_recognition_finished] rec_result is empty.');
+            console.log('[test.html][socket.on][agent_speech_recognition_finished] 音频识别结果为空.');
             return;
         }
         const token = localStorage.getItem('token');
-        console.log('[test.html][socket.on][agent_speech_recognition_finished] rec_result: %s', rec_result);
+        console.log('[test.html][socket.on][agent_speech_recognition_finished] 音频识别结果: %s', rec_result);
 
         fetch(`/agent/chat_stream?query=${rec_result}`, {
             headers: {
