@@ -1,33 +1,100 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-html::-webkit-scrollbar {
-    display: none;
-}
-
 body {
     font-family: Arial, sans-serif;
+    background-color: #121212;
+    color: #e0e0e0;
     margin: 0;
     padding: 0;
-    height: 100vh;
-    overflow: hidden;
 }
 
-p {
+.header {
+    padding: 10px;
+    text-align: center;
     font-size: 20px;
+    font-weight: bold;
+    color: #e0e0e0;
 }
 
-#main_page {
-    display: flex;
+.message-list {
     width: 100%;
-    height: 100%;
-    margin: 0;
-    padding: 0;
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: #1e1e1e;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.message-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #333;
+    cursor: pointer;
+    /* 添加鼠标指针样式 */
+    transition: background-color 0.3s ease;
+    /* 添加过渡效果 */
+}
+
+.message-item:last-child {
+    border-bottom: none;
+}
+
+.message-item:hover {
+    background-color: #333;
+    /* 鼠标悬停时的背景颜色 */
+}
+
+.message-item:active {
+    background-color: #555;
+    /* 被点击时的背景颜色 */
+}
+
+.avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.content {
+    flex: 1;
+}
+
+.name {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.description {
+    font-size: 12px;
+    color: #b0b0b0;
+}
+
+.buttons {
+    display: flex;
+    gap: 5px;
+}
+
+.button {
+    width: 60px;
+    height: 60px;
+    border: 2px solid #ffffff;
+    border-radius: 10px;
     background-color: #2c2c2c;
-    background-size: cover;
+    background-size: 30px 30px;
+    background-repeat: no-repeat;
+    background-position: center;
+    cursor: pointer;
+}
+
+.button.phone {
+    background-image: url('../static/images/phone.png');
+}
+
+.button.video {
+    background-image: url('../static/images/camera.png');
+}
+
+.button:hover {
+    background-color: #1a1a1a;
 }
 
 #navbar {
@@ -47,306 +114,25 @@ p {
 #navbar a {
     text-decoration: none;
     color: inherit;
-    margin: 0 10px;
-    padding: 5px 10px;
+    margin: 0px 5px;
+    padding: 10px 20px;
     border-radius: 5px;
     transition: background-color 0.3s ease;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 #navbar a:hover {
     background-color: #211f1f;
 }
 
-#chat-input-container {
-    position: absolute;
-    bottom: 45px;
-    width: 100%;
-    height: 50px;
-    display: flex;
-    justify-content: right;
-    border: 0;
-    padding: 0;
-}
-
-#send-button {
-    display: flex;
-    position: relative;
-    top: 5px;
-    padding: 10px;
-    font-size: 16px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    cursor: pointer;
+#navbar img {
     width: 35px;
-    display: inline-block;
-    vertical-align: bottom;
+    /* 增加图片的宽度 */
     height: 35px;
-    border-radius: 90px;
-    right: 14px;
-}
-
-#send-button:hover {
-    background-color: #0056b3;
-}
-
-#send-button #arrow_right {
-    display: flex;
-    position: absolute;
-    top: 3px;
-    right: 3px;
-    width: 28px;
-    height: 28px;
-}
-
-#more_function_button {
-    display: none;
-    position: relative;
-    top: 5px;
-    padding: 10px;
-    font-size: 16px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    cursor: pointer;
-    width: 35px;
-    display: inline-block;
-    vertical-align: bottom;
-    height: 35px;
-    border-radius: 90px;
-    right: 8px;
-}
-
-#more_function_button:hover {
-    background-color: #0056b3;
-}
-
-#more_function_button #more_function_start {
-    display: flex;
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    width: 25px;
-    height: 25px;
-}
-
-#more_function_button_2 {
-    display: none;
-    position: relative;
-    top: 5px;
-    padding: 10px;
-    font-size: 16px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    cursor: pointer;
-    width: 35px;
-    display: inline-block;
-    vertical-align: bottom;
-    height: 35px;
-    border-radius: 90px;
-    right: 8px;
-}
-
-#more_function_button_2:hover {
-    background-color: #0056b3;
-}
-
-#more_function_button_2 #more_function_end {
-    display: flex;
-    position: absolute;
-    top: 2px;
-    right: 2px;
-    width: 30px;
-    height: 30px;
-}
-
-
-#agent-chat-textarea {
-    display: flex;
-    min-height: 20px;
-    max-height: 50px;
-    overflow-y: auto;
-    resize: none;
-    width: auto;
-    position: absolute;
-    bottom: 5px;
-    right: 1px;
-    left: 1px;
-    background-color: rgba(33, 31, 31, 0.8);
-    color: #fff;
-    border-radius: 10px 10px 0 0;
-    padding: 10px 100px 10px 15px;
-    font-size: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    transition: all 0.3s ease;
-    line-height: 1.5;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-#agent-chat-textarea:focus {
-    outline: none;
-    border-color: rgba(255, 255, 255, 0.2);
-    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.2);
-}
-
-#chat-container {
-    display: flex;
-    position: absolute;
-    top: 0%;
-    width: 100%;
-    padding: 10px;
-    height: 90%;
-    flex-direction: column;
-    background-color: rgba(red, green, blue, 0);
-    overflow: auto;
-    scrollbar-width: none;
-}
-
-
-.chat-messages-user {
-    display: flex;
-    flex-direction: row;
-    position: relative;
-    top: 5px;
-    width: 100%;
-    height: fit-content;
-    justify-content: right;
-}
-
-.chat-messages-bot {
-    display: flex;
-    flex-direction: row;
-    position: relative;
-    top: 5px;
-    width: 100%;
-    height: fit-content;
-    justify-content: left;
-}
-
-.chat-bubble {
-    padding: 10px;
-    margin: 10px;
-    border-radius: 4px;
-    max-width: 60%;
-    word-wrap: break-word;
-    font-size: larger;
-    background-color: #5b61b9;
-    color: #fff;
-    align-self: flex-end;
-}
-
-.chat-image-user {
-    background-image: url('../images/user.png');
-    width: 40px;
-    height: 40px;
-    background-size: cover;
-    border-radius: 5px;
-}
-
-.chat-image-bot {
-    background-image: url('../images/bot.png');
-    width: 40px;
-    height: 40px;
-    background-size: cover;
-    border-radius: 5px;
-}
-
-#star {
-    height: 30px;
-    width: 30px;
-}
-
-#flicker {
-    display: flex;
-    position: absolute;
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    height: 100%;
-    background-image: url('../images/水晶宫殿.jpeg');
-    background-size: cover;
-}
-
-#more_function_board {
-    width: auto;
-    height: 200px;
-    position: absolute;
-    right: 0;
-    left: 0;
-    bottom: -150px;
-    background-color: #4b4242;
-    display: flex;
-}
-
-#more_function_board #function_1 {
-    display: flex;
-    position: relative;
-    top: 50px;
-    width: 50px;
-    height: 50px;
-    left: 4%;
-    background-color: #b0aec4;
-    border: 0;
-    padding: 0;
-    border-radius: 10px;
-}
-
-#more_function_board #function_1:hover {
-    background-color: #726c6c;
-}
-
-#photo {
-    display: flex;
-    position: relative;
-    top: 10px;
-    left: 10px;
-    width: 50px;
-    height: 50px;
-    border-radius: 5px;
-}
-
-#decorate_photo {
-    display: flex;
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    width: 50px;
-    height: 50px;
-    background-image: url('../images/camera.png');
-    background-size: cover;
-    background-color: #4b4242;
-}
-
-#decorate_photo:hover {
-    background-color: #726c6c;
-}
-
-@keyframes slideup {
-    from {
-        transform: translateY(0px);
-    }
-
-    to {
-        transform: translateY(-150px);
-    }
-}
-
-@keyframes slidedown {
-    from {
-        transform: translateY(-150px);
-    }
-
-    to {
-        transform: translateY(0px);
-    }
-}
-
-.slide-up {
-    animation: slideup 0.5s ease-in-out forwards;
-}
-
-.slide-down {
-    animation: slidedown 0.5s ease-in-out forwards;
+    /* 增加图片的高度 */
+    margin-right: 0;
+    /* 移除图片与文字之间的间距 */
 }
