@@ -197,7 +197,7 @@ p {
     top: 0%;
     width: 100%;
     padding: 10px;
-    height: 90%;
+    height: 80%;
     flex-direction: column;
     background-color: rgba(red, green, blue, 0);
     overflow: auto;
@@ -354,7 +354,7 @@ p {
 #phone-button {
     position: absolute;
     left: 3px;
-    bottom: 55px;
+    bottom: 60px;
     width: 50px;
     height: 50px;
     border: none;

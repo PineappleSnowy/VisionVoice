@@ -322,7 +322,7 @@
     // 获取大模型输出结果显示元素
     const modelOutputResult = document.getElementById('modelOutputResult');
 
-    // 监听后端发送的 agent_speech_rec 语音识别事件
+    // 监听后端发送的 agent_speech_recognition_finished 语音识别事件
     let index = 0;
     socket.on('agent_speech_recognition_finished', function (data) {
         const rec_result = data['rec_result'];
