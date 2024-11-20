@@ -56,11 +56,6 @@ def index():
     return render_template("index.html")
 
 
-@app.route("/test", methods=["GET"])
-def test():
-    return render_template("test.html")
-
-
 @app.route("/agent", methods=["GET"])
 def Agent():
     """智能体根路由"""
