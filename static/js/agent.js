@@ -350,6 +350,9 @@ document.getElementById('more_function_button_2').style.display = 'none';
 - 当元素播放结束后，继续播放下一个元素，直到队列中没有元素为止
 --------------------------------------------------------- */ 
 
+// 获取暂停按钮元素
+const pauseDiv = document.querySelector('.pause');
+
 // 获取音频播放器 DOM 元素
 const audioPlayer = document.getElementById('audioPlayer');
 
@@ -373,6 +376,7 @@ socket.on('agent_play_audio_chunk', function (data) {
 
     // 如果当前没有音频正在播放，开始播放
     if (!isPlaying) {
+        pauseDiv.style.backgroundImage = `url('${'./static/images/pause.png'}')`;
         playNextAudio();
     }
 });
@@ -385,6 +389,7 @@ function playNextAudio() {
     // 如果音频队列中没有音频数据（即后端还没有发送音频数据），则停止播放
     if (audioQueue.length === 0) {
         isPlaying = false;
+        pauseDiv.style.backgroundImage = `url('${'./static/images/pause_inactive.png'}')`;
         return;
     }
     console.log('[agent.js][playNextAudio] audioQueue:', audioQueue);
@@ -426,9 +431,6 @@ function playNextAudio() {
 audioPlayer.onended = function () {
     playNextAudio();
 };
-
-// 获取暂停按钮元素
-const pauseDiv = document.querySelector('.pause');
 
 /**
  * @description 暂停音频播放
