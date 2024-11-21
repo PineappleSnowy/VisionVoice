@@ -25,6 +25,7 @@ from flask_jwt_extended import jwt_required
 # 自定义函数
 from agent_files.agent_speech_rec import speech_rec
 from agent_files.agent_speech_synthesis import agent_audio_generate
+from lib.debugger import *
 
 # ----- 加载全局应用 -----
 app = Flask(__name__)
@@ -47,8 +48,7 @@ def before_request():
         except Exception as e:
             return (
                 jsonify(
-                    {"message": "Token has expired!",
-                        "code": 401, "error": str(e)}
+                    {"message": "Token has expired!", "code": 401, "error": str(e)}
                 ),
                 401,
             )
@@ -74,10 +74,12 @@ def chat():
     return render_template("chat.html")
 
 
+
 @app.route("/phone", methods=["GET"])
 def phone():
     """消息路由"""
     return render_template("phone.html")
+
 
 
 @app.route("/create", methods=["GET"])
@@ -107,10 +109,6 @@ with open("./static/api.json", "r", encoding="utf-8") as f:
 
 # 当前操作系统
 current_os = platform.system()
-# 偏置，因为断句会导致句子总数发生变化，这引入了偏置
-bias = 0
-# 带人类断句的回答，字典，以序号:回答形式保存，避免语序错误
-ideal_answers = dict()
 # 聊天记录最大长度
 MAX_HISTORY = 50
 
@@ -150,7 +148,8 @@ def predict(responses, agent_name):
             text = "我听不懂你在说什么\n"
         response_all += text
         yield text
-
+    # 结束标志
+    yield "<END>"
     messages[agent_name].append({"role": "assistant", "content": response_all})
     save_chat_history(agent_name)
 
@@ -170,25 +169,52 @@ def change_sample_rate(input_file, target_sample_rate, ori_sample_rate):
     return resampled_audio_data.astype(np.int16).tobytes()
 
 
-def find_pause(str_seek):
+def find_pause(sentence: str) -> int:
     """
     寻找话语停顿函数，返回最后一次断句位置
+
+    Args:
+        sentence {str} 一句话
+
+    Example:
+        sentence = "你好，我是小明。今天天气真好！"
+        rfind 会找到：
+        "，" 的位置是 2
+        "。" 的位置是 7
+        "！" 的位置是 14
+        未找到时返回 -1
+        最终返回 14，即最后的感叹号位置
+
+    Returns:
+        pause_index {int} 最后一次断句位置
     """
-    aim_symbols = ["。", "！", "：", "？", "，", "；"]
+
+    # 断句的目标符号
+    target_symbols = [
+        "。",
+        "！",
+        "：",
+        "？",
+        "，",
+        "；",  # 全角符号
+        # ".", "!", ":", "?", ",", ";",  # 半角符号
+    ]
+
+    # 记录目标符号的位置
     index_list = []
-    for symbol in aim_symbols:
-        index = str_seek.rfind(symbol)
+
+    for symbol in target_symbols:
+        index = sentence.rfind(symbol)
         index_list.append(index)
-    aim_index = max(index_list)
-    return aim_index
+    pause_index = max(index_list)
+    return pause_index
 
 
 def encode_message_content(message):
     """对消息内容进行 Base64 编码"""
     if isinstance(message, dict) and "content" in message:
         content = message["content"]
-        encoded_content = base64.b64encode(
-            content.encode("utf-8")).decode("utf-8")
+        encoded_content = base64.b64encode(content.encode("utf-8")).decode("utf-8")
         message["content"] = encoded_content
     return message
 
@@ -265,12 +291,17 @@ def login():
 
     # 对比用户信息
     for user in users:
-        print(user["username"], user["password"])
+        info(
+            "run.py",
+            "login",
+            "用户名：" + user["username"] + "密码：" + user["password"],
+        )
         if user["username"] == username and user["password"] == password:
             print("登录成功")
             # 设置 local token
             access_token = create_access_token(
-                identity=username, expires_delta=timedelta(hours=1))
+                identity=username, expires_delta=timedelta(hours=1)
+            )
             return (
                 jsonify(
                     {"message": "登录成功", "code": 200, "access_token": access_token}
@@ -288,34 +319,39 @@ def verify_token():
     try:
         # 验证 token 是否有效
         verify_jwt_in_request()
-        print("token 有效")
         # 获取当前 token 对应的用户
         current_user = get_jwt_identity()
-        print("当前用户：", current_user)
+        success("run.py", "verify_token", "token 有效，当前用户：" + current_user)
         return jsonify({"valid": True, "user": current_user}), 200
     # 如果token无效，返回错误信息
     except:
-        return jsonify({"valid": False, "message": "token has expired!"}), 400
+        return jsonify({"valid": False, "message": "token has expired!"}), 200
 
 
 @app.route("/get-chat-history", methods=["GET"])
-@jwt_required()
 def get_chat_history():
-    """
-    获取聊天记录
-    """
     agent_name = request.args.get("agent", "defaultAgent")  # 获取智能体名称
-    current_user = get_jwt_identity()
-
-    # 从用户聊天记录获取历史消息，如果没有则初始化
-    with open("./static/user.json", "r", encoding="utf-8") as f:
-        users = json.load(f)
-        for user in users:
-            if user["username"] == current_user:
-                if agent_name not in user:
-                    user[agent_name] = {"chat_history": []}
-                encoded_chat_history = user[agent_name]["chat_history"]
-                break
+    try:
+        verify_jwt_in_request()
+        current_user = get_jwt_identity()
+        success(
+            "run.py",
+            "get_chat_history",
+            "token 有效，当前用户：" + current_user + "，开始获取聊天记录...",
+        )
+        
+        # 从用户聊天记录获取历史消息，如果没有则初始化
+        with open("./static/user.json", "r", encoding="utf-8") as f:
+            users = json.load(f)
+            for user in users:
+                if user["username"] == current_user:
+                    if agent_name not in user:
+                        user[agent_name] = {"chat_history": []}
+                    encoded_chat_history = user[agent_name]["chat_history"]
+                    break
+    except Exception as e:
+        error("run.py", "get_chat_history", "获取聊天记录失败: " + str(e))
+        return jsonify({"error": str(e)}), 401
 
     # 对聊天记录进行解码
     chat_history = [decode_message_content(
@@ -428,18 +464,18 @@ def upload_image():
     接收前端发来的图片的路由
     """
     data = request.get_json()
-    if 'image' not in data:
+    if "image" not in data:
         return jsonify({"error": "No image data in the request"}), 400
 
-    image_data = data['image']
+    image_data = data["image"]
 
     # 去掉base64前缀
-    if image_data.startswith('data:image'):
-        image_data = image_data.split(',')[1]
+    if image_data.startswith("data:image"):
+        image_data = image_data.split(",")[1]
 
     # 将图片保存为文件
-    image_path = os.path.join('.cache', 'uploaded_image.png')
-    with open(image_path, 'wb') as f:
+    image_path = os.path.join(".cache", "uploaded_image.png")
+    with open(image_path, "wb") as f:
         f.write(base64.b64decode(image_data))
 
     return jsonify({"message": "Image uploaded successfully"}), 200
@@ -449,7 +485,15 @@ def upload_image():
 def agent_upload_audio():
     """
     接收前端发来的音频的路由
+
+    Args:
+        audio_data {wav} 一次完整的音频数据
+        sample_rate {int} 音频采样率
+
+    socketio.emit:
+        agent_speech_recognition_finished {string} 本次音频数据的完整语音识别结果
     """
+    info("run.py", "agent_upload_audio", "开始音频处理...")
     if "audio_data" not in request.files:
         return "No file part in the request", 400
 
@@ -462,71 +506,109 @@ def agent_upload_audio():
         return "file is empty", 400
 
     # 保存文件为.wav格式
-    file.save("agent_files/audio.wav")
+    file.save(".cache/audio.wav")
 
     # 修改采样率
     resampled_audio_data = change_sample_rate(
-        "agent_files/audio.wav", 16000, ori_sample_rate
+        ".cache/audio.wav", 16000, ori_sample_rate
     )
 
     # 语音识别
     rec_result = speech_rec(resampled_audio_data)
 
-    # 语音识别结果发送到前端
-    socketio.emit("agent_speech_rec", {"rec_result": rec_result})
+    print("音频识别结果：", rec_result)
+
+    # 音频识别结果发送到前端
+    socketio.emit("agent_speech_recognition_finished", {"rec_result": rec_result})
 
     return jsonify({"message": "File uploaded successfully and processed"}), 200
 
 
+# 是否结束标志
+is_streaming: bool = False
+
+
 # ----- socket 监听函数 -----
 @socketio.on("agent_stream_audio")
-def agent_handle_audio_stream(data):
+def agent_stream_audio(data: dict[str, int | str]):
     """
-    处理音频流路由。
+    对音频进行断句处理。
 
     Args:
-        data: 包含大模型响应token的数据。
+        data: 包含大模型响应 token 的数据。
+            data["index"]: token 序号
+            data["answer"]: token 内容
 
     Description:
-        处理前端发来的大模型响应token，以人类断句的方式合成音频再发往前端。
+        将前端发来的大模型响应 token 持续添加到句子中，当发现断句符号时，断句符号之前的句子合成音频发往前端。
     """
-    global bias
-    # 寻找最后一次断句下标
-    aim = find_pause(data["answer"])
-    # 未找到时的处理
-    if aim == -1:
+    global is_streaming, ideal_answers, bias
+
+    if not is_streaming:
+        is_streaming = True
+
+        # 偏置，因为断句会导致文字总数发生变化，这引入了偏置
+        bias = 0
+
+        # 带人类断句的回答，字典，以序号:回答形式保存，避免语序错误
+        ideal_answers = {}
+
+    info("run.py", "agent_stream_audio", ideal_answers)
+
+    # 如果 token 内容是 <END>，则表示大模型响应已经结束
+    if "<END>" in data["answer"]:
+
+        # 设置结束标志
+        is_streaming = False
+
+        # 根据文本合成音频
+        audio_chunk = agent_audio_generate(ideal_answers[data["index"] - bias])
+
+        socketio.emit(
+            "agent_play_audio_chunk",
+            {"audio_index": data["index"] - bias, "audio_chunk": audio_chunk},
+        )
+        return
+
+    # 寻找 token 中的断句下标
+    else:
+        pause_index = find_pause(data["answer"])
+
+    # 找不到任何断句符号的时候，持续将 token 积累到句子中，直到变成有断句符号的完整句子
+    if pause_index == -1:
         if (data["index"] - bias) in ideal_answers:
             ideal_answers[data["index"] - bias] += data["answer"]
         else:
             ideal_answers[data["index"] - bias] = data["answer"]
         bias += 1
-        socketio.emit("agent_play_audio_chunk", {
-                      "index": -1, "audio_chunk": ""})
+
+        return
+
+    # 找到断句符号
     else:
-        good_answer = data["answer"][: aim + 1]
-        bad_answer = data["answer"][aim + 1:]
+        good_answer = data["answer"][: pause_index + 1]
+        bad_answer = data["answer"][pause_index + 1 :]
+
+        # 将断句符号之前的文字添加到句子中
         if (data["index"] - bias) in ideal_answers:
             ideal_answers[data["index"] - bias] += good_answer
         else:
             ideal_answers[data["index"] - bias] = good_answer
 
+        # 将断句符号之后的文字添加到句子中
         if bad_answer:
             ideal_answers[data["index"] - bias + 1] = bad_answer
+
+        # 此处需要提前将偏置保存到 data 中，否则在此次 socket 发送消息之前，bias 会因为下次的请求而发生变化
         data["bias"] = bias
 
-        # 发送合成的语音到前端，对音频进行播放
-        input_text = ideal_answers[data["index"] - bias]
-        # print('data["index"] - data["bias"]:', data["index"] - data["bias"])
-        # print('data["index"]', data["index"])
-        # print('data["bias"]:', data["bias"])
-        audio_chunk = agent_audio_generate(ideal_answers[data["index"] - bias])
-        # 发送合成的语音到前端
-        print("TTS 处理完毕:", input_text)
-
+        # 根据文本合成音频
+        audio_chunk = agent_audio_generate(ideal_answers[data["index"] - data["bias"]])
+        info("run.py", "agent_stream_audio", data["index"] - data["bias"], color="red")
+        
         socketio.emit(
             "agent_play_audio_chunk",
-            {"index": data["index"] - data["bias"],
-                "audio_chunk": audio_chunk},
+            {"audio_index": data["index"] - data["bias"], "audio_chunk": audio_chunk},
         )
 
 
@@ -535,7 +617,7 @@ if __name__ == "__main__":
     # if current_os == 'Windows':
     socketio.run(
         app,
-        port=5000,
+        port=80,
         host="0.0.0.0",
         allow_unsafe_werkzeug=True,
         debug=True,  # 调试模式（开发环境）

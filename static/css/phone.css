@@ -1,6 +1,5 @@
 html {
-  /* 只是占个位置，不然less会编译出空选择器 */
-  font-size: 16px;
+  font-size: var(--font-size);
 }
 html body {
   margin: 0;
@@ -27,7 +26,7 @@ html body .controller {
   height: 2.6rem;
   left: 0;
   bottom: 0;
-  background-color: #f7f7f7;
+  background-color: white;
 }
 html body .controller canvas {
   display: block;
@@ -59,7 +58,7 @@ html body .container {
   width: 100vw;
   height: 100vh;
   transition: transform 0.3s ease;
-  background-color: #f7f7f7;
+  background-color: white;
 }
 html body .container img {
   position: absolute;

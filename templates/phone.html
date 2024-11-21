@@ -11,24 +11,25 @@
     <script src="../static/js/vudio.js"></script>
 </head>
 <body>
-    <i class="fa-solid fa-chevron-left goBack"></i>
-    <i class="fa-solid fa-repeat toggleCamera" style="display: none;"></i>
-    <video autoplay style="display: none;">您的浏览器不支持视频通话</video>
+    <div aria-label="返回主页"><i class="fa-solid fa-chevron-left goBack"></i></div>
+    <div aria-label="切换摄像头" style="display: none;" class="toggleCamera"><i class="fa-solid fa-repeat toggleCamera"></i></div>
+    <video autoplay style="display: none;" aria-label="视频通话窗口">您的浏览器不支持视频通话</video>
     <div class="container">
-        <img src="../static/images/bot.png" alt="智能体头像">
+        <img src="../static/images/bot.png" alt="智能体头像" aria-label="智能体头像">
     </div>
 
     <!-- 控件部分 -->
     <div class="controller">
-        <canvas id="waveShape"></canvas>
-        <audio autoplay id="audio"></audio>
-        <i class="fa-solid fa-video openCamera"></i>
-        <i class="fa-solid fa-phone-slash hangUp"></i>
+        <canvas id="waveShape" aria-label="音频波形图"></canvas>
+        <audio autoplay id="audio" aria-label="通话音频"></audio>
+        <div aria-label="打开摄像头"><i class="fa-solid fa-video openCamera"></i></div>
+        <div aria-label="挂断电话"><i class="fa-solid fa-phone-slash hangUp"></i></div>
+
     </div>
     <div id="microphone" class="voice"></div>
     <audio id="audioPlayer" controls autoplay style="display: none"></audio>
+    <script src="../static/js/recorder.js"></script>
     <script src="../static/js/phone.js"></script>
-    <script src="../static/js/audio.js"></script>
     <script src="../static/js/auth.js"></script>
 </body>
 </html>

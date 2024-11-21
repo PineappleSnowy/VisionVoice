@@ -351,6 +351,11 @@
             return this;
         },
 
+        // 获取暂停状态
+        paused: function () {
+            return this.stat === 0;
+        },
+
         // 改变参数
         setOption: function (option) {
             this.option = __mergeOption(this.option, option);

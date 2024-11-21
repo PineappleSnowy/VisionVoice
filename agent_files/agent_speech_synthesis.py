@@ -2,6 +2,8 @@
 import sys
 import json
 import os
+from lib.debugger import *
+import re
 
 with open("./static/api.json", "r", encoding="utf-8") as f:
     data = json.load(f)
@@ -27,9 +29,9 @@ if IS_PY3:
 # 精品音库：度逍遥=5003，度小鹿=5118，度博文=106，度小童=110，度小萌=111，度米朵=103，度小娇=5，默认为度小美
 PER = 5118
 # 语速，取值0-15，默认为5中语速
-SPD = 5
+SPD = 8
 # 音调，取值0-15，默认为5中语调
-PIT = 6
+PIT = 7
 # 音量，取值0-9，默认为5中音量
 VOL = 9
 # 下载的文件格式, 3:mp3(default) 4:pcm-16k 5:pcm-8k 6:wav
@@ -57,7 +59,7 @@ init_params = {
     "ctp": 1,
 }  # lan ctp 固定参数
 
-with open("./settings/audio_settings.json", "w", encoding="utf-8") as f:
+with open("./configs/audio_settings.json", "w", encoding="utf-8") as f:
     json.dump(init_params, f, ensure_ascii=False, indent=4)
 
 
@@ -71,7 +73,7 @@ TOKEN_URL = "http://aip.baidubce.com/oauth/2.0/token"
 SCOPE = "audio_tts_post"  # 有此scope表示有tts能力，没有请在网页里勾选
 
 
-def fetch_token():
+def fetch_token() -> str:
     params = {
         "grant_type": "client_credentials",
         "client_id": api_key,
@@ -104,16 +106,38 @@ def fetch_token():
 """  TOKEN end """
 
 
-def agent_audio_generate(TEXT):
+def agent_audio_generate(text: str) -> str:
+    """
+    根据文本生成音频
+    """
     token = fetch_token()
-    print("TTS 输入:", TEXT)
-    tex = quote_plus(TEXT)
+    info("agent_speech_synthesis.py", "agent_audio_generate", "输入:" + text)
+
+    # 利用正则匹配去除括号及括号中的内容
+    if "（" in text and "）" in text:
+        text = re.sub(r"\（.*?\）", "", text)
+    if "(" in text and ")" in text:
+        text = re.sub(r"\(.*?\)", "", text)
+    
+    if "（" in text and "）" not in text:
+        return ""
+    if "）" in text and "（" not in text:
+        return ""
+
+    # 去除换行符
+    text = text.replace("\n", "")
+
+    if len(text) == 0:
+        return ""
+
+    # 对文本进行 URL 编码
+    url_encoded_text = quote_plus(text)
 
     if os.path.exists(
-        "./settings/audio_settings.json"
+        "./configs/audio_settings.json"
     ):  # 此处路径没有问题, app 启动后, 运行程序路径不在此文件
         try:
-            with open("./settings/audio_settings.json", "r", encoding="utf-8") as f:
+            with open("./configs/audio_settings.json", "r", encoding="utf-8") as f:
                 params = json.load(f)
                 f.close()
         except Exception as e:
@@ -122,11 +146,10 @@ def agent_audio_generate(TEXT):
         print("TTS 输出失败：配置文件丢失")
         exit(0)
 
-    params.update({"tok": token, "tex": tex})
+    params.update({"tok": token, "tex": url_encoded_text})
 
     # print('语音请求参数:', params)
     data = urlencode(params)
-    # print('test on Web Browser' + TTS_URL + '?' + data)
 
     req = Request(TTS_URL, data.encode("utf-8"))
     try:
@@ -136,6 +159,7 @@ def agent_audio_generate(TEXT):
     except URLError as err:
         print("asr http response http code : " + str(err.code))
 
+    success("agent_speech_synthesis.py", "agent_audio_generate", "音频 '{}' 生成成功".format(text))
     return result_str
 
 

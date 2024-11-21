@@ -1,63 +1,58 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8" />
-    <title>智能聊天 - 视界之声</title>
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0 user-scalable=no"
-    />
-    <link rel="stylesheet" href="../static/css/agent.css" />
-    <link rel="icon" href="../static/images/star.png" />
-    <script src="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/socket.io/4.4.1/socket.io.min.js"></script>
-  </head>
 
-  <body>
-    <div id="main_page">
-      <div id="chat-container">
-        <!-- 聊天消息将在这里显示 -->
-      </div>
-      <!-- 下部功能区 -->
-      <div id="chat-input-container">
-        <div class="pause"></div>
-        <a id="phone-button" href="/phone">
-          <img src="../static/images/phone.png" id="phone_icon" />
-        </a>
-        <textarea id="agent-chat-textarea" placeholder="输入消息..."></textarea>
-        <button id="send-button">
-          <img src="../static/images/arrow_right.png" id="arrow_right" />
-        </button>
-        <button id="more_function_button">
-          <img
-            src="../static/images/more_function_start.png"
-            id="more_function_start"
-          />
-        </button>
-        <button id="more_function_button_2">
-          <img
-            src="../static/images/more_function_end.png"
-            id="more_function_end"
-          />
-        </button>
-      </div>
-      <div id="more_function_board">
-        <input id="photo" type="file" accept="image/*" />
-        <div id="decorate_photo"></div>
-      </div>
-      <div id="navbar">
-        <a href="/agent">首页</a>
-        <a href="/chat">消息</a>
-        <a href="/create">
-          <img src="../static/images/star.png" id="star" />
-        </a>
-        <a href="/square">广场</a>
-        <a href="/mine">我的</a>
-      </div>
+<head>
+  <meta charset="UTF-8" />
+  <title>智能聊天 - 视界之声</title>
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0 user-scalable=no" />
+  <link rel="stylesheet" href="../static/css/agent.css" />
+  <link rel="icon" href="../static/images/star.png" />
+  <script src="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/socket.io/4.4.1/socket.io.min.js"></script>
+</head>
+
+<body>
+  <div id="main_page">
+
+    <!-- 聊天消息显示区域 -->
+    <div id="chat-container"></div>
+    <!-- 下部功能区 -->
+    <div id="chat-input-container">
+      <div class="pause"></div>
+      <a id="phone-button" href="/phone">
+        <img src="../static/images/phone.png" id="phone_icon" />
+      </a>
+      <textarea id="agent-chat-textarea" placeholder="输入消息..."></textarea>
+      <button id="send-button">
+        <img src="../static/images/arrow_right.png" id="arrow_right" />
+      </button>
+      <button id="more_function_button">
+        <img src="../static/images/more_function_start.png" id="more_function_start" />
+      </button>
+      <button id="more_function_button_2">
+        <img src="../static/images/more_function_end.png" id="more_function_end" />
+      </button>
     </div>
-    <div id="microphone" class="voice"></div>
-    <audio id="audioPlayer" controls autoplay style="display: none"></audio>
-    <script src="../static/js/auth.js"></script>
-    <script src="../static/js/agent.js"></script>
-    <script src="../static/js/audio.js"></script>
-  </body>
+    <div id="more_function_board">
+      <input id="photo" type="file" accept="image/*" />
+      <div id="decorate_photo"></div>
+    </div>
+    <div id="navbar">
+      <a href="/agent">首页</a>
+      <a href="/chat">消息</a>
+      <a href="/create">
+        <img src="../static/images/star.png" id="star" />
+      </a>
+      <a href="/square">广场</a>
+      <a href="/mine">我的</a>
+    </div>
+  </div>
+
+  <!-- 音频播放标签 -->
+  <audio id="audioPlayer" controls autoplay style="display: none"></audio>
+
+  <script src="../static/js/auth.js"></script>
+  <script src="../static/js/agent.js"></script>
+</body>
+
 </html>

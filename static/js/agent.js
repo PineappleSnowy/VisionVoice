@@ -29,44 +29,49 @@ function loadChatHistory(agent) {
             "Authorization": `Bearer ${localStorage.getItem('token')}`
         }
     })
-    .then(response => response.json())
-    .then(history => {
-        history.forEach(msg => {
-            if(msg.role === 'user') {
-                // 创建用户消息
-                var messagesContainer_user = document.createElement('div');
-                messagesContainer_user.className = 'chat-messages-user';
-                var bubble = document.createElement('div');
-                bubble.className = 'chat-bubble';
-                var image_user = document.createElement('div');
-                image_user.className = 'chat-image-user';
-                bubble.textContent = msg.content;
-                
-                messagebackground.appendChild(messagesContainer_user);
-                messagesContainer_user.appendChild(bubble);
-                messagesContainer_user.appendChild(image_user);
-            } else if(msg.role === 'assistant') {
-                // 创建机器人消息
-                var image_bot = document.createElement('div');
-                image_bot.className = 'chat-image-bot';
-                var messagesContainer_bot = document.createElement('div');
-                messagesContainer_bot.className = 'chat-messages-bot';
-                var bubble_2 = document.createElement('div');
-                bubble_2.className = 'chat-bubble';
-                bubble_2.textContent = msg.content;
-                
-                messagesContainer_bot.appendChild(image_bot);
-                messagesContainer_bot.appendChild(bubble_2);
-                messagebackground.appendChild(messagesContainer_bot);
+        .then(response => response.json())
+        .then(history => {
+            if (history.length > 0) {
+                history.forEach(msg => {
+                    if (msg.role === 'user') {
+                        // 创建用户消息
+                        var messagesContainer_user = document.createElement('div');
+                        messagesContainer_user.className = 'chat-messages-user';
+                        var bubble = document.createElement('div');
+                        bubble.className = 'chat-bubble';
+                        var image_user = document.createElement('div');
+                        image_user.className = 'chat-image-user';
+                        bubble.textContent = msg.content;
+
+                        messagebackground.appendChild(messagesContainer_user);
+                        messagesContainer_user.appendChild(bubble);
+                        messagesContainer_user.appendChild(image_user);
+                    } else if (msg.role === 'assistant') {
+                        // 创建机器人消息
+                        var image_bot = document.createElement('div');
+                        image_bot.className = 'chat-image-bot';
+                        var messagesContainer_bot = document.createElement('div');
+                        messagesContainer_bot.className = 'chat-messages-bot';
+                        var bubble_2 = document.createElement('div');
+                        bubble_2.className = 'chat-bubble';
+                        bubble_2.textContent = msg.content;
+
+                        messagesContainer_bot.appendChild(image_bot);
+                        messagesContainer_bot.appendChild(bubble_2);
+                        messagebackground.appendChild(messagesContainer_bot);
+                    }
+                });
+                messagebackground.scrollTop = messagebackground.scrollHeight;
+            } else {
+                messagebackground.innerHTML = '<div class="chat-messages-user"><div class="chat-bubble">您还没有聊天记录</div></div>';
             }
+        })
+        .catch(error => {
+            console.error('Error loading chat history:', error);
         });
-        messagebackground.scrollTop = messagebackground.scrollHeight;
-    })
-    .catch(error => {
-        console.error('Error loading chat history:', error);
-    });
 }
 
+// 发送消息按钮
 document.getElementById('send-button').addEventListener('click', function () {
     var input = document.getElementById('agent-chat-textarea');
     var message = input.value.trim();
@@ -92,9 +97,8 @@ document.getElementById('send-button').addEventListener('click', function () {
  * @param {string} message 消息内容
  */
 function addMessage(message) {
-    console.log('[agent.js][addMessage] message: %s', message);
+    // console.log('[agent.js][addMessage] message: %s', message);
     const token = localStorage.getItem('token');
-    var index = 0;
     var messagebackground = document.getElementById('chat-container');
     var messagesContainer_user = document.createElement('div');
     messagesContainer_user.className = 'chat-messages-user';
@@ -159,15 +163,6 @@ function addMessage(message) {
     messagebackground.scrollTop = messagebackground.scrollHeight;
 }
 
-const pauseDiv = document.querySelector('.pause');
-pauseDiv.addEventListener('click', function () {
-    audioPlayer.pause()
-    audioList = [];
-    audioIndex = 0;
-    console.log('audio pause');
-    pauseDiv.style.backgroundImage = `url('${'./static/images/pause_inactive.png'}')`;
-});
-
 //捕捉用户选择的图像
 document.getElementById('photo').addEventListener('change', function (e) {
     var file = e.target.files[0];
@@ -185,13 +180,13 @@ document.getElementById('photo').addEventListener('change', function (e) {
             },
             body: JSON.stringify({ image: image_impt })
         })
-        .then(response => response.json())
-        .then(data => {
-            console.log('图片上传成功:', data);
-        })
-        .catch(error => {
-            console.error('图片上传失败:', error);
-        });
+            .then(response => response.json())
+            .then(data => {
+                console.log('图片上传成功:', data);
+            })
+            .catch(error => {
+                console.error('图片上传失败:', error);
+            });
     };
     reader.readAsDataURL(file);
 })
@@ -288,3 +283,85 @@ function flicker_hidden() {
 }
 
 document.getElementById('more_function_button_2').style.display = 'none';
+
+/* 音频播放相关 start
+--------------------------------------------------------- */
+
+// 保存音频数据的对象
+let audioDict = {};
+
+// 当前播放的音频索引
+let audioIndex = 0;
+
+// 获取音频播放器元素
+const audioPlayer = document.getElementById('audioPlayer');
+
+// 获取暂停按钮元素
+const pauseDiv = document.querySelector('.pause');
+
+pauseDiv.addEventListener('click', function () {
+    audioPlayer.pause()
+    audioDict = {};
+    audioIndex = 0;
+    console.log('[agent.js][pauseDiv.addEventListener] audio pause');
+    pauseDiv.style.backgroundImage = `url('${'./static/images/pause_inactive.png'}')`;
+});
+
+// 播放下一个音频
+function playNextAudio() {
+    try {
+        // console.log('[agent.js][playNextAudio] audioIndex: ', audioIndex);
+        // console.log('[agent.js][playNextAudio] audioDict: ', audioDict);
+
+        // 检查当前索引的音频是否存在
+        if (audioDict[audioIndex] !== undefined) {
+            pauseDiv.style.backgroundImage = `url('${'./static/images/pause.png'}')`;
+            const audioBlob = new Blob([audioDict[audioIndex]], { type: 'audio/mp3' });
+            const audioURL = URL.createObjectURL(audioBlob);
+
+            audioPlayer.src = audioURL;
+
+            try {
+                audioPlayer.play();
+                console.log('[agent.js][playNextAudio] 音频片段播放中...');
+            } catch (error) {
+                console.log('[agent.js][playNextAudio] 音频片段播放失败.');
+                console.log('[agent.js][playNextAudio] 错误信息：', error);
+            }
+        } else {
+            audioIndex = 0;
+            audioDict = {};
+            console.log('[agent.js][playNextAudio] 没有更多音频可播放');
+        }
+    } catch (error) {
+        console.log('[agent.js][playNextAudio] 错误信息：', error);
+    }
+}
+
+// 监听音频播放结束事件
+audioPlayer.onended = function () {
+    // console.log('[agent.js][audioPlayer.onended] audioIndex: %d', audioIndex);
+    audioIndex++;
+    pauseDiv.style.backgroundImage = `url('${'./static/images/pause_inactive.png'}')`;
+    playNextAudio();
+};
+
+// 监听后端发送的 agent_play_audio_chunk 事件
+socket.on('agent_play_audio_chunk', function (data) {
+    console.log('[agent.js][socket.on][agent_play_audio_chunk] index: %d', data['audio_index']);
+    const audioIndex = data['audio_index'];
+    const audioData = data['audio_chunk']; // 后端发送的音频数据
+
+    // 将音频数据添加到音频字典
+    audioDict[audioIndex] = audioData;
+
+    // 如果当前没有音频正在播放，开始播放
+    if (audioPlayer.paused) {
+        audioPlayer.pause();
+        console.log("[agent.js][socket.on][agent_play_audio_chunk] 播放ing..");
+        playNextAudio();
+    }
+});
+
+/* 音频播放相关 end
+--------------------------------------------------------- */

@@ -10,6 +10,8 @@
 
 ```bash
 ├── agent_files        // 智能体语音工具
+├── configs            // 语音配置文件
+├── lib                // 自定义工具函数
 ├── static             // 静态文件（图片、css、js）
 ├── templates          // 模板文件（html页面）
 ├── test               // 测试文件
