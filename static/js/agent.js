@@ -79,8 +79,8 @@ document.getElementById('send-button').addEventListener('click', function () {
 });
 
 /**
- * @description 添加用户或者机器人的消息
- * @param {string} message 消息内容
+ * @description 添加用户和大模型的消息
+ * @param {string} message 用户的消息内容
  */
 function addMessage(message) {
 
@@ -127,9 +127,6 @@ function addMessage(message) {
     var bubble_2 = document.createElement('div');
     bubble_2.className = 'chat-bubble';
 
-    // index 用于告诉后端 fetch 到的 token 在整句话中是第几个 token，以便对语句人类断句进行处理
-    let index = 0;
-
     // 向后端请求大模型响应，同时将大模型响应发送给音频合成相关的 socket 事件
     fetch(`/agent/chat_stream?query=${message}`, {
         headers: {
@@ -146,8 +143,7 @@ function addMessage(message) {
                 }
                 let jsonString = new TextDecoder().decode(value); // 将字节流转换为字符串
 
-                socket.emit("agent_stream_audio", { "index": index, "answer": jsonString })
-                index += 1;
+                socket.emit("agent_stream_audio", jsonString)
 
                 // 如果当前不是结束标志，则将文本添加到气泡中
                 if (!(jsonString.includes("<END>"))) {
@@ -369,11 +365,11 @@ let isPlaying = false;
  * - 后端会将音频数据分段发送过来，该函数需要将这些音频数据分段存储到队列中，并开始播放
  */
 socket.on('agent_play_audio_chunk', function (data) {
-    const index = data['audio_index'];
+    const audioIndex = data['index'];
     const audioData = data['audio_chunk'];
 
     // 将音频数据添加到队列中
-    audioQueue[index] = audioData;
+    audioQueue[audioIndex] = audioData;
 
     // 如果当前没有音频正在播放，开始播放
     if (!isPlaying) {
@@ -395,19 +391,31 @@ function playNextAudio() {
 
     // 从队列中取出下一个音频
     const nextAudioData = audioQueue.shift();
+
+    // 如果音频数据不为空，则播放音频
     if (nextAudioData) {
+
+        // 标识音频正在播放
         isPlaying = true;
+
+        // 将音频数据转换为 Blob 对象
         const audioBlob = new Blob([nextAudioData], { type: 'audio/mp3' });
+
+        // 创建音频 URL
         const audioURL = URL.createObjectURL(audioBlob);
+
+        // 设置音频播放器元素的播放源
         audioPlayer.src = audioURL;
 
+        // 播放音频
         audioPlayer.play().then(() => {
             console.log('音频片段播放中...');
         }).catch(error => {
             console.log('音频片段播放失败.', error);
         });
     } else {
-        playNextAudio(); // 如果当前音频为空，继续播放下一个
+        // 如果当前音频为空，继续播放下一个
+        playNextAudio();
     }
 }
 

@@ -473,93 +473,74 @@ def agent_upload_audio():
     return jsonify({"message": "File uploaded successfully and processed"}), 200
 
 
-# 是否结束标志
-is_streaming: bool = False
+# 用于累积 token 的缓冲区
+sentence_buffer = ""
+
+# 标记是否正在处理流式响应
+is_streaming = False
+
+# 用于标记当前是第几句
+sentence_index = 0
 
 
-# ----- socket 监听函数 -----
 @socketio.on("agent_stream_audio")
-def agent_stream_audio(data: dict[str, int | str]):
+def agent_stream_audio(current_token: str):
     """
     对音频进行断句处理。
 
     Args:
-        data: 包含大模型响应 token 的数据。
-            data["index"]: token 序号
-            data["answer"]: token 内容
+        current_token {str} 从前端发来的当前 token
 
     Description:
-        将前端发来的大模型响应 token 持续添加到句子中，当发现断句符号时，断句符号之前的句子合成音频发往前端。
+        将前端发来的大模型响应 token 持续添加到缓冲区中,
+        当发现断句符号时,将断句符号之前的内容合成音频发往前端。
     """
-    global is_streaming, ideal_answers, bias
+    global is_streaming, sentence_buffer, sentence_index
 
     if not is_streaming:
         is_streaming = True
+        sentence_buffer = ""
 
-        # 偏置，因为断句会导致文字总数发生变化，这引入了偏置
-        bias = 0
+    # 如果收到结束标记
+    if "<END>" in current_token:
+        info("run.py", "agent_stream_audio", "大模型响应结束", color="red")
 
-        # 带人类断句的回答，字典，以序号:回答形式保存，避免语序错误
-        ideal_answers = {}
+        # 处理缓冲区中剩余的内容
+        if sentence_buffer:
+            audio_chunk = agent_audio_generate(sentence_buffer)
+            socketio.emit(
+                "agent_play_audio_chunk",
+                {"index": sentence_index, "audio_chunk": audio_chunk},
+            )
 
-    # info("run.py", "agent_stream_audio", ideal_answers)
-
-    # 如果 token 内容是 <END>，则表示大模型响应已经结束
-    if "<END>" in data["answer"]:
-        info("run.py", "agent_stream_audio", "大模型响应结束" + data["answer"], color="red")
-
-        # 设置结束标志
+        # 重置状态
         is_streaming = False
-
-        # 根据文本合成音频
-        audio_chunk = agent_audio_generate(ideal_answers[data["index"] - bias])
-
-        socketio.emit(
-            "agent_play_audio_chunk",
-            {"audio_index": data["index"] - bias, "audio_chunk": audio_chunk},
-        )
+        sentence_buffer = ""
+        sentence_index = 0
         return
 
-    # 寻找 token 中的断句下标
-    else:
-        pause_index = find_pause(data["answer"])
+    # 寻找断句符号的下标（下标从 0 开始）
+    pause_index = find_pause(current_token)
 
-    # 找不到任何断句符号的时候，持续将 token 积累到句子中，直到变成有断句符号的完整句子
+    # 如果没有找到断句符号，则继续将 token 累积到缓冲区中
     if pause_index == -1:
-        if (data["index"] - bias) in ideal_answers:
-            ideal_answers[data["index"] - bias] += data["answer"]
-        else:
-            ideal_answers[data["index"] - bias] = data["answer"]
-        bias += 1
-
+        sentence_buffer += current_token
         return
 
-    # 找到断句符号
-    else:
-        good_answer = data["answer"][: pause_index + 1]
-        bad_answer = data["answer"][pause_index + 1 :]
+    # 如果找到断句符号，则 '将缓冲区中的内容' 和 '当前 token 的断句符号前的文字' 拼接成完整的句子，并生成音频
+    complete_sentence = sentence_buffer + current_token[:pause_index]
 
-        # 将断句符号之前的文字添加到句子中
-        if (data["index"] - bias) in ideal_answers:
-            ideal_answers[data["index"] - bias] += good_answer
-        else:
-            ideal_answers[data["index"] - bias] = good_answer
+    # 更新缓冲区，更新缓冲区的代码应该放在 agent_audio_generate 之前，防止线程阻塞导致缓冲区未及时更新
+    sentence_buffer = current_token[pause_index + 1 :]
 
-        # 将断句符号之后的文字添加到句子中
-        if bad_answer:
-            ideal_answers[data["index"] - bias + 1] = bad_answer
+    # 生成音频
+    audio_chunk = agent_audio_generate(complete_sentence)
 
-        # 此处需要提前将偏置保存到 data 中，否则在此次 socket 发送消息之前，bias 会因为下次的请求而发生变化
-        data["bias"] = bias
-
-        # 根据文本合成音频
-        audio_chunk = agent_audio_generate(ideal_answers[data["index"] - data["bias"]])
-        info("run.py", "agent_stream_audio", data["index"] - data["bias"], color="red")
-        
-        socketio.emit(
-            "agent_play_audio_chunk",
-            {"audio_index": data["index"] - data["bias"], "audio_chunk": audio_chunk},
-        )
+    # 发送音频
+    socketio.emit(
+        "agent_play_audio_chunk", {"index": sentence_index, "audio_chunk": audio_chunk}
+    )
+    sentence_index += 1
 
 
 if __name__ == "__main__":
