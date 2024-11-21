@@ -1,7 +1,7 @@
 # 缓存文件
 *.pyc
 **/__pycache__
-.cache/
+.cache/*
 
 # 虚拟环境
 .venv

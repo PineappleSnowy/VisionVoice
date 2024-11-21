@@ -1,80 +1,81 @@
-// let stream;
-// const toggleCamera = document.querySelector('.toggleCamera');
-// const openCamera = document.querySelector('.openCamera');
-// const container = document.querySelector('.container');
-// const video = document.querySelector('video');
-// const img = document.querySelector('img');
-// const audio = document.querySelector('#audio');
-// const waveShape = document.querySelector('#waveShape');
-// let videoChat = false;
-// let isFrontCamera = false;
+// 摄像头开关逻辑
+let stream;
+const toggleCamera = document.querySelector('.toggleCamera');
+const openCamera = document.querySelector('.openCamera');
+const container = document.querySelector('.container');
+const video = document.querySelector('video');
+const img = document.querySelector('img');
+const audio = document.querySelector('#audio');
+const waveShape = document.querySelector('#waveShape');
+let videoChat = false;
+let isFrontCamera = false;
 
-// openCamera.addEventListener('click', async () => {
-//     try {
-//         videoChat = !videoChat;
-//         if (videoChat) {
-//             try {
-//                 stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio: false });
-//                 video.srcObject = stream;
-//             }catch(err) {
-//                 if (err.name === 'NotAllowedError') {
-//                     alert('请允许访问您的摄像头！');
-//                 } else if (err.name === 'NotFoundError') {
-//                     alert('未找到可用的摄像头！');
-//                 } else {
-//                     alert('发生错误: ' + err.message);
-//                 }
-//             }
+openCamera.addEventListener('click', async () => {
+    try {
+        videoChat = !videoChat;
+        if (videoChat) {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio: false });
+                video.srcObject = stream;
+            }catch(err) {
+                if (err.name === 'NotAllowedError') {
+                    alert('请允许访问您的摄像头！');
+                } else if (err.name === 'NotFoundError') {
+                    alert('未找到可用的摄像头！');
+                } else {
+                    alert('发生错误: ' + err.message);
+                }
+            }
 
-//             video.style.display = 'block';
-//             container.classList.add('shifted');
-//             toggleCamera.style.display = 'block';
-//             img.style.display = 'none';
-//             goBack.style.color = 'white';
-//             toggleCamera.style.color = 'white';
-//         } else {
-//             stream.getTracks().forEach((track) => {
-//                 track.stop();
-//             });
-//             video.srcObject = null;
-//             video.style.display = 'null';
-//             container.classList.remove('shifted');
-//             toggleCamera.style.display = 'none';
-//             img.style.display = 'block';
-//             goBack.style.color = 'black';
-//         }
-//     } catch (err) {
-//         console.log(err);
-//     }
+            video.style.display = 'block';
+            container.classList.add('shifted');
+            toggleCamera.style.display = 'block';
+            img.style.display = 'none';
+            goBack.style.color = 'white';
+            toggleCamera.style.color = 'white';
+        } else {
+            stream.getTracks().forEach((track) => {
+                track.stop();
+            });
+            video.srcObject = null;
+            video.style.display = 'null';
+            container.classList.remove('shifted');
+            toggleCamera.style.display = 'none';
+            img.style.display = 'block';
+            goBack.style.color = 'black';
+        }
+    } catch (err) {
+        console.log(err);
+    }
 
-// });
+});
 
-// toggleCamera.addEventListener('click', async () => {
-//     if (stream) {
+toggleCamera.addEventListener('click', async () => {
+    if (stream) {
         
-//         isFrontCamera = !isFrontCamera;
-//         // Stop previous stream
-//         stream.getTracks().forEach((track) => {
-//             track.stop();
-//         });
-//         if(isFrontCamera){
-//             try {
-//                 stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false});
-//                 video.srcObject = stream;
-//             } catch (err) {
-//                 alert(err);
-//             }
-//         }else{
-//             try {
-//                 stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-//                 video.srcObject = stream;
-//             } catch (err) {
-//                 alert(err);
-//             }
-//         }
+        isFrontCamera = !isFrontCamera;
+        // Stop previous stream
+        stream.getTracks().forEach((track) => {
+            track.stop();
+        });
+        if(isFrontCamera){
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false});
+                video.srcObject = stream;
+            } catch (err) {
+                alert(err);
+            }
+        }else{
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+                video.srcObject = stream;
+            } catch (err) {
+                alert(err);
+            }
+        }
         
-//     }
-// });
+    }
+});
 
 // phone 界面大小适配
 const html = document.querySelector('html');
@@ -365,7 +366,7 @@ window.onload = async () => {
         }
         const token = localStorage.getItem('token');
         console.log('[test.html][socket.on][agent_speech_recognition_finished] 音频识别结果: %s', rec_result);
-
+        index = 0;
         fetch(`/agent/chat_stream?query=${rec_result}`, {
             headers: {
                 "Authorization": `Bearer ${token}`

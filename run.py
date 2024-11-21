@@ -33,7 +33,7 @@ JWTManager(app)
 CORS(app)
 # 设置 JWT 密钥
 app.config["JWT_SECRET_KEY"] = "s96cae35ce8a9b0244178bf28e4966c2ce1b83"
-
+messages = {"defaultAgent":[], "psychologicalAgent":[]}
 # ----- 路由 -----
 
 
@@ -147,10 +147,10 @@ def predict(responses, agent_name):
             text = "我听不懂你在说什么\n"
         response_all += text
         yield text
-    # 结束标志
-    yield "<END>"
     messages[agent_name].append({"role": "assistant", "content": response_all})
     save_chat_history(agent_name)
+    # 结束标志
+    yield "<END>"
 
 
 def change_sample_rate(input_file, target_sample_rate, ori_sample_rate):
@@ -526,7 +526,7 @@ def agent_upload_audio():
 # 是否结束标志
 is_streaming: bool = False
 
-
+bias = 0
 # ----- socket 监听函数 -----
 @socketio.on("agent_stream_audio")
 def agent_stream_audio(data: dict[str, int | str]):
@@ -549,19 +549,24 @@ def agent_stream_audio(data: dict[str, int | str]):
         # 偏置，因为断句会导致文字总数发生变化，这引入了偏置
         bias = 0
 
-        # 带人类断句的回答，字典，以序号:回答形式保存，避免语序错误
-        ideal_answers = {}
+        # 带人类断句的回答，字典，以{序号:回答}形式保存，避免语序错误
+        ideal_answers = dict()
 
-    info("run.py", "agent_stream_audio", ideal_answers)
+    # info("run.py", "agent_stream_audio", ideal_answers)
 
     # 如果 token 内容是 <END>，则表示大模型响应已经结束
     if "<END>" in data["answer"]:
 
         # 设置结束标志
         is_streaming = False
-
         # 根据文本合成音频
-        audio_chunk = agent_audio_generate(ideal_answers[data["index"] - bias])
+        try:
+            audio_chunk = agent_audio_generate(ideal_answers[data["index"] - bias-1]) # 多加了-1，添加测试！
+        except Exception:
+            print(ideal_answers)
+            print(data["index"] - bias)
+            print("## error")
+            audio_chunk = ''
 
         socketio.emit(
             "agent_play_audio_chunk",
@@ -602,7 +607,13 @@ def agent_stream_audio(data: dict[str, int | str]):
         data["bias"] = bias
 
         # 根据文本合成音频
-        audio_chunk = agent_audio_generate(ideal_answers[data["index"] - data["bias"]])
+        try:
+            audio_chunk = agent_audio_generate(ideal_answers[data["index"] - bias])
+        except Exception:
+            print(ideal_answers)
+            print(data["index"] - bias)
+            print("## error")
+            audio_chunk = ''
         info("run.py", "agent_stream_audio", data["index"] - data["bias"], color="red")
         
         socketio.emit(

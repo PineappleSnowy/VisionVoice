@@ -79,7 +79,7 @@ document.getElementById('send-button').addEventListener('click', function () {
     if (message || image_impt) {
         audioPlayer.pause()
         pauseDiv.style.backgroundImage = `url('${'./static/images/pause_inactive.png'}')`;
-        audioList = [];
+        audioDict = {};
         audioIndex = 0;
         addMessage(message);
         input.value = ''; // 清空输入框
@@ -125,6 +125,7 @@ function addMessage(message) {
     messagesContainer_bot.className = 'chat-messages-bot';
     var bubble_2 = document.createElement('div');
     bubble_2.className = 'chat-bubble';
+    var index = 0
     fetch(`/agent/chat_stream?query=${message}&agent=${selectedAgent}`, {
         headers: {
             "Authorization": `Bearer ${token}`
@@ -288,10 +289,10 @@ document.getElementById('more_function_button_2').style.display = 'none';
 --------------------------------------------------------- */
 
 // 保存音频数据的对象
-let audioDict = {};
+var audioDict = {};
 
 // 当前播放的音频索引
-let audioIndex = 0;
+var audioIndex = 0;
 
 // 获取音频播放器元素
 const audioPlayer = document.getElementById('audioPlayer');
@@ -329,8 +330,8 @@ function playNextAudio() {
                 console.log('[agent.js][playNextAudio] 错误信息：', error);
             }
         } else {
-            audioIndex = 0;
-            audioDict = {};
+            // audioIndex = 0;
+            // audioDict = {};
             console.log('[agent.js][playNextAudio] 没有更多音频可播放');
         }
     } catch (error) {
@@ -349,11 +350,11 @@ audioPlayer.onended = function () {
 // 监听后端发送的 agent_play_audio_chunk 事件
 socket.on('agent_play_audio_chunk', function (data) {
     console.log('[agent.js][socket.on][agent_play_audio_chunk] index: %d', data['audio_index']);
-    const audioIndex = data['audio_index'];
-    const audioData = data['audio_chunk']; // 后端发送的音频数据
+    var chunkIndex = data['audio_index'];
+    var audioData = data['audio_chunk']; // 后端发送的音频数据
 
     // 将音频数据添加到音频字典
-    audioDict[audioIndex] = audioData;
+    audioDict[chunkIndex] = audioData;
 
     // 如果当前没有音频正在播放，开始播放
     if (audioPlayer.paused) {
