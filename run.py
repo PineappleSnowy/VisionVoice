@@ -20,7 +20,6 @@ from flask_jwt_extended import (
     JWTManager,
 )
 import base64
-from flask_jwt_extended import jwt_required
 
 # 自定义函数
 from agent_files.agent_speech_rec import speech_rec
