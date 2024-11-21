@@ -86,11 +86,11 @@ body {
 }
 
 .button.phone {
-    background-image: url('../static/images/phone.png');
+    background-image: url('../images/phone.png');
 }
 
 .button.video {
-    background-image: url('../static/images/camera.png');
+    background-image: url('../images/camera.png');
 }
 
 .button:hover {
