@@ -492,8 +492,8 @@ def agent_stream_audio(current_token: str):
         current_token {str} 从前端发来的当前 token
 
     Description:
-        将前端发来的大模型响应 token 持续添加到缓冲区中,
-        当发现断句符号时,将断句符号之前的内容合成音频发往前端。
+        将前端发来的大模型响应 token 持续添加到缓冲区中，
+        当发现断句符号时，将断句符号之前的内容合成音频发往前端，然后更新缓存区。
     """
     global is_streaming, sentence_buffer, sentence_index
 
@@ -545,14 +545,19 @@ def agent_stream_audio(current_token: str):
 
 if __name__ == "__main__":
     # 根据操作系统选择服务器启动方式
-    # if current_os == 'Windows':
-    socketio.run(
-        app,
-        port=80,
-        host="0.0.0.0",
-        allow_unsafe_werkzeug=True,
-        debug=True,  # 调试模式（开发环境）
-    )
-    # else:
-    # socketio.run(app, port=443, host='0.0.0.0', allow_unsafe_werkzeug=True,
-    # ssl_context=('/ssl/cert.pem', '/ssl/cert.key'))
+    if current_os == "Windows":
+        socketio.run(
+            app,
+            port=80,
+            host="0.0.0.0",
+            allow_unsafe_werkzeug=True,
+            debug=True,  # 调试模式（开发环境）
+        )
+    else:
+        socketio.run(
+            app,
+            port=443,
+            host="0.0.0.0",
+            allow_unsafe_werkzeug=True,
+            ssl_context=("/ssl/cert.pem", "/ssl/cert.key"),
+        )

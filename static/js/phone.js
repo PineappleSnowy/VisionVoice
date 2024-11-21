@@ -51,7 +51,7 @@
 
 // toggleCamera.addEventListener('click', async () => {
 //     if (stream) {
-        
+
 //         isFrontCamera = !isFrontCamera;
 //         // Stop previous stream
 //         stream.getTracks().forEach((track) => {
@@ -72,7 +72,7 @@
 //                 alert(err);
 //             }
 //         }
-        
+
 //     }
 // });
 
@@ -120,7 +120,7 @@ async function initAudioAnalyser(stream) {
 }
 
 // 静音阈值(单位:分贝)
-const SILENCE_THRESHOLD = -40;
+const SILENCE_THRESHOLD = -20;
 
 /**
  * @function detectSilence
@@ -293,66 +293,100 @@ window.onload = async () => {
     // 创建 socket 连接
     const socket = io();
 
-    // 保存音频数据的列表
-    var audioList = [];
-
-    // 当前播放的音频索引
-    var audioIndex = 0;
-
-    // 获取音频播放器元素
+    // 获取音频播放器 DOM 元素
     const audioPlayer = document.getElementById('audioPlayer');
 
-    // 播放下一个音频
-    function playNextAudio() {
-        if (audioList[audioIndex] != undefined) {
-            const audioBlob = new Blob([audioList[audioIndex]], { type: 'audio/mp3' });
-            const audioURL = URL.createObjectURL(audioBlob);
+    // 用于存放音频的队列
+    let audioQueue = [];
 
-            audioPlayer.src = audioURL;
+    // 标识是否正在播放音频
+    let isPlaying = false;
 
-            try {
-                audioPlayer.play();
-            } catch (error) {
-                console.log('[phone.js][playNextAudio] 音频片段播放失败.', error);
-            }
-        } else {
-            // 如果波形图动画处于暂停状态，则开始播放
-            if (vudio.paused()) {
-                // console.log('[phone.js][playNextAudio] 波形暂停信息', vudio.paused());
-                vudio.dance();
-            }
-            console.log('[phone.js][playNextAudio] undefined audioIndex: %d', audioIndex);
-        }
-    }
-
-    // 监听音频播放结束事件
-    audioPlayer.onended = function () {
-        audioIndex++;
-        playNextAudio();
-    };
-
-    // 监听后端发送的 agent_play_audio_chunk 事件
+    /**
+     * @description 监听后端发送的 agent_play_audio_chunk 事件
+     * - 音频播放模块的起点
+     * - 后端会将音频数据分段发送过来，该函数需要将这些音频数据分段存储到队列中，并开始播放
+     */
     socket.on('agent_play_audio_chunk', function (data) {
-        const index = data['index'];
-        const audioData = data['audio_chunk']; // 后端传来的音频数据
+        const audioIndex = data['index'];
+        const audioData = data['audio_chunk'];
 
-        // 将音频数据添加到音频列表
-        audioList[index] = audioData;
-
-        // 如果波形图动画正在播放，则暂停
-        if (!vudio.paused()) {
-            // console.log('[phone.js][socket.on][agent_play_audio_chunk] 波形暂停信息', vudio.paused());
-            vudio.pause();
-        }
+        // 将音频数据添加到队列中
+        audioQueue[audioIndex] = audioData;
 
         // 如果当前没有音频正在播放，开始播放
-        if (audioPlayer.paused) {
-            audioPlayer.pause();
+        if (!isPlaying) {
             playNextAudio();
+        }
+
+        // 如果正在播放音频，则暂停波形图动画（波形动画暂停表示大模型正在讲话）
+        if (isPlaying) {
+            vudio.pause();
         }
     });
 
-    let index = 0;
+    /**
+     * @description 播放下一个音频
+     * - 大模型的回答是有断句的，当播放完该句话后，继续播放下一句话
+     */
+    function playNextAudio() {
+        // 如果音频队列中没有音频数据（即后端还没有发送音频数据），则停止播放
+        if (audioQueue.length === 0) {
+            isPlaying = false;
+
+            // 如果波形图动画处于暂停状态，则开始播放（波形动画启动表示用户可以讲话）
+            if (vudio.paused()) {
+                vudio.dance();
+            }
+
+            return;
+        }
+        console.log('[agent.js][playNextAudio] audioQueue:', audioQueue);
+
+        // 从队列中取出下一个音频
+        const nextAudioData = audioQueue.shift();
+
+        // 如果音频数据不为空，则播放音频
+        if (nextAudioData) {
+
+            // 标识音频正在播放
+            isPlaying = true;
+
+            // 将音频数据转换为 Blob 对象
+            const audioBlob = new Blob([nextAudioData], { type: 'audio/mp3' });
+
+            // 创建音频 URL
+            const audioURL = URL.createObjectURL(audioBlob);
+
+            // 设置音频播放器元素的播放源
+            audioPlayer.src = audioURL;
+
+            // 播放音频
+            audioPlayer.play().then(() => {
+                console.log('音频片段播放中...');
+            }).catch(error => {
+                console.log('音频片段播放失败.', error);
+            });
+        } else {
+            // 如果当前音频为空，继续播放下一个
+            playNextAudio();
+        }
+    }
+
+    /**
+     * @description 设置音频播放结束后的回调函数
+     * - 大模型的回答是有断句的，当播放完该句话后，继续播放下一句话
+     */
+    audioPlayer.onended = function () {
+        playNextAudio();
+    };
+
+    /* 处理音频播放 end
+    ------------------------------------------------------------*/
+
+
+    /* 处理音频识别 start 
+    ------------------------------------------------------------*/
 
     /**
      * @description 语音识别结束后，将识别结果发送给后端，并开始语音对话
@@ -381,8 +415,7 @@ window.onload = async () => {
                     }
                     let jsonString = new TextDecoder().decode(value); // 将字节流转换为字符串
 
-                    socket.emit("agent_stream_audio", { "index": index, "answer": jsonString })
-                    index += 1;
+                    socket.emit("agent_stream_audio", jsonString);
 
                     // 继续读取下一个数据
                     return reader.read().then(processText);
@@ -392,6 +425,7 @@ window.onload = async () => {
                 console.error('[phone.js][socket.on][agent_speech_recognition_finished] Error fetching stream:', error);
             });
     })
-    /* 处理音频播放 end
+
+    /* 处理音频识别 end 
     ------------------------------------------------------------*/
 }
