@@ -130,6 +130,7 @@ def predict(responses):
         yield text
 
     # 结束标志
+    # if text[-1] != "。":
     yield "<END>"
 
     messages.append({"role": "assistant", "content": response_all})
@@ -392,7 +393,7 @@ def agent_chat_stream():
         model="charglm-3",
         meta={
             "user_info": "我是陆星辰，是一个男性...",
-            "bot_info": "苏梦远，本名苏远心...",
+            "bot_info": "苏梦远，本名苏远心...（每句话结尾都要加句号）",
             "bot_name": "苏梦远",
             "user_name": "陆星辰",
         },
@@ -501,10 +502,11 @@ def agent_stream_audio(data: dict[str, int | str]):
         # 带人类断句的回答，字典，以序号:回答形式保存，避免语序错误
         ideal_answers = {}
 
-    info("run.py", "agent_stream_audio", ideal_answers)
+    # info("run.py", "agent_stream_audio", ideal_answers)
 
     # 如果 token 内容是 <END>，则表示大模型响应已经结束
     if "<END>" in data["answer"]:
+        info("run.py", "agent_stream_audio", "大模型响应结束" + data["answer"], color="red")
 
         # 设置结束标志
         is_streaming = False
