@@ -292,6 +292,8 @@ p {
     bottom: -150px;
     background-color: #4b4242;
     display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 #more_function_board #function_1 {
@@ -312,13 +314,7 @@ p {
 }
 
 #photo {
-    display: flex;
-    position: relative;
-    top: 10px;
-    left: 10px;
-    width: 50px;
-    height: 50px;
-    border-radius: 5px;
+    visibility: hidden;
 }
 
 #decorate_photo {
@@ -335,6 +331,18 @@ p {
 
 #decorate_photo:hover {
     background-color: #726c6c;
+}
+
+#image-preview {
+    height: 180px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+  
+#preview-image {
+    max-width: 100%;
+    max-height: 100%;
 }
 
 @keyframes slideup {

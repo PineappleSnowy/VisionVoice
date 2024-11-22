@@ -171,6 +171,9 @@ document.getElementById('photo').addEventListener('change', function (e) {
         image_impt = event.target.result;
         console.log('用户上传图片');
         document.getElementById('photo').value = '';
+        // 显示图片预览
+        document.getElementById('preview-image').src = image_impt;
+        document.getElementById('image-preview').style.display = 'block';
 
         // 将图片数据发送到后端
         fetch('/agent/upload_image', {
