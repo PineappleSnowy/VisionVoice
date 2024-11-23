@@ -20,15 +20,17 @@ from flask_jwt_extended import (
     JWTManager,
 )
 import base64
+import asyncio
 
-# 自定义函数
+# 自定义工具
 from agent_files.agent_speech_rec import speech_rec
 from agent_files.agent_speech_synthesis import agent_audio_generate
-from lib.debugger import *
+from lib import logging
+from agent_files.async_task_queue import AsyncTaskQueue
 
 # ----- 加载全局应用 -----
 app = Flask(__name__)
-socketio = SocketIO(app)
+socketio = SocketIO(app, async_mode="threading")
 JWTManager(app)
 CORS(app)
 # 设置 JWT 密钥
@@ -287,7 +289,7 @@ def login():
 
     # 对比用户信息
     for user in users:
-        info(
+        logging.info(
             "run.py",
             "login",
             "用户名：" + user["username"] + "密码：" + user["password"],
@@ -317,7 +319,9 @@ def verify_token():
         verify_jwt_in_request()
         # 获取当前 token 对应的用户
         current_user = get_jwt_identity()
-        success("run.py", "verify_token", "token 有效，当前用户：" + current_user)
+        logging.success(
+            "run.py", "verify_token", "token 有效，当前用户：" + current_user
+        )
         return jsonify({"valid": True, "user": current_user}), 200
     # 如果token无效，返回错误信息
     except:
@@ -329,7 +333,7 @@ def get_chat_history():
     try:
         verify_jwt_in_request()
         current_user = get_jwt_identity()
-        success(
+        logging.success(
             "run.py",
             "get_chat_history",
             "token 有效，当前用户：" + current_user + "，开始获取聊天记录...",
@@ -344,12 +348,12 @@ def get_chat_history():
                         decode_message_content(msg.copy())
                         for msg in encoded_chat_history
                     ]
-                    success("run.py", "get_chat_history", "获取聊天记录成功")
+                    logging.success("run.py", "get_chat_history", "获取聊天记录成功")
                     return jsonify(decoded_chat_history), 200
 
         return jsonify([]), 200
     except Exception as e:
-        error("run.py", "get_chat_history", "获取聊天记录失败: " + str(e))
+        logging.error("run.py", "get_chat_history", "获取聊天记录失败: " + str(e))
         return jsonify({"error": str(e)}), 401
 
 
@@ -442,7 +446,7 @@ def agent_upload_audio():
     socketio.emit:
         agent_speech_recognition_finished {string} 本次音频数据的完整语音识别结果
     """
-    info("run.py", "agent_upload_audio", "开始音频处理...")
+    logging.info("run.py", "agent_upload_audio", "开始音频处理...")
     if "audio_data" not in request.files:
         return "No file part in the request", 400
 
@@ -482,65 +486,86 @@ is_streaming = False
 # 用于标记当前是第几句
 sentence_index = 0
 
+# 任务队列
+task_queue = AsyncTaskQueue()
 
 @socketio.on("agent_stream_audio")
 def agent_stream_audio(current_token: str):
     """
     对音频进行断句处理。
-
+    
     Args:
         current_token {str} 从前端发来的当前 token
-
-    Description:
-        将前端发来的大模型响应 token 持续添加到缓冲区中，
-        当发现断句符号时，将断句符号之前的内容合成音频发往前端，然后更新缓存区。
     """
     global is_streaming, sentence_buffer, sentence_index
 
     if not is_streaming:
+        # 标记正在处理流式响应
         is_streaming = True
+        
+        # 重置缓冲区和任务队列
         sentence_buffer = ""
+        task_queue.reset()
+        sentence_index = 0
+        
+        # 启动异步任务处理循环
+        socketio.start_background_task(process_audio_stream)
 
     # 如果收到结束标记
     if "<END>" in current_token:
-        info("run.py", "agent_stream_audio", "大模型响应结束", color="red")
+        logging.info("run.py", "agent_stream_audio", "大模型响应结束", color="red")
 
         # 处理缓冲区中剩余的内容
         if sentence_buffer:
-            audio_chunk = agent_audio_generate(sentence_buffer)
-            socketio.emit(
-                "agent_play_audio_chunk",
-                {"index": sentence_index, "audio_chunk": audio_chunk},
-            )
+            # 将剩余内容加入任务队列
+            task_queue.add_task_sync(agent_audio_generate, sentence_buffer)
 
         # 重置状态
         is_streaming = False
         sentence_buffer = ""
-        sentence_index = 0
         return
 
-    # 寻找断句符号的下标（下标从 0 开始）
+    # 寻找断句符号的下标
     pause_index = find_pause(current_token)
 
-    # 如果没有找到断句符号，则继续将 token 累积到缓冲区中
+    # 如果没有找到断句符号，则继续累积
     if pause_index == -1:
         sentence_buffer += current_token
         return
 
-    # 如果找到断句符号，则 '将缓冲区中的内容' 和 '当前 token 的断句符号前的文字' 拼接成完整的句子，并生成音频
-    complete_sentence = sentence_buffer + current_token[:pause_index]
+    # 如果找到断句符号，则生成完整句子
+    complete_sentence = sentence_buffer + current_token[:pause_index + 1]
+    
+    # 更新缓冲区
+    sentence_buffer = current_token[pause_index + 1:]
+    
+    # 将音频生成任务加入队列
+    task_queue.add_task_sync(agent_audio_generate, complete_sentence)
 
-    # 更新缓冲区，更新缓冲区的代码应该放在 agent_audio_generate 之前，防止线程阻塞导致缓冲区未及时更新
-    sentence_buffer = current_token[pause_index + 1 :]
-
-    # 生成音频
-    audio_chunk = agent_audio_generate(complete_sentence)
-
-    # 发送音频
-    socketio.emit(
-        "agent_play_audio_chunk", {"index": sentence_index, "audio_chunk": audio_chunk}
-    )
-    sentence_index += 1
+def process_audio_stream():
+    """处理音频流的后台任务"""
+    global sentence_index
+    
+    while True:
+        try:
+            # 获取下一个音频结果
+            audio_chunk = task_queue.get_next_result_sync()
+            
+            if audio_chunk is not None:
+                # 发送到前端
+                socketio.emit(
+                    "agent_play_audio_chunk",
+                    {"index": sentence_index, "audio_chunk": audio_chunk}
+                )
+                sentence_index += 1
+            
+            # 如果流式响应结束且没有更多任务，退出循环
+            if not is_streaming and task_queue.is_empty():
+                break
+                
+        except Exception as e:
+            logging.error("run.py", "process_audio_stream", f"处理音频流错误: {e}")
+            break
 
 
 if __name__ == "__main__":

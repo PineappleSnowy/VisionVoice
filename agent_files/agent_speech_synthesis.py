@@ -2,7 +2,7 @@
 import sys
 import json
 import os
-from lib.debugger import *
+from lib import logging
 import re
 
 with open("./static/api.json", "r", encoding="utf-8") as f:
@@ -111,7 +111,7 @@ def agent_audio_generate(text: str) -> str:
     根据文本生成音频
     """
     token = fetch_token()
-    info("agent_speech_synthesis.py", "agent_audio_generate", "输入:" + text)
+    logging.info("agent_speech_synthesis.py", "agent_audio_generate", "输入:" + text)
 
     # 利用正则匹配去除括号及括号中的内容
     # 如果文本中有一对括号，则括号内的文字是描写，不属于人物的回答
@@ -162,8 +162,12 @@ def agent_audio_generate(text: str) -> str:
 
     except URLError as err:
         print("asr http response http code : " + str(err.code))
-
-    success("agent_speech_synthesis.py", "agent_audio_generate", "音频 '{}' 生成成功".format(text))
+    
+    logging.success(
+        "agent_speech_synthesis.py",
+        "agent_audio_generate",
+        "音频 '{}' 生成成功".format(text),
+    )
     return result_str
 
 
