@@ -406,13 +406,9 @@ function playNextAudio() {
         // 标识音频正在播放
         isPlaying = true;
 
-        // 将音频数据转换为 Blob 对象
+        // 将音频数据转换为 Blob 对象，并对其创建资源 URL，从而设置音频播放器的播放源（播放源只能是 URL）
         const audioBlob = new Blob([nextAudioData], { type: 'audio/mp3' });
-
-        // 创建音频 URL
         const audioURL = URL.createObjectURL(audioBlob);
-
-        // 设置音频播放器元素的播放源
         audioPlayer.src = audioURL;
 
         // 播放音频

@@ -39,7 +39,7 @@ class AsyncTaskQueue:
 
     def add_task_sync(self, func, *args, **kwargs):
         """
-        同步方式添加任务并立即在后台线程执行
+        添加任务并立即在后台线程执行
         """
 
         # 分配任务编号
@@ -68,7 +68,7 @@ class AsyncTaskQueue:
 
     def get_next_result_sync(self):
         """
-        同步方式获取下一个结果
+        按照添加任务的顺序获取下一个结果
         """
         while True:
             with self.lock:

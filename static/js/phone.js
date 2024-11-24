@@ -241,7 +241,7 @@ window.onload = async () => {
         input = audioContext.createMediaStreamSource(audioStream);
 
         // 创建一个新的 Recorder 实例，用于录制音频
-        // numChannels: 1 表示使用单声道录音，用于减少文件大小
+        // numChannels: 1 表示使用单声道录音，用于减少文件大小，如果声道为 2，文件会变成两倍大小
         rec = new Recorder(input, { numChannels: 1 })
 
         // 启动录制过程
