@@ -145,7 +145,7 @@ window.onload = async () => {
 
     // 获取音频流
     let audioStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-    console.log("[test.html][window.onload] 创建 getUserMedia 音频流成功...");
+    console.log("[phone.js][window.onload] 创建 getUserMedia 音频流成功...");
 
     // 初始化音频分析器
     const { analyser, dataArray } = await initAudioAnalyser(audioStream);
@@ -179,7 +179,7 @@ window.onload = async () => {
                 }, SILENCE_DURATION);
             }
             if (userStatus == 1) {
-                console.log('[test.html][checkSilence] 用户停止讲话...');
+                console.log('[phone.js][checkSilence] 用户停止讲话...');
                 userStatus = 0;
             }
         }
@@ -196,7 +196,7 @@ window.onload = async () => {
                 recordingFinished = false;
             }
             if (userStatus == 0) {
-                console.log('[test.html][checkSilence] 用户正在讲话...');
+                console.log('[phone.js][checkSilence] 用户正在讲话...');
                 userStatus = 1;
             }
         }
@@ -258,7 +258,7 @@ window.onload = async () => {
     }
 
     function stopRecording() {
-        console.log("[test.html][stopRecording] 停止录音...");
+        console.log("[phone.js][stopRecording] 停止录音...");
 
         // 告诉录制器停止录制
         rec.stop();
@@ -269,7 +269,7 @@ window.onload = async () => {
         const xhr = new XMLHttpRequest();
         xhr.onload = function (e) {
             if (this.readyState === 4) {
-                // console.log("[test.html][upload_audio] response:", e.target.responseText);
+                // console.log("[phone.js][upload_audio] response:", e.target.responseText);
             }
         };
         const fd = new FormData();
@@ -277,7 +277,7 @@ window.onload = async () => {
         const sampleRate = audioContext.sampleRate;
         fd.append("sample_rate", sampleRate);
         const token = localStorage.getItem('token');
-        console.log("[test.html][upload_audio] 上传音频数据...");
+        console.log("[phone.js][upload_audio] 上传音频数据...");
         xhr.open("POST", "/agent/upload_audio", true);
         xhr.setRequestHeader('Authorization', 'Bearer ' + token);
         xhr.send(fd);
@@ -395,11 +395,11 @@ window.onload = async () => {
     socket.on('agent_speech_recognition_finished', function (data) {
         const rec_result = data['rec_result'];
         if (!rec_result) {
-            console.log('[test.html][socket.on][agent_speech_recognition_finished] 音频识别结果为空.');
+            console.log('[phone.js][socket.on][agent_speech_recognition_finished] 音频识别结果为空.');
             return;
         }
         const token = localStorage.getItem('token');
-        console.log('[test.html][socket.on][agent_speech_recognition_finished] 音频识别结果: %s', rec_result);
+        console.log('[phone.js][socket.on][agent_speech_recognition_finished] 音频识别结果: %s', rec_result);
         index = 0;
         fetch(`/agent/chat_stream?query=${rec_result}`, {
             headers: {
