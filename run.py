@@ -20,7 +20,6 @@ from flask_jwt_extended import (
     JWTManager,
 )
 import base64
-import asyncio
 
 # 自定义工具
 from agent_files.agent_speech_rec import speech_rec
@@ -366,6 +365,7 @@ def get_chat_history():
 
 def build_response(agent_name, user_talk, current_user):
     if agent_name == "defaultAgent":
+        # 根据选择的模型调用大模型
         model_name = "glm-4-flash"
         sys_prompt = "你是视界之声，一位乐于助人的对话助手。为了能让用户能尽快解决问题，你的话语总是十分简洁而概要。"
         # 读取用户的加密聊天记录
@@ -399,6 +399,7 @@ def build_response(agent_name, user_talk, current_user):
         )
 
     else:
+        model_name = "charglm-3"
         # 从用户聊天记录获取历史消息，如果没有则初始化
         background_info = "（旁白：苏梦远主演了陆星辰导演的一部音乐题材电影，在拍摄期间，两人因为一场戏的表现有分歧。） 导演，关于这场戏，我觉得可以尝试从角色的内心情感出发，让表现更加真实。"
 
@@ -425,8 +426,6 @@ def build_response(agent_name, user_talk, current_user):
         if len(messages[agent_name]) > MAX_HISTORY:
             messages[agent_name] = messages[agent_name][-MAX_HISTORY:]
 
-        # 根据选择的模型调用大模型
-        model_name = "charglm-3"
 
         # 调用大模型
         responses = client.chat.completions.create(
