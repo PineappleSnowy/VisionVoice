@@ -20,15 +20,17 @@ from flask_jwt_extended import (
     JWTManager,
 )
 import base64
+import asyncio
 
-# 自定义函数
+# 自定义工具
 from agent_files.agent_speech_rec import speech_rec
 from agent_files.agent_speech_synthesis import agent_audio_generate
-from lib.debugger import *
+from lib import logging
+from agent_files.async_task_queue import AsyncTaskQueue
 
 # ----- 加载全局应用 -----
 app = Flask(__name__)
-socketio = SocketIO(app)
+socketio = SocketIO(app, async_mode="threading")
 JWTManager(app)
 CORS(app)
 # 设置 JWT 密钥
@@ -150,6 +152,7 @@ def predict(responses, agent_name):
     messages[agent_name].append({"role": "assistant", "content": response_all})
     save_chat_history(agent_name)
     # 结束标志
+    # if text[-1] != "。":
     yield "<END>"
 
 
@@ -290,7 +293,7 @@ def login():
 
     # 对比用户信息
     for user in users:
-        info(
+        logging.info(
             "run.py",
             "login",
             "用户名：" + user["username"] + "密码：" + user["password"],
@@ -320,7 +323,9 @@ def verify_token():
         verify_jwt_in_request()
         # 获取当前 token 对应的用户
         current_user = get_jwt_identity()
-        success("run.py", "verify_token", "token 有效，当前用户：" + current_user)
+        logging.success(
+            "run.py", "verify_token", "token 有效，当前用户：" + current_user
+        )
         return jsonify({"valid": True, "user": current_user}), 200
     # 如果token无效，返回错误信息
     except:
@@ -333,7 +338,7 @@ def get_chat_history():
     try:
         verify_jwt_in_request()
         current_user = get_jwt_identity()
-        success(
+        logging.success(
             "run.py",
             "get_chat_history",
             "token 有效，当前用户：" + current_user + "，开始获取聊天记录...",
@@ -349,7 +354,7 @@ def get_chat_history():
                     encoded_chat_history = user[agent_name]["chat_history"]
                     break
     except Exception as e:
-        error("run.py", "get_chat_history", "获取聊天记录失败: " + str(e))
+        logging.error("run.py", "get_chat_history", "获取聊天记录失败: " + str(e))
         return jsonify({"error": str(e)}), 401
 
     # 对聊天记录进行解码
@@ -492,7 +497,7 @@ def agent_upload_audio():
     socketio.emit:
         agent_speech_recognition_finished {string} 本次音频数据的完整语音识别结果
     """
-    info("run.py", "agent_upload_audio", "开始音频处理...")
+    logging.info("run.py", "agent_upload_audio", "开始音频处理...")
     if "audio_data" not in request.files:
         return "No file part in the request", 400
 
@@ -523,115 +528,112 @@ def agent_upload_audio():
     return jsonify({"message": "File uploaded successfully and processed"}), 200
 
 
-# 是否结束标志
-is_streaming: bool = False
+# 用于累积 token 的缓冲区
+sentence_buffer = ""
 
-bias = 0
-# ----- socket 监听函数 -----
+# 标记是否正在处理流式响应
+is_streaming = False
+
+# 用于标记当前是第几句
+sentence_index = 0
+
+# 任务队列
+task_queue = AsyncTaskQueue()
+
 @socketio.on("agent_stream_audio")
-def agent_stream_audio(data: dict[str, int | str]):
+def agent_stream_audio(current_token: str):
     """
     对音频进行断句处理。
-
+    
     Args:
-        data: 包含大模型响应 token 的数据。
-            data["index"]: token 序号
-            data["answer"]: token 内容
-
-    Description:
-        将前端发来的大模型响应 token 持续添加到句子中，当发现断句符号时，断句符号之前的句子合成音频发往前端。
+        current_token {str} 从前端发来的当前 token
     """
-    global is_streaming, ideal_answers, bias
+    global is_streaming, sentence_buffer, sentence_index
 
     if not is_streaming:
+        # 标记正在处理流式响应
         is_streaming = True
-
-        # 偏置，因为断句会导致文字总数发生变化，这引入了偏置
-        bias = 0
-
-        # 带人类断句的回答，字典，以{序号:回答}形式保存，避免语序错误
-        ideal_answers = dict()
-
-    # info("run.py", "agent_stream_audio", ideal_answers)
-
-    # 如果 token 内容是 <END>，则表示大模型响应已经结束
-    if "<END>" in data["answer"]:
-
-        # 设置结束标志
-        is_streaming = False
-        # 根据文本合成音频
-        try:
-            audio_chunk = agent_audio_generate(ideal_answers[data["index"] - bias-1]) # 多加了-1，添加测试！
-        except Exception:
-            print(ideal_answers)
-            print(data["index"] - bias)
-            print("## error")
-            audio_chunk = ''
-
-        socketio.emit(
-            "agent_play_audio_chunk",
-            {"audio_index": data["index"] - bias, "audio_chunk": audio_chunk},
-        )
-        return
-
-    # 寻找 token 中的断句下标
-    else:
-        pause_index = find_pause(data["answer"])
-
-    # 找不到任何断句符号的时候，持续将 token 积累到句子中，直到变成有断句符号的完整句子
-    if pause_index == -1:
-        if (data["index"] - bias) in ideal_answers:
-            ideal_answers[data["index"] - bias] += data["answer"]
-        else:
-            ideal_answers[data["index"] - bias] = data["answer"]
-        bias += 1
-
-        return
-
-    # 找到断句符号
-    else:
-        good_answer = data["answer"][: pause_index + 1]
-        bad_answer = data["answer"][pause_index + 1 :]
-
-        # 将断句符号之前的文字添加到句子中
-        if (data["index"] - bias) in ideal_answers:
-            ideal_answers[data["index"] - bias] += good_answer
-        else:
-            ideal_answers[data["index"] - bias] = good_answer
-
-        # 将断句符号之后的文字添加到句子中
-        if bad_answer:
-            ideal_answers[data["index"] - bias + 1] = bad_answer
-
-        # 此处需要提前将偏置保存到 data 中，否则在此次 socket 发送消息之前，bias 会因为下次的请求而发生变化
-        data["bias"] = bias
-
-        # 根据文本合成音频
-        try:
-            audio_chunk = agent_audio_generate(ideal_answers[data["index"] - bias])
-        except Exception:
-            print(ideal_answers)
-            print(data["index"] - bias)
-            print("## error")
-            audio_chunk = ''
-        info("run.py", "agent_stream_audio", data["index"] - data["bias"], color="red")
         
-        socketio.emit(
-            "agent_play_audio_chunk",
-            {"audio_index": data["index"] - data["bias"], "audio_chunk": audio_chunk},
-        )
+        # 重置缓冲区和任务队列
+        sentence_buffer = ""
+        task_queue.reset()
+        sentence_index = 0
+        
+        # 启动异步任务处理循环
+        socketio.start_background_task(process_audio_stream)
+
+    # 如果收到结束标记
+    if "<END>" in current_token:
+        logging.info("run.py", "agent_stream_audio", "大模型响应结束", color="red")
+
+        # 处理缓冲区中剩余的内容
+        if sentence_buffer:
+            # 将剩余内容加入任务队列
+            task_queue.add_task_sync(agent_audio_generate, sentence_buffer)
+
+        # 重置状态
+        is_streaming = False
+        sentence_buffer = ""
+        return
+
+    # 寻找断句符号的下标
+    pause_index = find_pause(current_token)
+
+    # 如果没有找到断句符号，则继续累积
+    if pause_index == -1:
+        sentence_buffer += current_token
+        return
+
+    # 如果找到断句符号，则生成完整句子
+    complete_sentence = sentence_buffer + current_token[:pause_index + 1]
+    
+    # 更新缓冲区
+    sentence_buffer = current_token[pause_index + 1:]
+    
+    # 将音频生成任务加入队列
+    task_queue.add_task_sync(agent_audio_generate, complete_sentence)
+
+def process_audio_stream():
+    """处理音频流的后台任务"""
+    global sentence_index
+    
+    while True:
+        try:
+            # 获取下一个音频结果
+            audio_chunk = task_queue.get_next_result_sync()
+            
+            if audio_chunk is not None:
+                # 发送到前端
+                socketio.emit(
+                    "agent_play_audio_chunk",
+                    {"index": sentence_index, "audio_chunk": audio_chunk}
+                )
+                sentence_index += 1
+            
+            # 如果流式响应结束且没有更多任务，退出循环
+            if not is_streaming and task_queue.is_empty():
+                break
+                
+        except Exception as e:
+            logging.error("run.py", "process_audio_stream", f"处理音频流错误: {e}")
+            break
 
 
 if __name__ == "__main__":
     # 根据操作系统选择服务器启动方式
-    # if current_os == 'Windows':
-    socketio.run(
-        app,
-        port=80,
-        host="0.0.0.0",
-        allow_unsafe_werkzeug=True,
-        debug=True,  # 调试模式（开发环境）
-    )
-    # else:
-    # socketio.run(app, port=443, host='0.0.0.0', allow_unsafe_werkzeug=True,
-    # ssl_context=('/ssl/cert.pem', '/ssl/cert.key'))
+    if current_os == "Windows":
+        socketio.run(
+            app,
+            port=80,
+            host="0.0.0.0",
+            allow_unsafe_werkzeug=True,
+            debug=True,  # 调试模式（开发环境）
+        )
+    else:
+        socketio.run(
+            app,
+            port=443,
+            host="0.0.0.0",
+            allow_unsafe_werkzeug=True,
+            ssl_context=("/ssl/cert.pem", "/ssl/cert.key"),
+        )

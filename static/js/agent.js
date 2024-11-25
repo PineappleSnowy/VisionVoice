@@ -73,8 +73,8 @@ function loadChatHistory(agent) {
 
 // 发送消息按钮
 document.getElementById('send-button').addEventListener('click', function () {
-    var input = document.getElementById('agent-chat-textarea');
-    var message = input.value.trim();
+    let input = document.getElementById('agent-chat-textarea');
+    let message = input.value.trim();
     message = message.replace(/(\r\n|\n|\r)/gm, '')
     if (message || image_impt) {
         audioPlayer.pause()
@@ -92,13 +92,27 @@ document.getElementById('send-button').addEventListener('click', function () {
 });
 
 /**
- * @function addMessage
- * @description 添加用户或者机器人的消息
- * @param {string} message 消息内容
+ * @description 添加用户和大模型的消息
+ * @param {string} message 用户的消息内容
  */
 function addMessage(message) {
-    // console.log('[agent.js][addMessage] message: %s', message);
+
+    /* 对上一轮对话的音频播放进行处理
+    --------------------------------------------------------- */
+    // 暂停上一轮对话的音频播放
+    audioPlayer.pause();
+
+    // 清空音频队列
+    audioQueue = [];
+
+    // 设置音频播放结束标志
+    isPlaying = false;
+    /* 对上一轮对话的音频播放进行处理 end
+    --------------------------------------------------------- */
+
+    // 获取本地 token
     const token = localStorage.getItem('token');
+
     var messagebackground = document.getElementById('chat-container');
     var messagesContainer_user = document.createElement('div');
     messagesContainer_user.className = 'chat-messages-user';
@@ -125,7 +139,7 @@ function addMessage(message) {
     messagesContainer_bot.className = 'chat-messages-bot';
     var bubble_2 = document.createElement('div');
     bubble_2.className = 'chat-bubble';
-    var index = 0
+    
     fetch(`/agent/chat_stream?query=${message}&agent=${selectedAgent}`, {
         headers: {
             "Authorization": `Bearer ${token}`
@@ -137,14 +151,11 @@ function addMessage(message) {
             // 逐块读取并处理数据
             return reader.read().then(function processText({ done, value }) {
                 if (done) {
-                    // console.log('Stream complete');
                     return;
                 }
                 let jsonString = new TextDecoder().decode(value); // 将字节流转换为字符串
 
-                // console.log('[agent.js][addMessage] agent_stream_audio: %s', jsonString);
-                socket.emit("agent_stream_audio", { "index": index, "answer": jsonString })
-                index += 1;
+                socket.emit("agent_stream_audio", jsonString)
 
                 // 如果当前不是结束标志，则将文本添加到气泡中
                 if (!(jsonString == "<END>")) {
@@ -172,6 +183,9 @@ document.getElementById('photo').addEventListener('change', function (e) {
         image_impt = event.target.result;
         console.log('用户上传图片');
         document.getElementById('photo').value = '';
+        // 显示图片预览
+        document.getElementById('preview-image').src = image_impt;
+        document.getElementById('image-preview').style.display = 'block';
 
         // 将图片数据发送到后端
         fetch('/agent/upload_image', {
@@ -286,82 +300,102 @@ function flicker_hidden() {
 document.getElementById('more_function_button_2').style.display = 'none';
 
 /* 音频播放相关 start
---------------------------------------------------------- */
-
-// 保存音频数据的对象
-var audioDict = {};
-
-// 当前播放的音频索引
-var audioIndex = 0;
-
-// 获取音频播放器元素
-const audioPlayer = document.getElementById('audioPlayer');
+- 由于大模型的音频回答应该要有断句，所以需要将音频数据分段由后端发送至前端，
+- 前端需要将这些分段的音频数据存储到队列（本质是 list 列表）中。
+- 当音频开始播放时，队列的第一个元素出栈，并播放。
+- 当元素播放结束后，继续播放下一个元素，直到队列中没有元素为止
+--------------------------------------------------------- */ 
 
 // 获取暂停按钮元素
 const pauseDiv = document.querySelector('.pause');
 
-pauseDiv.addEventListener('click', function () {
-    audioPlayer.pause()
-    audioDict = {};
-    audioIndex = 0;
-    console.log('[agent.js][pauseDiv.addEventListener] audio pause');
-    pauseDiv.style.backgroundImage = `url('${'./static/images/pause_inactive.png'}')`;
+// 获取音频播放器 DOM 元素
+const audioPlayer = document.getElementById('audioPlayer');
+
+// 用于存放音频的队列
+let audioQueue = [];
+
+// 标识是否正在播放音频
+let isPlaying = false;
+
+/**
+ * @description 监听后端发送的 agent_play_audio_chunk 事件
+ * - 音频播放模块的起点
+ * - 后端会将音频数据分段发送过来，该函数需要将这些音频数据分段存储到队列中，并开始播放
+ */
+socket.on('agent_play_audio_chunk', function (data) {
+    const audioIndex = data['index'];
+    const audioData = data['audio_chunk'];
+
+    // 将音频数据添加到队列中
+    audioQueue[audioIndex] = audioData;
+
+    // 如果当前没有音频正在播放，开始播放
+    if (!isPlaying) {
+        pauseDiv.style.backgroundImage = `url('${'./static/images/pause.png'}')`;
+        playNextAudio();
+    }
 });
 
-// 播放下一个音频
+/**
+ * @description 播放下一个音频
+ * - 大模型的回答是有断句的，当播放完该句话后，继续播放下一句话
+ */
 function playNextAudio() {
-    try {
-        // console.log('[agent.js][playNextAudio] audioIndex: ', audioIndex);
-        // console.log('[agent.js][playNextAudio] audioDict: ', audioDict);
+    // 如果音频队列中没有音频数据（即后端还没有发送音频数据），则停止播放
+    if (audioQueue.length === 0) {
+        isPlaying = false;
+        pauseDiv.style.backgroundImage = `url('${'./static/images/pause_inactive.png'}')`;
+        return;
+    }
+    console.log('[agent.js][playNextAudio] audioQueue:', audioQueue);
 
-        // 检查当前索引的音频是否存在
-        if (audioDict[audioIndex] !== undefined) {
-            pauseDiv.style.backgroundImage = `url('${'./static/images/pause.png'}')`;
-            const audioBlob = new Blob([audioDict[audioIndex]], { type: 'audio/mp3' });
-            const audioURL = URL.createObjectURL(audioBlob);
+    // 从队列中取出下一个音频
+    const nextAudioData = audioQueue.shift();
 
-            audioPlayer.src = audioURL;
+    // 如果音频数据不为空，则播放音频
+    if (nextAudioData) {
 
-            try {
-                audioPlayer.play();
-                console.log('[agent.js][playNextAudio] 音频片段播放中...');
-            } catch (error) {
-                console.log('[agent.js][playNextAudio] 音频片段播放失败.');
-                console.log('[agent.js][playNextAudio] 错误信息：', error);
-            }
-        } else {
-            // audioIndex = 0;
-            // audioDict = {};
-            console.log('[agent.js][playNextAudio] 没有更多音频可播放');
-        }
-    } catch (error) {
-        console.log('[agent.js][playNextAudio] 错误信息：', error);
+        // 标识音频正在播放
+        isPlaying = true;
+
+        // 将音频数据转换为 Blob 对象，并对其创建资源 URL，从而设置音频播放器的播放源（播放源只能是 URL）
+        const audioBlob = new Blob([nextAudioData], { type: 'audio/mp3' });
+        const audioURL = URL.createObjectURL(audioBlob);
+        audioPlayer.src = audioURL;
+
+        // 播放音频
+        audioPlayer.play().then(() => {
+            console.log('音频片段播放中...');
+        }).catch(error => {
+            console.log('音频片段播放失败.', error);
+        });
+    } else {
+        // 如果当前音频为空，继续播放下一个
+        playNextAudio();
     }
 }
 
-// 监听音频播放结束事件
+/**
+ * @description 设置音频播放结束后的回调函数
+ * - 大模型的回答是有断句的，当播放完该句话后，继续播放下一句话
+ */
 audioPlayer.onended = function () {
-    // console.log('[agent.js][audioPlayer.onended] audioIndex: %d', audioIndex);
-    audioIndex++;
-    pauseDiv.style.backgroundImage = `url('${'./static/images/pause_inactive.png'}')`;
     playNextAudio();
 };
 
-// 监听后端发送的 agent_play_audio_chunk 事件
-socket.on('agent_play_audio_chunk', function (data) {
-    console.log('[agent.js][socket.on][agent_play_audio_chunk] index: %d', data['audio_index']);
-    var chunkIndex = data['audio_index'];
-    var audioData = data['audio_chunk']; // 后端发送的音频数据
+/**
+ * @description 暂停音频播放
+ * - 暂停音频播放后，清空音频队列，并将暂停按钮设置为未激活状态（灰色）
+ */
+pauseDiv.addEventListener('click', function () {
+    // 暂停音频播放
+    audioPlayer.pause()
 
-    // 将音频数据添加到音频字典
-    audioDict[chunkIndex] = audioData;
+    // 清空音频队列
+    audioQueue = [];
 
-    // 如果当前没有音频正在播放，开始播放
-    if (audioPlayer.paused) {
-        audioPlayer.pause();
-        console.log("[agent.js][socket.on][agent_play_audio_chunk] 播放ing..");
-        playNextAudio();
-    }
+    pauseDiv.style.backgroundImage = `url('${'./static/images/pause_inactive.png'}')`;
 });
 
 /* 音频播放相关 end
