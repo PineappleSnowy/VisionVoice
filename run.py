@@ -451,9 +451,14 @@ def agent_chat_stream():
 
     user_talk = request.args.get("query")
     agent_name = request.args.get("agent", "defaultAgent")  # 获取选择的智能体
+    video_open = request.args.get("agent", "videoOpen") == "true" # 获取选择的智能体
     current_user = get_jwt_identity()
     messages[agent_name].append({"role": "user", "content": user_talk})
-    responses = build_response(agent_name, user_talk, current_user)
+
+    if video_open:
+        pass
+    else:
+        responses = build_response(agent_name, user_talk, current_user)
 
     generate = predict(responses, agent_name)
     return app.response_class(
@@ -473,8 +478,7 @@ def upload_image():
     image_data = data["image"]
 
     # 去掉base64前缀
-    if image_data.startswith("data:image"):
-        image_data = image_data.split(",")[1]
+    image_data = image_data.split(",")[1]
 
     # 将图片保存为文件
     image_path = os.path.join(".cache", "uploaded_image.png")

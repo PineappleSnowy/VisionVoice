@@ -77,6 +77,32 @@ toggleCamera.addEventListener('click', async () => {
     }
 });
 
+function captureAndSendFrame() {
+    if (videoChat) {
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const context = canvas.getContext('2d');
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const imageData = canvas.toDataURL('image/jpeg');
+
+        fetch('/agent/upload_image', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ image: imageData })
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Frame uploaded successfully:', data);
+        })
+        .catch(error => {
+            console.error('Error uploading frame:', error);
+        });
+    }
+}
+
 // phone 界面大小适配
 const html = document.querySelector('html');
 html.style.fontSize = (window.innerWidth * 100) / 412 + 'px';
@@ -234,7 +260,7 @@ window.onload = async () => {
     ------------------------------------------------------------*/
 
     function startRecording() {
-
+        captureAndSendFrame()
         // 创建新的音频上下文，这是Web Audio API的核心对象
         audioContext = new AudioContext();
 
@@ -401,7 +427,7 @@ window.onload = async () => {
         const token = localStorage.getItem('token');
         console.log('[test.html][socket.on][agent_speech_recognition_finished] 音频识别结果: %s', rec_result);
         index = 0;
-        fetch(`/agent/chat_stream?query=${rec_result}&agent=${selectedAgent}`, {
+        fetch(`/agent/chat_stream?query=${rec_result}&agent=${selectedAgent}&videoOpen=${videoChat}`, {
             headers: {
                 "Authorization": `Bearer ${token}`
             }
