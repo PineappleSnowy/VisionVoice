@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 
 <head>
   <meta charset="UTF-8" />
@@ -12,49 +12,49 @@
 </head>
 
 <body>
-  <div id="main_page">
+  <div id="main_page" role="main">
 
     <!-- 聊天消息显示区域 -->
-    <div id="chat-container"></div>
+    <div id="chat-container" aria-live="polite" aria-atomic="true"></div>
     <!-- 下部功能区 -->
-    <div id="chat-input-container">
-      <div class="pause"></div>
-      <a id="phone-button" href="/phone">
-        <img src="../static/images/phone.png" id="phone_icon" />
+    <div id="chat-input-container" role="form">
+      <div class="pause" aria-hidden="true"></div>
+      <a id="phone-button" href="/phone" aria-label="电话">
+        <img src="../static/images/phone.png" id="phone_icon" alt="电话图标" />
       </a>
-      <textarea id="agent-chat-textarea" placeholder="输入消息..."></textarea>
-      <button id="send-button">
-        <img src="../static/images/arrow_right.png" id="arrow_right" />
+      <textarea id="agent-chat-textarea" placeholder="输入消息..." aria-label="输入消息"></textarea>
+      <button id="send-button" aria-label="发送消息">
+        <img src="../static/images/arrow_right.png" id="arrow_right" alt="发送图标" />
       </button>
-      <button id="more_function_button">
-        <img src="../static/images/more_function_start.png" id="more_function_start" />
+      <button id="more_function_button" aria-label="更多功能">
+        <img src="../static/images/more_function_start.png" id="more_function_start" alt="更多功能图标" />
       </button>
-      <button id="more_function_button_2">
-        <img src="../static/images/more_function_end.png" id="more_function_end" />
+      <button id="more_function_button_2" aria-label="关闭更多功能">
+        <img src="../static/images/more_function_end.png" id="more_function_end" alt="关闭更多功能图标" />
       </button>
     </div>
-    <div id="more_function_board">
+    <div id="more_function_board" role="region" aria-labelledby="more_function_label">
       <div id="decorate_photo">
-        <input id="photo" type="file" accept="image/*" />
+        <input id="photo" type="file" accept="image/*" aria-label="选择图片" />
       </div>
-      <div id="image-preview" style="display: none;">
-        <img id="preview-image" alt="预览图片"/>
+      <div id="image-preview" style="display: none;" aria-hidden="true">
+        <img id="preview-image" alt="预览图片" />
       </div>
     </div>
-    <div id="navbar">
-      <a href="/agent">首页</a>
-      <a href="/chat">消息</a>
-      <a href="/create">
-        <img src="../static/images/star.png" id="star" />
+    <div id="navbar" role="navigation">
+      <a href="/agent" aria-label="首页">首页</a>
+      <a href="/chat" aria-label="消息">消息</a>
+      <a href="/create" aria-label="创建">
+        <img src="../static/images/star.png" id="star" alt="创建图标" />
       </a>
-      <a href="/square">广场</a>
-      <a href="/mine">我的</a>
+      <a href="/square" aria-label="广场">广场</a>
+      <a href="/mine" aria-label="我的">我的</a>
     </div>
   </div>
 
   <!-- 音频播放标签 -->
-  <audio id="audioPlayer" controls autoplay style="display: none"></audio>
-
+  <audio id="audioPlayer" controls autoplay style="display: none" aria-label="音频播放器"></audio>
+  <script src="../static/js/chat.js"></script>
   <script src="../static/js/auth.js"></script>
   <script src="../static/js/agent.js"></script>
 </body>

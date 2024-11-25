@@ -211,7 +211,7 @@ p {
     top: 0%;
     width: 100%;
     padding: 10px;
-    height: 80%;
+    height: 90%;
     flex-direction: column;
     background-color: rgba(red, green, blue, 0);
     overflow: auto;

@@ -401,7 +401,7 @@ window.onload = async () => {
         const token = localStorage.getItem('token');
         console.log('[phone.js][socket.on][agent_speech_recognition_finished] 音频识别结果: %s', rec_result);
         index = 0;
-        fetch(`/agent/chat_stream?query=${rec_result}`, {
+        fetch(`/agent/chat_stream?query=${rec_result}&agent=${selectedAgent}`, {
             headers: {
                 "Authorization": `Bearer ${token}`
             }

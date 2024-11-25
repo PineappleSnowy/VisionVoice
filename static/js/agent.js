@@ -1,20 +1,12 @@
 var image_impt = null;
 var flag_board = 0;
 
-var selectedAgent = 'defaultAgent'; // 默认智能体
-
-function selectChatAgent(agent) {
-    selectedAgent = agent;
-    localStorage.setItem('selectedAgent', agent); // 将选择的智能体存储到本地存储
-}
-
-const socket = io();
-
 // 在 DOM 加载完成后获取聊天记录
 document.addEventListener('DOMContentLoaded', function() {
-    selectedAgent = localStorage.getItem('selectedAgent') || 'defaultAgent'; // 从本地存储中获取选择的智能体
     loadChatHistory(selectedAgent);
 });
+
+const socket = io();
 
 /**
  * @function loadChatHistory
