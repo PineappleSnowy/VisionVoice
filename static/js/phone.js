@@ -9,6 +9,8 @@ const audio = document.querySelector('#audio');
 const waveShape = document.querySelector('#waveShape');
 let videoChat = false;
 let isFrontCamera = false;
+let state = 0;  // 状态标识，0：普通对话 1：避障 2：寻物
+
 
 openCamera.addEventListener('click', async () => {
     try {
@@ -17,7 +19,7 @@ openCamera.addEventListener('click', async () => {
             try {
                 stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio: false });
                 video.srcObject = stream;
-            }catch(err) {
+            } catch (err) {
                 if (err.name === 'NotAllowedError') {
                     alert('请允许访问您的摄像头！');
                 } else if (err.name === 'NotFoundError') {
@@ -52,20 +54,19 @@ openCamera.addEventListener('click', async () => {
 
 toggleCamera.addEventListener('click', async () => {
     if (stream) {
-        videoChat = false;
         isFrontCamera = !isFrontCamera;
         // Stop previous stream
         stream.getTracks().forEach((track) => {
             track.stop();
         });
-        if(isFrontCamera){
+        if (isFrontCamera) {
             try {
-                stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false});
+                stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
                 video.srcObject = stream;
             } catch (err) {
                 alert(err);
             }
-        }else{
+        } else {
             try {
                 stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
                 video.srcObject = stream;
@@ -73,7 +74,7 @@ toggleCamera.addEventListener('click', async () => {
                 alert(err);
             }
         }
-        
+
     }
 });
 
@@ -94,13 +95,14 @@ function captureAndSendFrame() {
             },
             body: JSON.stringify({ image: imageData })
         })
-        .then(response => response.json())
-        .then(data => {
-            console.log('Frame uploaded successfully:', data);
-        })
-        .catch(error => {
-            console.error('Error uploading frame:', error);
-        });
+            .then(response => response.json())
+            .then(data => {
+                console.log('Frame uploaded successfully:', data);
+                // if (state == 1) { captureAndSendFrame() }
+            })
+            .catch(error => {
+                console.error('Error uploading frame:', error);
+            });
     }
 }
 
@@ -412,7 +414,7 @@ window.onload = async () => {
     /* 处理音频播放 end
     ------------------------------------------------------------*/
 
-
+    let obstacle_avoie_start = false
     /* 处理音频识别 start 
     ------------------------------------------------------------*/
 
@@ -428,30 +430,48 @@ window.onload = async () => {
         const token = localStorage.getItem('token');
         console.log('[phone.js][socket.on][agent_speech_recognition_finished] 音频识别结果: %s', rec_result);
 
-        fetch(`/agent/chat_stream?query=${rec_result}&agent=${selectedAgent}&videoOpen=${videoChat}`, {
-            headers: {
-                "Authorization": `Bearer ${token}`
-            }
-        })
-            .then(response => {
-                let reader = response.body.getReader();
-
-                // 逐块读取并处理数据
-                return reader.read().then(function processText({ done, value }) {
-                    if (done) {
-                        return;
-                    }
-                    let jsonString = new TextDecoder().decode(value); // 将字节流转换为字符串
-
-                    socket.emit("agent_stream_audio", jsonString);
-
-                    // 继续读取下一个数据
-                    return reader.read().then(processText);
-                });
+        // 根据语音识别的结果执行不同的任务
+        if (rec_result.include("避")) {
+            state = 1;
+            obstacle_avoie_start = true;
+        }
+        else if (rec_result.include("退出"))
+        {
+            state = 0;
+        }
+        
+        if (state == 0)
+        {
+            fetch(`/agent/chat_stream?query=${rec_result}&agent=${selectedAgent}&videoOpen=${videoChat}`, {
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
             })
-            .catch(error => {
-                console.error('[phone.js][socket.on][agent_speech_recognition_finished] Error fetching stream:', error);
-            });
+                .then(response => {
+                    let reader = response.body.getReader();
+    
+                    // 逐块读取并处理数据
+                    return reader.read().then(function processText({ done, value }) {
+                        if (done) {
+                            return;
+                        }
+                        let jsonString = new TextDecoder().decode(value); // 将字节流转换为字符串
+    
+                        socket.emit("agent_stream_audio", jsonString);
+    
+                        // 继续读取下一个数据
+                        return reader.read().then(processText);
+                    });
+                })
+                .catch(error => {
+                    console.error('[phone.js][socket.on][agent_speech_recognition_finished] Error fetching stream:', error);
+                });
+        }
+        else if (state == 1)
+        {
+            socket.emit("agent_stream_audio", "<state=1>");
+        }
+        
     })
 
     /* 处理音频识别 end 
