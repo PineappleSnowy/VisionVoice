@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
     <title>我的 - 视界之声</title>
@@ -10,21 +10,21 @@
     <link rel="stylesheet" href="../static/css/mine.css" />
   </head>
   <body>
-    <div id="imformation-board">
-      <div id="user-image"></div>
+    <div id="imformation-board" role="region" aria-label="用户信息板">
+      <div id="user-image" role="img" aria-label="用户头像"></div>
       <div id="info-detail">
         <h1>用户名</h1>
         <p>UID:123456789</p>
       </div>
     </div>
-    <div class="navbar">
-      <a href="/">首页</a>
-      <a href="/chat">消息</a>
-      <a href="/create">
-        <img src="../static/images/star.png" id="star" />
+    <div class="navbar" role="navigation" aria-label="导航栏">
+      <a href="/" aria-label="首页">首页</a>
+      <a href="/chat" aria-label="消息">消息</a>
+      <a href="/create" aria-label="创建">
+        <img src="../static/images/star.png" alt="创建" id="star" />
       </a>
-      <a href="/square">广场</a>
-      <a href="/mine">我的</a>
+      <a href="/square" aria-label="广场">广场</a>
+      <a href="/mine" aria-label="我的">我的</a>
     </div>
 
     <script src="../static/js/mine.js"></script>

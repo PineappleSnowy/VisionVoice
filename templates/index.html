@@ -7,11 +7,15 @@
     <link rel="stylesheet" href="../static/css/index.css">
 </head>
 <body>
-    <div class="login-container">
-        <input type="text" placeholder="请输入用户名" id="username">
-        <input type="password" placeholder="请输入密码" id="password">
-        <button id="login_button">登录</button>
-        <button id="register_button">注册</button>
+    <div class="login-container" role="form" aria-label="登录表单">
+        <label for="username" aria-label="用户名">用户名:</label>
+        <input type="text" placeholder="请输入用户名" id="username" aria-label="请输入用户名">
+        
+        <label for="password" aria-label="密码">密码:</label>
+        <input type="password" placeholder="请输入密码" id="password" aria-label="请输入密码">
+        
+        <button id="login_button" aria-label="登录">登录</button>
+        <button id="register_button" aria-label="注册">注册</button>
     </div>
     <script src="../static/js/index.js"></script>
 </body>
