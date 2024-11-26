@@ -455,7 +455,13 @@ window.onload = async () => {
                     }
                     let jsonString = new TextDecoder().decode(value); // 将字节流转换为字符串
 
-                    socket.emit("agent_stream_audio", jsonString);
+                    
+                    // 如果当前不是结束标志，则将文本进行语音合成
+                    if (!("<END>" == jsonString)) {
+                        socket.emit("agent_stream_audio", jsonString);
+                    }
+
+                    
 
                     // 继续读取下一个数据
                     return reader.read().then(processText);

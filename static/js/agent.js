@@ -147,10 +147,10 @@ function addMessage(message) {
                 }
                 let jsonString = new TextDecoder().decode(value); // 将字节流转换为字符串
 
-                socket.emit("agent_stream_audio", jsonString)
-
+                
                 // 如果当前不是结束标志，则将文本添加到气泡中
                 if (!(jsonString == "<END>")) {
+                    socket.emit("agent_stream_audio", jsonString)
                     bubble_2.textContent += jsonString;
                 }
 

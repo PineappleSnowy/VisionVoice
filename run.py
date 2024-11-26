@@ -159,6 +159,14 @@ def predict(responses, agent_name):
 def change_sample_rate(input_file, target_sample_rate, ori_sample_rate):
     """
     修改采样率函数
+
+    Args:
+        input_file {str} 输入文件路径
+        target_sample_rate {int} 目标采样率
+        ori_sample_rate {int} 原始采样率
+
+    Returns:
+        resampled_audio_data {bytes} 修改后的音频数据
     """
     ratio = target_sample_rate / ori_sample_rate
     converter = "sinc_best"  # or 'sinc_fastest', ...
