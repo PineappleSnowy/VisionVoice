@@ -52,7 +52,7 @@ openCamera.addEventListener('click', async () => {
 
 toggleCamera.addEventListener('click', async () => {
     if (stream) {
-        
+        videoChat = false;
         isFrontCamera = !isFrontCamera;
         // Stop previous stream
         stream.getTracks().forEach((track) => {
@@ -77,7 +77,7 @@ toggleCamera.addEventListener('click', async () => {
     }
 });
 
-function captureAndSendFrame() {
+function captureAndSendFrame(state) {
     if (videoChat) {
         const canvas = document.createElement('canvas');
         canvas.width = video.videoWidth;
@@ -426,7 +426,10 @@ window.onload = async () => {
         }
         const token = localStorage.getItem('token');
         console.log('[phone.js][socket.on][agent_speech_recognition_finished] 音频识别结果: %s', rec_result);
-        index = 0;
+        // 根据识别结果做不同处理
+        if(rec_result.includes("避"))
+            captureAndSendFrame(1)
+
         fetch(`/agent/chat_stream?query=${rec_result}&agent=${selectedAgent}&videoOpen=${videoChat}`, {
             headers: {
                 "Authorization": `Bearer ${token}`

@@ -149,8 +149,7 @@ def predict(responses, agent_name):
         response_all += text
         yield text
     messages[agent_name].append({"role": "assistant", "content": response_all})
-    print(response_all)
-    print(messages)
+    print(f"response_all: {response_all}")
     save_chat_history(agent_name)
     # 结束标志
     # if text[-1] != "。":
@@ -392,7 +391,7 @@ def build_response(agent_name, user_talk, current_user, video_open):
                 img_base = base64.b64encode(img_file.read()).decode('utf-8')
             dst_messages.append({"role": "user",
                                 "content": [{"type": "image_url", "image_url": {"url": img_base}},
-                                            {"type": "text", "text": user_talk}]})
+                                            {"type": "text", "text": "请描述这个图片"}]})
         else:
             dst_messages.append({"role": "user",
                                 "content": [{"type": "text", "text": user_talk}]})
@@ -406,7 +405,7 @@ def build_response(agent_name, user_talk, current_user, video_open):
         # 调用大模型
         responses = client.chat.completions.create(
             model=model_name,
-            messages=messages[agent_name],
+            messages=dst_messages,
             stream=True,
         )
     else:
@@ -513,7 +512,7 @@ def message_format_tran(src_messages: list):
     转换message格式，用于多模态大模型的历史聊天
     """
     dst_messages = []
-    for msg in src_messages:
+    for msg in src_messages[-10:]:  ## 多模态聊天记录保存轮数
         talk = msg["content"]
         temp_msg = msg.copy()
         temp_msg["content"] = [{"text": talk, "type": "text"}]
@@ -536,8 +535,7 @@ def upload_image():
     image_data = image_data.split(",")[1]
 
     # 将图片保存为文件
-    image_path = os.path.join(".cache", "uploaded_image.jpg")
-    with open(image_path, "wb") as f:
+    with open(IAMGE_SAVE_PATH, "wb") as f:
         f.write(base64.b64decode(image_data))
 
     return jsonify({"message": "Image uploaded successfully"}), 200
