@@ -60,21 +60,25 @@ toggleCamera.addEventListener('click', async () => {
             track.stop();
         });
         if (isFrontCamera) {
-            try {
-                stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
-                video.srcObject = stream;
-            } catch (err) {
-                alert(err);
+            if (isFrontCamera) {
+                try {
+                    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
+                    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
+                    video.srcObject = stream;
+                } catch (err) {
+                    alert(err);
+                }
+            } else {
+                try {
+                    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+                    video.srcObject = stream;
+                } catch (err) {
+                    alert(err);
+                }
             }
-        } else {
-            try {
-                stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-                video.srcObject = stream;
-            } catch (err) {
-                alert(err);
-            }
-        }
 
+
+        }
     }
 });
 
@@ -190,6 +194,7 @@ window.onload = async () => {
 
     // 检测用户是否停止讲话
     function checkSilence() {
+        console.log('[phone.js][checkSilence] 检测用户是否正在说话中...');
 
         // 如果用户停止讲话，则设置短暂的静音等待
         if (detectSilence(analyser, dataArray)) {
@@ -197,6 +202,11 @@ window.onload = async () => {
             // 如果静音定时器不存在，则设置静音定时器
             if (!silenceTimer) {
                 silenceTimer = setTimeout(() => {
+                    // 停止检测用户是否说话
+                    clearTimeout(checkSilenceTimer);
+                    checkSilenceTimer = null;
+
+                    // 停止录音
                     stopRecording();
 
                     // 创建 WAV blob 并传递给 createDownloadLink
@@ -232,7 +242,7 @@ window.onload = async () => {
     }
 
     // 使用 setInterval，每 333ms 检查一次用户是否停止讲话
-    setInterval(checkSilence, 333);
+    let checkSilenceTimer = setInterval(checkSilence, 333);
 
     // ----- 音频波形可视化 start -----
     const waveShape = document.querySelector('#waveShape');
@@ -362,7 +372,13 @@ window.onload = async () => {
     function playNextAudio() {
         // 如果音频队列中没有音频数据（即后端还没有发送音频数据），则停止播放
         if (audioQueue.length === 0) {
+            // 表示音频播放结束
             isPlaying = false;
+
+            // 开始检测用户是否正在说话
+            checkSilenceTimer = setInterval(checkSilence, 333);
+
+            console.log('[phone.js][playNextAudio] 音频队列中没有音频数据，停止播放...');
 
             // 如果波形图动画处于暂停状态，则开始播放（波形动画启动表示用户可以讲话）
             if (vudio.paused()) {
@@ -393,9 +409,9 @@ window.onload = async () => {
 
             // 播放音频
             audioPlayer.play().then(() => {
-                console.log('音频片段播放中...');
+                console.log('[phone.js][playNextAudio] 音频片段播放中...');
             }).catch(error => {
-                console.log('音频片段播放失败.', error);
+                console.log('[phone.js][playNextAudio] 音频片段播放失败.', error);
             });
         } else {
             // 如果当前音频为空，继续播放下一个
@@ -435,13 +451,11 @@ window.onload = async () => {
             state = 1;
             obstacle_avoie_start = true;
         }
-        else if (rec_result.include("退出"))
-        {
+        else if (rec_result.include("退出")) {
             state = 0;
         }
-        
-        if (state == 0)
-        {
+
+        if (state == 0) {
             fetch(`/agent/chat_stream?query=${rec_result}&agent=${selectedAgent}&videoOpen=${videoChat}`, {
                 headers: {
                     "Authorization": `Bearer ${token}`
@@ -449,16 +463,22 @@ window.onload = async () => {
             })
                 .then(response => {
                     let reader = response.body.getReader();
-    
+
                     // 逐块读取并处理数据
                     return reader.read().then(function processText({ done, value }) {
                         if (done) {
                             return;
                         }
                         let jsonString = new TextDecoder().decode(value); // 将字节流转换为字符串
-    
-                        socket.emit("agent_stream_audio", jsonString);
-    
+
+
+                        // 如果当前不是结束标志，则将文本进行语音合成
+                        if (!("<END>" == jsonString)) {
+                            socket.emit("agent_stream_audio", jsonString);
+                        }
+
+
+
                         // 继续读取下一个数据
                         return reader.read().then(processText);
                     });
@@ -467,11 +487,10 @@ window.onload = async () => {
                     console.error('[phone.js][socket.on][agent_speech_recognition_finished] Error fetching stream:', error);
                 });
         }
-        else if (state == 1)
-        {
+        else if (state == 1) {
             socket.emit("agent_stream_audio", "<state=1>");
         }
-        
+
     })
 
     /* 处理音频识别 end 

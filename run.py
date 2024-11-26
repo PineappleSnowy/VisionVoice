@@ -151,14 +151,22 @@ def predict(responses, agent_name):
     messages[agent_name].append({"role": "assistant", "content": response_all})
     print(f"response_all: {response_all}")
     save_chat_history(agent_name)
-    # 结束标志
-    # if text[-1] != "。":
+
+    # 结束标志，用于判断大模型说话结束，后续语音合成需要该标志
     yield "<END>"
 
 
 def change_sample_rate(input_file, target_sample_rate, ori_sample_rate):
     """
     修改采样率函数
+
+    Args:
+        input_file {str} 输入文件路径
+        target_sample_rate {int} 目标采样率
+        ori_sample_rate {int} 原始采样率
+
+    Returns:
+        resampled_audio_data {bytes} 修改后的音频数据
     """
     ratio = target_sample_rate / ori_sample_rate
     converter = "sinc_best"  # or 'sinc_fastest', ...
