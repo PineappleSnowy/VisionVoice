@@ -1,7 +1,7 @@
 // 摄像头开关逻辑
 let stream;
-const toggleCamera = document.querySelector('.toggleCamera');
-const openCamera = document.querySelector('.openCamera');
+const toggleCamera = document.querySelector('.toggleCamera');  // 切换摄像头
+const openCamera = document.querySelector('.openCamera');  // 打开摄像头
 const container = document.querySelector('.container');
 const video = document.querySelector('video');
 const img = document.querySelector('img');
@@ -430,7 +430,6 @@ window.onload = async () => {
     /* 处理音频播放 end
     ------------------------------------------------------------*/
 
-    let obstacle_avoie_start = false
     /* 处理音频识别 start 
     ------------------------------------------------------------*/
 
@@ -447,11 +446,10 @@ window.onload = async () => {
         console.log('[phone.js][socket.on][agent_speech_recognition_finished] 音频识别结果: %s', rec_result);
 
         // 根据语音识别的结果执行不同的任务
-        if (rec_result.include("避")) {
+        if (rec_result.includes("避")) {
             state = 1;
-            obstacle_avoie_start = true;
         }
-        else if (rec_result.include("退出")) {
+        else if (rec_result.includes("退出")) {
             state = 0;
         }
 
