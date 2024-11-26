@@ -189,7 +189,7 @@ function detectSilence(analyser, dataArray) {
 function exit_obstacle_void() {
     state = 0
     obstacle_avoid = false;
-    socket.emit("agent_stream_audio", "##<state=1 exit=true>");  // 添加测试
+    socket.emit("agent_stream_audio", "##<state=1 exit>");
 }
 
 window.onload = async () => {
@@ -455,8 +455,7 @@ window.onload = async () => {
      * @description 语音识别结束后，将识别结果发送给后端，并开始语音对话
      */
     socket.on('agent_speech_recognition_finished', function (data) {
-        // const rec_result = data['rec_result'];
-        const rec_result = "开启避障模式"  // 添加测试
+        const rec_result = data['rec_result'];
 
         if (!rec_result) {
             console.log('[phone.js][socket.on][agent_speech_recognition_finished] 音频识别结果为空.');
@@ -507,7 +506,7 @@ window.onload = async () => {
         }
         else if (state == 1 && !obstacle_avoid) {
             obstacle_avoid = true;
-            socket.emit("agent_stream_audio", "<state=1>");
+            socket.emit("agent_stream_audio", "##<state=1>");
         }
     })
     // 避障socket

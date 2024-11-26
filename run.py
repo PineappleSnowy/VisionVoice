@@ -594,8 +594,8 @@ def agent_upload_audio():
     )
 
     # 语音识别
-    # rec_result = speech_rec(resampled_audio_data)
-    rec_result = "添加测试"  # "添加测试"
+    rec_result = speech_rec(resampled_audio_data)
+    # rec_result = "开启避障模式"  # 添加测试
     print("音频识别结果：", rec_result)
 
     # 音频识别结果发送到前端
@@ -628,11 +628,11 @@ def agent_stream_audio(current_token: str):
     """
     global is_streaming, sentence_buffer, sentence_index
     if "##" in current_token:
-        if current_token == "<state=1>":
+        if current_token == "##<state=1>":
             audio_file_path = ".cache/obstacle_start.wav"
             # with open(audio_file_path, "wb") as audio_file:
             #     audio_file.write(agent_audio_generate("避障模式已开启。"))
-        elif current_token == "<state=1 exit>":
+        elif current_token == "##<state=1 exit>":
             audio_file_path = ".cache/obstacle_end.wav"
 
         with open(audio_file_path, "rb") as audio_file:
