@@ -364,7 +364,7 @@ def get_chat_history():
 
     return jsonify(chat_history)
 
-
+## 图片保存地址
 IAMGE_SAVE_PATH = ".cache/uploaded_image.jpg"
 
 
@@ -396,7 +396,7 @@ def build_response(agent_name, user_talk, current_user, video_open):
             dst_messages.append({"role": "user",
                                 "content": [{"type": "text", "text": user_talk}]})
             print(f"未找到图片{IAMGE_SAVE_PATH}！")
-        # 添加用户消息
+        # 保存和多模态大模型的聊天
         messages[agent_name].append({"role": "user", "content": user_talk})
         # 限制消息历史长度
         if len(messages[agent_name]) > MAX_HISTORY:

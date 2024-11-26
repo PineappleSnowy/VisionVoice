@@ -77,7 +77,8 @@ toggleCamera.addEventListener('click', async () => {
     }
 });
 
-function captureAndSendFrame(state) {
+// 将视频帧发往后端的函数
+function captureAndSendFrame() {
     if (videoChat) {
         const canvas = document.createElement('canvas');
         canvas.width = video.videoWidth;
@@ -426,9 +427,6 @@ window.onload = async () => {
         }
         const token = localStorage.getItem('token');
         console.log('[phone.js][socket.on][agent_speech_recognition_finished] 音频识别结果: %s', rec_result);
-        // 根据识别结果做不同处理
-        if(rec_result.includes("避"))
-            captureAndSendFrame(1)
 
         fetch(`/agent/chat_stream?query=${rec_result}&agent=${selectedAgent}&videoOpen=${videoChat}`, {
             headers: {
