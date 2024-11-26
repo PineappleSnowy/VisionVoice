@@ -630,8 +630,6 @@ def agent_stream_audio(current_token: str):
     if "##" in current_token:
         if current_token == "##<state=1>":
             audio_file_path = ".cache/obstacle_start.wav"
-            # with open(audio_file_path, "wb") as audio_file:
-            #     audio_file.write(agent_audio_generate("避障模式已开启。"))
         elif current_token == "##<state=1 exit>":
             audio_file_path = ".cache/obstacle_end.wav"
 
