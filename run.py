@@ -26,6 +26,7 @@ from agent_files.agent_speech_rec import speech_rec
 from agent_files.agent_speech_synthesis import agent_audio_generate
 from lib import logging
 from agent_files.async_task_queue import AsyncTaskQueue
+from agent_files.obstacle_avoid.detect import obstacle_avoid_realize
 
 # ----- 加载全局应用 -----
 app = Flask(__name__)
@@ -149,7 +150,7 @@ def predict(responses, agent_name):
         response_all += text
         yield text
     messages[agent_name].append({"role": "assistant", "content": response_all})
-    print(f"response_all: {response_all}")
+    print("[run.py][predict] response_all:", response_all)
     save_chat_history(agent_name)
 
     # 结束标志，用于判断大模型说话结束，后续语音合成需要该标志
@@ -372,7 +373,8 @@ def get_chat_history():
 
     return jsonify(chat_history)
 
-## 图片保存地址
+
+# 图片保存地址
 IAMGE_SAVE_PATH = ".cache/uploaded_image.jpg"
 
 
@@ -520,7 +522,7 @@ def message_format_tran(src_messages: list):
     转换message格式，用于多模态大模型的历史聊天
     """
     dst_messages = []
-    for msg in src_messages[-10:]:  ## 多模态聊天记录保存轮数
+    for msg in src_messages[-10:]:  # 多模态聊天记录保存轮数
         talk = msg["content"]
         temp_msg = msg.copy()
         temp_msg["content"] = [{"text": talk, "type": "text"}]
@@ -534,18 +536,28 @@ def upload_image():
     接收前端发来的图片的路由
     """
     data = request.get_json()
-    if "image" not in data:
+    if "image" not in data or not data["image"]:
         return jsonify({"error": "No image data in the request"}), 400
 
     image_data = data["image"]
 
     # 去掉base64前缀
     image_data = image_data.split(",")[1]
-
     # 将图片保存为文件
     with open(IAMGE_SAVE_PATH, "wb") as f:
         f.write(base64.b64decode(image_data))
 
+    state = data["state"]
+    print(state, type(state))
+    if state == 1:
+        try:
+            obstacle_info = obstacle_avoid_realize(IAMGE_SAVE_PATH)
+            print("[run.py][upload_image] obstacle_info:", obstacle_info)
+            return jsonify({"obstacle_info": obstacle_info}), 200
+        except Exception:
+            print("[run.py][upload_image] error:", "图片为空")
+            return jsonify({"obstacle_info": []}), 200
+        
     return jsonify({"message": "Image uploaded successfully"}), 200
 
 
@@ -582,8 +594,8 @@ def agent_upload_audio():
     )
 
     # 语音识别
-    rec_result = speech_rec(resampled_audio_data)
-
+    # rec_result = speech_rec(resampled_audio_data)
+    rec_result = "添加测试"  # "添加测试"
     print("音频识别结果：", rec_result)
 
     # 音频识别结果发送到前端
@@ -615,49 +627,68 @@ def agent_stream_audio(current_token: str):
         current_token {str} 从前端发来的当前 token
     """
     global is_streaming, sentence_buffer, sentence_index
+    if "##" in current_token:
+        if current_token == "<state=1>":
+            audio_file_path = ".cache/obstacle_start.wav"
+            # with open(audio_file_path, "wb") as audio_file:
+            #     audio_file.write(agent_audio_generate("避障模式已开启。"))
+        elif current_token == "<state=1 exit>":
+            audio_file_path = ".cache/obstacle_end.wav"
 
-    if not is_streaming:
-        # 标记正在处理流式响应
-        is_streaming = True
+        with open(audio_file_path, "rb") as audio_file:
+            audio_chunk = audio_file.read()
+        socketio.emit(
+            "agent_play_audio_chunk",
+            {"index": 0, "audio_chunk": audio_chunk}
+        )
+        socketio.emit(
+            "obstacle_avoid",
+            {"flag": "begin"}
+        )
+    else:
+        if not is_streaming:
+            # 标记正在处理流式响应
+            is_streaming = True
 
-        # 重置缓冲区和任务队列
-        sentence_buffer = ""
-        task_queue.reset()
-        sentence_index = 0
+            # 重置缓冲区和任务队列
+            sentence_buffer = ""
+            task_queue.reset()
+            sentence_index = 0
 
-        # 启动异步任务处理循环
-        socketio.start_background_task(process_audio_stream)
+            # 启动异步任务处理循环
+            socketio.start_background_task(process_audio_stream)
 
-    # 如果收到结束标记
-    if "<END>" in current_token:
-        logging.info("run.py", "agent_stream_audio", "大模型响应结束", color="red")
+        # 如果收到结束标记
+        if "<END>" in current_token:
+            logging.info("run.py", "agent_stream_audio",
+                         "大模型响应结束", color="red")
 
-        # 处理缓冲区中剩余的内容
-        if sentence_buffer:
-            # 将剩余内容加入任务队列
-            task_queue.add_task_sync(agent_audio_generate, sentence_buffer)
+            # 处理缓冲区中剩余的内容
+            if sentence_buffer:
+                # 将剩余内容加入任务队列
+                task_queue.add_task_sync(agent_audio_generate, sentence_buffer)
 
-        # 重置状态
-        is_streaming = False
-        sentence_buffer = ""
-        return
+            # 重置状态
+            is_streaming = False
+            sentence_buffer = ""
+            return
 
-    # 寻找断句符号的下标
-    pause_index = find_pause(current_token)
+        # 寻找断句符号的下标
+        pause_index = find_pause(current_token)
 
-    # 如果没有找到断句符号，则继续累积
-    if pause_index == -1:
-        sentence_buffer += current_token
-        return
+        # 如果没有找到断句符号，则继续累积
+        if pause_index == -1:
+            sentence_buffer += current_token
+            return
 
-    # 如果找到断句符号，则生成完整句子
-    complete_sentence = sentence_buffer + current_token[:pause_index + 1]
+        # 如果找到断句符号，则生成完整句子
+        complete_sentence = sentence_buffer + current_token[:pause_index + 1]
 
-    # 更新缓冲区
-    sentence_buffer = current_token[pause_index + 1:]
+        # 更新缓冲区
+        sentence_buffer = current_token[pause_index + 1:]
 
-    # 将音频生成任务加入队列
-    task_queue.add_task_sync(agent_audio_generate, complete_sentence)
+        # 将音频生成任务加入队列
+        task_queue.add_task_sync(agent_audio_generate, complete_sentence)
 
 
 def process_audio_stream():

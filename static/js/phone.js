@@ -1,3 +1,5 @@
+// 创建 socket 连接
+const socket = io();
 // 摄像头开关逻辑
 let stream;
 const toggleCamera = document.querySelector('.toggleCamera');  // 切换摄像头
@@ -10,7 +12,7 @@ const waveShape = document.querySelector('#waveShape');
 let videoChat = false;
 let isFrontCamera = false;
 let state = 0;  // 状态标识，0：普通对话 1：避障 2：寻物
-
+let obstacle_avoid = false;
 
 openCamera.addEventListener('click', async () => {
     try {
@@ -36,6 +38,11 @@ openCamera.addEventListener('click', async () => {
             goBack.style.color = 'white';
             toggleCamera.style.color = 'white';
         } else {
+            // 关闭摄像头时退出避障模式
+            if (state == 1) {
+                exit_obstacle_void()
+            }
+
             stream.getTracks().forEach((track) => {
                 track.stop();
             });
@@ -60,24 +67,19 @@ toggleCamera.addEventListener('click', async () => {
             track.stop();
         });
         if (isFrontCamera) {
-            if (isFrontCamera) {
-                try {
-                    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
-                    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
-                    video.srcObject = stream;
-                } catch (err) {
-                    alert(err);
-                }
-            } else {
-                try {
-                    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-                    video.srcObject = stream;
-                } catch (err) {
-                    alert(err);
-                }
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
+                video.srcObject = stream;
+            } catch (err) {
+                alert(err);
             }
-
-
+        } else {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+                video.srcObject = stream;
+            } catch (err) {
+                alert(err);
+            }
         }
     }
 });
@@ -97,12 +99,22 @@ function captureAndSendFrame() {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ image: imageData })
+            body: JSON.stringify({ "image": imageData, "state": state })
         })
             .then(response => response.json())
             .then(data => {
                 console.log('Frame uploaded successfully:', data);
-                // if (state == 1) { captureAndSendFrame() }
+                if (state == 1) {
+                    if (data["obstacle_info"].length != 0) {
+                        const detected_item = data["obstacle_info"][0]["label"];
+                        const distant = data["obstacle_info"][0]["distant"]
+                        socket.emit("agent_stream_audio", `画面右侧${detected_item}距离${distant.toFixed(2)}米。`);
+                    }
+                    // 设置等待时间
+                    setTimeout(function () {
+                        captureAndSendFrame()
+                    }, 2000);
+                }
             })
             .catch(error => {
                 console.error('Error uploading frame:', error);
@@ -172,6 +184,12 @@ function detectSilence(analyser, dataArray) {
     const average = sum / dataArray.length;
     const db = 20 * Math.log10(average);
     return db < SILENCE_THRESHOLD;
+}
+
+function exit_obstacle_void() {
+    state = 0
+    obstacle_avoid = false;
+    socket.emit("agent_stream_audio", "##<state=1 exit=true>");  // 添加测试
 }
 
 window.onload = async () => {
@@ -273,7 +291,9 @@ window.onload = async () => {
     ------------------------------------------------------------*/
 
     function startRecording() {
-        captureAndSendFrame()
+        if (state == 0) {
+            captureAndSendFrame()
+        }
         // 创建新的音频上下文，这是Web Audio API的核心对象
         audioContext = new AudioContext();
 
@@ -329,9 +349,6 @@ window.onload = async () => {
 
     /* 处理音频播放 start 
     ------------------------------------------------------------*/
-
-    // 创建 socket 连接
-    const socket = io();
 
     // 获取音频播放器 DOM 元素
     const audioPlayer = document.getElementById('audioPlayer');
@@ -430,6 +447,7 @@ window.onload = async () => {
     /* 处理音频播放 end
     ------------------------------------------------------------*/
 
+
     /* 处理音频识别 start 
     ------------------------------------------------------------*/
 
@@ -437,20 +455,25 @@ window.onload = async () => {
      * @description 语音识别结束后，将识别结果发送给后端，并开始语音对话
      */
     socket.on('agent_speech_recognition_finished', function (data) {
-        const rec_result = data['rec_result'];
+        // const rec_result = data['rec_result'];
+        const rec_result = "开启避障模式"  // 添加测试
+
         if (!rec_result) {
             console.log('[phone.js][socket.on][agent_speech_recognition_finished] 音频识别结果为空.');
             return;
         }
         const token = localStorage.getItem('token');
         console.log('[phone.js][socket.on][agent_speech_recognition_finished] 音频识别结果: %s', rec_result);
-
         // 根据语音识别的结果执行不同的任务
-        if (rec_result.includes("避")) {
+        if (rec_result.includes("避") || rec_result.includes("模")) {  // 加强鲁棒性
             state = 1;
+            if (!videoChat) {
+                openCamera.click()
+            }
         }
         else if (rec_result.includes("退出")) {
-            state = 0;
+            exit_obstacle_void()
+            return;
         }
 
         if (state == 0) {
@@ -469,13 +492,10 @@ window.onload = async () => {
                         }
                         let jsonString = new TextDecoder().decode(value); // 将字节流转换为字符串
 
-
                         // 如果当前不是结束标志，则将文本进行语音合成
                         if (!("<END>" == jsonString)) {
                             socket.emit("agent_stream_audio", jsonString);
                         }
-
-
 
                         // 继续读取下一个数据
                         return reader.read().then(processText);
@@ -485,12 +505,18 @@ window.onload = async () => {
                     console.error('[phone.js][socket.on][agent_speech_recognition_finished] Error fetching stream:', error);
                 });
         }
-        else if (state == 1) {
+        else if (state == 1 && !obstacle_avoid) {
+            obstacle_avoid = true;
             socket.emit("agent_stream_audio", "<state=1>");
         }
-
     })
-
+    // 避障socket
+    socket.on('obstacle_avoid', function (data) {
+        const flag = data["flag"];
+        if (flag == "begin") {
+            captureAndSendFrame();
+        }
+    })
     /* 处理音频识别 end 
     ------------------------------------------------------------*/
 }
