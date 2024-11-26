@@ -151,8 +151,8 @@ def predict(responses, agent_name):
     messages[agent_name].append({"role": "assistant", "content": response_all})
     print(f"response_all: {response_all}")
     save_chat_history(agent_name)
-    # 结束标志
-    # if text[-1] != "。":
+
+    # 结束标志，用于判断大模型说话结束，后续语音合成需要该标志
     yield "<END>"
 
 
