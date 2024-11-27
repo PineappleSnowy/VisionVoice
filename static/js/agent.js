@@ -6,7 +6,12 @@ document.addEventListener('DOMContentLoaded', function() {
     loadChatHistory(selectedAgent);
 });
 
-const socket = io();
+const token = localStorage.getItem('token');
+const socket = io({
+    query: {
+        token: token
+    }
+});
 
 /**
  * @function loadChatHistory

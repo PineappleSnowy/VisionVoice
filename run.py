@@ -14,6 +14,7 @@ import json
 import platform
 from zhipuai import ZhipuAI
 from flask_jwt_extended import (
+    jwt_required, 
     create_access_token,
     verify_jwt_in_request,
     get_jwt_identity,
@@ -53,6 +54,36 @@ def before_request():
                 ),
                 401,
             )
+
+@socketio.on("connect")
+def connect():
+    token = request.args.get('token')
+    if token:
+        request.headers = {"Authorization": f"Bearer {token}"}
+        try:
+            verify_jwt_in_request()
+            user = get_jwt_identity()
+            print(f"User {user} connected")
+        except Exception as e:
+            print(f"JWT verification failed: {e}")
+            
+    else:
+        print("Missing token")
+
+
+@socketio.on('disconnect')
+def handle_disconnect():
+    token = request.args.get('token')
+    if token:
+        request.headers = {"Authorization": f"Bearer {token}"}
+    verify_jwt_in_request()
+    user = get_jwt_identity()
+    print(f"User {user} disconnected")
+    try:
+        del user_var[user]
+        print(f"Remove user {user} varieties")
+    except Exception:
+        print(f"Fail to remove user {user} varieties")
 
 
 @app.route("/", methods=["GET"])
@@ -337,6 +368,14 @@ def verify_token():
         logging.success(
             "run.py", "verify_token", "token 有效，当前用户：" + current_user
         )
+
+        # 初始化用户变量
+        user_var[current_user] = dict()
+        user_var[current_user]["is_streaming"] = False  # 标记是否正在处理流式响应
+        user_var[current_user]["sentence_buffer"] = ""  # 用于累积 token 的缓冲区
+        user_var[current_user]["sentence_index"] = 0  # 用于标记当前是第几句
+        user_var[current_user]["task_queue"] = AsyncTaskQueue()  # 任务队列
+
         return jsonify({"valid": True, "user": current_user}), 200
     # 如果token无效，返回错误信息
     except:
@@ -566,19 +605,7 @@ def agent_upload_audio():
 
     return jsonify({"message": "File uploaded successfully and processed"}), 200
 
-
-# 用于累积 token 的缓冲区
-sentence_buffer = ""
-
-# 标记是否正在处理流式响应
-is_streaming = False
-
-# 用于标记当前是第几句
-sentence_index = 0
-
-# 任务队列
-task_queue = AsyncTaskQueue()
-
+user_var = dict()
 
 @socketio.on("agent_stream_audio")
 def agent_stream_audio(current_token: str):
@@ -588,7 +615,12 @@ def agent_stream_audio(current_token: str):
     Args:
         current_token {str} 从前端发来的当前 token
     """
-    global is_streaming, sentence_buffer, sentence_index
+    # 检测socket的token，为了可以调用get_jwt_identity()
+    token = request.args.get('token')
+    if token:
+        request.headers = {"Authorization": f"Bearer {token}"}
+    verify_jwt_in_request()
+    user = get_jwt_identity()
     if "##" in current_token:
         if current_token == "##<state=1>":
             audio_file_path = ".cache/obstacle_start.wav"
@@ -606,17 +638,17 @@ def agent_stream_audio(current_token: str):
             {"flag": "begin"}
         )
     else:
-        if not is_streaming:
+        if not user_var[user]["is_streaming"]:
             # 标记正在处理流式响应
-            is_streaming = True
+            user_var[user]["is_streaming"] = True
 
             # 重置缓冲区和任务队列
-            sentence_buffer = ""
-            task_queue.reset()
-            sentence_index = 0
+            user_var[user]["sentence_buffer"] = ""
+            user_var[user]["task_queue"].reset()
+            user_var[user]["sentence_index"] = 0
 
             # 启动异步任务处理循环
-            socketio.start_background_task(process_audio_stream)
+            socketio.start_background_task(process_audio_stream, user)
 
         # 如果收到结束标记
         if "<END>" in current_token:
@@ -624,13 +656,13 @@ def agent_stream_audio(current_token: str):
                          "大模型响应结束", color="red")
 
             # 处理缓冲区中剩余的内容
-            if sentence_buffer:
+            if user_var[user]["sentence_buffer"]:
                 # 将剩余内容加入任务队列
-                task_queue.add_task_sync(agent_audio_generate, sentence_buffer)
+                user_var[user]["task_queue"].add_task_sync(agent_audio_generate, user_var[user]["sentence_buffer"])
 
             # 重置状态
-            is_streaming = False
-            sentence_buffer = ""
+            user_var[user]["is_streaming"] = False
+            user_var[user]["sentence_buffer"] = ""
             return
 
         # 寻找断句符号的下标
@@ -638,38 +670,36 @@ def agent_stream_audio(current_token: str):
 
         # 如果没有找到断句符号，则继续累积
         if pause_index == -1:
-            sentence_buffer += current_token
+            user_var[user]["sentence_buffer"] += current_token
             return
 
         # 如果找到断句符号，则生成完整句子
-        complete_sentence = sentence_buffer + current_token[:pause_index + 1]
+        complete_sentence = user_var[user]["sentence_buffer"] + current_token[:pause_index + 1]
 
         # 更新缓冲区
-        sentence_buffer = current_token[pause_index + 1:]
+        user_var[user]["sentence_buffer"] = current_token[pause_index + 1:]
 
         # 将音频生成任务加入队列
-        task_queue.add_task_sync(agent_audio_generate, complete_sentence)
+        user_var[user]["task_queue"].add_task_sync(agent_audio_generate, complete_sentence)
 
 
-def process_audio_stream():
+def process_audio_stream(user):
     """处理音频流的后台任务"""
-    global sentence_index
-
     while True:
         try:
             # 获取下一个音频结果
-            audio_chunk = task_queue.get_next_result_sync()
+            audio_chunk = user_var[user]["task_queue"].get_next_result_sync()
 
             if audio_chunk is not None:
                 # 发送到前端
                 socketio.emit(
                     "agent_play_audio_chunk",
-                    {"index": sentence_index, "audio_chunk": audio_chunk}
+                    {"index": user_var[user]["sentence_index"], "audio_chunk": audio_chunk}
                 )
-                sentence_index += 1
+                user_var[user]["sentence_index"] += 1
 
             # 如果流式响应结束且没有更多任务，退出循环
-            if not is_streaming and task_queue.is_empty():
+            if not user_var[user]["is_streaming"] and user_var[user]["task_queue"].is_empty():
                 break
 
         except Exception as e:
