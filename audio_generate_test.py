@@ -1,3 +1,4 @@
+"""用于合成所需的固定音频"""
 from agent_files.agent_speech_synthesis import agent_audio_generate
 
 if __name__ == "__main__":

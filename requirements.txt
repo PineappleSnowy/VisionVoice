@@ -11,3 +11,4 @@ flask-jwt-extended==4.6.0
 
 # 大模型（业务处理）
 zhipuai==2.1.5.20230904
+ultralytics==8.3.37

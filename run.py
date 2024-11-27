@@ -110,7 +110,7 @@ with open("./static/api.json", "r", encoding="utf-8") as f:
 # 当前操作系统
 current_os = platform.system()
 # 聊天记录最大长度
-MAX_HISTORY = 50
+MAX_HISTORY = 10  # 较多的聊天记录长度会导致较多的token消耗
 
 
 # ----- 预定义函数 -----
