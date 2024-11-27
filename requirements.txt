@@ -1,14 +1,11 @@
-# python=3.11.5
 
-# 语音处理
 samplerate==0.2.1
 
-# 后端
 Flask==3.0.3
 Flask-SocketIO==5.4.1
 Flask-CORS==5.0.0
 flask-jwt-extended==4.6.0
 
-# 大模型（业务处理）
 zhipuai==2.1.5.20230904
+
 ultralytics==8.3.37

@@ -51,6 +51,8 @@ class AsyncTaskQueue:
             try:
                 result = func(*args, **kwargs)
 
+                logging.info("async_task_queue", "add_task_sync", f"合成 {args[0]} 的任务加入了队列", color="blue")
+
                 # 保存任务结果
                 with self.lock:
                     self.results[task_index] = result
