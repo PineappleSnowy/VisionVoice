@@ -30,7 +30,7 @@ function loadChatHistory(agent) {
                         var messagesContainer_user = document.createElement('div');
                         messagesContainer_user.className = 'chat-messages-user';
                         var bubble = document.createElement('div');
-                        bubble.className = 'chat-bubble';
+                        bubble.className = 'chat-bubble-user';
                         var image_user = document.createElement('div');
                         image_user.className = 'chat-image-user';
                         bubble.textContent = msg.content;
@@ -45,7 +45,7 @@ function loadChatHistory(agent) {
                         var messagesContainer_bot = document.createElement('div');
                         messagesContainer_bot.className = 'chat-messages-bot';
                         var bubble_2 = document.createElement('div');
-                        bubble_2.className = 'chat-bubble';
+                        bubble_2.className = 'chat-bubble-bot';
                         bubble_2.textContent = msg.content;
 
                         messagesContainer_bot.appendChild(image_bot);
@@ -55,7 +55,7 @@ function loadChatHistory(agent) {
                 });
                 messagebackground.scrollTop = messagebackground.scrollHeight;
             } else {
-                messagebackground.innerHTML = '<div class="chat-messages-user"><div class="chat-bubble">您还没有聊天记录</div></div>';
+                // messagebackground.innerHTML = '<div class="chat-messages-user"><div class="chat-bubble-user">您还没有聊天记录</div></div>';
             }
         })
         .catch(error => {
@@ -109,7 +109,7 @@ function addMessage(message) {
     var messagesContainer_user = document.createElement('div');
     messagesContainer_user.className = 'chat-messages-user';
     var bubble = document.createElement('div');
-    bubble.className = 'chat-bubble';
+    bubble.className = 'chat-bubble-user';
     var image_user = document.createElement('div');
     image_user.className = 'chat-image-user';
     bubble.textContent = message;
@@ -130,7 +130,7 @@ function addMessage(message) {
     var messagesContainer_bot = document.createElement('div');
     messagesContainer_bot.className = 'chat-messages-bot';
     var bubble_2 = document.createElement('div');
-    bubble_2.className = 'chat-bubble';
+    bubble_2.className = 'chat-bubble-bot';
     
     fetch(`/agent/chat_stream?query=${message}&agent=${selectedAgent}`, {
         headers: {

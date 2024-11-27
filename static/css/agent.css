@@ -239,7 +239,7 @@ p {
     justify-content: left;
 }
 
-.chat-bubble {
+.chat-bubble-user {
     padding: 10px;
     margin: 10px;
     border-radius: 4px;
@@ -247,6 +247,18 @@ p {
     word-wrap: break-word;
     font-size: larger;
     background-color: #5b61b9;
+    color: #fff;
+    align-self: flex-end;
+}
+
+.chat-bubble-bot {
+    padding: 10px;
+    margin: 10px;
+    border-radius: 4px;
+    max-width: 60%;
+    word-wrap: break-word;
+    font-size: larger;
+    background-color: #4b4c57;
     color: #fff;
     align-self: flex-end;
 }

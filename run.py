@@ -126,7 +126,8 @@ def save_chat_history(agent_name):
         for user in users:
             if user["username"] == current_user:
                 if "chat_history" not in user[agent_name]:
-                    user[agent_name]["chat_history"] = []  # 如果没有"chat_history"则初始化
+                    # 如果没有"chat_history"则初始化
+                    user[agent_name]["chat_history"] = []
                 user[agent_name]["chat_history"] = encoded_messages
                 break
         f.seek(0)
@@ -273,10 +274,13 @@ def register():
             # 检查用户名是否存在
             if any(user["username"] == username for user in users):
                 return jsonify({"message": "用户名已存在", "code": 400}), 400
-                
+            
             # 注册完后向用户信息中添加预设智能体，此处可以后续智能体定制兼容
+            sys_prompt = "你是视界之声，一位乐于助人的对话助手。为了能让用户能尽快解决问题，你的话语总是十分简洁而概要。"
+            background_info = "（旁白：苏梦远主演了陆星辰导演的一部音乐题材电影，在拍摄期间，两人因为一场戏的表现有分歧。） 导演，关于这场戏，我觉得可以尝试从角色的内心情感出发，让表现更加真实。"
             users.append({"username": username, "password": password,
-                         "defaultAgent": {}, "psychologicalAgent": {}})
+                         "defaultAgent": {"chat_history": [{"role": "system", "content": sys_prompt}]},
+                          "psychologicalAgent": {"chat_history": [{"role": "assistant", "content": background_info}]}})
 
             print("用户注册成功：\n用户名：{}\n密码：{}".format(username, password))
 
@@ -380,7 +384,6 @@ def get_chat_history():
 
 # 图片保存地址
 IAMGE_SAVE_PATH = ".cache/uploaded_image.jpg"
-
 
 def build_response(agent_name, user_talk, current_user, video_open):
     if video_open:
