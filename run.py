@@ -35,7 +35,6 @@ JWTManager(app)
 CORS(app)
 # 设置 JWT 密钥
 app.config["JWT_SECRET_KEY"] = "s96cae35ce8a9b0244178bf28e4966c2ce1b83"
-messages = {"defaultAgent": [], "psychologicalAgent": []}
 # ----- 路由 -----
 
 
@@ -64,9 +63,6 @@ def index():
 @app.route("/agent", methods=["GET"])
 def Agent():
     """智能体根路由"""
-    global response_all, messages
-    response_all = ""
-    messages = {"defaultAgent": [], "psychologicalAgent": []}
     return render_template("agent.html")
 
 
@@ -115,46 +111,41 @@ MAX_HISTORY = 10  # 较多的聊天记录长度会导致较多的token消耗
 
 # ----- 预定义函数 -----
 
-def save_chat_history(agent_name):
+def save_chat_history(current_user, agent_name, messages):
     # 对聊天记录进行编码
     encoded_messages = [encode_message_content(
-        msg.copy()) for msg in messages[agent_name]]
+        msg.copy()) for msg in messages]
 
     # 更新用户聊天记录
     with open("./static/user.json", "r+", encoding="utf-8") as f:
         users = json.load(f)
         for user in users:
             if user["username"] == current_user:
-                if "chat_history" not in user[agent_name]:
-                    # 如果没有"chat_history"则初始化
-                    user[agent_name]["chat_history"] = []
-                user[agent_name]["chat_history"] = encoded_messages
+                user["agents"][agent_name]["chat_history"] = encoded_messages
                 break
         f.seek(0)
         json.dump(users, f, indent=4, ensure_ascii=False)
         f.truncate()
 
 
-def predict(responses, agent_name):
+def predict(current_user, agent_name, messages, responses):
     """
     生成器函数，用于大模型流式输出
     """
-    global response_all
     response_all = ""
 
     # 大模型流式输出
     for response in responses:
         finish_reason = response.choices[0].finish_reason
         text = response.choices[0].delta.content
-        if (
-            finish_reason == "sensitive"
-        ):  # 当用户输入的内容违规时输出“我听不懂你在说什么”
+        # 当用户输入的内容违规时输出“我听不懂你在说什么”
+        if (finish_reason == "sensitive"):
             text = "我听不懂你在说什么\n"
         response_all += text
         yield text
-    messages[agent_name].append({"role": "assistant", "content": response_all})
+    messages.append({"role": "assistant", "content": response_all})
     print("[run.py][predict] response_all:", response_all)
-    save_chat_history(agent_name)
+    save_chat_history(current_user, agent_name, messages)
 
     # 结束标志，用于判断大模型说话结束，后续语音合成需要该标志
     yield "<END>"
@@ -274,13 +265,15 @@ def register():
             # 检查用户名是否存在
             if any(user["username"] == username for user in users):
                 return jsonify({"message": "用户名已存在", "code": 400}), 400
-            
+
             # 注册完后向用户信息中添加预设智能体，此处可以后续智能体定制兼容
             sys_prompt = "你是视界之声，一位乐于助人的对话助手。为了能让用户能尽快解决问题，你的话语总是十分简洁而概要。"
             background_info = "（旁白：苏梦远主演了陆星辰导演的一部音乐题材电影，在拍摄期间，两人因为一场戏的表现有分歧。） 导演，关于这场戏，我觉得可以尝试从角色的内心情感出发，让表现更加真实。"
             users.append({"username": username, "password": password,
-                         "defaultAgent": {"chat_history": [{"role": "system", "content": sys_prompt}]},
-                          "psychologicalAgent": {"chat_history": [{"role": "assistant", "content": background_info}]}})
+                         "agents":
+                          {"defaultAgent": {"chat_history": [{"role": "system", "content": sys_prompt},
+                                                             {"role": "assistant", "content": "我是视界之声，你的生活助手，有什么我可以帮你的么？"}]},
+                           "psychologicalAgent": {"chat_history": [{"role": "assistant", "content": background_info}]}}})
 
             print("用户注册成功：\n用户名：{}\n密码：{}".format(username, password))
 
@@ -367,9 +360,7 @@ def get_chat_history():
             users = json.load(f)
             for user in users:
                 if user["username"] == current_user:
-                    if "chat_history" not in user[agent_name]:
-                        user[agent_name]["chat_history"] = []
-                    encoded_chat_history = user[agent_name]["chat_history"]
+                    encoded_chat_history = user["agents"][agent_name]["chat_history"]
                     break
     except Exception as e:
         logging.error("run.py", "get_chat_history", "获取聊天记录失败: " + str(e))
@@ -385,24 +376,31 @@ def get_chat_history():
 # 图片保存地址
 IAMGE_SAVE_PATH = ".cache/uploaded_image.jpg"
 
-def build_response(agent_name, user_talk, current_user, video_open):
+
+def init_chat_history(current_user, agent_name, messages):
+    with open("./static/user.json", "r", encoding="utf-8") as f:
+        users = json.load(f)
+        for user in users:
+            if user["username"] == current_user:
+                encoded_chat_history = user["agents"][agent_name]["chat_history"]
+                break
+    # 对聊天记录进行解码
+    messages = [decode_message_content(msg.copy())
+                for msg in encoded_chat_history]
+    # 限制消息历史长度
+    if len(messages) >= MAX_HISTORY:
+        messages = messages[-MAX_HISTORY:]
+
+    return messages
+
+
+def build_response(current_user, agent_name, user_talk, video_open):
+    messages = []
     if video_open:
         model_name = "glm-4v"
-        # 读取用户的加密聊天记录
-        with open("./static/user.json", "r", encoding="utf-8") as f:
-            users = json.load(f)
-            for user in users:
-                if user["username"] == current_user:
-                    if "chat_history" not in user[agent_name]:
-                        user[agent_name]["chat_history"] = []
-                    encoded_chat_history = user[agent_name]["chat_history"]
-                    break
+        messages = init_chat_history(current_user, agent_name, messages)
 
-        # 对聊天记录进行解码
-        messages[agent_name] = [decode_message_content(msg.copy())
-                                for msg in encoded_chat_history]
-
-        dst_messages = message_format_tran(messages[agent_name])
+        dst_messages = message_format_tran(messages)
         if os.path.exists(IAMGE_SAVE_PATH):
             with open(IAMGE_SAVE_PATH, 'rb') as img_file:
                 img_base = base64.b64encode(img_file.read()).decode('utf-8')
@@ -414,10 +412,7 @@ def build_response(agent_name, user_talk, current_user, video_open):
                                 "content": [{"type": "text", "text": user_talk}]})
             print(f"未找到图片{IAMGE_SAVE_PATH}！")
         # 保存和多模态大模型的聊天
-        messages[agent_name].append({"role": "user", "content": user_talk})
-        # 限制消息历史长度
-        if len(messages[agent_name]) > MAX_HISTORY:
-            messages[agent_name] = messages[agent_name][-MAX_HISTORY:]
+        messages.append({"role": "user", "content": user_talk})
 
         # 调用大模型
         responses = client.chat.completions.create(
@@ -426,81 +421,43 @@ def build_response(agent_name, user_talk, current_user, video_open):
             stream=True,
         )
     else:
-        if agent_name == "defaultAgent":
-            # 根据选择的模型调用大模型
-            model_name = "glm-4-flash"
-            sys_prompt = "你是视界之声，一位乐于助人的对话助手。为了能让用户能尽快解决问题，你的话语总是十分简洁而概要。"
-            # 读取用户的加密聊天记录
-            with open("./static/user.json", "r", encoding="utf-8") as f:
-                users = json.load(f)
-                for user in users:
-                    if user["username"] == current_user:
-                        if "chat_history" not in user[agent_name]:
-                            user[agent_name]["chat_history"] = [
-                                {"role": "system", "content": sys_prompt}
-                            ]
-                        encoded_chat_history = user[agent_name]["chat_history"]
-                        break
-
-            # 对聊天记录进行解码
-            messages[agent_name] = [decode_message_content(msg.copy())
-                                    for msg in encoded_chat_history]
+        if agent_name == "psychologicalAgent":
+            model_name = "charglm-3"
+            messages = init_chat_history(current_user, agent_name, messages)
 
             # 添加用户消息
-            messages[agent_name].append({"role": "user", "content": user_talk})
+            messages.append({"role": "user", "content": user_talk})
 
-            # 限制消息历史长度
-            if len(messages[agent_name]) > MAX_HISTORY:
-                messages[agent_name] = messages[agent_name][-MAX_HISTORY:]
-
+            meta = {
+                "user_info": "我是陆星辰，是一个男性...",
+                "bot_info": "苏梦远，本名苏远心...（说话的结尾一定有句号等结尾符号）",
+                "bot_name": "苏梦远",
+                "user_name": "陆星辰",
+            }
             # 调用大模型
             responses = client.chat.completions.create(
                 model=model_name,
-                messages=messages[agent_name],
+                meta=meta,
+                messages=messages,
                 stream=True,
             )
 
         else:
-            model_name = "charglm-3"
-            # 从用户聊天记录获取历史消息，如果没有则初始化
-            background_info = "（旁白：苏梦远主演了陆星辰导演的一部音乐题材电影，在拍摄期间，两人因为一场戏的表现有分歧。） 导演，关于这场戏，我觉得可以尝试从角色的内心情感出发，让表现更加真实。"
-
-            # 读取用户的加密聊天记录
-            with open("./static/user.json", "r", encoding="utf-8") as f:
-                users = json.load(f)
-                for user in users:
-                    if user["username"] == current_user:
-                        if "chat_history" not in user[agent_name]:
-                            user[agent_name]["chat_history"] = [
-                                {"role": "assistant", "content": background_info}
-                            ]
-                        encoded_chat_history = user[agent_name]["chat_history"]
-                        break
-
-            # 对聊天记录进行解码
-            messages[agent_name] = [decode_message_content(msg.copy())
-                                    for msg in encoded_chat_history]
+            # 根据选择的模型调用大模型
+            model_name = "glm-4-flash"
+            messages = init_chat_history(current_user, agent_name, messages)
 
             # 添加用户消息
-            messages[agent_name].append({"role": "user", "content": user_talk})
-
-            # 限制消息历史长度
-            if len(messages[agent_name]) > MAX_HISTORY:
-                messages[agent_name] = messages[agent_name][-MAX_HISTORY:]
+            messages.append({"role": "user", "content": user_talk})
 
             # 调用大模型
             responses = client.chat.completions.create(
                 model=model_name,
-                meta={
-                    "user_info": "我是陆星辰，是一个男性...",
-                    "bot_info": "苏梦远，本名苏远心...（说话的结尾一定有句号等结尾符号）",
-                    "bot_name": "苏梦远",
-                    "user_name": "陆星辰",
-                },
-                messages=messages[agent_name],
+                messages=messages,
                 stream=True,
             )
-    return responses
+
+    return responses, messages
 
 
 @app.route("/agent/chat_stream")
@@ -508,17 +465,15 @@ def agent_chat_stream():
     """
     大模型前端流式输出路由
     """
-    global response_all, current_user
-
     user_talk = request.args.get("query")
     agent_name = request.args.get("agent", "defaultAgent")  # 获取选择的智能体
     video_open = request.args.get("videoOpen", "false") == "true"  # 获取选择的智能体
     current_user = get_jwt_identity()
-    # messages[agent_name].append({"role": "user", "content": user_talk})
 
-    responses = build_response(agent_name, user_talk, current_user, video_open)
+    responses, messages = build_response(
+        current_user, agent_name, user_talk, video_open)
 
-    generate = predict(responses, agent_name)
+    generate = predict(current_user, agent_name, messages, responses)
     return app.response_class(
         stream_with_context(generate), mimetype="text/event-stream"
     )
