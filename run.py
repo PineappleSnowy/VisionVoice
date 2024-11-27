@@ -125,6 +125,8 @@ def save_chat_history(agent_name):
         users = json.load(f)
         for user in users:
             if user["username"] == current_user:
+                if "chat_history" not in user[agent_name]:
+                    user[agent_name]["chat_history"] = []  # 如果没有"chat_history"则初始化
                 user[agent_name]["chat_history"] = encoded_messages
                 break
         f.seek(0)
@@ -271,8 +273,10 @@ def register():
             # 检查用户名是否存在
             if any(user["username"] == username for user in users):
                 return jsonify({"message": "用户名已存在", "code": 400}), 400
-
-            users.append({"username": username, "password": password})
+                
+            # 注册完后向用户信息中添加预设智能体，此处可以后续智能体定制兼容
+            users.append({"username": username, "password": password,
+                         "defaultAgent": {}, "psychologicalAgent": {}})
 
             print("用户注册成功：\n用户名：{}\n密码：{}".format(username, password))
 
@@ -359,8 +363,8 @@ def get_chat_history():
             users = json.load(f)
             for user in users:
                 if user["username"] == current_user:
-                    if agent_name not in user:
-                        user[agent_name] = {"chat_history": []}
+                    if "chat_history" not in user[agent_name]:
+                        user[agent_name]["chat_history"] = []
                     encoded_chat_history = user[agent_name]["chat_history"]
                     break
     except Exception as e:
@@ -557,7 +561,7 @@ def upload_image():
         except Exception:
             print("[run.py][upload_image] error:", "图片为空")
             return jsonify({"obstacle_info": []}), 200
-        
+
     return jsonify({"message": "Image uploaded successfully"}), 200
 
 
