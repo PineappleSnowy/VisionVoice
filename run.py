@@ -50,6 +50,8 @@ USER_VAR = dict()
 # ----- 路由 -----
 
 # 使用 verify_jwt_in_request 进行 JWT 验证
+
+
 @app.before_request
 def before_request():
     # 排除 GET 请求的 JWT 验证
@@ -80,9 +82,11 @@ def handle_disconnect():
             print(f"[run.py][handle_disconnect] User {user} disconnected")
             try:
                 del USER_VAR[user]
-                print(f"[run.py][handle_disconnect] Remove user {user} varieties")
+                print(
+                    f"[run.py][handle_disconnect] Remove user {user} varieties")
             except Exception as e:
-                print(f"[run.py][handle_disconnect] Fail to remove user {user} varieties: {e}")
+                print(
+                    f"[run.py][handle_disconnect] Fail to remove user {user} varieties: {e}")
         except Exception as e:
             print(f"[run.py][handle_disconnect] JWT verification failed: {e}")
     else:
@@ -621,7 +625,7 @@ def agent_stream_audio(current_token: str):
     token = request.args.get('token')
     if token:
         request.headers = {"Authorization": f"Bearer {token}"}
-        try: 
+        try:
             verify_jwt_in_request()
             user = get_jwt_identity()
             if user not in USER_VAR:
