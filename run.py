@@ -55,9 +55,7 @@ USER_VAR = dict()
 @app.before_request
 def before_request():
     # 排除 GET 请求的 JWT 验证
-    if request.path == "/agent/chat_stream" or\
-            request.path == "/agent/upload_audio" or\
-            request.path == "/agent/upload_image":
+    if request.path == "/agent/chat_stream" or request.path == "/agent/upload_audio" or request.path == "/agent/upload_image":
         try:
             verify_jwt_in_request()
         except Exception as e:
@@ -556,7 +554,6 @@ def upload_image():
         f.write(base64.b64decode(image_data))
 
     state = data["state"]
-    print(state, type(state))
     if state == 1:
         try:
             obstacle_info = obstacle_avoid_realize(IAMGE_SAVE_PATH)

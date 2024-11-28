@@ -33,7 +33,7 @@ body {
     justify-content: center;
 }
 
-#navbar a[href="/mine"] {
+#navbar a[href="/create"] {
     font-weight: bold; /* 加粗字体 */
 }
 

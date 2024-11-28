@@ -99,11 +99,12 @@ function captureAndSendFrame() {
         const context = canvas.getContext('2d');
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
         const imageData = canvas.toDataURL('image/jpeg');
-
+        const token = localStorage.getItem('token');
         fetch('/agent/upload_image', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}` // 添加 token 到请求头
             },
             body: JSON.stringify({ "image": imageData, "state": state })
         })
@@ -199,6 +200,14 @@ function exit_obstacle_void() {
 }
 
 window.onload = async () => {
+    // 检查 URL 中的查询参数
+    const urlParams = new URLSearchParams(window.location.search);
+    const camera = urlParams.get('camera');
+
+    // 如果查询参数中包含 camera=on，则打开摄像头
+    if (camera === 'on') {
+        openCamera.click();
+    }
 
     // 获取音频流
     let audioStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });

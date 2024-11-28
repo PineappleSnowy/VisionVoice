@@ -58,6 +58,10 @@ p {
     justify-content: center;
 }
 
+#navbar a[href="/agent"] {
+    font-weight: bold; /* 加粗字体 */
+}
+
 #navbar a:hover {
     background-color: #211f1f;
 }
