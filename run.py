@@ -67,6 +67,16 @@ def before_request():
                 401,
             )
 
+    # 允许访问的静态资源路径
+    allowed_paths = ["/static/css", "/static/js", "/static/images"]
+
+    # 获取所有已注册的路由
+    registered_routes = [rule.rule for rule in app.url_map.iter_rules()]
+
+    # 检查请求路径是否在允许的静态资源路径或已注册的路由中
+    if not any(request.path.startswith(path) for path in allowed_paths) and request.path not in registered_routes:
+        return jsonify({"message": "Forbidden", "code": 403}), 403
+
 
 # 断开连接时删除用户变量
 @socketio.on('disconnect')
@@ -237,7 +247,7 @@ def find_pause(sentence: str) -> int:
         "：",
         "？",
         "，",
-        "；",  # 全角符号
+        "；",  # 全���符号
         # ".", "!", ":", "?", ",", ";",  # 半角符号
     ]
 
@@ -318,7 +328,7 @@ def register():
             json.dump(users, f, indent=4, ensure_ascii=False)
             f.truncate()
 
-        return jsonify({"message": "注册成功", "code": 200}), 200
+        return jsonify({"message": "注册成���", "code": 200}), 200
 
     except Exception as e:
         return jsonify({"message": f"注册失败: {str(e)}", "code": 500}), 500
@@ -474,7 +484,7 @@ def build_response(current_user, agent_name, user_talk, video_open):
 
             meta = {
                 "user_info": "我是陆星辰，是一个男性...",
-                "bot_info": "苏梦远，本名苏远心...（说话的结尾一定有句号等结尾符号）",
+                "bot_info": "苏梦远，本名苏远心...（说话的结尾一定有句号等结尾符���）",
                 "bot_name": "苏梦远",
                 "user_name": "陆星辰",
             }

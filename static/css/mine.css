@@ -23,11 +23,11 @@ body {
 #navbar a {
     text-decoration: none;
     color: inherit;
-    margin: 0px 5px;
+    margin: 0px 2px;
     padding: 10px 20px;
     border-radius: 5px;
     transition: background-color 0.3s ease;
-    font-size: 16px;
+    font-size: 13px;
     display: flex;
     align-items: center;
     justify-content: center;

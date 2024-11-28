@@ -58,18 +58,6 @@
             "psychologicalAgent": {
                 "chat_history": [
                     {
-                        "role": "assistant",
-                        "content": "77yI5peB55m977ya6IuP5qKm6L+c5Li75ryU5LqG6ZmG5pif6L6w5a+85ryU55qE5LiA6YOo6Z+z5LmQ6aKY5p2Q55S15b2x77yM5Zyo5ouN5pGE5pyf6Ze077yM5Lik5Lq65Zug5Li65LiA5Zy65oiP55qE6KGo546w5pyJ5YiG5q2n44CC77yJIOWvvOa8lO+8jOWFs+S6jui/meWcuuaIj++8jOaIkeinieW+l+WPr+S7peWwneivleS7juinkuiJsueahOWGheW/g+aDheaEn+WHuuWPke+8jOiuqeihqOeOsOabtOWKoOecn+WunuOAgg=="
-                    },
-                    {
-                        "role": "user",
-                        "content": "5L2g5aW95ZWK"
-                    },
-                    {
-                        "role": "assistant",
-                        "content": "5a+85ryU77yM5YWz5LqO6L+Z5Zy65oiP77yM5oiR6KeJ5b6X5Y+v5Lul5bCd6K+V5LuO6KeS6Imy55qE5YaF5b+D5oOF5oSf5Ye65Y+R77yM6K6p6KGo546w5pu05Yqg55yf5a6e44CCCg=="
-                    },
-                    {
                         "role": "user",
                         "content": "5bCx5piv6YKj56eN44CC"
                     },
@@ -100,6 +88,22 @@
                     {
                         "role": "assistant",
                         "content": "6L+Z5byg5Zu+54mH5bGV56S65LqG5pWZ5a6k6YeM55qE5LiA5Liq5Zy65pmv44CC5YmN5pmv5Lit5pyJ5LiA5Liq5oi0552A55y86ZWc44CB56m/552A54Gw6Imy6KGj5pyN55qE5bm06L2755S35a2Q77yM5LuW55yL6LW35p2l5pyJ5Lqb5qih57OK77yM5Ly85LmO5piv5Zyo56e75Yqo5Lit5ouN5pGE55qE44CC6IOM5pmv5Lit77yM5Y+v5Lul55yL5Yiw5Y+m5LiA5L2N56m/552A6buR6Imy5LiK6KGj55qE5bm06L2755S35a2Q6IOM5a+5552A6ZWc5aS056uZ56uL552A77yM5LuW5Ly85LmO5q2j5Zyo5pON5L2c5oiW5qOA5p+l5p+Q5Lqb6K6+5aSH44CC5pWZ5a6k55qE5aKZ5aOB5LiK5oyC5pyJ5bim5pyJ5aSn5a2m5qCH5b+X5ZKM5paH5a2X55qE56qX5biY77yM6L+Z6KGo5piO6L+Z5Y+v6IO95piv5LiA5Liq5pWZ6IKy5py65p6E5YaF6YOo55qE5Zy65pmv44CC"
+                    },
+                    {
+                        "role": "user",
+                        "content": "5oiR5LiN5Lya6K+044CC"
+                    },
+                    {
+                        "role": "assistant",
+                        "content": "5ZWK44CCCg=="
+                    },
+                    {
+                        "role": "user",
+                        "content": "5L2g5aW9"
+                    },
+                    {
+                        "role": "assistant",
+                        "content": "5L2g5aW977yM6K+36Zeu5pyJ5LuA5LmI6ZyA6KaB5biu5Yqp55qE5ZCX77yfCg=="
                     }
                 ]
             }
