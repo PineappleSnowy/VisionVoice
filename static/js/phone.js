@@ -1,5 +1,11 @@
-// 创建 socket 连接
-const socket = io();
+// 创建socket连接，并附上token用于后端验证
+const token = localStorage.getItem('token');
+const socket = io({
+    query: {
+        token: token
+    }
+});
+
 // 摄像头开关逻辑
 let stream;
 const toggleCamera = document.querySelector('.toggleCamera');  // 切换摄像头

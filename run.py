@@ -14,7 +14,6 @@ import json
 import platform
 from zhipuai import ZhipuAI
 from flask_jwt_extended import (
-    jwt_required, 
     create_access_token,
     verify_jwt_in_request,
     get_jwt_identity,
@@ -36,14 +35,27 @@ JWTManager(app)
 CORS(app)
 # 设置 JWT 密钥
 app.config["JWT_SECRET_KEY"] = "s96cae35ce8a9b0244178bf28e4966c2ce1b83"
-# ----- 路由 -----
 
+
+"""user_var 保存用户变量的字典，字典格式为:
+{"<username>": {
+"is_streaming": false, 
+"sentence_buffer": "", 
+"sentence_index": 0, 
+"task_queue": AsyncTaskQueue()}
+}
+"""
+USER_VAR = dict()
+
+# ----- 路由 -----
 
 # 使用 verify_jwt_in_request 进行 JWT 验证
 @app.before_request
 def before_request():
     # 排除 GET 请求的 JWT 验证
-    if request.path == "/agent/chat_stream" or request.path == "/agent/upload_audio":
+    if request.path == "/agent/chat_stream" or\
+            request.path == "/agent/upload_audio" or\
+            request.path == "/agent/upload_image":
         try:
             verify_jwt_in_request()
         except Exception as e:
@@ -55,35 +67,26 @@ def before_request():
                 401,
             )
 
-@socketio.on("connect")
-def connect():
+
+# 断开连接时删除用户变量
+@socketio.on('disconnect')
+def handle_disconnect():
     token = request.args.get('token')
     if token:
         request.headers = {"Authorization": f"Bearer {token}"}
         try:
             verify_jwt_in_request()
             user = get_jwt_identity()
-            print(f"User {user} connected")
+            print(f"[run.py][handle_disconnect] User {user} disconnected")
+            try:
+                del USER_VAR[user]
+                print(f"[run.py][handle_disconnect] Remove user {user} varieties")
+            except Exception as e:
+                print(f"[run.py][handle_disconnect] Fail to remove user {user} varieties: {e}")
         except Exception as e:
-            print(f"JWT verification failed: {e}")
-            
+            print(f"[run.py][handle_disconnect] JWT verification failed: {e}")
     else:
-        print("Missing token")
-
-
-@socketio.on('disconnect')
-def handle_disconnect():
-    token = request.args.get('token')
-    if token:
-        request.headers = {"Authorization": f"Bearer {token}"}
-    verify_jwt_in_request()
-    user = get_jwt_identity()
-    print(f"User {user} disconnected")
-    try:
-        del user_var[user]
-        print(f"Remove user {user} varieties")
-    except Exception:
-        print(f"Fail to remove user {user} varieties")
+        print("[run.py][handle_disconnect] Missing token")
 
 
 @app.route("/", methods=["GET"])
@@ -370,11 +373,11 @@ def verify_token():
         )
 
         # 初始化用户变量
-        user_var[current_user] = dict()
-        user_var[current_user]["is_streaming"] = False  # 标记是否正在处理流式响应
-        user_var[current_user]["sentence_buffer"] = ""  # 用于累积 token 的缓冲区
-        user_var[current_user]["sentence_index"] = 0  # 用于标记当前是第几句
-        user_var[current_user]["task_queue"] = AsyncTaskQueue()  # 任务队列
+        USER_VAR[current_user] = dict()
+        USER_VAR[current_user]["is_streaming"] = False  # 标记是否正在处理流式响应
+        USER_VAR[current_user]["sentence_buffer"] = ""  # 用于累积 token 的缓冲区
+        USER_VAR[current_user]["sentence_index"] = 0  # 用于标记当前是第几句
+        USER_VAR[current_user]["task_queue"] = AsyncTaskQueue()  # 任务队列
 
         return jsonify({"valid": True, "user": current_user}), 200
     # 如果token无效，返回错误信息
@@ -605,7 +608,6 @@ def agent_upload_audio():
 
     return jsonify({"message": "File uploaded successfully and processed"}), 200
 
-user_var = dict()
 
 @socketio.on("agent_stream_audio")
 def agent_stream_audio(current_token: str):
@@ -619,8 +621,18 @@ def agent_stream_audio(current_token: str):
     token = request.args.get('token')
     if token:
         request.headers = {"Authorization": f"Bearer {token}"}
-    verify_jwt_in_request()
-    user = get_jwt_identity()
+        try: 
+            verify_jwt_in_request()
+            user = get_jwt_identity()
+            if user not in USER_VAR:
+                print(f"[run.py][agent_stream_audio] user {user} not exist")
+                return
+        except Exception as e:
+            print(f"[run.py][agent_stream_audio] JWT verification failed: {e}")
+            return
+    else:
+        print("[run.py][agent_stream_audio] Missing token")
+        return
     if "##" in current_token:
         if current_token == "##<state=1>":
             audio_file_path = ".cache/obstacle_start.wav"
@@ -638,14 +650,14 @@ def agent_stream_audio(current_token: str):
             {"flag": "begin"}
         )
     else:
-        if not user_var[user]["is_streaming"]:
+        if not USER_VAR[user]["is_streaming"]:
             # 标记正在处理流式响应
-            user_var[user]["is_streaming"] = True
+            USER_VAR[user]["is_streaming"] = True
 
             # 重置缓冲区和任务队列
-            user_var[user]["sentence_buffer"] = ""
-            user_var[user]["task_queue"].reset()
-            user_var[user]["sentence_index"] = 0
+            USER_VAR[user]["sentence_buffer"] = ""
+            USER_VAR[user]["task_queue"].reset()
+            USER_VAR[user]["sentence_index"] = 0
 
             # 启动异步任务处理循环
             socketio.start_background_task(process_audio_stream, user)
@@ -656,13 +668,14 @@ def agent_stream_audio(current_token: str):
                          "大模型响应结束", color="red")
 
             # 处理缓冲区中剩余的内容
-            if user_var[user]["sentence_buffer"]:
+            if USER_VAR[user]["sentence_buffer"]:
                 # 将剩余内容加入任务队列
-                user_var[user]["task_queue"].add_task_sync(agent_audio_generate, user_var[user]["sentence_buffer"])
+                USER_VAR[user]["task_queue"].add_task_sync(
+                    agent_audio_generate, USER_VAR[user]["sentence_buffer"])
 
             # 重置状态
-            user_var[user]["is_streaming"] = False
-            user_var[user]["sentence_buffer"] = ""
+            USER_VAR[user]["is_streaming"] = False
+            USER_VAR[user]["sentence_buffer"] = ""
             return
 
         # 寻找断句符号的下标
@@ -670,17 +683,19 @@ def agent_stream_audio(current_token: str):
 
         # 如果没有找到断句符号，则继续累积
         if pause_index == -1:
-            user_var[user]["sentence_buffer"] += current_token
+            USER_VAR[user]["sentence_buffer"] += current_token
             return
 
         # 如果找到断句符号，则生成完整句子
-        complete_sentence = user_var[user]["sentence_buffer"] + current_token[:pause_index + 1]
+        complete_sentence = USER_VAR[user]["sentence_buffer"] + \
+            current_token[:pause_index + 1]
 
         # 更新缓冲区
-        user_var[user]["sentence_buffer"] = current_token[pause_index + 1:]
+        USER_VAR[user]["sentence_buffer"] = current_token[pause_index + 1:]
 
         # 将音频生成任务加入队列
-        user_var[user]["task_queue"].add_task_sync(agent_audio_generate, complete_sentence)
+        USER_VAR[user]["task_queue"].add_task_sync(
+            agent_audio_generate, complete_sentence)
 
 
 def process_audio_stream(user):
@@ -688,18 +703,19 @@ def process_audio_stream(user):
     while True:
         try:
             # 获取下一个音频结果
-            audio_chunk = user_var[user]["task_queue"].get_next_result_sync()
+            audio_chunk = USER_VAR[user]["task_queue"].get_next_result_sync()
 
             if audio_chunk is not None:
                 # 发送到前端
                 socketio.emit(
                     "agent_play_audio_chunk",
-                    {"index": user_var[user]["sentence_index"], "audio_chunk": audio_chunk}
+                    {"index": USER_VAR[user]["sentence_index"],
+                        "audio_chunk": audio_chunk}
                 )
-                user_var[user]["sentence_index"] += 1
+                USER_VAR[user]["sentence_index"] += 1
 
             # 如果流式响应结束且没有更多任务，退出循环
-            if not user_var[user]["is_streaming"] and user_var[user]["task_queue"].is_empty():
+            if not USER_VAR[user]["is_streaming"] and USER_VAR[user]["task_queue"].is_empty():
                 break
 
         except Exception as e:
