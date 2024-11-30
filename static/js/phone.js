@@ -172,7 +172,7 @@ async function initAudioAnalyser(stream) {
     };
 }
 
-/* 处理环境噪音获取 start
+/* 处理音量大小测定 start
 ----------------------------------------------------------*/
 
 // 在页面右上角添加新容器，用于显示当前音频的平均分贝值
@@ -198,7 +198,7 @@ function detectSilence(analyser, dataArray) {
     return db < SILENCE_THRESHOLD;
 }
 
-/* 处理环境噪音获取 end
+/* 处理音量大小测定 end
 ----------------------------------------------------------*/
 
 function exit_obstacle_void() {

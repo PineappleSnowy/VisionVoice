@@ -1,4 +1,11 @@
 /**
+ * @fileoverview 音频处理模块
+ * @description 该模块用于处理音频相关的操作
+ * @author Yang-ZhiHang
+ */
+
+
+/**
  * @function initAudioAnalyser
  * @description 初始化音频分析器
  * @param {MediaStream} stream 音频流
