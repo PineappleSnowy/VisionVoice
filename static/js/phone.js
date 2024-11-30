@@ -174,120 +174,23 @@ async function initAudioAnalyser(stream) {
 
 /* 处理环境噪音获取 start
 ----------------------------------------------------------*/
+
 // 在页面右上角添加新容器，用于显示当前音频的平均分贝值
 const dbDisplay = document.createElement('div');
 dbDisplay.style.cssText = 'width: 30%; font-size: 10px; position: fixed; top: 10px; right: 10px; background: rgba(0,0,0,0.5); color: white; padding: 5px 10px; border-radius: 4px; z-index: 1000;';
 container.appendChild(dbDisplay);
 
-// 在页面右上角添加新容器，用于显示音频的时间累计平均分贝值
-const avgDbDisplay = document.createElement('div');
-avgDbDisplay.style.cssText = 'width: 41%; font-size: 10px; position: fixed; top: 40px; right: 10px; background: rgba(0,0,0,0.5); color: white; padding: 5px 10px; border-radius: 4px; z-index: 1000;';
-container.appendChild(avgDbDisplay);
-
-// 使用 let 关键字修饰静音阈值
-let SILENCE_THRESHOLD = -20;
-
-/**
- * @description 计算当前音频的平均分贝值
- * @returns {Number} 当前音频的平均分贝值
- */
-function detectDB(analyser, dataArray) {
-    // 获取当前音频的时域数据
-    analyser.getFloatTimeDomainData(dataArray);
-
-    // 计算平均值
-    let sum = 0;
-    for (let i = 0; i < dataArray.length; i++) {
-        sum += Math.abs(dataArray[i]);
-    }
-    const average = sum / dataArray.length;
-
-    // 计算分贝值
-    const db = 20 * Math.log10(average);
-
-    // 更新分贝值显示
-    dbDisplay.textContent = '当前分贝值: ' + db.toFixed(2);
-
-    return db;
+// 获取静音阈值
+const SILENCE_THRESHOLD = localStorage.getItem('SILENCE_THRESHOLD');
+if (SILENCE_THRESHOLD) {
+    console.log('[phone.js][window.onload] 获取静音阈值:', SILENCE_THRESHOLD);
 }
-
-/**
- * @description 校准环境噪音
- * - 每 100ms 采样一次，检测时长持续 1 秒
- * - 1 秒后计算环境噪音的平均分贝值
- * @param {AnalyserNode} analyser 音频分析器
- * @param {Float32Array} dataArray 数据数组
- * @param {Number} duration 检测时长，单位：毫秒
- * @returns {Promise<Number>} 环境噪音阈值
- */
-async function calibrateNoiseLevel(analyser, dataArray, duration = 1000) {
-    console.log('[phone.js][calibrateNoiseLevel] 开始检测环境噪音...');
-    return new Promise((resolve) => {
-
-        // 用于存放采样数据
-        const samples = [];
-
-        // 每 100ms 采样一次
-        const sampleInterval = 100;
-
-        // 采样开始时间
-        const startTime = Date.now();
-
-        // 采样函数
-        const sampleNoise = () => {
-
-            // 如果采样时间超过检测时长，则结束采样
-            if (Date.now() - startTime >= duration) {
-
-                // 过滤掉无效的采样值(-Infinity)，只保留有穷值，否则最终计算平均值时会导致无穷大
-                const validSamples = samples.filter(sample => isFinite(sample));
-
-                // 如果没有有效采样值，设置一个默认阈值
-                if (validSamples.length === 0) {
-                    console.log('[phone.js][calibrateNoiseLevel] 未检测到有效噪音，使用默认阈值: -20dB');
-                    resolve(-20);
-                    return;
-                }
-
-                // 计算平均噪音水平
-                const averageNoise = validSamples.reduce((a, b) => a + b, 0) / validSamples.length;
-
-                // 设置阈值为平均噪音上浮5分贝，并确保不小于最小阈值 -20dB
-                const newThreshold = Math.max(averageNoise + 5, -20);
-
-                console.log(`[phone.js][calibrateNoiseLevel] 环境噪音基准: ${averageNoise.toFixed(2)}dB, 设置阈值: ${newThreshold.toFixed(2)}dB`);
-                resolve(newThreshold);
-                return;
-            } else {
-
-                // 如果采样时间未超过检测时长，则继续采样
-                const db = detectDB(analyser, dataArray);
-
-                // 将分贝值存入采样数据数组
-                samples.push(db);
-
-                // 计算平均噪音水平
-                const validSamples = samples.filter(sample => isFinite(sample));
-                const averageNoise = validSamples.reduce((a, b) => a + b, 0) / validSamples.length;
-
-                // 更新时间累计平均分贝值显示
-                avgDbDisplay.textContent = '时间累计平均分贝值: ' + averageNoise.toFixed(2);
-
-                // 每 100ms 采样一次
-                setTimeout(sampleNoise, sampleInterval);
-            }
-        };
-
-        // 开始采样
-        sampleNoise();
-    });
+// 如果本地静音阈值不存在，则设置默认值
+else {
+    SILENCE_THRESHOLD = -20;
 }
-
-
 /**
  * @description 检测用户是否已经停止讲话
- * @param {AnalyserNode} analyser 音频分析器
- * @param {Float32Array} dataArray 数据数组
  * @returns {Boolean} 用户是否已经停止讲话
  */
 function detectSilence(analyser, dataArray) {
@@ -321,9 +224,9 @@ window.onload = async () => {
     // 初始化音频分析器
     const { analyser, dataArray } = await initAudioAnalyser(audioStream);
 
-    // 在开始录音前进行环境噪音检测
-    SILENCE_THRESHOLD = await calibrateNoiseLevel(analyser, dataArray);
-    console.log('[phone.js][window.onload] 环境噪音校准完成, 静音阈值:', SILENCE_THRESHOLD);
+    // // 在开始录音前进行环境噪音检测
+    // SILENCE_THRESHOLD = await calibrateNoiseLevel(analyser, dataArray);
+    // console.log('[phone.js][window.onload] 环境噪音校准完成, 静音阈值:', SILENCE_THRESHOLD);
 
     // 静音定时器
     let silenceTimer;
