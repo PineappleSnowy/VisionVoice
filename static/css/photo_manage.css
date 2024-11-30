@@ -1,6 +1,42 @@
+body {
+    background-color: #121212;
+    color: #e0e0e0;
+    margin: 0;
+    padding: 0;
+}
+
+p {
+    color: #ffffff;
+}
+
+.header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: #333;
+    color: #e0e0e0;
+    text-align: center;
+    padding: 10px 0;
+    z-index: 1000;
+}
+
+.back-button {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #e0e0e0;
+    font-size: 24px;
+    cursor: pointer;
+}
+
 .gallery {
     display: flex;
     flex-wrap: wrap;
+    margin-top: 50px; /* 确保画廊不会被顶栏遮挡 */
 }
 
 .gallery-item {
@@ -26,11 +62,11 @@
     bottom: 0;
     left: 0;
     width: 100%;
-    background-color: #f1f1f1;
+    background-color: #333;
     text-align: center;
     transition: height 0.3s;
     height: 60px;
-    /* 设置底栏的固定高度 */
+    color: #e0e0e0;
 }
 
 .footer.expanded {
@@ -42,7 +78,13 @@
     width: calc(50% - 20px);
     display: block;
     height: calc(50% - 10px);
-    /* 按钮高度充满底栏 */
+    background-color: #444;
+    color: #e0e0e0;
+    border: none;
+}
+
+.footer button:hover {
+    background-color: #555;
 }
 
 .modal {
@@ -54,14 +96,14 @@
     width: 100%;
     height: 100%;
     overflow: auto;
-    background-color: rgb(0, 0, 0);
-    background-color: rgba(0, 0, 0, 0.4);
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #e0e0e0;
     padding-top: 60px;
 }
 
 .modal-content {
-    background-color: #fefefe;
-    margin: 5% auto;
+    background-color: #333;
+    margin: 15% auto;
     padding: 20px;
     border: 1px solid #888;
     width: 80%;
@@ -79,4 +121,15 @@
 
 .modal button {
     width: 80px;
+}
+
+.modal-content input,
+.modal-content button {
+    background-color: #444;
+    color: #e0e0e0;
+    border: none;
+}
+
+.modal-content button:hover {
+    background-color: #555;
 }

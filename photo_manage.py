@@ -59,8 +59,8 @@ def rename_image():
         return jsonify({'success': False, 'error': str(e)}), 400
 
 
-@app.route('/upload_image', methods=['POST'])
-def upload_image():
+@app.route('/save_item_image', methods=['POST'])
+def save_item_image():
     if 'file' not in request.files:
         return jsonify({'success': False, 'error': 'No file part'}), 400
     file = request.files['file']

@@ -1,3 +1,5 @@
+/* 该文件为帮我寻物物品模板管理模块的内容 */
+
 document.addEventListener('DOMContentLoaded', function () {
     fetch('/images')
         .then(response => response.json())
@@ -59,7 +61,7 @@ document.addEventListener('DOMContentLoaded', function () {
             // 禁用所有按钮
             disableButtons(true);
 
-            fetch('/upload_image', {
+            fetch('/save_item_image', {
                 method: 'POST',
                 body: formData
             })
@@ -98,6 +100,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     document.getElementById('deleteButton').addEventListener('click', function () {
+        disableButtons(true);
         const imageName = document.getElementById('modalImage').alt;
         fetch('/delete_image', {
             method: 'POST',
@@ -108,6 +111,7 @@ document.addEventListener('DOMContentLoaded', function () {
         })
             .then(response => response.json())
             .then(data => {
+                disableButtons(false);
                 const statusMessage = document.getElementById('statusMessage');
                 if (data.success) {
                     statusMessage.textContent = '删除成功';
@@ -120,6 +124,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             })
             .catch(error => {
+                disableButtons(false);
                 const statusMessage = document.getElementById('statusMessage');
                 statusMessage.textContent = '删除失败';
                 statusMessage.style.color = 'red';
@@ -152,14 +157,10 @@ function openModal(url, name, button) {
     imageName.value = name;
 
     document.getElementById('saveButton').addEventListener('click', function () {
-        const modal = document.getElementById('myModal');
+        disableButtons(true)
         const newName = document.getElementById('imageName').value;
         const oldName = button.querySelector('p').innerText;
 
-        // 更新前端显示的图片名称
-        button.querySelector('p').innerText = newName;
-        button.querySelector('img').alt = newName;
-        button.setAttribute('onclick', `openModal('${url}', '${newName}', this)`);
         // 发送请求到后端修改图片名称
         fetch('/rename_image', {
             method: 'POST',
@@ -170,8 +171,15 @@ function openModal(url, name, button) {
         })
             .then(response => response.json())
             .then(data => {
+                disableButtons(false)
                 if (data.success) {
                     console.log('Image name updated successfully');
+
+                    // 更新前端显示的图片名称
+                    button.querySelector('p').innerText = newName;
+                    button.querySelector('img').alt = newName;
+                    button.setAttribute('onclick', `openModal('${url}', '${newName}', this)`);
+
                     statusMessage.textContent = '修改成功';
                     statusMessage.style.color = 'green';
                 } else {
@@ -181,6 +189,7 @@ function openModal(url, name, button) {
                 }
             })
             .catch(error => {
+                disableButtons(false);
                 console.error('Error:', error);
                 statusMessage.textContent = '修改失败';
                 statusMessage.style.color = 'red';
