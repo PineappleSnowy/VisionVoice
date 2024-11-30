@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Gallery</title>
+    <style>
+        .gallery {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .gallery-item {
+            width: 46%;
+            margin: 2%;
+            text-align: center;
+        }
+
+        .gallery-item button {
+            width: 100%;
+            border: none;
+            background: none;
+            padding: 0;
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: auto;
+        }
+
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #f1f1f1;
+            text-align: center;
+            transition: height 0.3s;
+            height: 60px;
+            /* 设置底栏的固定高度 */
+        }
+
+        .footer.expanded {
+            height: 150px;
+        }
+
+        .footer button {
+            margin: 5px auto;
+            width: calc(100% - 20px);
+            display: block;
+            height: calc(50% - 10px);
+            /* 按钮高度充满底栏 */
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0, 0, 0);
+            background-color: rgba(0, 0, 0, 0.4);
+            padding-top: 60px;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+        }
+
+        .modal img {
+            width: 100%;
+            height: auto;
+        }
+
+        .modal input {
+            width: calc(100% - 100px);
+            margin-right: 10px;
+        }
+
+        .modal button {
+            width: 80px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="gallery" id="gallery"></div>
+
+    <div class="footer" id="footer">
+        <button id="addButton">+</button>
+        <button id="cameraButton" style="display: none;">从摄像头获取图片</button>
+        <button id="albumButton" style="display: none;">从相册获取图片</button>
+    </div>
+
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <img id="modalImage" src="" alt="">
+            <input type="text" id="imageName" value="">
+            <button id="saveButton">修改</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            fetch('/images')
+                .then(response => response.json())
+                .then(data => {
+                    const gallery = document.getElementById('gallery');
+                    data.forEach(image => {
+                        const item = document.createElement('div');
+                        item.className = 'gallery-item';
+                        item.innerHTML = `
+                            <button onclick="openModal('${image.url}', '${image.name}', this)">
+                                <img src="${image.url}" alt="${image.name}">
+                                <p>${image.name}</p>
+                            </button>
+                        `;
+                        gallery.appendChild(item);
+                    });
+                })
+                .catch(error => console.error('Error fetching images:', error));
+
+            const footer = document.getElementById('footer');
+            const addButton = document.getElementById('addButton');
+            const cameraButton = document.getElementById('cameraButton');
+            const albumButton = document.getElementById('albumButton');
+
+            addButton.addEventListener('click', function () {
+                footer.classList.add('expanded');
+                addButton.style.display = 'none';
+                cameraButton.style.display = 'block';
+                albumButton.style.display = 'block';
+            });
+
+            cameraButton.addEventListener('click', function () {
+                // 处理从摄像头获取图片的逻辑
+                footer.classList.remove('expanded');
+                addButton.style.display = 'block';
+                cameraButton.style.display = 'none';
+                albumButton.style.display = 'none';
+            });
+
+            albumButton.addEventListener('click', function () {
+                // 处理从相册获取图片的逻辑
+                footer.classList.remove('expanded');
+                addButton.style.display = 'block';
+                cameraButton.style.display = 'none';
+                albumButton.style.display = 'none';
+            });
+        });
+
+        let currentButton = null;
+
+        function openModal(url, name, button) {
+            const modal = document.getElementById('myModal');
+            const modalImage = document.getElementById('modalImage');
+            const imageName = document.getElementById('imageName');
+            modal.style.display = 'block';
+            modalImage.src = url;
+            imageName.value = name;
+            // currentButton = button;
+
+            document.getElementById('saveButton').addEventListener('click', function () {
+                const modal = document.getElementById('myModal');
+                const newName = document.getElementById('imageName').value;
+                const oldName = button.querySelector('p').innerText;
+                modal.style.display = 'none';
+
+                // 更新前端显示的图片名称
+                button.querySelector('p').innerText = newName;
+                button.querySelector('img').alt = newName;
+                button.setAttribute('onclick', `openModal('${url}', '${newName}', this)`);
+                // 发送请求到后端修改图片名称
+                fetch('/rename_image', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ oldName: oldName, newName: newName })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            console.log('Image name updated successfully');
+                        } else {
+                            console.error('Error updating image name');
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+            });
+        }
+
+        window.onclick = function (event) {
+            const modal = document.getElementById('myModal');
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+
+</html>
