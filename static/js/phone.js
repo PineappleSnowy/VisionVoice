@@ -188,7 +188,7 @@ async function calibrateNoiseLevel(analyser, dataArray, duration = 1000) {
         const samples = [];
         const sampleInterval = 100; // 每100ms采样一次
         const startTime = Date.now();
-        
+
         const sampleNoise = () => {
             if (Date.now() - startTime >= duration) {
 
@@ -210,7 +210,7 @@ async function calibrateNoiseLevel(analyser, dataArray, duration = 1000) {
             const average = sum / dataArray.length;
             const db = 20 * Math.log10(average);
             samples.push(db);
-            
+
             setTimeout(sampleNoise, sampleInterval);
         };
 
@@ -257,7 +257,7 @@ window.onload = async () => {
 
     // 初始化音频分析器
     const { analyser, dataArray } = await initAudioAnalyser(audioStream);
-    
+
     // 在开始录音前进行环境噪音检测
     SILENCE_THRESHOLD = await calibrateNoiseLevel(analyser, dataArray);
     console.log('[phone.js][window.onload] 环境噪音校准完成, 静音阈值:', SILENCE_THRESHOLD);
@@ -579,4 +579,41 @@ window.onload = async () => {
     })
     /* 处理音频识别 end 
     ------------------------------------------------------------*/
+
+    const findItemButton = document.querySelector('.findItem');
+    const findItemModal = document.getElementById('findItemModal');
+    const closeModalButton = document.getElementById('closeModalButton');
+
+    findItemButton.addEventListener('click', () => {
+        findItemModal.style.display = 'block';
+        loadGallery();
+    });
+
+    closeModalButton.addEventListener('click', () => {
+        findItemModal.style.display = 'none';
+        const gallery = document.getElementById('gallery');
+        while (gallery.firstChild) {
+            gallery.removeChild(gallery.firstChild);
+        }
+    });
+
+    function loadGallery() {
+        fetch('/images')
+            .then(response => response.json())
+            .then(data => {
+                const gallery = document.getElementById('gallery');
+                data.forEach(image => {
+                    const item = document.createElement('div');
+                    item.className = 'gallery-item';
+                    item.innerHTML = `
+                            <button onclick="console.log('${image.name}'">
+                                <img src="${image.url}" alt="${image.name}">
+                                <p>${image.name}</p>
+                            </button>
+                        `;
+                    gallery.appendChild(item);
+                });
+            })
+            .catch(error => console.error('Error fetching images:', error));
+    }
 }

@@ -1,11 +1,13 @@
 html {
   font-size: var(--font-size);
 }
+
 html body {
   margin: 0;
   padding: 0;
   background-color: black;
 }
+
 html body .goBack {
   position: fixed;
   left: 0.28rem;
@@ -13,6 +15,7 @@ html body .goBack {
   font-size: 0.3rem;
   z-index: 2;
 }
+
 html body .toggleCamera {
   position: fixed;
   right: 0.28rem;
@@ -20,6 +23,7 @@ html body .toggleCamera {
   font-size: 0.3rem;
   z-index: 2;
 }
+
 html body .controller {
   position: fixed;
   width: 100vw;
@@ -28,6 +32,7 @@ html body .controller {
   bottom: 0;
   background-color: white;
 }
+
 html body .controller canvas {
   display: block;
   position: absolute;
@@ -36,30 +41,43 @@ html body .controller canvas {
   width: 1.5rem;
   height: 1rem;
 }
+
 html body .controller .openCamera {
   position: absolute;
   left: 0.9rem;
   bottom: 0.63rem;
   font-size: 0.5rem;
 }
+
 html body .controller .hangUp {
   position: absolute;
   right: 0.9rem;
   bottom: 0.63rem;
   font-size: 0.5rem;
 }
+
+html body .controller .findItem {
+  position: absolute;
+  left: 50%;
+  bottom: 0.63rem;
+  font-size: 0.5rem;
+  transform: translateX(-50%);
+}
+
 html body video {
   position: fixed;
   width: 100vw;
   height: 5.24rem;
   z-index: -1;
 }
+
 html body .container {
   width: 100vw;
   height: 100vh;
   transition: transform 0.3s ease;
   background-color: white;
 }
+
 html body .container img {
   position: absolute;
   width: 1.5rem;
@@ -70,8 +88,75 @@ html body .container img {
   top: 1.7rem;
   left: 1.31rem;
 }
+
 html body .container.shifted {
   transform: translateY(6.34rem);
   border-top-left-radius: 0.1rem;
   border-top-right-radius: 0.1rem;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  /* z-index: 1; */
+  left: 50%;
+  top: 53%;
+  width: 90%;
+  height: 88%;
+  background-color: rgba(0, 0, 0, 0.8);
+  padding-top: 5%;
+  transform: translate(-50%, -50%);
+}
+
+.overflowArea {
+  position: fixed;
+  left: 0%;
+  top: 0%;
+  width: 100%;
+  height: 92%;
+  overflow: auto;
+}
+
+.gallery {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+
+}
+
+.gallery-item {
+  width: 46%;
+  margin: 2%;
+  text-align: center;
+}
+
+.gallery-item button {
+  width: 100%;
+  border: none;
+  background: none;
+  padding: 0;
+}
+
+.gallery-item img {
+  width: 100%;
+  height: auto;
+}
+
+p {
+  color: #ffffff;
+}
+
+.closeModalButton {
+  position: fixed;
+  bottom: 0%;
+  left: 0;
+  width: 100%;
+  background-color: #444;
+  text-align: center;
+  height: 8%;
+  color: #e0e0e0;
+}
+
+.closeModalButton:hover {
+  background-color: #555;
 }

@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0">
     <title>与智能体通话</title>
     <link rel="stylesheet" href="../static/css/phone.css">
     <link rel="icon" href="../static/images/visionvoice_ico.ico" />
@@ -11,9 +13,11 @@
     <script src="https://kit.fontawesome.com/11023f265d.js" crossorigin="anonymous"></script>
     <script src="../static/js/vudio.js"></script>
 </head>
+
 <body>
     <div aria-label="返回主页"><i class="fa-solid fa-chevron-left goBack"></i></div>
-    <div aria-label="切换摄像头" style="display: none;" class="toggleCamera"><i class="fa-solid fa-repeat toggleCamera"></i></div>
+    <div aria-label="切换摄像头" style="display: none;" class="toggleCamera"><i class="fa-solid fa-repeat toggleCamera"></i>
+    </div>
     <video autoplay style="display: none;" aria-label="视频通话窗口">您的浏览器不支持视频通话</video>
     <div class="container">
         <img src="../static/images/bot.png" alt="智能体头像" aria-label="智能体头像">
@@ -25,8 +29,17 @@
         <audio autoplay id="audio" aria-label="通话音频"></audio>
         <div aria-label="打开摄像头"><i class="fa-solid fa-video openCamera"></i></div>
         <div aria-label="挂断电话"><i class="fa-solid fa-phone-slash hangUp"></i></div>
-
+        <div aria-label="帮我寻物"><i class="fa-solid fa-search findItem"></i></div>
     </div>
+
+    <!-- 小窗部分 -->
+    <div id="findItemModal" class="modal">
+        <div class="overflowArea">
+            <div class="gallery" id="gallery"></div>
+        </div>
+        <button id="closeModalButton" class="closeModalButton">关闭</button>
+    </div>
+
     <div id="microphone" class="voice"></div>
     <audio id="audioPlayer" controls autoplay style="display: none"></audio>
     <script src="../static/js/auth.js"></script>
@@ -34,4 +47,5 @@
     <script src="../static/js/recorder.js"></script>
     <script src="../static/js/phone.js"></script>
 </body>
+
 </html>
