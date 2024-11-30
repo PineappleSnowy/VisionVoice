@@ -175,7 +175,13 @@ async function initAudioAnalyser(stream) {
 // 使用 let 关键字修饰静音阈值
 let SILENCE_THRESHOLD = -20;
 
-// 添加环境噪音检测函数
+/**
+ * @description 校准环境噪音
+ * @param {AnalyserNode} analyser 音频分析器
+ * @param {Float32Array} dataArray 数据数组
+ * @param {Number} duration 检测时长，单位：毫秒
+ * @returns {Promise<Number>} 环境噪音阈值
+ */
 async function calibrateNoiseLevel(analyser, dataArray, duration = 1000) {
     console.log('[phone.js][calibrateNoiseLevel] 开始检测环境噪音...');
     return new Promise((resolve) => {
@@ -210,6 +216,23 @@ async function calibrateNoiseLevel(analyser, dataArray, duration = 1000) {
 
         sampleNoise();
     });
+}
+
+/**
+ * @description 检测用户是否已经停止讲话
+ * @param {AnalyserNode} analyser 音频分析器
+ * @param {Float32Array} dataArray 数据数组
+ * @returns {Boolean} 用户是否已经停止讲话
+ */
+function detectSilence(analyser, dataArray) {
+    analyser.getFloatTimeDomainData(dataArray);
+    let sum = 0;
+    for (let i = 0; i < dataArray.length; i++) {
+        sum += Math.abs(dataArray[i]);
+    }
+    const average = sum / dataArray.length;
+    const db = 20 * Math.log10(average);
+    return db < SILENCE_THRESHOLD;
 }
 
 function exit_obstacle_void() {
