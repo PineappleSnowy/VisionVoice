@@ -205,6 +205,25 @@
             }
         }
     </script>
+    <script>
+        // 获取底栏和画廊的元素
+        const footer = document.getElementById('footer');
+        const gallery = document.getElementById('gallery');
+
+        // 监听底栏高度的变化
+        const observer = new ResizeObserver(entries => {
+            for (let entry of entries) {
+                if (entry.target === footer) {
+                    // 动态调整画廊的高度
+                    const footerHeight = entry.contentRect.height;
+                    gallery.style.paddingBottom = `${footerHeight}px`;
+                }
+            }
+        });
+
+        // 开始观察底栏
+        observer.observe(footer);
+    </script>
 </body>
 
 </html>

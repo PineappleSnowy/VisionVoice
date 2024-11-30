@@ -15,8 +15,9 @@ def get_images():
     images = []
     for filename in os.listdir(IMAGE_FOLDER):
         if filename.endswith(('.png', '.jpg', '.jpeg', '.gif')):
+            name, ext = os.path.splitext(filename)
             images.append({
-                'name': filename,
+                'name': name,
                 'url': f'/image/{filename}'
             })
     return jsonify(images)
@@ -30,17 +31,26 @@ def rename_image():
     data = request.get_json()
     old_name = data['oldName']
     new_name = data['newName']
-    old_path = os.path.join(IMAGE_FOLDER, old_name)
-    new_path = os.path.join(IMAGE_FOLDER, new_name)
+    
+    # 查找旧文件名对应的文件
+    old_file = None
+    for filename in os.listdir(IMAGE_FOLDER):
+        name, ext = os.path.splitext(filename)
+        if name == old_name:
+            old_file = filename
+            break
+    
+    if old_file is None:
+        return jsonify({'success': False, 'error': 'Old file not found'})
+
+    old_path = os.path.join(IMAGE_FOLDER, old_file)
+    new_path = os.path.join(IMAGE_FOLDER, new_name + os.path.splitext(old_file)[1])
+    
     try:
         os.rename(old_path, new_path)
         return jsonify({'success': True})
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
-
-@app.route("/hello")
-def hello():
-    return "Hello World!"
 
 if __name__ == '__main__':
     app.run(debug=True)
