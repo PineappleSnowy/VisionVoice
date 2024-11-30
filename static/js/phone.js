@@ -172,68 +172,34 @@ async function initAudioAnalyser(stream) {
     };
 }
 
-// 使用 let 关键字修饰静音阈值
-let SILENCE_THRESHOLD = -20;
+/* 处理音量大小测定 start
+----------------------------------------------------------*/
 
-/**
- * @description 校准环境噪音，修改全局的 SILENCE_THRESHOLD 值
- * @param {AnalyserNode} analyser 音频分析器
- * @param {Float32Array} dataArray 数据数组
- * @param {Number} duration 检测时长，单位：毫秒
- * @returns {Promise<Number>} 环境噪音阈值
- */
-async function calibrateNoiseLevel(analyser, dataArray, duration = 1000) {
-    console.log('[phone.js][calibrateNoiseLevel] 开始检测环境噪音...');
-    return new Promise((resolve) => {
-        const samples = [];
-        const sampleInterval = 100; // 每100ms采样一次
-        const startTime = Date.now();
+// 在页面右上角添加新容器，用于显示当前音频的平均分贝值
+const dbDisplay = document.createElement('div');
+dbDisplay.style.cssText = 'width: 30%; font-size: 10px; position: fixed; top: 10px; right: 10px; background: rgba(0,0,0,0.5); color: white; padding: 5px 10px; border-radius: 4px; z-index: 1000;';
+container.appendChild(dbDisplay);
 
-        const sampleNoise = () => {
-            if (Date.now() - startTime >= duration) {
-
-                // 计算平均噪音水平
-                const averageNoise = samples.reduce((a, b) => a + b, 0) / samples.length;
-
-                // 设置阈值为平均噪音上浮5分贝
-                const newThreshold = averageNoise + 5;
-                console.log(`[phone.js][calibrateNoiseLevel] 环境噪音基准: ${averageNoise.toFixed(2)}dB, 设置阈值: ${newThreshold.toFixed(2)}dB`);
-                resolve(newThreshold);
-                return;
-            }
-
-            analyser.getFloatTimeDomainData(dataArray);
-            let sum = 0;
-            for (let i = 0; i < dataArray.length; i++) {
-                sum += Math.abs(dataArray[i]);
-            }
-            const average = sum / dataArray.length;
-            const db = 20 * Math.log10(average);
-            samples.push(db);
-
-            setTimeout(sampleNoise, sampleInterval);
-        };
-
-        sampleNoise();
-    });
+// 获取静音阈值
+const SILENCE_THRESHOLD = localStorage.getItem('SILENCE_THRESHOLD');
+if (SILENCE_THRESHOLD) {
+    console.log('[phone.js][window.onload] 获取静音阈值:', SILENCE_THRESHOLD);
 }
-
+// 如果本地静音阈值不存在，则设置默认值
+else {
+    SILENCE_THRESHOLD = -20;
+}
 /**
  * @description 检测用户是否已经停止讲话
- * @param {AnalyserNode} analyser 音频分析器
- * @param {Float32Array} dataArray 数据数组
  * @returns {Boolean} 用户是否已经停止讲话
  */
 function detectSilence(analyser, dataArray) {
-    analyser.getFloatTimeDomainData(dataArray);
-    let sum = 0;
-    for (let i = 0; i < dataArray.length; i++) {
-        sum += Math.abs(dataArray[i]);
-    }
-    const average = sum / dataArray.length;
-    const db = 20 * Math.log10(average);
+    const db = detectDB(analyser, dataArray);
     return db < SILENCE_THRESHOLD;
 }
+
+/* 处理音量大小测定 end
+----------------------------------------------------------*/
 
 function exit_obstacle_void() {
     state = 0
@@ -258,9 +224,9 @@ window.onload = async () => {
     // 初始化音频分析器
     const { analyser, dataArray } = await initAudioAnalyser(audioStream);
 
-    // 在开始录音前进行环境噪音检测
-    SILENCE_THRESHOLD = await calibrateNoiseLevel(analyser, dataArray);
-    console.log('[phone.js][window.onload] 环境噪音校准完成, 静音阈值:', SILENCE_THRESHOLD);
+    // // 在开始录音前进行环境噪音检测
+    // SILENCE_THRESHOLD = await calibrateNoiseLevel(analyser, dataArray);
+    // console.log('[phone.js][window.onload] 环境噪音校准完成, 静音阈值:', SILENCE_THRESHOLD);
 
     // 静音定时器
     let silenceTimer;
@@ -579,41 +545,4 @@ window.onload = async () => {
     })
     /* 处理音频识别 end 
     ------------------------------------------------------------*/
-
-    const findItemButton = document.querySelector('.findItem');
-    const findItemModal = document.getElementById('findItemModal');
-    const closeModalButton = document.getElementById('closeModalButton');
-
-    findItemButton.addEventListener('click', () => {
-        findItemModal.style.display = 'block';
-        loadGallery();
-    });
-
-    closeModalButton.addEventListener('click', () => {
-        findItemModal.style.display = 'none';
-        const gallery = document.getElementById('gallery');
-        while (gallery.firstChild) {
-            gallery.removeChild(gallery.firstChild);
-        }
-    });
-
-    function loadGallery() {
-        fetch('/images')
-            .then(response => response.json())
-            .then(data => {
-                const gallery = document.getElementById('gallery');
-                data.forEach(image => {
-                    const item = document.createElement('div');
-                    item.className = 'gallery-item';
-                    item.innerHTML = `
-                            <button onclick="console.log('${image.name}'">
-                                <img src="${image.url}" alt="${image.name}">
-                                <p>${image.name}</p>
-                            </button>
-                        `;
-                    gallery.appendChild(item);
-                });
-            })
-            .catch(error => console.error('Error fetching images:', error));
-    }
 }

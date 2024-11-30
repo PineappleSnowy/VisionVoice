@@ -428,7 +428,7 @@ def register():
             json.dump(users, f, indent=4, ensure_ascii=False)
             f.truncate()
 
-        return jsonify({"message": "注册成���", "code": 200}), 200
+        return jsonify({"message": "注册成功", "code": 200}), 200
 
     except Exception as e:
         return jsonify({"message": f"注册失败: {str(e)}", "code": 500}), 500
