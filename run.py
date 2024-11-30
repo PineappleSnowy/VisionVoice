@@ -88,6 +88,7 @@ def handle_disconnect():
             verify_jwt_in_request()
             user = get_jwt_identity()
             print(f"[run.py][handle_disconnect] User {user} disconnected")
+            # 偶尔会发生客户端连接超时导致user被意外删除
             try:
                 del USER_VAR[user]
                 print(
@@ -441,9 +442,6 @@ def init_chat_history(current_user, agent_name, messages):
     # 对聊天记录进行解码
     messages = [decode_message_content(msg.copy())
                 for msg in encoded_chat_history]
-    # 限制消息历史长度
-    if len(messages) >= MAX_HISTORY:
-        messages = messages[-MAX_HISTORY:]
 
     return messages
 
@@ -454,7 +452,7 @@ def build_response(current_user, agent_name, user_talk, video_open):
         model_name = "glm-4v"
         messages = init_chat_history(current_user, agent_name, messages)
 
-        dst_messages = message_format_tran(messages)
+        dst_messages = message_format_tran(messages[-MAX_HISTORY:])
         if os.path.exists(IAMGE_SAVE_PATH):
             with open(IAMGE_SAVE_PATH, 'rb') as img_file:
                 img_base = base64.b64encode(img_file.read()).decode('utf-8')
@@ -492,7 +490,7 @@ def build_response(current_user, agent_name, user_talk, video_open):
             responses = client.chat.completions.create(
                 model=model_name,
                 meta=meta,
-                messages=messages,
+                messages=messages[-MAX_HISTORY:],
                 stream=True,
             )
 
@@ -507,7 +505,7 @@ def build_response(current_user, agent_name, user_talk, video_open):
             # 调用大模型
             responses = client.chat.completions.create(
                 model=model_name,
-                messages=messages,
+                messages=messages[-MAX_HISTORY:],
                 stream=True,
             )
 
