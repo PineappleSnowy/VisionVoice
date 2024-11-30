@@ -172,25 +172,44 @@ async function initAudioAnalyser(stream) {
     };
 }
 
-// 静音阈值(单位:分贝)
-const SILENCE_THRESHOLD = -20;
+// 使用 let 关键字修饰静音阈值
+let SILENCE_THRESHOLD = -20;
 
-/**
- * @function detectSilence
- * @description 检测用户是否已经停止讲话
- * @param {AnalyserNode} analyser 音频分析器
- * @param {Float32Array} dataArray 数据数组
- * @returns {Boolean} 用户是否已经停止讲话
- */
-function detectSilence(analyser, dataArray) {
-    analyser.getFloatTimeDomainData(dataArray);
-    let sum = 0;
-    for (let i = 0; i < dataArray.length; i++) {
-        sum += Math.abs(dataArray[i]);
-    }
-    const average = sum / dataArray.length;
-    const db = 20 * Math.log10(average);
-    return db < SILENCE_THRESHOLD;
+// 添加环境噪音检测函数
+async function calibrateNoiseLevel(analyser, dataArray, duration = 1000) {
+    console.log('[phone.js][calibrateNoiseLevel] 开始检测环境噪音...');
+    return new Promise((resolve) => {
+        const samples = [];
+        const sampleInterval = 100; // 每100ms采样一次
+        const startTime = Date.now();
+        
+        const sampleNoise = () => {
+            if (Date.now() - startTime >= duration) {
+
+                // 计算平均噪音水平
+                const averageNoise = samples.reduce((a, b) => a + b, 0) / samples.length;
+
+                // 设置阈值为平均噪音上浮5分贝
+                const newThreshold = averageNoise + 5;
+                console.log(`[phone.js][calibrateNoiseLevel] 环境噪音基准: ${averageNoise.toFixed(2)}dB, 设置阈值: ${newThreshold.toFixed(2)}dB`);
+                resolve(newThreshold);
+                return;
+            }
+
+            analyser.getFloatTimeDomainData(dataArray);
+            let sum = 0;
+            for (let i = 0; i < dataArray.length; i++) {
+                sum += Math.abs(dataArray[i]);
+            }
+            const average = sum / dataArray.length;
+            const db = 20 * Math.log10(average);
+            samples.push(db);
+            
+            setTimeout(sampleNoise, sampleInterval);
+        };
+
+        sampleNoise();
+    });
 }
 
 function exit_obstacle_void() {
@@ -215,6 +234,10 @@ window.onload = async () => {
 
     // 初始化音频分析器
     const { analyser, dataArray } = await initAudioAnalyser(audioStream);
+    
+    // 在开始录音前进行环境噪音检测
+    SILENCE_THRESHOLD = await calibrateNoiseLevel(analyser, dataArray);
+    console.log('[phone.js][window.onload] 环境噪音校准完成, 静音阈值:', SILENCE_THRESHOLD);
 
     // 静音定时器
     let silenceTimer;
