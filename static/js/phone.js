@@ -181,13 +181,13 @@ dbDisplay.style.cssText = 'width: 30%; font-size: 10px; position: fixed; top: 10
 container.appendChild(dbDisplay);
 
 // 获取静音阈值
-const SILENCE_THRESHOLD = localStorage.getItem('SILENCE_THRESHOLD');
+let SILENCE_THRESHOLD = localStorage.getItem('SILENCE_THRESHOLD');
 if (SILENCE_THRESHOLD) {
     console.log('[phone.js][window.onload] 获取静音阈值:', SILENCE_THRESHOLD);
 }
 // 如果本地静音阈值不存在，则设置默认值
 else {
-    SILENCE_THRESHOLD = -20;
+    SILENCE_THRESHOLD = 1000;
 }
 /**
  * @description 检测用户是否已经停止讲话
