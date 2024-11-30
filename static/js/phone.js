@@ -176,7 +176,7 @@ async function initAudioAnalyser(stream) {
 let SILENCE_THRESHOLD = -20;
 
 /**
- * @description 校准环境噪音
+ * @description 校准环境噪音，修改全局的 SILENCE_THRESHOLD 值
  * @param {AnalyserNode} analyser 音频分析器
  * @param {Float32Array} dataArray 数据数组
  * @param {Number} duration 检测时长，单位：毫秒
