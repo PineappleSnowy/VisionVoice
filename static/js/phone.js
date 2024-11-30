@@ -181,13 +181,13 @@ dbDisplay.style.cssText = 'width: 30%; font-size: 10px; position: fixed; top: 10
 container.appendChild(dbDisplay);
 
 // 获取静音阈值
-const SILENCE_THRESHOLD = localStorage.getItem('SILENCE_THRESHOLD');
+let SILENCE_THRESHOLD = localStorage.getItem('SILENCE_THRESHOLD');
 if (SILENCE_THRESHOLD) {
     console.log('[phone.js][window.onload] 获取静音阈值:', SILENCE_THRESHOLD);
 }
 // 如果本地静音阈值不存在，则设置默认值
 else {
-    SILENCE_THRESHOLD = -20;
+    SILENCE_THRESHOLD = -30;
 }
 /**
  * @description 检测用户是否已经停止讲话
@@ -195,6 +195,10 @@ else {
  */
 function detectSilence(analyser, dataArray) {
     const db = detectDB(analyser, dataArray);
+
+    // 更新分贝值
+    dbDisplay.textContent = "当前分贝值: " + db;
+
     return db < SILENCE_THRESHOLD;
 }
 
@@ -224,12 +228,12 @@ window.onload = async () => {
     // 初始化音频分析器
     const { analyser, dataArray } = await initAudioAnalyser(audioStream);
 
-    // // 在开始录音前进行环境噪音检测
-    // SILENCE_THRESHOLD = await calibrateNoiseLevel(analyser, dataArray);
-    // console.log('[phone.js][window.onload] 环境噪音校准完成, 静音阈值:', SILENCE_THRESHOLD);
-
     // 静音定时器
-    let silenceTimer;
+    let silenceTimer = null;
+
+    // 用于表示对话开始
+    // 用户刚进入页面时，默认没有说过话，防止还没说话就上传音频
+    let conversationStarted = false;
 
     // 静音持续时间阈值（单位：毫秒）
     const SILENCE_DURATION = 2000;
@@ -244,8 +248,9 @@ window.onload = async () => {
         // 如果用户停止讲话，则设置短暂的静音等待
         if (detectSilence(analyser, dataArray)) {
 
-            // 如果静音定时器不存在，则设置静音定时器
-            if (!silenceTimer) {
+            // 如果静音定时器不存在，且用户已经说过话了，则设置静音定时器
+            if (!silenceTimer && conversationStarted) {
+            // if (!silenceTimer) {
                 silenceTimer = setTimeout(() => {
                     // 停止检测用户是否说话
                     clearTimeout(checkSilenceTimer);
@@ -273,6 +278,12 @@ window.onload = async () => {
                 clearTimeout(silenceTimer);
                 silenceTimer = null;
             }
+
+            // 如果用户还没有说过话，则设置对话开始标志
+            if (!conversationStarted) {
+                conversationStarted = true;
+            }
+
             if (!recordingFinished) {
                 continueRecording();
             } else {
