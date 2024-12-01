@@ -9,7 +9,7 @@
   "display": "fullscreen",
   "icons": [
     {
-      "src": "./image/favicon.png",
+      "src": "./images/favicon.png",
       "sizes": "256x256"
     },
     {
