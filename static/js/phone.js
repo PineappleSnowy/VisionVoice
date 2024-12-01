@@ -250,7 +250,7 @@ window.onload = async () => {
 
             // 如果静音定时器不存在，且用户已经说过话了，则设置静音定时器
             if (!silenceTimer && conversationStarted) {
-            // if (!silenceTimer) {
+                // if (!silenceTimer) {
                 silenceTimer = setTimeout(() => {
                     // 停止检测用户是否说话
                     clearTimeout(checkSilenceTimer);
@@ -560,13 +560,16 @@ window.onload = async () => {
     const findItemButton = document.querySelector('.findItem');
     const findItemModal = document.getElementById('findItemModal');
     const closeModalButton = document.getElementById('closeModalButton');
+    const overlay = document.getElementById('overlay');
 
     findItemButton.addEventListener('click', () => {
+        overlay.style.display = 'block';
         findItemModal.style.display = 'block';
         loadGallery();
     });
 
     closeModalButton.addEventListener('click', () => {
+        overlay.style.display = 'none';
         findItemModal.style.display = 'none';
         const gallery = document.getElementById('gallery');
         while (gallery.firstChild) {
