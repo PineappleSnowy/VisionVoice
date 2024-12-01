@@ -68,7 +68,8 @@ def before_request():
             )
 
     # 允许访问的静态资源路径
-    allowed_paths = ["/static/css", "/static/js", "/static/images", "/image"]
+    allowed_paths = ["/static/css", "/static/js", "/static/images",
+                     "/image", "/static/favicon.ico", "/static/manifest.json"]
 
     # 获取所有已注册的路由
     registered_routes = [rule.rule for rule in app.url_map.iter_rules()]
@@ -147,6 +148,7 @@ def mine():
 
 # 设置图片文件夹路径
 IMAGE_FOLDER = './user_images/images'
+
 
 @app.route("/photo_manage", methods=["GET"])
 def photo_manage():

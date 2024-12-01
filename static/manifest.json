@@ -1,0 +1,21 @@
+{
+  "name": "VisionVoice",
+  "short_name": "VisionVoice",
+  "description": "VisionVoice is a useful blind agent.",
+  "lang": "en-US",
+  "start_url": "../",
+  "theme_color": "#181c25",
+  "background_color": "#181c25",
+  "display": "fullscreen",
+  "icons": [
+    {
+      "src": "./image/favicon.png",
+      "sizes": "256x256"
+    },
+    {
+      "src": "./favicon.ico",
+      "sizes": "64x64"
+    }
+  ],
+  "orientation": "any"
+}

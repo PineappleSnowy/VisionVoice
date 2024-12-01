@@ -7,7 +7,7 @@
         content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0">
     <title>与智能体通话</title>
     <link rel="stylesheet" href="../static/css/phone.css">
-    <link rel="icon" href="../static/images/visionvoice_ico.ico" />
+    <link rel="icon" href="../static/favicon.ico" />
     <script src="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/socket.io/4.4.1/socket.io.min.js"></script>
     <!-- 引入fa字体图标和音频可视化库 -->
     <script src="https://kit.fontawesome.com/11023f265d.js" crossorigin="anonymous"></script>
@@ -42,6 +42,10 @@
 
     <div id="microphone" class="voice"></div>
     <audio id="audioPlayer" controls autoplay style="display: none"></audio>
+
+    <!-- 覆盖层元素，实现模态窗口弹出时无法点击其他按钮 -->
+    <div id="overlay"></div>
+
     <script src="../static/js/auth.js"></script>
     <script src="../static/js/chat.js"></script>
     <script src="../static/js/recorder.js"></script>

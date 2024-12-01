@@ -556,4 +556,41 @@ window.onload = async () => {
     })
     /* 处理音频识别 end 
     ------------------------------------------------------------*/
+
+    const findItemButton = document.querySelector('.findItem');
+    const findItemModal = document.getElementById('findItemModal');
+    const closeModalButton = document.getElementById('closeModalButton');
+
+    findItemButton.addEventListener('click', () => {
+        findItemModal.style.display = 'block';
+        loadGallery();
+    });
+
+    closeModalButton.addEventListener('click', () => {
+        findItemModal.style.display = 'none';
+        const gallery = document.getElementById('gallery');
+        while (gallery.firstChild) {
+            gallery.removeChild(gallery.firstChild);
+        }
+    });
+
+    function loadGallery() {
+        fetch('/images')
+            .then(response => response.json())
+            .then(data => {
+                const gallery = document.getElementById('gallery');
+                data.forEach(image => {
+                    const item = document.createElement('div');
+                    item.className = 'gallery-item';
+                    item.innerHTML = `
+                            <button onclick="console.log('${image.name}')">
+                                <img src="${image.url}" alt="${image.name}">
+                                <p>${image.name}</p>
+                            </button>
+                        `;
+                    gallery.appendChild(item);
+                });
+            })
+            .catch(error => console.error('Error fetching images:', error));
+    }
 }
