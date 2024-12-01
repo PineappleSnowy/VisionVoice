@@ -84,6 +84,7 @@ toggleCamera.addEventListener('click', async () => {
             try {
                 stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
                 video.srcObject = stream;
+                video.style.transform = 'none';
             } catch (err) {
                 alert(err);
             }
