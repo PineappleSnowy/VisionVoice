@@ -461,7 +461,7 @@ def login():
             print("登录成功")
             # 设置 local token
             access_token = create_access_token(
-                identity=username, expires_delta=timedelta(hours=1)
+                identity=username, expires_delta=False
             )
             return (
                 jsonify(
