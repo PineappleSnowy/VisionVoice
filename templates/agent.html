@@ -17,6 +17,15 @@
     <div id="chat-container" aria-live="polite" aria-atomic="true"></div>
     <!-- 下部功能区 -->
     <div id="chat-input-container" role="form">
+      <div id="imageUploadPanel" style="display: none;">
+        <div class="content">
+          <!-- 图片列表在这里 -->
+          <div class="add">
+            <img src="../static/images/more_function_start.png" alt="添加图片">
+            <input id="photo" type="file" accept="image/*" aria-label="选择图片" style="display: none;" />
+          </div>
+        </div>
+      </div>
       <div class="pause" aria-hidden="true"></div>
       <a id="phone-button" href="/phone" aria-label="电话">
         <img src="../static/images/phone.png" id="phone_icon" alt="电话图标" />
@@ -33,12 +42,7 @@
       </button>
     </div>
     <div id="more_function_board" role="region" aria-labelledby="more_function_label">
-      <div id="decorate_photo">
-        <input id="photo" type="file" accept="image/*" aria-label="选择图片" />
-      </div>
-      <div id="image-preview" style="display: none;" aria-hidden="true">
-        <img id="preview-image" alt="预览图片" />
-      </div>
+      <div id="decorate_photo"></div>
     </div>
     <div id="navbar" role="navigation">
       <a href="/agent" aria-label="首页">首页</a>

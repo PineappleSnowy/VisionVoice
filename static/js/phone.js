@@ -135,6 +135,7 @@ html.style.fontSize = (window.innerWidth * 100) / 412 + 'px';
 
 const goBack = document.querySelector('.goBack');
 const hangUp = document.querySelector('.hangUp');
+const statusDiv = document.querySelector('.controller .status');
 
 /**
  * 用户状态
@@ -250,11 +251,12 @@ window.onload = async () => {
 
             // 如果静音定时器不存在，且用户已经说过话了，则设置静音定时器
             if (!silenceTimer && conversationStarted) {
-                // if (!silenceTimer) {
                 silenceTimer = setTimeout(() => {
                     // 停止检测用户是否说话
-                    clearTimeout(checkSilenceTimer);
-                    checkSilenceTimer = null;
+                    if (checkSilenceTimer) {
+                        clearInterval(checkSilenceTimer);
+                        checkSilenceTimer = null;
+                    }
 
                     // 停止录音
                     stopRecording();
@@ -264,6 +266,7 @@ window.onload = async () => {
 
                     // 是否录制完毕
                     recordingFinished = true;
+                    statusDiv.textContent = '点击打断';
 
                 }, SILENCE_DURATION);
             }
@@ -397,6 +400,43 @@ window.onload = async () => {
     // 标识是否正在播放音频
     let isPlaying = false;
 
+    // statusDiv.addEventListener('click', () => {
+    //     if (statusDiv.textContent === '点击打断') {
+    //         stopRecording();
+    //         // 停止音频播放
+    //         audioPlayer.pause();
+    //         audioPlayer.currentTime = 0; // 重置音频播放位置
+
+    //         audioQueue = [];
+
+    //         // 恢复波形图动画
+    //         vudio.dance();
+
+    //         // 更新状态为正在听
+    //         statusDiv.textContent = '正在听';
+
+    //         // 如果之前有静音定时器，清除它
+    //         if (silenceTimer) {
+    //             clearTimeout(silenceTimer);
+    //             silenceTimer = null;
+    //         }
+
+    //         // 如果之前有检查沉默的定时器，清除它
+    //         if (checkSilenceTimer) {
+    //             clearInterval(checkSilenceTimer);
+    //             checkSilenceTimer = null;
+    //         }
+
+    //         checkSilenceTimer = setInterval(checkSilence, 333);
+    //         // 确保录音状态变量正确设置
+    //         recordingFinished = true;
+    //         conversationStarted = false;
+
+    //         console.log('[phone.js][statusDiv.click] 录音已停止，状态已重置');
+            
+    //     }
+    // });
+
     /**
      * @description 监听后端发送的 agent_play_audio_chunk 事件
      * - 音频播放模块的起点
@@ -435,6 +475,7 @@ window.onload = async () => {
 
             console.log('[phone.js][playNextAudio] 音频队列中没有音频数据，停止播放...');
 
+            statusDiv.textContent = '正在听';
             // 如果波形图动画处于暂停状态，则开始播放（波形动画启动表示用户可以讲话）
             if (vudio.paused()) {
                 vudio.dance();
