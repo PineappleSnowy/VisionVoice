@@ -32,7 +32,7 @@ function verifyToken() {
                     localStorage.removeItem('token');
                     localStorage.removeItem('user');
                     localStorage.removeItem('islogin');
-                    window.location.href = '/';
+                    window.location.href = '/login';
                 }
             })
             .catch(error => {
@@ -44,7 +44,7 @@ function verifyToken() {
                 window.location.href = '/';
             });
     } else {
-        window.location.href = '/';
+        window.location.href = '/login';
     }
 }
 
