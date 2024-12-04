@@ -3,6 +3,7 @@
 """
 
 # 第三方库
+import time
 import os
 from datetime import timedelta
 from flask import Flask, send_from_directory, stream_with_context, render_template, request, jsonify
@@ -90,13 +91,13 @@ def handle_disconnect():
             user = get_jwt_identity()
             print(f"[run.py][handle_disconnect] User {user} disconnected")
             # 偶尔会发生客户端连接超时导致user被意外删除
-            try:
-                del USER_VAR[user]
-                print(
-                    f"[run.py][handle_disconnect] Remove user {user} varieties")
-            except Exception as e:
-                print(
-                    f"[run.py][handle_disconnect] Fail to remove user {user} varieties: {e}")
+            # try:
+            #     del USER_VAR[user]
+            #     print(
+            #         f"[run.py][handle_disconnect] Remove user {user} varieties")
+            # except Exception as e:
+            #     print(
+            #         f"[run.py][handle_disconnect] Fail to remove user {user} varieties: {e}")
         except Exception as e:
             print(f"[run.py][handle_disconnect] JWT verification failed: {e}")
     else:
@@ -251,8 +252,7 @@ with open("./static/api.json", "r", encoding="utf-8") as f:
     api_key_zhipu = data["zhipu"]["api_key"]
     client = ZhipuAI(api_key=api_key_zhipu)
 
-# 当前操作系统
-current_os = platform.system()
+
 # 聊天记录最大长度
 MAX_HISTORY = 10  # 较多的聊天记录长度会导致较多的token消耗
 
@@ -833,15 +833,16 @@ def process_audio_stream(user):
             break
 
 
-if __name__ == "__main__":
-    # 根据操作系统选择服务器启动方式
+def run_server():
+    # 当前操作系统
+    current_os = platform.system()
     if current_os == "Windows":
         socketio.run(
             app,
             port=80,
             host="0.0.0.0",
             allow_unsafe_werkzeug=True,
-            debug=True,  # 调试模式（开发环境）
+            # debug=True,  # 调试模式（开发环境）
         )
     else:
         socketio.run(
@@ -851,3 +852,17 @@ if __name__ == "__main__":
             allow_unsafe_werkzeug=True,
             ssl_context=("/ssl/cert.pem", "/ssl/cert.key"),
         )
+
+
+def forever_run_server():
+    """确保服务器不意外终止"""
+    while True:
+        try:
+            run_server()
+        except Exception as e:
+            logging.error(f"服务器意外终止: {e}")
+            time.sleep(5)  # 等待5秒后重启服务器
+
+
+if __name__ == "__main__":
+    forever_run_server()
