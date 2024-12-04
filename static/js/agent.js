@@ -69,13 +69,12 @@ function loadChatHistory(agent) {
         });
 }
 
-// 发送消息按钮
 document.getElementById('send-button').addEventListener('click', function () {
     let input = document.getElementById('agent-chat-textarea');
     let message = input.value.trim();
-    message = message.replace(/(\r\n|\n|\r)/gm, '')
-    if (message || image_impt) {
-        audioPlayer.pause()
+    message = message.replace(/(\r\n|\n|\r)/gm, '');
+    if (message || uploadedImages.length > 0) {
+        audioPlayer.pause();
         pauseDiv.style.backgroundImage = `url('${'./static/images/pause_inactive.png'}')`;
         audioDict = {};
         audioIndex = 0;
@@ -86,7 +85,6 @@ document.getElementById('send-button').addEventListener('click', function () {
         }
     }
     document.getElementById('agent-chat-textarea').style.height = 'auto';
-    image_impt = null;
 });
 
 /**
@@ -119,13 +117,56 @@ function addMessage(message) {
     var image_user = document.createElement('div');
     image_user.className = 'chat-image-user';
     bubble.textContent = message;
-    if (image_impt) {
-        var image_import = document.createElement('img');
-        image_import.src = image_impt;
-        image_import.style.width = '100%';
-        image_import.style.height = 'auto';
-        bubble.appendChild(image_import);
+
+    // 处理上传的图像
+    if (uploadedImages.length > 0) {
+        const promises = uploadedImages.map(file => {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = function (event) {
+                    const imageUrl = event.target.result;
+                    const imageElement = document.createElement('img');
+                    imageElement.src = imageUrl;
+                    imageElement.style.width = '100%';
+                    imageElement.style.height = 'auto';
+                    bubble.appendChild(imageElement);
+
+                    // 发送图像到后端
+                    fetch('/agent/upload_image', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ image: imageUrl })
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log('图片上传成功:', data);
+                            resolve(imageUrl); // 返回图片URL以便后续发送
+                        })
+                        .catch(error => {
+                            console.error('图片上传失败:', error);
+                            reject(error);
+                        });
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+
+        // 等待所有图像上传完成
+        Promise.all(promises)
+            .then(imageUrls => {
+                // 清空 uploadedImages 数组
+                uploadedImages = [];
+                sendCombinedMessageToBackend(message, imageUrls);
+            })
+            .catch(error => {
+                console.error('图像上传过程中发生错误:', error);
+            });
+    } else {
+        sendCombinedMessageToBackend(message, []);
     }
+
     messagebackground.appendChild(messagesContainer_user);
     messagesContainer_user.appendChild(bubble);
     messagesContainer_user.appendChild(image_user);
@@ -137,7 +178,7 @@ function addMessage(message) {
     messagesContainer_bot.className = 'chat-messages-bot';
     var bubble_2 = document.createElement('div');
     bubble_2.className = 'chat-bubble-bot';
-    
+
     fetch(`/agent/chat_stream?query=${message}&agent=${selectedAgent}`, {
         headers: {
             "Authorization": `Bearer ${token}`
@@ -155,7 +196,7 @@ function addMessage(message) {
 
                 // 如果当前不是结束标志，则将文本添加到气泡中
                 if (!(jsonString.includes("<END>"))) {
-                    socket.emit("agent_stream_audio", jsonString)
+                    socket.emit("agent_stream_audio", jsonString);
                     bubble_2.textContent += jsonString;
                 }
 
@@ -166,42 +207,156 @@ function addMessage(message) {
         .catch(error => {
             console.error('Error fetching stream:', error);
         });
+
     messagesContainer_bot.appendChild(image_bot);
     messagesContainer_bot.appendChild(bubble_2);
     messagebackground.appendChild(messagesContainer_bot);
     messagebackground.scrollTop = messagebackground.scrollHeight;
 }
 
-//捕捉用户选择的图像
-document.getElementById('photo').addEventListener('change', function (e) {
-    var file = e.target.files[0];
-    var reader = new FileReader();
-    reader.onload = function (event) {
-        image_impt = event.target.result;
-        console.log('用户上传图片');
-        document.getElementById('photo').value = '';
-        // 显示图片预览
-        document.getElementById('preview-image').src = image_impt;
-        document.getElementById('image-preview').style.display = 'block';
+// 删除图片
+// 为 #imageUploadPanel 添加事件委托
+const content = document.querySelector('#imageUploadPanel .content');
+document.getElementById('imageUploadPanel').addEventListener('click', function (event) {
+    if (event.target.classList.contains('remove')) {
+        console.log('remove button clicked');
+        // 找到当前按钮的父元素 .image
+        const imageContainer = event.target.closest('.image');
+        if (imageContainer) {
+            // 获取图片容器的索引
+            const index = Array.from(content.children).indexOf(imageContainer);
+            if (index !== -1) {
+                // 从数组中移除对应的图片信息
+                uploadedImages.splice(index, 1);
+            }
+            // 从 DOM 中移除 .image 元素及其所有子元素
+            imageContainer.remove();
+        }
+    }
+});
 
-        // 将图片数据发送到后端
-        fetch('/agent/upload_image', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ image: image_impt })
+// 添加图片
+let uploadedImages = [];
+document.querySelector('#imageUploadPanel .content .add').addEventListener('click', function () {
+    document.querySelector('#imageUploadPanel .content .add input').click();
+});
+document.querySelector('#imageUploadPanel .content .add input').addEventListener('change', function (e) {
+    const file = e.target.files[0];
+
+    if (!file) return; // 检查文件是否存在
+
+    // 创建一个临时的 URL 来显示图片
+    const imageUrl = URL.createObjectURL(file);
+
+    // 将文件对象存储到数组中
+    uploadedImages.push(file);
+
+    // 在 .content 最前面插入包含上传图片的 <div> 结构
+    const content = document.querySelector('#imageUploadPanel .content');
+    const imageDiv = document.createElement('div');
+    imageDiv.className = 'image';
+    const userImg = document.createElement('img');
+    userImg.src = imageUrl; // 使用临时 URL
+    userImg.style.height = '100%';
+    userImg.style.width = 'auto';
+
+    const removeImg = document.createElement('img');
+    removeImg.className = 'remove';
+    removeImg.src = '../static/images/more_function_end.png';
+    removeImg.alt = '删除照片';
+
+    imageDiv.appendChild(userImg);
+    imageDiv.appendChild(removeImg);
+
+    // 插入到 .content 最前面
+    content.insertBefore(imageDiv, content.firstChild);
+
+    // 清空文件输入以允许重新选择同一文件
+    e.target.value = '';
+});
+
+/**
+ * @description 发送消息到后端
+ * @param {string} message 用户的消息内容
+ */
+function sendCombinedMessageToBackend(message, imageUrls) {
+    const token = localStorage.getItem('token');
+    fetch(`/agent/chat_stream`, {
+        method: 'POST',
+        headers: {
+            "Authorization": `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            query: message,
+            agent: selectedAgent,
+            images: imageUrls
         })
-            .then(response => response.json())
-            .then(data => {
-                console.log('图片上传成功:', data);
-            })
-            .catch(error => {
-                console.error('图片上传失败:', error);
-            });
-    };
-    reader.readAsDataURL(file);
-})
+    })
+        .then(response => response.json())
+        .then(data => {
+            console.log('消息发送成功:', data);
+            clearImageDiv(); // 清空图片div
+        })
+        .catch(error => {
+            console.error('消息发送失败:', error);
+            clearImageDiv(); // 清空图片div
+        });
+}
+
+// 清空图片div
+function clearImageDiv() {
+    const content = document.querySelector('#imageUploadPanel .content');
+    content.innerHTML = ''; // 清空内容
+    // 重新添加添加图片的HTML结构
+    const addDiv = document.createElement('div');
+    addDiv.className = 'add';
+
+    const img = document.createElement('img');
+    img.src = '../static/images/more_function_start.png';
+    img.alt = '添加图片';
+
+    const input = document.createElement('input');
+    input.id = 'photo';
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.setAttribute('aria-label', '选择图片');
+    input.style.display = 'none';
+
+    addDiv.appendChild(img);
+    addDiv.appendChild(input);
+    content.appendChild(addDiv);
+}
+// //捕捉用户选择的图像
+// document.getElementById('photo').addEventListener('change', function (e) {
+//     var file = e.target.files[0];
+//     var reader = new FileReader();
+//     reader.onload = function (event) {
+//         image_impt = event.target.result;
+//         console.log('用户上传图片');
+//         document.getElementById('photo').value = '';
+//         // 显示图片预览
+//         document.getElementById('preview-image').src = image_impt;
+//         document.getElementById('image-preview').style.display = 'block';
+
+//         // 将图片数据发送到后端
+//         fetch('/agent/upload_image', {
+//             method: 'POST',
+//             headers: {
+//                 'Content-Type': 'application/json'
+//             },
+//             body: JSON.stringify({ image: image_impt })
+//         })
+//             .then(response => response.json())
+//             .then(data => {
+//                 console.log('图片上传成功:', data);
+//             })
+//             .catch(error => {
+//                 console.error('图片上传失败:', error);
+//             });
+//     };
+//     // reader.readAsDataURL(file);
+// })
 
 // 按下回车键也可以发送消息
 document.getElementById('agent-chat-textarea').addEventListener('keypress', function (e) {
@@ -273,7 +428,12 @@ document.getElementById('agent-chat-textarea').addEventListener(
 )
 
 document.getElementById('decorate_photo').addEventListener('click', function () {
-    document.getElementById('photo').click();
+    const imageUploadPanel = document.getElementById('imageUploadPanel');
+    if (imageUploadPanel.style.display === 'flex') {
+        imageUploadPanel.style.display = 'none';
+    } else {
+        imageUploadPanel.style.display = 'flex';
+    }
 })
 
 // 测试一下元素消失操作
