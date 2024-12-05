@@ -715,8 +715,8 @@ def agent_upload_audio():
     )
 
     # 语音识别
-    rec_result = speech_rec(resampled_audio_data)
-    # rec_result = "开启避障模式"  # 添加测试
+    # rec_result = speech_rec(resampled_audio_data)
+    rec_result = "添加测试"  # 添加测试
     print("音频识别结果：", rec_result)
 
     # 音频识别结果发送到前端
@@ -750,22 +750,38 @@ def agent_stream_audio(current_token: str):
     else:
         print("[run.py][agent_stream_audio] Missing token")
         return
+    # 功能性处理
     if "##" in current_token:
         if current_token == "##<state=1>":
+            socketio.emit(
+                "obstacle_avoid",
+                {"flag": "begin"}
+            )
             audio_file_path = ".cache/obstacle_start.wav"
+
         elif current_token == "##<state=1 exit>":
             audio_file_path = ".cache/obstacle_end.wav"
 
-        with open(audio_file_path, "rb") as audio_file:
-            audio_chunk = audio_file.read()
+        elif "##<state=2>" in current_token:
+            socketio.emit(
+                "find_item",
+                {"flag": "begin"}
+            )
+            audio_chunk = agent_audio_generate(current_token[current_token.find('>')+1: ])
+            audio_file_path = ""
+
+        else:
+            return
+        
+        if audio_file_path:
+            with open(audio_file_path, "rb") as audio_file:
+                audio_chunk = audio_file.read()
+                
         socketio.emit(
             "agent_play_audio_chunk",
             {"index": 0, "audio_chunk": audio_chunk}
         )
-        socketio.emit(
-            "obstacle_avoid",
-            {"flag": "begin"}
-        )
+
     else:
         if not USER_VAR[user]["is_streaming"]:
             # 标记正在处理流式响应

@@ -18,7 +18,8 @@ const waveShape = document.querySelector('#waveShape');
 let videoChat = false;
 let isFrontCamera = false;
 let state = 0;  // 状态标识，0：普通对话 1：避障 2：寻物
-let obstacle_avoid = false;
+let obstacle_avoid = false;  // 防止多次启动避障
+let find_item = false;  // 防止多次启动寻物
 let rec_result = "";
 let speech_rec_ready = false;
 let image_upload_ready = false;
@@ -129,10 +130,7 @@ function formChat() {
                     console.error('[phone.js][socket.on][agent_speech_recognition_finished] Error fetching stream:', error);
                 });
         }
-        else if (state == 1 && !obstacle_avoid) {
-            obstacle_avoid = true;
-            socket.emit("agent_stream_audio", "##<state=1>");
-        }
+
     }
 }
 
@@ -174,6 +172,14 @@ function captureAndSendFrame() {
                         }
                         else { captureAndSendFrame() }
                     }
+
+                    else if (state == 2) {
+                        socket.emit("agent_stream_audio", `物品在画面中。`);
+                        setTimeout(function () {
+                            captureAndSendFrame()
+                        }, 2000);
+                    }
+
                     else if (state == 0) {
                         image_upload_ready = true;
                         formChat()
@@ -263,10 +269,52 @@ function detectSilence(analyser, dataArray) {
 /* 处理音量大小测定 end
 ----------------------------------------------------------*/
 
+// 退出避障
 function exit_obstacle_void() {
     state = 0
     obstacle_avoid = false;
     socket.emit("agent_stream_audio", "##<state=1 exit>");
+}
+// 退出寻物
+function exit_find_item() {
+    state = 0
+    find_item = false;
+    socket.emit("agent_stream_audio", "##<state=2 exit>");
+}
+
+// 寻物启动函数
+function startFindItem(item_name) {
+    closeModalButton.click()
+    state = 2
+    if (!videoChat) {
+        openCamera.click()
+    }
+    if (!find_item) {
+        find_item = true;
+        socket.emit("agent_stream_audio", `##<state=2>开始寻找${item_name}`);
+    }
+}
+
+// 避障启动函数
+function startAvoidObstacle() {
+    state = 1;
+    if (!videoChat) {
+        openCamera.click()
+    }
+    if (!obstacle_avoid) {
+        obstacle_avoid = true;
+        socket.emit("agent_stream_audio", "##<state=1>");
+    }
+}
+
+// 退出功能模式
+function exitFuncModel(){
+    if (obstacle_avoid) {
+        exit_obstacle_void()
+    }
+    else if (find_item) {
+        exit_find_item()
+    }
 }
 
 window.onload = async () => {
@@ -457,43 +505,6 @@ window.onload = async () => {
     // 标识是否正在播放音频
     let isPlaying = false;
 
-    // statusDiv.addEventListener('click', () => {
-    //     if (statusDiv.textContent === '点击打断') {
-    //         stopRecording();
-    //         // 停止音频播放
-    //         audioPlayer.pause();
-    //         audioPlayer.currentTime = 0; // 重置音频播放位置
-
-    //         audioQueue = [];
-
-    //         // 恢复波形图动画
-    //         vudio.dance();
-
-    //         // 更新状态为正在听
-    //         statusDiv.textContent = '正在听';
-
-    //         // 如果之前有静音定时器，清除它
-    //         if (silenceTimer) {
-    //             clearTimeout(silenceTimer);
-    //             silenceTimer = null;
-    //         }
-
-    //         // 如果之前有检查沉默的定时器，清除它
-    //         if (checkSilenceTimer) {
-    //             clearInterval(checkSilenceTimer);
-    //             checkSilenceTimer = null;
-    //         }
-
-    //         checkSilenceTimer = setInterval(checkSilence, 333);
-    //         // 确保录音状态变量正确设置
-    //         recordingFinished = true;
-    //         conversationStarted = false;
-
-    //         console.log('[phone.js][statusDiv.click] 录音已停止，状态已重置');
-
-    //     }
-    // });
-
     /**
      * @description 监听后端发送的 agent_play_audio_chunk 事件
      * - 音频播放模块的起点
@@ -601,16 +612,21 @@ window.onload = async () => {
             return;
         }
         console.log('[phone.js][socket.on][agent_speech_recognition_finished] 音频识别结果: %s', rec_result);
+
         // 根据语音识别的结果执行不同的任务
         if (rec_result.includes("避") || rec_result.includes("模")) {  // 加强鲁棒性
-            state = 1;
-
+            
+            startAvoidObstacle()  // 进入避障模式
+        }
+        if (rec_result.includes("寻")) {
             if (!videoChat) {
                 openCamera.click()
             }
+            findItemButton.click()  // 进入寻物模式
         }
+
         else if (rec_result.includes("退出")) {
-            exit_obstacle_void()
+            exitFuncModel()
             return;
         }
 
@@ -618,8 +634,8 @@ window.onload = async () => {
             speech_rec_ready = true;
             formChat()
         }
-
     })
+
     // 避障socket
     socket.on('obstacle_avoid', function (data) {
         const flag = data["flag"];
@@ -627,6 +643,15 @@ window.onload = async () => {
             captureAndSendFrame();
         }
     })
+
+    // 寻物socket
+    socket.on('find_item', function (data) {
+        const flag = data["flag"];
+        if (flag == "begin") {
+            captureAndSendFrame();
+        }
+    })
+
     /* 处理音频识别 end 
     ------------------------------------------------------------*/
 
@@ -660,7 +685,7 @@ window.onload = async () => {
                     const item = document.createElement('div');
                     item.className = 'gallery-item';
                     item.innerHTML = `
-                            <button onclick="console.log('${image.name}')">
+                            <button onclick="startFindItem('${image.name}')">
                                 <img src="${image.url}" alt="${image.name}">
                                 <p>${image.name}</p>
                             </button>
