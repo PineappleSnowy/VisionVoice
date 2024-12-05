@@ -19,6 +19,9 @@ let videoChat = false;
 let isFrontCamera = false;
 let state = 0;  // 状态标识，0：普通对话 1：避障 2：寻物
 let obstacle_avoid = false;
+let rec_result = "";
+let speech_rec_ready = false;
+let image_upload_ready = false;
 
 openCamera.addEventListener('click', async () => {
     try {
@@ -92,6 +95,47 @@ toggleCamera.addEventListener('click', async () => {
     }
 });
 
+function formChat() {
+    if (speech_rec_ready && image_upload_ready) {
+        speech_rec_ready = false;
+        image_upload_ready = false;
+        if (state == 0) {
+            const token = localStorage.getItem('token');
+            fetch(`/agent/chat_stream?query=${rec_result}&agent=${selectedAgent}&videoOpen=${videoChat}`, {
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            })
+                .then(response => {
+                    let reader = response.body.getReader();
+
+                    // 逐块读取并处理数据
+                    return reader.read().then(function processText({ done, value }) {
+                        if (done) {
+                            return;
+                        }
+                        let jsonString = new TextDecoder().decode(value); // 将字节流转换为字符串
+
+                        // 如果当前不是结束标志，则将文本进行语音合成
+                        if (!(jsonString.includes("<END>"))) {
+                            socket.emit("agent_stream_audio", jsonString);
+                        }
+
+                        // 继续读取下一个数据
+                        return reader.read().then(processText);
+                    });
+                })
+                .catch(error => {
+                    console.error('[phone.js][socket.on][agent_speech_recognition_finished] Error fetching stream:', error);
+                });
+        }
+        else if (state == 1 && !obstacle_avoid) {
+            obstacle_avoid = true;
+            socket.emit("agent_stream_audio", "##<state=1>");
+        }
+    }
+}
+
 // 将视频帧发往后端的函数
 function captureAndSendFrame() {
     if (videoChat) {
@@ -112,17 +156,28 @@ function captureAndSendFrame() {
         })
             .then(response => response.json())
             .then(data => {
-                console.log('Frame uploaded successfully:', data);
-                if (state == 1) {
-                    if (data["obstacle_info"].length != 0) {
-                        const detected_item = data["obstacle_info"][0]["label"];
-                        const distant = data["obstacle_info"][0]["distant"]
-                        socket.emit("agent_stream_audio", `画面右侧${detected_item}距离${distant.toFixed(2)}米。`);
+                if (data["message"] != "Success") {
+                    console.log('Error:', data);
+                    captureAndSendFrame()
+                }
+                else {
+                    console.log('Frame uploaded successfully:', data);
+                    if (state == 1) {
+                        if (data["obstacle_info"].length != 0) {
+                            const detected_item = data["obstacle_info"][0]["label"];
+                            const distant = data["obstacle_info"][0]["distant"]
+                            socket.emit("agent_stream_audio", `画面中${detected_item}距离${distant.toFixed(2)}米。`);
+                            // 设置等待时间
+                            setTimeout(function () {
+                                captureAndSendFrame()
+                            }, 2000);
+                        }
+                        else { captureAndSendFrame() }
                     }
-                    // 设置等待时间
-                    setTimeout(function () {
-                        captureAndSendFrame()
-                    }, 2000);
+                    else if (state == 0) {
+                        image_upload_ready = true;
+                        formChat()
+                    }
                 }
             })
             .catch(error => {
@@ -435,7 +490,7 @@ window.onload = async () => {
     //         conversationStarted = false;
 
     //         console.log('[phone.js][statusDiv.click] 录音已停止，状态已重置');
-            
+
     //     }
     // });
 
@@ -472,8 +527,10 @@ window.onload = async () => {
             // 表示音频播放结束
             isPlaying = false;
 
-            // 开始检测用户是否正在说话
-            checkSilenceTimer = setInterval(checkSilence, 333);
+            if (state === 0) {
+                // 开始检测用户是否正在说话
+                checkSilenceTimer = setInterval(checkSilence, 333);
+            }
 
             console.log('[phone.js][playNextAudio] 音频队列中没有音频数据，停止播放...');
 
@@ -535,18 +592,19 @@ window.onload = async () => {
     /**
      * @description 语音识别结束后，将识别结果发送给后端，并开始语音对话
      */
+
     socket.on('agent_speech_recognition_finished', function (data) {
-        const rec_result = data['rec_result'];
+        rec_result = data['rec_result'];
 
         if (!rec_result) {
             console.log('[phone.js][socket.on][agent_speech_recognition_finished] 音频识别结果为空.');
             return;
         }
-        const token = localStorage.getItem('token');
         console.log('[phone.js][socket.on][agent_speech_recognition_finished] 音频识别结果: %s', rec_result);
         // 根据语音识别的结果执行不同的任务
         if (rec_result.includes("避") || rec_result.includes("模")) {  // 加强鲁棒性
             state = 1;
+
             if (!videoChat) {
                 openCamera.click()
             }
@@ -557,38 +615,10 @@ window.onload = async () => {
         }
 
         if (state == 0) {
-            fetch(`/agent/chat_stream?query=${rec_result}&agent=${selectedAgent}&videoOpen=${videoChat}`, {
-                headers: {
-                    "Authorization": `Bearer ${token}`
-                }
-            })
-                .then(response => {
-                    let reader = response.body.getReader();
-
-                    // 逐块读取并处理数据
-                    return reader.read().then(function processText({ done, value }) {
-                        if (done) {
-                            return;
-                        }
-                        let jsonString = new TextDecoder().decode(value); // 将字节流转换为字符串
-
-                        // 如果当前不是结束标志，则将文本进行语音合成
-                        if (!(jsonString.includes("<END>"))) {
-                            socket.emit("agent_stream_audio", jsonString);
-                        }
-
-                        // 继续读取下一个数据
-                        return reader.read().then(processText);
-                    });
-                })
-                .catch(error => {
-                    console.error('[phone.js][socket.on][agent_speech_recognition_finished] Error fetching stream:', error);
-                });
+            speech_rec_ready = true;
+            formChat()
         }
-        else if (state == 1 && !obstacle_avoid) {
-            obstacle_avoid = true;
-            socket.emit("agent_stream_audio", "##<state=1>");
-        }
+
     })
     // 避障socket
     socket.on('obstacle_avoid', function (data) {
@@ -600,6 +630,7 @@ window.onload = async () => {
     /* 处理音频识别 end 
     ------------------------------------------------------------*/
 
+    // 寻物逻辑
     const findItemButton = document.querySelector('.findItem');
     const findItemModal = document.getElementById('findItemModal');
     const closeModalButton = document.getElementById('closeModalButton');

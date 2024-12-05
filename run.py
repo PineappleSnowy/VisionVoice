@@ -3,6 +3,7 @@
 """
 
 # 第三方库
+import cv2
 import time
 import os
 from datetime import timedelta
@@ -663,16 +664,22 @@ def upload_image():
         f.write(base64.b64decode(image_data))
 
     state = data["state"]
+
+    try:
+        cv2.imread(IAMGE_SAVE_PATH)
+    except Exception:
+        return jsonify({"message": "Image is empty", "obstacle_info": []}), 400
+
     if state == 1:
         try:
             obstacle_info = obstacle_avoid_realize(IAMGE_SAVE_PATH)
             print("[run.py][upload_image] obstacle_info:", obstacle_info)
-            return jsonify({"obstacle_info": obstacle_info}), 200
+            return jsonify({"message": "Success", "obstacle_info": obstacle_info}), 200
         except Exception:
             print("[run.py][upload_image] error:", "图片为空")
-            return jsonify({"obstacle_info": []}), 200
+            return jsonify({"message": "Image is empty", "obstacle_info": []}), 400
 
-    return jsonify({"message": "Image uploaded successfully"}), 200
+    return jsonify({"message": "Success", "obstacle_info": []}), 200
 
 
 @app.route("/agent/upload_audio", methods=["POST"])
@@ -865,4 +872,5 @@ def forever_run_server():
 
 
 if __name__ == "__main__":
-    forever_run_server()
+    # forever_run_server()
+    run_server()
