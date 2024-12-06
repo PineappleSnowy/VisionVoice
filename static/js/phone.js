@@ -97,7 +97,9 @@ toggleCamera.addEventListener('click', async () => {
 });
 
 function formChat() {
-    if (speech_rec_ready && image_upload_ready) {
+    /*当开启视频聊天时（videoChat==true），要求speech_rec_ready和image_upload_ready都是true；
+    否则仅要求speech_rec_ready是true*/
+    if (speech_rec_ready && (image_upload_ready || ~videoChat)) {
         speech_rec_ready = false;
         image_upload_ready = false;
         if (state == 0) {
@@ -308,7 +310,7 @@ function startAvoidObstacle() {
 }
 
 // 退出功能模式
-function exitFuncModel(){
+function exitFuncModel() {
     if (obstacle_avoid) {
         exit_obstacle_void()
     }
@@ -615,7 +617,7 @@ window.onload = async () => {
 
         // 根据语音识别的结果执行不同的任务
         if (rec_result.includes("避") || rec_result.includes("模")) {  // 加强鲁棒性
-            
+
             startAvoidObstacle()  // 进入避障模式
         }
         if (rec_result.includes("寻")) {
