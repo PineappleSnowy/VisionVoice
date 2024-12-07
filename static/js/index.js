@@ -62,7 +62,7 @@ const handleLogin = () => {
                 if (data.code === 200) {
                     localStorage.setItem('token', data.access_token);
                     localStorage.setItem('username', username);
-                    localStorage.setItem('nickname', data.nickname);
+                    localStorage.setItem('nickname', data.user_info.nickname);
                     loginMessage.textContent = data.message;
                     loginMessage.className = 'message success';
                     loginMessage.style.display = 'block';
