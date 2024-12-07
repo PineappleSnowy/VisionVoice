@@ -6,7 +6,6 @@ const socket = io({
     }
 });
 
-// 摄像头开关逻辑
 let stream;
 const toggleCamera = document.querySelector('.toggleCamera');  // 切换摄像头
 const openCamera = document.querySelector('.openCamera');  // 打开摄像头
@@ -54,6 +53,39 @@ function startAudio() {
     audioQueue = [];
 }
 
+// 是否允许打断以及当前功能的状态标识
+const statusDiv = document.querySelector('.controller .status');
+
+// 打断说话的按钮
+const shutUpSpeakButton = document.querySelector('.shutUpSpeak');
+shutUpSpeakButton.addEventListener('click', shutUpAgentSpeak);
+
+// 打断说话实现
+function shutUpAgentSpeak() {
+    stopAudio()
+    startCheckSilenceTimer()
+    finishShutUpStatus()
+}
+
+// 进入打断状态
+function startShutUpStatus() {
+    if (state === 0) {
+        statusDiv.textContent = '点击打断';
+        shutUpSpeakButton.style.display = 'block';
+        waveShape.style.display = 'none';
+    }
+}
+
+// 退出打断状态
+function finishShutUpStatus() {
+    shutUpSpeakButton.style.display = 'none';
+    waveShape.style.display = 'block';
+    statusDiv.textContent = "正在听"
+
+    if (vudio.pause()) { vudio.dance() }
+}
+
+// 摄像头开关逻辑
 openCamera.addEventListener('click', async () => {
     try {
         videoChat = !videoChat;
@@ -97,6 +129,7 @@ openCamera.addEventListener('click', async () => {
 
 });
 
+// 切换前后置摄像头
 toggleCamera.addEventListener('click', async () => {
     if (stream) {
         isFrontCamera = !isFrontCamera;
@@ -124,6 +157,7 @@ toggleCamera.addEventListener('click', async () => {
     }
 });
 
+// 发起大模型请求
 function formChat() {
     /*当开启视频聊天时（videoChat==true），要求speech_rec_ready和image_upload_ready都是true；
     否则仅要求speech_rec_ready是true*/
@@ -229,32 +263,6 @@ html.style.fontSize = (window.innerWidth * 100) / 412 + 'px';
 
 const goBack = document.querySelector('.goBack');
 const hangUp = document.querySelector('.hangUp');
-const statusDiv = document.querySelector('.controller .status');
-
-const shutUpSpeakButton = document.querySelector('.shutUpSpeak');
-shutUpSpeakButton.addEventListener('click', shutUpAgentSpeak);
-
-function shutUpAgentSpeak() {
-    stopAudio()
-    startCheckSilenceTimer()
-    finishShutUpStatus()
-}
-
-function startShutUpStatus() {
-    if (state === 0) {
-        statusDiv.textContent = '点击打断';
-        shutUpSpeakButton.style.display = 'block';
-        waveShape.style.display = 'none';
-    }
-}
-
-function finishShutUpStatus() {
-    shutUpSpeakButton.style.display = 'none';
-    waveShape.style.display = 'block';
-    statusDiv.textContent = "正在听"
-
-    if (vudio.pause()) { vudio.dance() }
-}
 
 /**
  * 用户状态
@@ -325,12 +333,25 @@ function detectSilence(analyser, dataArray) {
 /* 处理音量大小测定 end
 ----------------------------------------------------------*/
 
+// 取消检查静音的计时器
+function stopCheckSilenceTimer() {
+    clearInterval(checkSilenceTimer);
+    checkSilenceTimer = null;
+}
+
+// 启动检查静音的计时器
+function startCheckSilenceTimer() {
+    // 使用 setInterval，每 333ms 检查一次用户是否停止讲话
+    checkSilenceTimer = setInterval(checkSilence, 333);
+}
+
 // 退出避障
 function exit_obstacle_void() {
     state = 0
     obstacle_avoid = false;
     socket.emit("agent_stream_audio", "##<state=1 exit>");
 }
+
 // 退出寻物
 function exit_find_item() {
     state = 0
@@ -338,9 +359,17 @@ function exit_find_item() {
     socket.emit("agent_stream_audio", "##<state=2 exit>");
 }
 
-function stopCheckSilenceTimer() {
-    clearInterval(checkSilenceTimer);
-    checkSilenceTimer = null;
+// 退出功能模式
+function exitFuncModel() {
+    stopAudio()
+    startCheckSilenceTimer()
+    finishShutUpStatus()
+    if (obstacle_avoid) {
+        exit_obstacle_void()
+    }
+    else if (find_item) {
+        exit_find_item()
+    }
 }
 
 // 寻物启动函数
@@ -377,23 +406,6 @@ function startAvoidObstacle() {
     }
 }
 
-function startCheckSilenceTimer() {
-    // 使用 setInterval，每 333ms 检查一次用户是否停止讲话
-    checkSilenceTimer = setInterval(checkSilence, 333);
-}
-
-// 退出功能模式
-function exitFuncModel() {
-    stopAudio()
-    startCheckSilenceTimer()
-    finishShutUpStatus()
-    if (obstacle_avoid) {
-        exit_obstacle_void()
-    }
-    else if (find_item) {
-        exit_find_item()
-    }
-}
 
 window.onload = async () => {
     // 检查 URL 中的查询参数

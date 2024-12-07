@@ -235,7 +235,7 @@ def delete_image():
             break
 
     if file_to_delete is None:
-        return jsonify({'success': False, 'error': 'File not found'}), 400
+        return jsonify({'success': False, 'error': 'File not found'}), 200
 
     file_path = os.path.join(IMAGE_FOLDER, file_to_delete)
 
@@ -243,7 +243,7 @@ def delete_image():
         os.remove(file_path)
         return jsonify({'success': True, 'url': f'/image/{file_to_delete}'}), 200
     except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 400
+        return jsonify({'success': False, 'error': str(e)}), 200
 
 
 # ----- 加载全局变量 -----
