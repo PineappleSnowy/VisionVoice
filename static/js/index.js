@@ -61,7 +61,8 @@ const handleLogin = () => {
             .then(data => {
                 if (data.code === 200) {
                     localStorage.setItem('token', data.access_token);
-                    localStorage.setItem('islogin', 1);
+                    localStorage.setItem('username', username);
+                    localStorage.setItem('nickname', data.nickname);
                     loginMessage.textContent = data.message;
                     loginMessage.className = 'message success';
                     loginMessage.style.display = 'block';
@@ -152,8 +153,13 @@ register_button.addEventListener("click", () => {
                 registerMessage.textContent = data.message;
                 registerMessage.className = 'message success';
                 registerMessage.style.display = 'block';
+
+                // 尝试过使用前端 Cookie 存储信息，但有些用户可能禁用 Cookie
+                // 后端 Cookie 存储信息增加服务器负担，故改用 localStorage 存储信息
                 localStorage.setItem('token', data.access_token);
-                localStorage.setItem('islogin', 1);
+                localStorage.setItem('username', username);
+                localStorage.setItem('nickname', nickname);
+
                 window.location.href = '/agent';
             }).catch(error => {
                 console.error('Error:', error);

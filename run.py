@@ -165,13 +165,7 @@ def square():
 @app.route("/mine", methods=["GET"])
 def mine():
     """我的路由"""
-    if "username" not in session:
-        return redirect("/login")
-    return render_template(
-        "mine.html",
-        username=session["username"],
-        nickname=session.get("nickname", "用户"),
-    )
+    return render_template("mine.html")
 
 
 @app.route("/logout", methods=["GET"])
@@ -523,14 +517,16 @@ def login():
                     access_token = create_access_token(
                         identity=username, expires_delta=False
                     )
-                    session["username"] = username
-                    session["nickname"] = user.get("nickname")
                     return (
                         jsonify(
                             {
                                 "message": "登录成功",
                                 "code": 200,
                                 "access_token": access_token,
+                                "user_info": {
+                                    "username": username,
+                                    "nickname": user.get("nickname"),
+                                },
                             }
                         ),
                         200,
