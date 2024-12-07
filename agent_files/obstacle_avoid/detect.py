@@ -175,29 +175,34 @@ def detect(frame):
     """避障算法实现
 
     Args:
-        frame (cv2.Mat): 用于检测的图片
-    return: 
+        frame(cv2.Mat): 用于检测的图片
+    return:
         返回标签、距离、位置信息
     """
     confidence_threshold = 0.35  # 设置置信度阈值
     results = model(frame)
+    distance_dic = dict()  #用于比较，获取最近障碍物标签以及距离
+    distance_dic_all = dict()  #存储所有障碍物位置信息
     obstacle_info = []
     for i, (x, y, w, h) in enumerate(results[0].boxes.xywh):
         cls_id = int(results[0].boxes.cls[i])  # 获取类别ID
         confidence = results[0].boxes.conf[i]  # 获取置信度
-        label = yolo_classes.get(cls_id, "unknow")  # 获取中文标签（默认未知）
-        zh_label = yolo_classes_en_to_zh[label]
+        if confidence > 0.8:
+            label_0 = yolo_classes.get(cls_id, "unknown")
+            label = yolo_classes_en_to_zh.get(label_0)
+        else:
+            label_0 = "unknown"
+            label = "未知障碍物"
         if confidence > confidence_threshold:
             p = y + h / 2  # 像素坐标
             distance_real = -2.08054369e-12*p**4 + 6.25478630e-09*p**3 - 5.88280567e-06*p**2 + 1.07600182e-03*p + 9.74917750e-01
-            # print(f"{label}:{distance_real}:{p}")  # 输出格式“种类：真实世界距离：像素距离”
-            obstacle_info.append({"label": zh_label, "distant": distance_real.item(), "location": {"tl": (y - h / 2).item(), "w": w.item(), "h": h.item()}})
-            # if distance_real < 1 and x > 180 and x < 320:
-            #     print(f"{distance_real:.1f}米有{label}，请靠右")
-            # elif distance_real < 1 and x > 320 and x < 460:
-                # print(f"{distance_real:.1f}米有{label}，请靠左")
+            distance_dic[label] = distance_real
+            distance_dic_all[label] = [y + h / 2, w, h]
+    label_min, distance_min = min(distance_dic.items(), key=lambda x: x[1])
+    obstacle_info.append({"label": label_min, "distant": distance_min.item(),
+                          "location": {"tl": distance_dic_all[label_min][0].item(), "w": distance_dic_all[label_min][1].item(), "h": distance_dic_all[label_min][2].item()}})
+    # print(f"{label_min}距离{distance_min}:{distance_dic_all[label_min][0]}:{distance_dic_all[label_min][1]}:{distance_dic_all[label_min][2]}")
     return obstacle_info
-
 
 def obstacle_avoid_realize(path):
     frame = cv2.imread(path)
