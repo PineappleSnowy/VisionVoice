@@ -23,7 +23,7 @@ let find_item = false;  // 防止多次启动寻物
 let rec_result = "";
 let speech_rec_ready = false;
 let image_upload_ready = false;
-let audio_stop = false;
+let audio_stop = false;  // 音频阻断标识
 let vudio = null;
 
 // 标识是否正在播放音频
@@ -46,7 +46,6 @@ function stopAudio() {
     audioPlayer.pause()
     audioQueue = [];
     isPlaying = false;
-    vudio.dance()
 }
 
 // 开始音频播放
@@ -232,6 +231,31 @@ const goBack = document.querySelector('.goBack');
 const hangUp = document.querySelector('.hangUp');
 const statusDiv = document.querySelector('.controller .status');
 
+const shutUpSpeakButton = document.querySelector('.shutUpSpeak');
+shutUpSpeakButton.addEventListener('click', shutUpAgentSpeak);
+
+function shutUpAgentSpeak() {
+    stopAudio()
+    startCheckSilenceTimer()
+    finishShutUpStatus()
+}
+
+function startShutUpStatus() {
+    if (state === 0) {
+        statusDiv.textContent = '点击打断';
+        shutUpSpeakButton.style.display = 'block';
+        waveShape.style.display = 'none';
+    }
+}
+
+function finishShutUpStatus() {
+    shutUpSpeakButton.style.display = 'none';
+    waveShape.style.display = 'block';
+    statusDiv.textContent = "正在听"
+
+    if (vudio.pause()) { vudio.dance() }
+}
+
 /**
  * 用户状态
  * 0: 等待说话
@@ -321,12 +345,16 @@ function stopCheckSilenceTimer() {
 
 // 寻物启动函数
 function startFindItem(item_name) {
+    state = 2
     stopCheckSilenceTimer()
     stopAudio()
+    finishShutUpStatus()
+    statusDiv.textContent = "寻物模式";
+    if (vudio.dance()) { vudio.pause() }
+
     document.querySelector('.moreFunctions').style.display = 'none';
     document.querySelector('.endFunc').style.display = 'block';
     closeModalButton.click()
-    state = 2
     if (!videoChat) {
         openCamera.click()
     }
@@ -348,14 +376,17 @@ function startAvoidObstacle() {
         socket.emit("agent_stream_audio", "##<state=1>");
     }
 }
+
 function startCheckSilenceTimer() {
     // 使用 setInterval，每 333ms 检查一次用户是否停止讲话
     checkSilenceTimer = setInterval(checkSilence, 333);
 }
+
 // 退出功能模式
 function exitFuncModel() {
     stopAudio()
     startCheckSilenceTimer()
+    finishShutUpStatus()
     if (obstacle_avoid) {
         exit_obstacle_void()
     }
@@ -417,7 +448,7 @@ window.onload = async () => {
 
                     // 是否录制完毕
                     recordingFinished = true;
-                    statusDiv.textContent = '点击打断';
+                    startShutUpStatus()
 
                 }, SILENCE_DURATION);
             }
@@ -454,7 +485,6 @@ window.onload = async () => {
     startCheckSilenceTimer()
 
     // ----- 音频波形可视化 start -----
-    const waveShape = document.querySelector('#waveShape');
     vudio = new window.Vudio(audioStream, waveShape, {
         effect: 'waveform',
         accuracy: 16,
@@ -558,10 +588,6 @@ window.onload = async () => {
                 playNextAudio();
             }
 
-            // 如果正在播放音频，则暂停波形图动画（波形动画暂停表示大模型正在讲话）
-            if (isPlaying) {
-                vudio.pause();
-            }
         }
     });
 
@@ -578,15 +604,11 @@ window.onload = async () => {
             if (state === 0) {
                 // 开始检测用户是否正在说话
                 startCheckSilenceTimer()
+                // 设置音频动画状态
+                finishShutUpStatus()
             }
 
             console.log('[phone.js][playNextAudio] 音频队列中没有音频数据，停止播放...');
-
-            statusDiv.textContent = '正在听';
-            // 如果波形图动画处于暂停状态，则开始播放（波形动画启动表示用户可以讲话）
-            if (vudio.paused()) {
-                vudio.dance();
-            }
 
             return;
         }
@@ -616,6 +638,7 @@ window.onload = async () => {
             }).catch(error => {
                 console.log('[phone.js][playNextAudio] 音频片段播放失败.', error);
             });
+            startShutUpStatus()
         } else {
             // 如果当前音频为空，继续播放下一个
             playNextAudio();
