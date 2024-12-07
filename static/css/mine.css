@@ -99,3 +99,13 @@ body {
 .option:hover {
     background-color: #444;
 }
+
+.logout {
+    background-color: #d32f2f;
+    color: white;
+    margin-top: 20px;
+}
+
+.logout:hover {
+    background-color: #b71c1c;
+}
