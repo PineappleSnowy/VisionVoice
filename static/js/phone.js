@@ -1,3 +1,6 @@
+import { detectDB } from './lib/audioUtils.js';
+import { initAudioAnalyser } from './lib/audioUtils.js';
+
 // 创建socket连接，并附上token用于后端验证
 const token = localStorage.getItem('token');
 const socket = io({
@@ -279,27 +282,6 @@ hangUp.addEventListener('click', () => {
     window.location.href = '/agent';
 });
 
-/**
- * @function initAudioAnalyser
- * @description 初始化音频分析器
- * @param {MediaStream} stream 音频流
- * @returns {Object} 音频分析器和数据数组
- */
-async function initAudioAnalyser(stream) {
-    const audioContext = new AudioContext();
-    const analyser = audioContext.createAnalyser();
-    const microphone = audioContext.createMediaStreamSource(stream);
-    microphone.connect(analyser);
-    analyser.fftSize = 2048;
-    const bufferLength = analyser.frequencyBinCount;
-    const dataArray = new Float32Array(bufferLength);
-
-    return {
-        analyser,
-        dataArray
-    };
-}
-
 /* 处理音量大小测定 start
 ----------------------------------------------------------*/
 
@@ -428,6 +410,13 @@ window.onload = async () => {
         openCamera.click();
     }
 
+    // 音频上下文
+    let audioContext;
+    // 录制器
+    let rec;
+    // 音频流
+    let input;
+
     // 获取音频流
     let audioStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
     console.log("[phone.js][window.onload] 创建 getUserMedia 音频流成功...");
@@ -537,10 +526,10 @@ window.onload = async () => {
         if (state == 0) {
             captureAndSendFrame()
         }
-        // 创建新的音频上下文，这是Web Audio API的核心对象
+        // 创建新的音频上下文，这是 Web Audio API 的核心对象
         audioContext = new AudioContext();
 
-        // 将麦克风的音频流(stream)转换为音频源节点
+        // 将麦克风的音频流 (stream) 转换为音频源节点
         input = audioContext.createMediaStreamSource(audioStream);
 
         // 创建一个新的 Recorder 实例，用于录制音频
