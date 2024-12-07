@@ -7,7 +7,16 @@ import cv2
 import time
 import os
 from datetime import timedelta
-from flask import Flask, send_from_directory, stream_with_context, render_template, request, jsonify
+from flask import (
+    Flask,
+    send_from_directory,
+    stream_with_context,
+    render_template,
+    request,
+    jsonify,
+    redirect,
+    session,
+)
 from flask_socketio import SocketIO
 from flask_cors import CORS
 import numpy as np
@@ -32,6 +41,7 @@ from agent_files.obstacle_avoid.detect import obstacle_avoid_realize
 
 # ----- 加载全局应用 -----
 app = Flask(__name__)
+app.secret_key = "s96cae35ce8a9b0244178bf28e4966c2ce1b83"
 socketio = SocketIO(app, async_mode="threading")
 JWTManager(app)
 CORS(app)
@@ -57,34 +67,46 @@ USER_VAR = dict()
 @app.before_request
 def before_request():
     # 排除 GET 请求的 JWT 验证
-    if request.path == "/agent/chat_stream" or request.path == "/agent/upload_audio" or request.path == "/agent/upload_image":
+    if (
+        request.path == "/agent/chat_stream"
+        or request.path == "/agent/upload_audio"
+        or request.path == "/agent/upload_image"
+    ):
         try:
             verify_jwt_in_request()
         except Exception as e:
             return (
                 jsonify(
-                    {"message": "Token has expired!",
-                        "code": 401, "error": str(e)}
+                    {"message": "Token has expired!", "code": 401, "error": str(e)}
                 ),
                 401,
             )
 
     # 允许访问的静态资源路径
-    allowed_paths = ["/static/css", "/static/js", "/static/images",
-                     "/image", "/static/favicon.ico", "/static/manifest.json"]
+    allowed_paths = [
+        "/static/css",
+        "/static/js",
+        "/static/images",
+        "/image",
+        "/static/favicon.ico",
+        "/static/manifest.json",
+    ]
 
     # 获取所有已注册的路由
     registered_routes = [rule.rule for rule in app.url_map.iter_rules()]
 
     # 检查请求路径是否在允许的静态资源路径或已注册的路由中
-    if not any(request.path.startswith(path) for path in allowed_paths) and request.path not in registered_routes:
+    if (
+        not any(request.path.startswith(path) for path in allowed_paths)
+        and request.path not in registered_routes
+    ):
         return jsonify({"message": "Forbidden", "code": 403}), 403
 
 
 # 断开连接时删除用户变量
-@socketio.on('disconnect')
+@socketio.on("disconnect")
 def handle_disconnect():
-    token = request.args.get('token')
+    token = request.args.get("token")
     if token:
         request.headers = {"Authorization": f"Bearer {token}"}
         try:
@@ -146,10 +168,16 @@ def mine():
     return render_template("mine.html")
 
 
+@app.route("/logout", methods=["GET"])
+def logout():
+    session.clear()
+    return redirect("/login")
+
+
 """寻物画廊路由"""
 
 # 设置图片文件夹路径
-IMAGE_FOLDER = './user_images/images'
+IMAGE_FOLDER = "./user_images/images"
 
 
 @app.route("/photo_manage", methods=["GET"])
@@ -158,29 +186,26 @@ def photo_manage():
     return render_template("photo_manage.html")
 
 
-@app.route('/images', methods=['GET'])
+@app.route("/images", methods=["GET"])
 def get_images():
     images = []
     for filename in os.listdir(IMAGE_FOLDER):
-        if filename.endswith(('.png', '.jpg', '.jpeg', '.gif')):
+        if filename.endswith((".png", ".jpg", ".jpeg", ".gif")):
             name, ext = os.path.splitext(filename)
-            images.append({
-                'name': name,
-                'url': f'/image/{filename}'
-            })
+            images.append({"name": name, "url": f"/image/{filename}"})
     return jsonify(images)
 
 
-@app.route('/image/<filename>', methods=['GET'])
+@app.route("/image/<filename>", methods=["GET"])
 def get_image(filename):
     return send_from_directory(IMAGE_FOLDER, filename)
 
 
-@app.route('/rename_image', methods=['POST'])
+@app.route("/rename_image", methods=["POST"])
 def rename_image():
     data = request.get_json()
-    old_name = data['oldName']
-    new_name = data['newName']
+    old_name = data["oldName"]
+    new_name = data["newName"]
 
     # 查找旧文件名对应的文件
     old_file = None
@@ -191,40 +216,44 @@ def rename_image():
             break
 
     if old_file is None:
-        return jsonify({'success': False, 'error': 'Old file not found'}), 400
+        return jsonify({"success": False, "error": "Old file not found"}), 400
 
     old_path = os.path.join(IMAGE_FOLDER, old_file)
-    new_path = os.path.join(IMAGE_FOLDER, new_name +
-                            os.path.splitext(old_file)[1])
+    new_path = os.path.join(IMAGE_FOLDER, new_name + os.path.splitext(old_file)[1])
 
     try:
         os.rename(old_path, new_path)
-        return jsonify({'success': True}), 200
+        return jsonify({"success": True}), 200
     except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 400
+        return jsonify({"success": False, "error": str(e)}), 400
 
 
-@app.route('/save_item_image', methods=['POST'])
+@app.route("/save_item_image", methods=["POST"])
 def save_item_image():
-    if 'file' not in request.files:
-        return jsonify({'success': False, 'error': 'No file part'}), 400
-    file = request.files['file']
+    if "file" not in request.files:
+        return jsonify({"success": False, "error": "No file part"}), 400
+    file = request.files["file"]
     filename = file.filename
-    if filename == '':
-        return jsonify({'success': False, 'error': 'No selected file'}), 400
+    if filename == "":
+        return jsonify({"success": False, "error": "No selected file"}), 400
     if file:
         if os.path.exists(os.path.join(IMAGE_FOLDER, filename)):
-            return jsonify({'success': False, 'error': 'File already exists'}), 400
+            return jsonify({"success": False, "error": "File already exists"}), 400
         file.save(os.path.join(IMAGE_FOLDER, filename))
         name, ext = os.path.splitext(filename)
-        return jsonify({'success': True, 'image_name': name, 'image_url': f"/image/{filename}"}), 200
-    return jsonify({'success': False, 'error': 'File upload failed'}), 400
+        return (
+            jsonify(
+                {"success": True, "image_name": name, "image_url": f"/image/{filename}"}
+            ),
+            200,
+        )
+    return jsonify({"success": False, "error": "File upload failed"}), 400
 
 
-@app.route('/delete_image', methods=['POST'])
+@app.route("/delete_image", methods=["POST"])
 def delete_image():
     data = request.get_json()
-    name = data['name']
+    name = data["name"]
 
     # 查找文件名对应的文件
     file_to_delete = None
@@ -235,15 +264,15 @@ def delete_image():
             break
 
     if file_to_delete is None:
-        return jsonify({'success': False, 'error': 'File not found'}), 400
+        return jsonify({"success": False, "error": "File not found"}), 400
 
     file_path = os.path.join(IMAGE_FOLDER, file_to_delete)
 
     try:
         os.remove(file_path)
-        return jsonify({'success': True, 'url': f'/image/{file_to_delete}'}), 200
+        return jsonify({"success": True, "url": f"/image/{file_to_delete}"}), 200
     except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 400
+        return jsonify({"success": False, "error": str(e)}), 400
 
 
 # ----- 加载全局变量 -----
@@ -260,10 +289,10 @@ MAX_HISTORY = 10  # 较多的聊天记录长度会导致较多的token消耗
 
 # ----- 预定义函数 -----
 
+
 def save_chat_history(current_user, agent_name, messages):
     # 对聊天记录进行编码
-    encoded_messages = [encode_message_content(
-        msg.copy()) for msg in messages]
+    encoded_messages = [encode_message_content(msg.copy()) for msg in messages]
 
     # 更新用户聊天记录
     with open("./static/user.json", "r+", encoding="utf-8") as f:
@@ -288,7 +317,7 @@ def predict(current_user, agent_name, messages, responses):
         finish_reason = response.choices[0].finish_reason
         text = response.choices[0].delta.content
         # 当用户输入的内容违规时输出“我听不懂你在说什么”
-        if (finish_reason == "sensitive"):
+        if finish_reason == "sensitive":
             text = "我听不懂你在说什么\n"
         response_all += text
         yield text
@@ -368,8 +397,7 @@ def encode_message_content(message):
     """对消息内容进行 Base64 编码"""
     if isinstance(message, dict) and "content" in message:
         content = message["content"]
-        encoded_content = base64.b64encode(
-            content.encode("utf-8")).decode("utf-8")
+        encoded_content = base64.b64encode(content.encode("utf-8")).decode("utf-8")
         message["content"] = encoded_content
     return message
 
@@ -393,16 +421,17 @@ def register():
     data = request.get_json()
     username = data.get("username")
     password = data.get("password")
+    nickname = data.get("nickname")
 
-    print("注册信息：\n用户名：{}\n密码：{}".format(username, password))
-
-    # 验证用户名和密码格式
-    if not username or not password:
-        return jsonify({"message": "用户名和密码不能为空", "code": 400}), 400
+    print(
+        "注册信息：\n用户名：{}\n密码：{}\n昵称：{}".format(
+            username, password, nickname
+        )
+    )
 
     if len(username) < 3 or len(password) < 6:
         return (
-            jsonify({"message": "用户名长度至少3位,密码长度至少6位", "code": 400}),
+            jsonify({"message": "用户名长度至少3位，密码长度至少6位", "code": 400}),
             400,
         )
 
@@ -418,11 +447,29 @@ def register():
             # 注册完后向用户信息中添加预设智能体，此处可以后续智能体定制兼容
             sys_prompt = "你是视界之声，一位乐于助人的对话助手。为了能让用户能尽快解决问题，你的话语总是十分简洁而概要。"
             background_info = "（旁白：苏梦远主演了陆星辰导演的一部音乐题材电影，在拍摄期间，两人因为一场戏的表现有分歧。） 导演，关于这场戏，我觉得可以尝试从角色的内心情感出发，让表现更加真实。"
-            users.append({"username": username, "password": password,
-                         "agents":
-                          {"defaultAgent": {"chat_history": [{"role": "system", "content": sys_prompt},
-                                                             {"role": "assistant", "content": "我是视界之声，你的生活助手，有什么我可以帮你的么？"}]},
-                           "psychologicalAgent": {"chat_history": [{"role": "assistant", "content": background_info}]}}})
+            users.append(
+                {
+                    "username": username,
+                    "password": password,
+                    "nickname": nickname,
+                    "agents": {
+                        "defaultAgent": {
+                            "chat_history": [
+                                {"role": "system", "content": sys_prompt},
+                                {
+                                    "role": "assistant",
+                                    "content": "我是视界之声，你的生活助手，有什么我可以帮你的么？",
+                                },
+                            ]
+                        },
+                        "psychologicalAgent": {
+                            "chat_history": [
+                                {"role": "assistant", "content": background_info}
+                            ]
+                        },
+                    },
+                }
+            )
 
             print("用户注册成功：\n用户名：{}\n密码：{}".format(username, password))
 
@@ -431,7 +478,15 @@ def register():
             json.dump(users, f, indent=4, ensure_ascii=False)
             f.truncate()
 
-        return jsonify({"message": "注册成功", "code": 200}), 200
+        # 注册成功后直接生成 token
+        access_token = create_access_token(identity=username, expires_delta=False)
+        session["username"] = username
+        session["nickname"] = nickname
+
+        return (
+            jsonify({"message": "注册成功", "code": 200, "access_token": access_token}),
+            200,
+        )
 
     except Exception as e:
         return jsonify({"message": f"注册失败: {str(e)}", "code": 500}), 500
@@ -440,37 +495,51 @@ def register():
 @app.post("/login")
 def login():
     """登录路由"""
-    # 读取用户信息
-    with open("./static/user.json", "r", encoding="utf-8") as f:
-        users = json.load(f)
-
     # 获取前端传来的用户名和密码
     data = request.get_json()
     username = data.get("username")
     password = data.get("password")
 
-    print("登录信息：\n用户名：{}\n密码：{}".format(username, password))
+    try:
+        # 读取用户信息
+        with open("./static/user.json", "r", encoding="utf-8") as f:
+            users = json.load(f)
 
-    # 对比用户信息
-    for user in users:
-        logging.info(
-            "run.py",
-            "login",
-            "用户名：" + user["username"] + "密码：" + user["password"],
-        )
-        if user["username"] == username and user["password"] == password:
-            print("登录成功")
-            # 设置 local token
-            access_token = create_access_token(
-                identity=username, expires_delta=False
-            )
-            return (
-                jsonify(
-                    {"message": "登录成功", "code": 200, "access_token": access_token}
-                ),
-                200,
-            )
-    return jsonify({"message": "账号或密码错误", "code": 400}), 400
+        # 检查用户是否存在
+        user_exists = False
+        for user in users:
+            if user["username"] == username:
+                user_exists = True
+                # 检查密码是否正确
+                if user["password"] == password:
+                    print("登录成功")
+                    # 设置 local token
+                    access_token = create_access_token(
+                        identity=username, expires_delta=False
+                    )
+                    return (
+                        jsonify(
+                            {
+                                "message": "登录成功",
+                                "code": 200,
+                                "access_token": access_token,
+                                "user_info": {
+                                    "username": username,
+                                    "nickname": user.get("nickname"),
+                                },
+                            }
+                        ),
+                        200,
+                    )
+                else:
+                    return jsonify({"message": "密码错误", "code": 400}), 400
+
+        if not user_exists:
+            return jsonify({"message": "用户不存在", "code": 400}), 400
+
+    except Exception as e:
+        logging.error("run.py", "login", f"登录失败: {str(e)}")
+        return jsonify({"message": f"出错了，请联系工作人员！", "code": 500}), 500
 
 
 @app.route("/verify-token", methods=["POST"])
@@ -524,8 +593,7 @@ def get_chat_history():
         return jsonify({"error": str(e)}), 401
 
     # 对聊天记录进行解码
-    chat_history = [decode_message_content(
-        msg.copy()) for msg in encoded_chat_history]
+    chat_history = [decode_message_content(msg.copy()) for msg in encoded_chat_history]
 
     return jsonify(chat_history)
 
@@ -542,8 +610,7 @@ def init_chat_history(current_user, agent_name, messages):
                 encoded_chat_history = user["agents"][agent_name]["chat_history"]
                 break
     # 对聊天记录进行解码
-    messages = [decode_message_content(msg.copy())
-                for msg in encoded_chat_history]
+    messages = [decode_message_content(msg.copy()) for msg in encoded_chat_history]
 
     return messages
 
@@ -556,14 +623,21 @@ def build_response(current_user, agent_name, user_talk, video_open):
 
         dst_messages = message_format_tran(messages[-MAX_HISTORY:])
         if os.path.exists(IAMGE_SAVE_PATH):
-            with open(IAMGE_SAVE_PATH, 'rb') as img_file:
-                img_base = base64.b64encode(img_file.read()).decode('utf-8')
-            dst_messages.append({"role": "user",
-                                "content": [{"type": "image_url", "image_url": {"url": img_base}},
-                                            {"type": "text", "text": "请描述这个图片"}]})
+            with open(IAMGE_SAVE_PATH, "rb") as img_file:
+                img_base = base64.b64encode(img_file.read()).decode("utf-8")
+            dst_messages.append(
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "image_url", "image_url": {"url": img_base}},
+                        {"type": "text", "text": "请描述这个图片"},
+                    ],
+                }
+            )
         else:
-            dst_messages.append({"role": "user",
-                                "content": [{"type": "text", "text": user_talk}]})
+            dst_messages.append(
+                {"role": "user", "content": [{"type": "text", "text": user_talk}]}
+            )
             print(f"未找到图片{IAMGE_SAVE_PATH}！")
         # 保存和多模态大模型的聊天
         messages.append({"role": "user", "content": user_talk})
@@ -625,7 +699,8 @@ def agent_chat_stream():
     current_user = get_jwt_identity()
 
     responses, messages = build_response(
-        current_user, agent_name, user_talk, video_open)
+        current_user, agent_name, user_talk, video_open
+    )
 
     generate = predict(current_user, agent_name, messages, responses)
     return app.response_class(
@@ -720,8 +795,7 @@ def agent_upload_audio():
     print("音频识别结果：", rec_result)
 
     # 音频识别结果发送到前端
-    socketio.emit("agent_speech_recognition_finished",
-                  {"rec_result": rec_result})
+    socketio.emit("agent_speech_recognition_finished", {"rec_result": rec_result})
 
     return jsonify({"message": "File uploaded successfully and processed"}), 200
 
@@ -735,7 +809,7 @@ def agent_stream_audio(current_token: str):
         current_token {str} 从前端发来的当前 token
     """
     # 检测socket的token，为了可以调用get_jwt_identity()
-    token = request.args.get('token')
+    token = request.args.get("token")
     if token:
         request.headers = {"Authorization": f"Bearer {token}"}
         try:
@@ -753,28 +827,23 @@ def agent_stream_audio(current_token: str):
     # 功能性处理
     if "##" in current_token:
         if current_token == "##<state=1>":
-            socketio.emit(
-                "obstacle_avoid",
-                {"flag": "begin"}
-            )
+            socketio.emit("obstacle_avoid", {"flag": "begin"})
             audio_file_path = ".cache/obstacle_start.wav"
         elif "##<state=2>" in current_token:
-            socketio.emit(
-                "find_item",
-                {"flag": "begin"}
+            socketio.emit("find_item", {"flag": "begin"})
+            audio_chunk = agent_audio_generate(
+                current_token[current_token.find(">") + 1 :]
             )
-            audio_chunk = agent_audio_generate(current_token[current_token.find('>')+1: ])
             audio_file_path = ""
         else:
             return
-        
+
         if audio_file_path:
             with open(audio_file_path, "rb") as audio_file:
                 audio_chunk = audio_file.read()
-                
+
         socketio.emit(
-            "agent_play_audio_chunk",
-            {"index": 0, "audio_chunk": audio_chunk}
+            "agent_play_audio_chunk", {"index": 0, "audio_chunk": audio_chunk}
         )
 
     else:
@@ -792,14 +861,14 @@ def agent_stream_audio(current_token: str):
 
         # 如果收到结束标记
         if "<END>" in current_token:
-            logging.info("run.py", "agent_stream_audio",
-                         "大模型响应结束", color="red")
+            logging.info("run.py", "agent_stream_audio", "大模型响应结束", color="red")
 
             # 处理缓冲区中剩余的内容
             if USER_VAR[user]["sentence_buffer"]:
                 # 将剩余内容加入任务队列
                 USER_VAR[user]["task_queue"].add_task_sync(
-                    agent_audio_generate, USER_VAR[user]["sentence_buffer"])
+                    agent_audio_generate, USER_VAR[user]["sentence_buffer"]
+                )
 
             # 重置状态
             USER_VAR[user]["is_streaming"] = False
@@ -815,15 +884,17 @@ def agent_stream_audio(current_token: str):
             return
 
         # 如果找到断句符号，则生成完整句子
-        complete_sentence = USER_VAR[user]["sentence_buffer"] + \
-            current_token[:pause_index + 1]
+        complete_sentence = (
+            USER_VAR[user]["sentence_buffer"] + current_token[: pause_index + 1]
+        )
 
         # 更新缓冲区
-        USER_VAR[user]["sentence_buffer"] = current_token[pause_index + 1:]
+        USER_VAR[user]["sentence_buffer"] = current_token[pause_index + 1 :]
 
         # 将音频生成任务加入队列
         USER_VAR[user]["task_queue"].add_task_sync(
-            agent_audio_generate, complete_sentence)
+            agent_audio_generate, complete_sentence
+        )
 
 
 def process_audio_stream(user):
@@ -837,13 +908,18 @@ def process_audio_stream(user):
                 # 发送到前端
                 socketio.emit(
                     "agent_play_audio_chunk",
-                    {"index": USER_VAR[user]["sentence_index"],
-                        "audio_chunk": audio_chunk}
+                    {
+                        "index": USER_VAR[user]["sentence_index"],
+                        "audio_chunk": audio_chunk,
+                    },
                 )
                 USER_VAR[user]["sentence_index"] += 1
 
             # 如果流式响应结束且没有更多任务，退出循环
-            if not USER_VAR[user]["is_streaming"] and USER_VAR[user]["task_queue"].is_empty():
+            if (
+                not USER_VAR[user]["is_streaming"]
+                and USER_VAR[user]["task_queue"].is_empty()
+            ):
                 break
 
         except Exception as e:
@@ -860,7 +936,7 @@ def run_server():
             port=80,
             host="0.0.0.0",
             allow_unsafe_werkzeug=True,
-            # debug=True,  # 调试模式（开发环境）
+            debug=True,  # 调试模式（开发环境）
         )
     else:
         socketio.run(
