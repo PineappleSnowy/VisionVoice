@@ -758,10 +758,6 @@ def agent_stream_audio(current_token: str):
                 {"flag": "begin"}
             )
             audio_file_path = ".cache/obstacle_start.wav"
-
-        elif current_token == "##<state=1 exit>":
-            audio_file_path = ".cache/obstacle_end.wav"
-
         elif "##<state=2>" in current_token:
             socketio.emit(
                 "find_item",
@@ -769,10 +765,6 @@ def agent_stream_audio(current_token: str):
             )
             audio_chunk = agent_audio_generate(current_token[current_token.find('>')+1: ])
             audio_file_path = ""
-
-        elif current_token == "##<state=2 exit>":
-            audio_file_path = ".cache/find_end.wav"
-
         else:
             return
         
