@@ -67,14 +67,6 @@ html body .controller .hangUp {
   font-size: 0.5rem;
 }
 
-html body .controller .findItem {
-  position: absolute;
-  left: 50%;
-  bottom: 0.63rem;
-  font-size: 0.5rem;
-  transform: translateX(-50%);
-}
-
 html body .moreFunctions {
   position: absolute;
   left: 50%;
@@ -234,8 +226,4 @@ p {
   display: flex;
   flex-direction: column;
   align-items: center;
-}
-
-.optionButton i {
-  font-size: 0.4rem;
 }

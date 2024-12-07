@@ -770,6 +770,9 @@ def agent_stream_audio(current_token: str):
             audio_chunk = agent_audio_generate(current_token[current_token.find('>')+1: ])
             audio_file_path = ""
 
+        elif current_token == "##<state=2 exit>":
+            audio_file_path = ".cache/find_end.wav"
+
         else:
             return
         

@@ -341,22 +341,22 @@ function stopCheckSilenceTimer() {
 
 // 启动检查静音的计时器
 function startCheckSilenceTimer() {
-    // 使用 setInterval，每 333ms 检查一次用户是否停止讲话
-    checkSilenceTimer = setInterval(checkSilence, 333);
+    // 使用 setInterval，每隔一段时间（ms）检查一次用户是否停止讲话
+    checkSilenceTimer = setInterval(checkSilence, 100);
 }
 
 // 退出避障
 function exit_obstacle_void() {
     state = 0
     obstacle_avoid = false;
-    socket.emit("agent_stream_audio", "##<state=1 exit>");
+    // socket.emit("agent_stream_audio", "##<state=1 exit>");
 }
 
 // 退出寻物
 function exit_find_item() {
     state = 0
     find_item = false;
-    socket.emit("agent_stream_audio", "##<state=2 exit>");
+    // socket.emit("agent_stream_audio", "##<state=2 exit>");
 }
 
 // 退出功能模式
@@ -372,6 +372,28 @@ function exitFuncModel() {
     }
 }
 
+// 避障启动函数
+function startAvoidObstacle() {
+    state = 1;
+    stopCheckSilenceTimer()
+    stopAudio()
+    finishShutUpStatus()
+    statusDiv.textContent = "避障模式";
+    if (vudio.dance()) { vudio.pause() }
+
+    document.querySelector('.moreFunctions').style.display = 'none';
+    document.querySelector('.endFunc').style.display = 'block';
+
+    if (!videoChat) {
+        openCamera.click()
+    }
+    if (!obstacle_avoid) {
+        obstacle_avoid = true;
+        startAudio()
+        socket.emit("agent_stream_audio", "##<state=1>");
+    }
+}
+
 // 寻物启动函数
 function startFindItem(item_name) {
     state = 2
@@ -383,6 +405,7 @@ function startFindItem(item_name) {
 
     document.querySelector('.moreFunctions').style.display = 'none';
     document.querySelector('.endFunc').style.display = 'block';
+
     closeModalButton.click()
     if (!videoChat) {
         openCamera.click()
@@ -391,18 +414,6 @@ function startFindItem(item_name) {
         find_item = true;
         startAudio()
         socket.emit("agent_stream_audio", `##<state=2>开始寻找${item_name}`);
-    }
-}
-
-// 避障启动函数
-function startAvoidObstacle() {
-    state = 1;
-    if (!videoChat) {
-        openCamera.click()
-    }
-    if (!obstacle_avoid) {
-        obstacle_avoid = true;
-        socket.emit("agent_stream_audio", "##<state=1>");
     }
 }
 
@@ -644,6 +655,9 @@ window.onload = async () => {
             // 设置音频播放器元素的播放源
             audioPlayer.src = audioURL;
 
+            // 音频播放前先确认静音定时器取消
+            stopCheckSilenceTimer() 
+
             // 播放音频
             audioPlayer.play().then(() => {
                 console.log('[phone.js][playNextAudio] 音频片段播放中...');
@@ -687,21 +701,14 @@ window.onload = async () => {
 
         // 根据语音识别的结果执行不同的任务
         if (rec_result.includes("避") || rec_result.includes("模")) {  // 加强鲁棒性
-
             startAvoidObstacle()  // 进入避障模式
         }
+
         if (rec_result.includes("寻")) {
-            if (!videoChat) {
-                openCamera.click()
-            }
-            findItemButton.click()  // 进入寻物模式
+            startFindItem()  // 进入寻物模式
         }
 
-        else if (rec_result.includes("退出")) {
-            exitFuncModel()
-            return;
-        }
-
+        // 仅当对话模式是修改speech_rec_ready为true
         if (state == 0) {
             speech_rec_ready = true;
             formChat()
@@ -751,6 +758,14 @@ window.onload = async () => {
         exitFuncModel()
     });
 
+    // 避障逻辑
+    document.querySelector('.optionButton.findItem');
+    const obstacleAvoidButton = document.querySelector('.optionButton.avoidObstacle');
+    obstacleAvoidButton.addEventListener('click', () => {
+        closeOptionsBar();
+        startAvoidObstacle();
+    });
+
     // 寻物逻辑
     const findItemModal = document.getElementById('findItemModal');
     const closeModalButton = document.getElementById('closeModalButton');
@@ -771,15 +786,6 @@ window.onload = async () => {
         while (gallery.firstChild) {
             gallery.removeChild(gallery.firstChild);
         }
-    });
-
-    // 其他功能按钮的逻辑
-    const otherButtons = document.querySelectorAll('.optionButton:not(.findItem)');
-    otherButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            // 在这里添加其他按钮的功能逻辑
-            closeOptionsBar();
-        });
     });
 
     function loadGallery() {
