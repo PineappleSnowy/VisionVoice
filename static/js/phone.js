@@ -286,6 +286,8 @@ function exit_find_item() {
 
 // 寻物启动函数
 function startFindItem(item_name) {
+    document.querySelector('.moreFunctions').style.display = 'none';
+    document.querySelector('.endFunc').style.display = 'block';
     closeModalButton.click()
     state = 2
     if (!videoChat) {
@@ -669,18 +671,30 @@ window.onload = async () => {
         }
     });
     
+    function closeOptionsBar() {
+        optionsBar.style.display = 'none';
+    }
+
+    // 退出功能键逻辑
+    const endFuncButton = document.querySelector('.endFunc');
+    endFuncButton.addEventListener('click', () => {
+        moreFunctionsButton.style.display = 'block';
+        endFuncButton.style.display = 'none';
+    });
+    
     // 寻物逻辑
     const findItemModal = document.getElementById('findItemModal');
     const closeModalButton = document.getElementById('closeModalButton');
     const overlay = document.getElementById('overlay');
-
+    
     const findItemButton = document.querySelector('.optionButton.findItem');
     findItemButton.addEventListener('click', () => {
         overlay.style.display = 'block';
         findItemModal.style.display = 'block';
         loadGallery();
+        closeOptionsBar();
     });
-
+    
     closeModalButton.addEventListener('click', () => {
         overlay.style.display = 'none';
         findItemModal.style.display = 'none';
@@ -689,7 +703,16 @@ window.onload = async () => {
             gallery.removeChild(gallery.firstChild);
         }
     });
-
+    
+    // 其他功能按钮的逻辑
+    const otherButtons = document.querySelectorAll('.optionButton:not(.findItem)');
+    otherButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            // 在这里添加其他按钮的功能逻辑
+            closeOptionsBar();
+        });
+    });
+    
     function loadGallery() {
         fetch('/images')
             .then(response => response.json())
