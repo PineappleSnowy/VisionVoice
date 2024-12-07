@@ -13,3 +13,6 @@
 
 # less 文件
 *.less
+
+# yolo大体积模型
+yolo11x-seg.pt

@@ -657,12 +657,24 @@ window.onload = async () => {
     /* 处理音频识别 end 
     ------------------------------------------------------------*/
 
+    // 功能键逻辑
+    const moreFunctionsButton = document.querySelector('.moreFunctions');
+    const optionsBar = document.querySelector('.optionsBar');
+    
+    moreFunctionsButton.addEventListener('click', () => {
+        if (optionsBar.style.display === 'none' || optionsBar.style.display === '') {
+            optionsBar.style.display = 'flex';
+        } else {
+            optionsBar.style.display = 'none';
+        }
+    });
+    
     // 寻物逻辑
-    const findItemButton = document.querySelector('.findItem');
     const findItemModal = document.getElementById('findItemModal');
     const closeModalButton = document.getElementById('closeModalButton');
     const overlay = document.getElementById('overlay');
 
+    const findItemButton = document.querySelector('.optionButton.findItem');
     findItemButton.addEventListener('click', () => {
         overlay.style.display = 'block';
         findItemModal.style.display = 'block';
