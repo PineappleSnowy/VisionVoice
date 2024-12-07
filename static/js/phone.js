@@ -23,6 +23,37 @@ let find_item = false;  // 防止多次启动寻物
 let rec_result = "";
 let speech_rec_ready = false;
 let image_upload_ready = false;
+let audio_stop = false;
+let vudio = null;
+
+// 标识是否正在播放音频
+let isPlaying = false;
+// 检查静音的定时器
+let checkSilenceTimer = null;
+
+// 获取音频播放器 DOM 元素
+const audioPlayer = document.getElementById('audioPlayer');
+
+// 用于存放音频的队列
+let audioQueue = [];
+
+// 全局定义checkSilence，防止未定义错误
+function checkSilence() { }
+
+// 停止音频播放
+function stopAudio() {
+    audio_stop = true;
+    audioPlayer.pause()
+    audioQueue = [];
+    isPlaying = false;
+    vudio.dance()
+}
+
+// 开始音频播放
+function startAudio() {
+    audio_stop = false;
+    audioQueue = [];
+}
 
 openCamera.addEventListener('click', async () => {
     try {
@@ -49,9 +80,7 @@ openCamera.addEventListener('click', async () => {
             toggleCamera.style.color = 'white';
         } else {
             // 关闭摄像头时退出避障模式
-            if (state == 1) {
-                exit_obstacle_void()
-            }
+            exitFuncModel()
 
             stream.getTracks().forEach((track) => {
                 track.stop();
@@ -104,6 +133,7 @@ function formChat() {
         image_upload_ready = false;
         if (state == 0) {
             const token = localStorage.getItem('token');
+            startAudio()
             fetch(`/agent/chat_stream?query=${rec_result}&agent=${selectedAgent}&videoOpen=${videoChat}`, {
                 headers: {
                     "Authorization": `Bearer ${token}`
@@ -284,8 +314,15 @@ function exit_find_item() {
     socket.emit("agent_stream_audio", "##<state=2 exit>");
 }
 
+function stopCheckSilenceTimer() {
+    clearInterval(checkSilenceTimer);
+    checkSilenceTimer = null;
+}
+
 // 寻物启动函数
 function startFindItem(item_name) {
+    stopCheckSilenceTimer()
+    stopAudio()
     document.querySelector('.moreFunctions').style.display = 'none';
     document.querySelector('.endFunc').style.display = 'block';
     closeModalButton.click()
@@ -295,6 +332,7 @@ function startFindItem(item_name) {
     }
     if (!find_item) {
         find_item = true;
+        startAudio()
         socket.emit("agent_stream_audio", `##<state=2>开始寻找${item_name}`);
     }
 }
@@ -310,9 +348,14 @@ function startAvoidObstacle() {
         socket.emit("agent_stream_audio", "##<state=1>");
     }
 }
-
+function startCheckSilenceTimer() {
+    // 使用 setInterval，每 333ms 检查一次用户是否停止讲话
+    checkSilenceTimer = setInterval(checkSilence, 333);
+}
 // 退出功能模式
 function exitFuncModel() {
+    stopAudio()
+    startCheckSilenceTimer()
     if (obstacle_avoid) {
         exit_obstacle_void()
     }
@@ -352,7 +395,7 @@ window.onload = async () => {
     let recordingFinished = false;
 
     // 检测用户是否停止讲话
-    function checkSilence() {
+    checkSilence = function () {
         console.log('[phone.js][checkSilence] 检测用户是否正在说话中...');
 
         // 如果用户停止讲话，则设置短暂的静音等待
@@ -363,8 +406,7 @@ window.onload = async () => {
                 silenceTimer = setTimeout(() => {
                     // 停止检测用户是否说话
                     if (checkSilenceTimer) {
-                        clearInterval(checkSilenceTimer);
-                        checkSilenceTimer = null;
+                        stopCheckSilenceTimer()
                     }
 
                     // 停止录音
@@ -409,12 +451,10 @@ window.onload = async () => {
         }
     }
 
-    // 使用 setInterval，每 333ms 检查一次用户是否停止讲话
-    let checkSilenceTimer = setInterval(checkSilence, 333);
+    startCheckSilenceTimer()
 
     // ----- 音频波形可视化 start -----
     const waveShape = document.querySelector('#waveShape');
-    let vudio;
     vudio = new window.Vudio(audioStream, waveShape, {
         effect: 'waveform',
         accuracy: 16,
@@ -500,35 +540,28 @@ window.onload = async () => {
     /* 处理音频播放 start 
     ------------------------------------------------------------*/
 
-    // 获取音频播放器 DOM 元素
-    const audioPlayer = document.getElementById('audioPlayer');
-
-    // 用于存放音频的队列
-    let audioQueue = [];
-
-    // 标识是否正在播放音频
-    let isPlaying = false;
-
     /**
      * @description 监听后端发送的 agent_play_audio_chunk 事件
      * - 音频播放模块的起点
      * - 后端会将音频数据分段发送过来，该函数需要将这些音频数据分段存储到队列中，并开始播放
      */
     socket.on('agent_play_audio_chunk', function (data) {
-        const audioIndex = data['index'];
-        const audioData = data['audio_chunk'];
+        if (!audio_stop) {
+            const audioIndex = data['index'];
+            const audioData = data['audio_chunk'];
 
-        // 将音频数据添加到队列中
-        audioQueue[audioIndex] = audioData;
+            // 将音频数据添加到队列中
+            audioQueue[audioIndex] = audioData;
 
-        // 如果当前没有音频正在播放，开始播放
-        if (!isPlaying) {
-            playNextAudio();
-        }
+            // 如果当前没有音频正在播放，开始播放
+            if (!isPlaying) {
+                playNextAudio();
+            }
 
-        // 如果正在播放音频，则暂停波形图动画（波形动画暂停表示大模型正在讲话）
-        if (isPlaying) {
-            vudio.pause();
+            // 如果正在播放音频，则暂停波形图动画（波形动画暂停表示大模型正在讲话）
+            if (isPlaying) {
+                vudio.pause();
+            }
         }
     });
 
@@ -544,7 +577,7 @@ window.onload = async () => {
 
             if (state === 0) {
                 // 开始检测用户是否正在说话
-                checkSilenceTimer = setInterval(checkSilence, 333);
+                startCheckSilenceTimer()
             }
 
             console.log('[phone.js][playNextAudio] 音频队列中没有音频数据，停止播放...');
@@ -662,7 +695,7 @@ window.onload = async () => {
     // 功能键逻辑
     const moreFunctionsButton = document.querySelector('.moreFunctions');
     const optionsBar = document.querySelector('.optionsBar');
-    
+
     moreFunctionsButton.addEventListener('click', () => {
         if (optionsBar.style.display === 'none' || optionsBar.style.display === '') {
             optionsBar.style.display = 'flex';
@@ -670,7 +703,7 @@ window.onload = async () => {
             optionsBar.style.display = 'none';
         }
     });
-    
+
     function closeOptionsBar() {
         optionsBar.style.display = 'none';
     }
@@ -680,13 +713,14 @@ window.onload = async () => {
     endFuncButton.addEventListener('click', () => {
         moreFunctionsButton.style.display = 'block';
         endFuncButton.style.display = 'none';
+        exitFuncModel()
     });
-    
+
     // 寻物逻辑
     const findItemModal = document.getElementById('findItemModal');
     const closeModalButton = document.getElementById('closeModalButton');
     const overlay = document.getElementById('overlay');
-    
+
     const findItemButton = document.querySelector('.optionButton.findItem');
     findItemButton.addEventListener('click', () => {
         overlay.style.display = 'block';
@@ -694,7 +728,7 @@ window.onload = async () => {
         loadGallery();
         closeOptionsBar();
     });
-    
+
     closeModalButton.addEventListener('click', () => {
         overlay.style.display = 'none';
         findItemModal.style.display = 'none';
@@ -703,7 +737,7 @@ window.onload = async () => {
             gallery.removeChild(gallery.firstChild);
         }
     });
-    
+
     // 其他功能按钮的逻辑
     const otherButtons = document.querySelectorAll('.optionButton:not(.findItem)');
     otherButtons.forEach(button => {
@@ -712,7 +746,7 @@ window.onload = async () => {
             closeOptionsBar();
         });
     });
-    
+
     function loadGallery() {
         fetch('/images')
             .then(response => response.json())
