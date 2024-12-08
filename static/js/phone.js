@@ -15,7 +15,6 @@ const openCamera = document.querySelector('.openCamera');  // 打开摄像头
 const container = document.querySelector('.container');
 const video = document.querySelector('video');
 const img = document.querySelector('img');
-const audio = document.querySelector('#audio');
 const waveShape = document.querySelector('#waveShape');
 let videoChat = false;
 let isFrontCamera = false;
@@ -414,29 +413,28 @@ function startAvoidObstacle() {
 // 寻物启动函数
 let find_item_name = '';
 
-function startFindItem(item_name) {
-    state = 2
-    stopCheckSilenceTimer()
-    stopAudio()
-    finishShutUpStatus()
+window.startFindItem = function(item_name) {
+    state = 2;
+    stopCheckSilenceTimer();
+    stopAudio();
+    finishShutUpStatus();
     statusDiv.textContent = "寻物模式";
-    if (vudio.dance()) { vudio.pause() }
+    if (vudio.dance()) { vudio.pause(); }
 
     document.querySelector('.moreFunctions').style.display = 'none';
     document.querySelector('.endFunc').style.display = 'block';
 
-    closeModalButton.click()
+    closeModalButton.click();
     if (!videoChat) {
-        openCamera.click()
+        openCamera.click();
     }
     if (!find_item) {
         find_item = true;
         find_item_name = item_name;
         socket.emit("agent_stream_audio", `##<state=2>开始寻找${item_name}`);
-        startAudio()
+        startAudio();
     }
 }
-
 
 window.onload = async () => {
     // 检查 URL 中的查询参数
@@ -792,7 +790,6 @@ window.onload = async () => {
     });
 
     // 避障逻辑
-    document.querySelector('.optionButton.findItem');
     const obstacleAvoidButton = document.querySelector('.optionButton.avoidObstacle');
     obstacleAvoidButton.addEventListener('click', () => {
         closeOptionsBar();

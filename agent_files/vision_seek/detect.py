@@ -99,6 +99,9 @@ class ObjectDetector:
 
     # 目标物品检测
     def detect_main(self, img):
+        result = [{'left': 0.5, 'top': 0.5}]  # 添加测试
+        return result
+    
         # 获得图像宽高
         height, width = img.shape[:2]
         # 物体检测
