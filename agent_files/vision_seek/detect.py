@@ -162,6 +162,9 @@ class ObjectDetector:
 
     # 目标物品检测
     def detect_main(self, img):
+        # 获取图像的宽高
+        height, width, _ = img.shape
+
         # 物体检测
         results = model.predict(img, conf=0.3)
 
@@ -293,13 +296,11 @@ class ObjectDetector:
                             x_min, y_min, w_min, h_min = x1, y1, w, h
                     print(f'x: {x_min}, y: {y_min}, w: {w_min}, h: {h_min}')
 
-                    left = (x_min + w / 2) / width
-                    top = (y_min + h / 2) / height
+                    left = (x_min + w_min / 2) / width
+                    top = (y_min + h_min / 2) / height
 
                     # result = [{'x': x_min, 'y': y_min, 'w': w_min, 'h': h_min}]
-                    # result = [{'left': left, 'top': top}]
-                    result = [{'left': 0.5, 'top': 0.5}]
-
+                    result = [{'left': left, 'top': top}]
                     return result
                 else:
                     # print('未检测到该物品!')
