@@ -81,6 +81,7 @@ p {
     background-color: #444;
     color: #e0e0e0;
     border: none;
+    border-radius: 5px;
 }
 
 .footer button:hover {
@@ -116,7 +117,9 @@ p {
 
 .modal input {
     width: calc(100% - 100px);
-    margin-right: 10px;
+    margin-right: 5px;
+    margin-bottom: 10px;
+    padding-left: 8px;
 }
 
 .modal button {
@@ -128,8 +131,19 @@ p {
     background-color: #444;
     color: #e0e0e0;
     border: none;
+    height: 40px;
+    border-radius: 3px;
 }
 
 .modal-content button:hover {
     background-color: #555;
+}
+
+.modal-content button#deleteButton {
+    background-color: #d9534f;
+    color: #ffffff;
+}
+
+.modal-content button#deleteButton:hover {
+    background-color: #c9302c;
 }
