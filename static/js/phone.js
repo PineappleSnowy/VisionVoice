@@ -858,7 +858,6 @@ window.onload = async () => {
             var script = document.createElement('script');
             script.src = `https://webapi.amap.com/maps?v=2.0&key=${H5_locate_key}`
             document.head.appendChild(script);
-            // console.log(jsonString); // 输出获取的 JSON 字符串
         })
         .catch(error => {
             console.error('Error fetching JSON file:', error);
@@ -898,8 +897,6 @@ window.onload = async () => {
     // 解析定位错误信息
     function onError(data) {
         console.error('定位失败。\n失败原因排查信息:' + data.message + '\n浏览器返回信息：' + data.originMessage)
-        // 失败时默认地理位置为西电（这是为提高西电用户的体验而设计的，待优化）
-        // chat_stream(`你定位失败，无法获得我的位置信息，但我的位置很可能在陕西省西安市长安区西太路西安电子科技大学南校区。我的提问是：${rec_result}请简洁回答。`, current_active)
         let prompt = "你定位失败，无法获得我的位置信息。请简洁回答。我的提问是："
         let location_info = "定位超时，无法获得你的位置信息。"
         return { 'prompt': prompt, 'location_info': location_info }

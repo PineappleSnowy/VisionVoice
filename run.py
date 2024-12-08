@@ -3,6 +3,7 @@
 """
 
 # 第三方库
+import random
 import cv2
 import time
 import os
@@ -607,7 +608,9 @@ def get_chat_history():
 
 
 # 图片保存地址
-IAMGE_SAVE_PATH = ".cache/uploaded_image.jpg"
+IMAGE_SAVE_PATH = ".cache/uploaded_image.jpg"
+# 多图片对话保存目录
+MULTI_IMAGE_DIRECTORY = ".cache/multi_image/"
 
 
 def init_chat_history(current_user, agent_name, messages):
@@ -624,22 +627,37 @@ def init_chat_history(current_user, agent_name, messages):
     return messages
 
 
-def build_response(current_user, agent_name, user_talk, video_open):
+def get_image_filenames(directory):
+    # 支持的图片扩展名
+    image_extensions = ('.png', '.jpg', '.jpeg', '.gif', '.bmp', '.tiff')
+
+    # 获取目录下的所有文件
+    all_files = os.listdir(directory)
+
+    # 过滤出图片文件
+    image_files = [
+        file for file in all_files if file.lower().endswith(image_extensions)]
+
+    return image_files
+
+
+def build_response(current_user, agent_name, user_talk, video_open, multi_image_talk):
     messages = []
+
     if video_open:
-        model_name = "glm-4v"
+        model_name = "glm-4v-flash"
         messages = init_chat_history(current_user, agent_name, messages)
 
         dst_messages = message_format_tran(messages[-MAX_HISTORY:])
-        if os.path.exists(IAMGE_SAVE_PATH):
-            with open(IAMGE_SAVE_PATH, "rb") as img_file:
+        if os.path.exists(IMAGE_SAVE_PATH):
+            with open(IMAGE_SAVE_PATH, "rb") as img_file:
                 img_base = base64.b64encode(img_file.read()).decode("utf-8")
             dst_messages.append(
                 {
                     "role": "user",
                     "content": [
                         {"type": "image_url", "image_url": {"url": img_base}},
-                        {"type": "text", "text": "请描述这个图片"},
+                        {"type": "text", "text": user_talk},
                     ],
                 }
             )
@@ -648,7 +666,7 @@ def build_response(current_user, agent_name, user_talk, video_open):
                 {"role": "user", "content": [
                     {"type": "text", "text": user_talk}]}
             )
-            print(f"未找到图片{IAMGE_SAVE_PATH}！")
+            print(f"未找到图片{IMAGE_SAVE_PATH}！")
         # 保存和多模态大模型的聊天
         messages.append({"role": "user", "content": user_talk})
 
@@ -658,6 +676,37 @@ def build_response(current_user, agent_name, user_talk, video_open):
             messages=dst_messages,
             stream=True,
         )
+
+    elif multi_image_talk:
+        if user_talk == '':
+            user_talk = '请描述图片内容'
+        image_path_list = get_image_filenames(MULTI_IMAGE_DIRECTORY)
+        model_name = 'glm-4v-flash' if len(
+            image_path_list) == 1 else 'glm-4v-plus'
+
+        messages = init_chat_history(current_user, agent_name, messages)
+        dst_messages = message_format_tran(messages[-MAX_HISTORY:])
+
+        content = []
+        for image_file in image_path_list:
+            img_path = os.path.join(MULTI_IMAGE_DIRECTORY, image_file)
+            with open(img_path, "rb") as f:
+                img_base = base64.b64encode(f.read()).decode("utf-8")
+            content.append({"type": "image_url", "image_url": {"url": img_base}})
+        delete_file_from_dir(MULTI_IMAGE_DIRECTORY)  # 及时清空图片缓存
+
+        content.append({"type": "text", "text": user_talk})
+
+        dst_messages.append({"role": "user", "content": content})
+
+        messages.append({"role": "user", "content": user_talk})
+
+        responses = client.chat.completions.create(
+            model=model_name,
+            messages=dst_messages,
+            stream=True,
+        )
+
     else:
         if agent_name == "psychologicalAgent":
             model_name = "emohaa"
@@ -706,10 +755,11 @@ def agent_chat_stream():
     user_talk = request.args.get("query")
     agent_name = request.args.get("agent", "defaultAgent")  # 获取选择的智能体
     video_open = request.args.get("videoOpen", "false") == "true"  # 获取选择的智能体
+    multi_image_talk = request.args.get("multi_image_talk", False)  # 是否开启多轮对话
     current_user = get_jwt_identity()
 
     responses, messages = build_response(
-        current_user, agent_name, user_talk, video_open
+        current_user, agent_name, user_talk, video_open, multi_image_talk
     )
 
     generate = predict(current_user, agent_name, messages, responses)
@@ -730,11 +780,22 @@ def message_format_tran(src_messages: list):
         dst_messages.append(temp_msg)
     return dst_messages
 
+
 @app.route("/gaode_api", methods=["GET"])
 def gaode_api():
     """返回高德 API 相关信息"""
     gaode_info = api_data.get("gaode", {})
     return jsonify(gaode_info)
+
+
+def delete_file_from_dir(directory):
+    # 删除文件夹下的所有文件
+    for filename in os.listdir(directory):
+        file_path = os.path.join(directory, filename)
+        try:
+            os.remove(file_path)
+        except Exception as e:
+            print("[run.py][delete_file_from_dir]删除文件时出错：", e)
 
 @app.route("/agent/upload_image", methods=["POST"])
 def upload_image():
@@ -749,14 +810,29 @@ def upload_image():
 
     # 去掉base64前缀
     image_data = image_data.split(",")[1]
+
+    # 获取当前是否是多图片对话
+    if "multi_image_index" in data:
+        print(data["multi_image_index"])
+        if data["multi_image_index"] == 0:
+            # 清空历史图片
+            delete_file_from_dir(MULTI_IMAGE_DIRECTORY)
+        # 以8位随机数作为文件名
+        image_save_path = f'{MULTI_IMAGE_DIRECTORY}{random.randint(10000000, 99999999)}.jpg'
+    else:
+        image_save_path = IMAGE_SAVE_PATH
+
     # 将图片保存为文件
-    with open(IAMGE_SAVE_PATH, "wb") as f:
+    with open(image_save_path, "wb") as f:
         f.write(base64.b64decode(image_data))
 
-    state = data["state"]
+    if "state" in data:
+        state = data["state"]
+    else:
+        return {"message": "Image upload success"}
 
     try:
-        mat_image = cv2.imread(IAMGE_SAVE_PATH)
+        mat_image = cv2.imread(IMAGE_SAVE_PATH)
     except Exception:
         return jsonify({"message": "Image is empty"}), 400
 
@@ -771,6 +847,10 @@ def upload_image():
 
     elif state == 2:
         try:
+            init_state = detector.detect_init(mat_image)
+            if init_state != 0:
+                return jsonify({"message": "未识别到图片中的目标", "item_info": []}), 400
+
             detect_result = detector.detect_main(mat_image)
             item_info = [] if detect_result == -1 else detect_result
             print("[run.py][upload_image] item_info:", item_info)

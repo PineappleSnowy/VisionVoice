@@ -228,7 +228,7 @@ class ObjectDetector:
                         similarity_score_cur = compute_similarity(template_feature_, roi_features)
                         if similarity_score_cur > similarity_score:
                             similarity_score = similarity_score_cur
-                    print(f'相似度: {similarity_score}')
+                    # print(f'相似度: {similarity_score}')
 
                     if similarity_score < SIMILARITY_SCORE_THRESHOLD:
                         continue
@@ -300,7 +300,7 @@ class ObjectDetector:
                         if size < size_min:
                             size_min = size
                             x_min, y_min, w_min, h_min = x1, y1, w, h
-                    print(f'x: {x_min}, y: {y_min}, w: {w_min}, h: {h_min}')
+                    # print(f'x: {x_min}, y: {y_min}, w: {w_min}, h: {h_min}')
 
                     left = (x_min + w_min / 2) / img_width
                     top = (y_min + h_min / 2) / img_height

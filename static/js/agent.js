@@ -121,8 +121,12 @@ function addMessage(message) {
     image_user.className = 'chat-image-user';
     bubble.textContent = message;
 
+    let multi_image_talk = false;
+
     // 处理上传的图像
     if (uploadedImages.length > 0) {
+        multi_image_talk = true;
+        let index = 0
         const promises = uploadedImages.map(file => {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -134,13 +138,15 @@ function addMessage(message) {
                     imageElement.style.height = 'auto';
                     bubble.appendChild(imageElement);
 
+                    const token = localStorage.getItem('token');
                     // 发送图像到后端
                     fetch('/agent/upload_image', {
                         method: 'POST',
                         headers: {
-                            'Content-Type': 'application/json'
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
                         },
-                        body: JSON.stringify({ image: imageUrl })
+                        body: JSON.stringify({ image: imageUrl, multi_image_index: index})
                     })
                         .then(response => response.json())
                         .then(data => {
@@ -151,29 +157,33 @@ function addMessage(message) {
                             console.error('图片上传失败:', error);
                             reject(error);
                         });
+                    index += 1;  // 上传的图片序号加一
                 };
                 reader.readAsDataURL(file);
             });
         });
 
-        // 等待所有图像上传完成
-        Promise.all(promises)
-            .then(imageUrls => {
-                // 清空 uploadedImages 数组
-                uploadedImages = [];
-                sendCombinedMessageToBackend(message, imageUrls);
-            })
-            .catch(error => {
-                console.error('图像上传过程中发生错误:', error);
-            });
+        // 等待所有图片上传完成后再发送消息
+        Promise.all(promises).then(() => {
+            sendMessageToAgent(message, multi_image_talk);
+        }).catch(error => {
+            console.error('图片上传过程中出错:', error);
+        });
     } else {
-        sendCombinedMessageToBackend(message, []);
+        sendMessageToAgent(message, multi_image_talk);
     }
 
     messagebackground.appendChild(messagesContainer_user);
     messagesContainer_user.appendChild(bubble);
     messagesContainer_user.appendChild(image_user);
+}
 
+/**
+ * @description 发送消息到智能体
+ * @param {string} message 用户的消息内容
+ * @param {boolean} multi_image_talk 是否包含多张图片
+ */
+function sendMessageToAgent(message, multi_image_talk) {
     // 机器人响应
     var image_bot = document.createElement('div');
     image_bot.className = 'chat-image-bot';
@@ -184,7 +194,7 @@ function addMessage(message) {
     var bubble_2 = document.createElement('div');
     bubble_2.className = 'chat-bubble-bot';
 
-    fetch(`/agent/chat_stream?query=${message}&agent=${selectedAgent}`, {
+    fetch(`/agent/chat_stream?query=${message}&agent=${selectedAgent}&multi_image_talk=${multi_image_talk}`, {
         headers: {
             "Authorization": `Bearer ${token}`
         }
@@ -245,6 +255,7 @@ let uploadedImages = [];
 document.querySelector('#imageUploadPanel .content .add').addEventListener('click', function () {
     document.querySelector('#imageUploadPanel .content .add input').click();
 });
+
 document.querySelector('#imageUploadPanel .content .add input').addEventListener('change', function (e) {
     const file = e.target.files[0];
 
@@ -279,35 +290,6 @@ document.querySelector('#imageUploadPanel .content .add input').addEventListener
     // 清空文件输入以允许重新选择同一文件
     e.target.value = '';
 });
-
-/**
- * @description 发送消息到后端
- * @param {string} message 用户的消息内容
- */
-function sendCombinedMessageToBackend(message, imageUrls) {
-    const token = localStorage.getItem('token');
-    fetch(`/agent/chat_stream`, {
-        method: 'POST',
-        headers: {
-            "Authorization": `Bearer ${token}`,
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            query: message,
-            agent: selectedAgent,
-            images: imageUrls
-        })
-    })
-        .then(response => response.json())
-        .then(data => {
-            console.log('消息发送成功:', data);
-            clearImageDiv(); // 清空图片div
-        })
-        .catch(error => {
-            console.error('消息发送失败:', error);
-            clearImageDiv(); // 清空图片div
-        });
-}
 
 // 清空图片div
 function clearImageDiv() {
