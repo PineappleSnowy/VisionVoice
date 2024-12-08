@@ -47,3 +47,5 @@ function detectDB(analyser, dataArray) {
  
     return db;
  }
+
+export { initAudioAnalyser, detectDB };

@@ -30,7 +30,17 @@
         <audio autoplay id="audio" aria-label="通话音频"></audio>
         <div aria-label="打开摄像头"><i class="fa-solid fa-video openCamera"></i></div>
         <div aria-label="挂断电话"><i class="fa-solid fa-phone-slash hangUp"></i></div>
-        <div aria-label="帮我寻物"><i class="fa-solid fa-search findItem"></i></div>
+        <div aria-label="更多功能"><i class="fa-solid fa-bars moreFunctions"></i></div>
+        <div aria-label="结束功能"><i class="fa-solid fa-times endFunc"></i></div>
+        <div aria-label="打断说话"><i class="fa-solid fa-stop shutUpSpeak"></i></div>
+    </div>
+
+    <!-- 选项栏 -->
+    <div class="optionsBar">
+        <button class="optionButton avoidObstacle" aria-label="辅助避障"><i class="fa-solid fa-shield-alt"></i></button>
+        <button class="optionButton findItem" aria-label="帮我寻物"><i class="fa-solid fa-search"></i></button>
+        <button class="optionButton environmentDescription" aria-label="环境描述"><i class="fa-solid fa-image"></i></button>
+        <button class="optionButton currentLocation" aria-label="当前位置"><i class="fa-solid fa-map-marker-alt"></i></button>
     </div>
 
     <!-- 小窗部分 -->
@@ -49,9 +59,9 @@
 
     <script src="../static/js/auth.js"></script>
     <script src="../static/js/chat.js"></script>
-    <script src="../static/js/recorder.js"></script>
-    <script src="../static/js/audioUtils.js"></script>
-    <script src="../static/js/phone.js"></script>
+    <script src="../static/js/lib/recorder.js"></script>
+    <script type="module" src="../static/js/lib/audioUtils.js"></script>
+    <script type="module" src="../static/js/phone.js"></script>
 </body>
 
 </html>

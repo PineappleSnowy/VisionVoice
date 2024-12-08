@@ -67,12 +67,32 @@ html body .controller .hangUp {
   font-size: 0.5rem;
 }
 
-html body .controller .findItem {
+html body .moreFunctions {
   position: absolute;
   left: 50%;
   bottom: 0.63rem;
   font-size: 0.5rem;
   transform: translateX(-50%);
+}
+
+html body .endFunc {
+  position: absolute;
+  left: 50%;
+  bottom: 0.63rem;
+  font-size: 0.5rem;
+  transform: translateX(-50%);
+  display: none;
+  color: red;
+}
+
+html body .shutUpSpeak {
+  position: absolute;
+  left: 50%;
+  bottom: 1.5rem;
+  font-size: 0.5rem;
+  transform: translateX(-50%);
+  display: none;
+  color: red;
 }
 
 html body video {
@@ -181,4 +201,29 @@ p {
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
   z-index: 3;
+}
+
+.optionsBar {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  width: 80%;
+  height: 6%;
+  background-color: rgba(0, 0, 0, 0.8);
+  transform: translateX(-50%);
+  z-index: 2;
+  /* display: flex; */
+  justify-content: space-around;
+  align-items: center;
+}
+
+.optionButton {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 0.4rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
