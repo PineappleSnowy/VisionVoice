@@ -2,7 +2,7 @@
 ------------------------------------------ */
 #navbar {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-around;
     align-items: center;
     color: #fff;
     height: 50px;
