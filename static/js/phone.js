@@ -1,3 +1,6 @@
+import { detectDB } from './lib/audioUtils.js';
+import { initAudioAnalyser } from './lib/audioUtils.js';
+
 // 创建socket连接，并附上token用于后端验证
 const token = localStorage.getItem('token');
 const socket = io({
@@ -314,27 +317,6 @@ hangUp.addEventListener('click', () => {
     window.location.href = '/agent';
 });
 
-/**
- * @function initAudioAnalyser
- * @description 初始化音频分析器
- * @param {MediaStream} stream 音频流
- * @returns {Object} 音频分析器和数据数组
- */
-async function initAudioAnalyser(stream) {
-    const audioContext = new AudioContext();
-    const analyser = audioContext.createAnalyser();
-    const microphone = audioContext.createMediaStreamSource(stream);
-    microphone.connect(analyser);
-    analyser.fftSize = 2048;
-    const bufferLength = analyser.frequencyBinCount;
-    const dataArray = new Float32Array(bufferLength);
-
-    return {
-        analyser,
-        dataArray
-    };
-}
-
 /* 处理音量大小测定 start
 ----------------------------------------------------------*/
 
@@ -466,6 +448,13 @@ window.onload = async () => {
         openCamera.click();
     }
 
+    // 音频上下文
+    let audioContext;
+    // 录制器
+    let rec;
+    // 音频流
+    let input;
+
     // 获取音频流
     let audioStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
     console.log("[phone.js][window.onload] 创建 getUserMedia 音频流成功...");
@@ -575,10 +564,10 @@ window.onload = async () => {
         if (state == 0) {
             captureAndSendFrame()
         }
-        // 创建新的音频上下文，这是Web Audio API的核心对象
+        // 创建新的音频上下文，这是 Web Audio API 的核心对象
         audioContext = new AudioContext();
 
-        // 将麦克风的音频流(stream)转换为音频源节点
+        // 将麦克风的音频流 (stream) 转换为音频源节点
         input = audioContext.createMediaStreamSource(audioStream);
 
         // 创建一个新的 Recorder 实例，用于录制音频
@@ -728,7 +717,7 @@ window.onload = async () => {
      * @description 语音识别结束后，将识别结果发送给后端，并开始语音对话
      */
 
-    socket.on('agent_speech_recognition_finished', function (data) {
+    socket.on('agent_speech_recognition_finished', async function (data) {
         rec_result = data['rec_result'];
 
         if (!rec_result) {
@@ -750,11 +739,12 @@ window.onload = async () => {
         else if (state == 0) {
             speech_rec_ready = true;
             // 使用定位
-            if (rec_result.includes("位置")) { 
-                let prompt = requestLocaion()['prompt']
-                rec_result = prompt + rec_result 
+            if (rec_result.includes("位置")) {
+                let location_result = await requestLocaion();
+                let prompt = location_result['prompt'];
+                rec_result = prompt + rec_result;
             }
-            formChat()
+            formChat();
         }
     })
 
@@ -858,8 +848,8 @@ window.onload = async () => {
         .then(response => response.json())
         .then(data => {
             // 将 JSON 数据转换为字符串
-            H5_locate_key = data.gaode.H5_locate;
-            geocode_key = data.gaode.geocode;
+            H5_locate_key = data.H5_locate;
+            geocode_key = data.geocode;
             var script = document.createElement('script');
             script.src = `https://webapi.amap.com/maps?v=2.0&key=${H5_locate_key}`
             document.head.appendChild(script);
@@ -870,38 +860,36 @@ window.onload = async () => {
         });
 
     //解析定位结果
-    function onComplete(data) {
+    function onComplete(location_data) {
         let str = [];
-        const geoLocation = data.position;
+        const geoLocation = location_data.position;
         str.push('定位成功！\n定位结果：' + location);
-        str.push('定位类别：' + data.location_type);
-        if (data.accuracy) {
-            str.push('精度：' + data.accuracy + ' 米');
+        str.push('定位类别：' + location_data.location_type);
+        if (location_data.accuracy) {
+            str.push('精度：' + location_data.accuracy + ' 米');
         }  // 如为浏览器精确定位结果则没有精度信息
-        str.push('是否经过偏移：' + (data.isConverted ? '是' : '否'));
-        console.log(str.join('\n'))
-        const apiUrl =
-            `https://restapi.amap.com/v3/geocode/regeo?key=${geocode_key}&location=${geoLocation}&poitype=&radius=&extensions=all&roadlevel=0`
-        let prompt = '';
-        let location_info = '';
+        str.push('是否经过偏移：' + (location_data.isConverted ? '是' : '否'));
+        console.log(str.join('\n'));
 
-        // 地理逆编码：经纬信息->地理信息
-        fetch(apiUrl)
+        const apiUrl = `https://restapi.amap.com/v3/geocode/regeo?key=${geocode_key}&location=${geoLocation}&poitype=&radius=&extensions=all&roadlevel=0`;
+
+        return fetch(apiUrl)
             .then(response => response.json())
             .then(data => {
                 const formattedAddress = data.regeocode.formatted_address;
                 console.log('位置信息:', formattedAddress);
-                prompt = `我当前的位置是：${formattedAddress}，定位精度${data.accuracy}米。请简洁回答。我的提问是：`
-                location_info = `你位于${formattedAddress}，定位精度${data.accuracy}米。`
+                const prompt = `我当前的位置是：${formattedAddress}，定位精度${location_data.accuracy}米。请简洁回答。我的提问是：`;
+                const location_info = `你位于${formattedAddress}，定位精度${location_data.accuracy}米。`;
+                return { prompt, location_info };
             })
             .catch(error => {
                 console.error('请求出错:', error);
-                prompt = `你地理编码逆解析失败，仅可知我当前经纬坐标为(${geoLocation})。请简洁回答。我的提问是：`
-                location_info = `地理编码逆解析失败，你当前经纬坐标为：${geoLocation}。`
+                const prompt = `你地理编码逆解析失败，仅可知我当前经纬坐标为(${geoLocation})。请简洁回答。我的提问是：`;
+                const location_info = `地理编码逆解析失败，你当前经纬坐标为：${geoLocation}。`;
+                return { prompt, location_info };
             });
-        return { 'prompt': prompt, 'location_info': location_info }
     }
-    // "陕西省西安市长安区西太路西安电子科技大学南校区"
+
     // 解析定位错误信息
     function onError(data) {
         console.error('定位失败。\n失败原因排查信息:' + data.message + '\n浏览器返回信息：' + data.originMessage)
@@ -913,21 +901,24 @@ window.onload = async () => {
     }
 
     function requestLocaion() {
-        AMap.plugin('AMap.Geolocation', function () {
-            const geolocation = new AMap.Geolocation({
-                enableHighAccuracy: true,  // 是否使用高精度定位，默认:true
-                timeout: 100,  // 超过多少毫秒后停止定位，默认：5s
-            });
-            geolocation.getCurrentPosition(function (status, result) {
-                if (status == 'complete') {
-                    // 成功时的处理
-                    return onComplete(result)
-                } else {
-                    // 失败时的处理
-                    return onError(result)
-                }
+        return new Promise((resolve, reject) => {
+            AMap.plugin('AMap.Geolocation', function () {
+                const geolocation = new AMap.Geolocation({
+                    enableHighAccuracy: true,  // 是否使用高精度定位，默认:true
+                    timeout: 2000,  // 超过多少毫秒后停止定位，默认：5s
+                });
+                geolocation.getCurrentPosition(function (status, result) {
+                    if (status == 'complete') {
+                        // 成功时的处理
+                        onComplete(result).then(resolve).catch(reject);
+                    } else {
+                        // 失败时的处理
+                        resolve(onError(result));
+                    }
+                });
             });
         });
-
     }
+
+    
 }

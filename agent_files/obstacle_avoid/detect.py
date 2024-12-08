@@ -1,7 +1,8 @@
 from ultralytics import YOLO
 import cv2
 
-model = YOLO("yolo11n.yaml").load("./agent_files/obstacle_avoid/best.pt")  # 加载模型
+# model = YOLO("yolo11n.yaml").load("./agent_files/obstacle_avoid/best.pt")  # 加载模型
+model = YOLO("./agent_files/obstacle_avoid/yolo11x-seg.pt")
 
 # YOLO检测种类字典
 yolo_classes = {
@@ -179,6 +180,7 @@ def obstacle_avoid_realize(frame):
     return:
         返回标签、距离、位置信息
     """
+    height, width = frame.shape[:2]
     confidence_threshold = 0.35  # 设置置信度阈值
     results = model(frame)
     distance_dic = dict()  #用于比较，获取最近障碍物标签以及距离
@@ -192,20 +194,16 @@ def obstacle_avoid_realize(frame):
             label = yolo_classes_en_to_zh.get(label_0)
         else:
             label_0 = "unknown"
-            label = "障碍物"
+            label = "未知障碍物"
+        label_1 = label_0 + f"{i}"
         if confidence > confidence_threshold:
             p = y + h / 2  # 像素坐标
 
             # 解算出真实距离
             distance_real = -2.08054369e-12*p**4 + 6.25478630e-09*p**3 - 5.88280567e-06*p**2 + 1.07600182e-03*p + 9.74917750e-01
-            
-            distance_dic[label] = distance_real
-            distance_dic_all[label] = [p, w, h]
-
+            distance_dic[label_1] = distance_real
+            distance_dic_all[label_1] = [label, distance_real, x/width, y/height]
     label_min, distance_min = min(distance_dic.items(), key=lambda x: x[1])
-    obstacle_info.append({"label": label_min, "distant": distance_min.item(),
-                          "location": {"tl": distance_dic_all[label_min][0].item(), 
-                                       "w": distance_dic_all[label_min][1].item(), 
-                                       "h": distance_dic_all[label_min][2].item()}})
-    # print(f"{label_min}距离{distance_min}:{distance_dic_all[label_min][0]}:{distance_dic_all[label_min][1]}:{distance_dic_all[label_min][2]}")
+    obstacle_info.append({"label": distance_dic_all[label_min][0], "distant": distance_dic_all[label_min][1].item(),
+                          "left":distance_dic_all[label_min][2].item(),"top": distance_dic_all[label_min][3].item()})
     return obstacle_info
