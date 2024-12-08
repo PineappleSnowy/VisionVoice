@@ -70,8 +70,6 @@ def compute_similarity(feature1, feature2):
 
 
 # 目标物品检测器
-
-
 class ObjectDetector:
     def __init__(self):
         self.templates = []
@@ -164,11 +162,6 @@ class ObjectDetector:
 
     # 目标物品检测
     def detect_main(self, img):
-        result = [{'left': 0.5, 'top': 0.5}]  # 添加测试
-        return result
-    
-        # 获得图像宽高
-        height, width = img.shape[:2]
         # 物体检测
         results = model.predict(img, conf=0.3)
 
@@ -198,7 +191,6 @@ class ObjectDetector:
                     roi = cur_img[y1:y2, x1:x2]
 
                     # 排除掉长宽比不一致的物体
-<<<<<<< HEAD
                     # height, width = self.template_1.shape[:2]
                     # template_ratio_1 = width / height
                     # template_ratio_2 = height / width
@@ -241,29 +233,6 @@ class ObjectDetector:
                         # 增强对比度
                         gray_image = cv2.cvtColor(denoised_image, cv2.COLOR_BGR2GRAY)
                         roi = cv2.equalizeHist(gray_image)
-=======
-                    height, width = self.template_1.shape[:2]
-                    template_ratio_1 = width / height
-                    template_ratio_2 = height / width
-                    template_ratio_max = max(
-                        template_ratio_1, template_ratio_2)
-                    template_ratio_min = min(
-                        template_ratio_1, template_ratio_2)
-                    object_ratio = w / h
-                    if object_ratio > template_ratio_max * 1.5 or object_ratio < template_ratio_min / 1.5:
-                        continue
-
-                    # 使用双三次插值放大图像
-                    roi = cv2.resize(roi, (0, 0), fx=2, fy=2,
-                                     interpolation=cv2.INTER_CUBIC)
-                    # 去噪处理
-                    denoised_image = cv2.fastNlMeansDenoisingColored(
-                        roi, None, 10, 10, 7, 21)
-                    # 增强对比度
-                    gray_image = cv2.cvtColor(
-                        denoised_image, cv2.COLOR_BGR2GRAY)
-                    roi = cv2.equalizeHist(gray_image)
->>>>>>> e286216b743c3d202c7bed2c69f23b070a095ec9
 
                     # 特征点匹配
                     def get_matches(template, roi):
@@ -282,23 +251,8 @@ class ObjectDetector:
                         return matches_
 
                     matches_results = []
-
-<<<<<<< HEAD
                     with ThreadPoolExecutor(max_workers = len(self.templates)) as executor:
                         future_matches = {executor.submit(get_matches, template, roi): idx for idx, template in enumerate(self.templates)}
-=======
-                    with ThreadPoolExecutor(max_workers=5) as executor:
-                        future_matches_1 = executor.submit(
-                            get_matches, self.template_1, roi)
-                        future_matches_2 = executor.submit(
-                            get_matches, self.template_2, roi)
-                        future_matches_3 = executor.submit(
-                            get_matches, self.template_3, roi)
-                        future_matches_4 = executor.submit(
-                            get_matches, self.template_4, roi)
-                        future_matches_5 = executor.submit(
-                            get_matches, self.template_5, roi)
->>>>>>> e286216b743c3d202c7bed2c69f23b070a095ec9
 
                     for future in future_matches.keys():
                         matches_ = future.result()
