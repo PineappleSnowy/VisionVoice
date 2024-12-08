@@ -225,11 +225,13 @@ function captureAndSendFrame() {
                 }
                 else {
                     console.log('Frame uploaded successfully:', data);
-                    if (state == 1) {
+                    if (state == 1 && "obstacle_info" in data) {
                         if (data["obstacle_info"].length != 0) {
                             const detected_item = data["obstacle_info"][0]["label"];
                             const distant = data["obstacle_info"][0]["distant"]
-                            socket.emit("agent_stream_audio", `画面中${detected_item}距离${distant.toFixed(2)}米。`);
+                            const left_loc = data["obstacle_info"][0]["left"]
+                            const top_loc = data["obstacle_info"][0]["top"]
+                            socket.emit("agent_stream_audio", `画面${calcLocation(top_loc, left_loc)}${detected_item}距离${distant.toFixed(2)}米。`);
                             // 设置等待时间
                             setTimeout(function () {
                                 captureAndSendFrame()
@@ -238,11 +240,17 @@ function captureAndSendFrame() {
                         else { captureAndSendFrame() }
                     }
 
-                    else if (state == 2) {
-                        socket.emit("agent_stream_audio", `物品在画面中。`);
-                        setTimeout(function () {
-                            captureAndSendFrame()
-                        }, 2000);
+                    else if (state == 2 && "item_info" in data) {
+                        if (data['item_info'].length != 0) {
+                            const left_loc = data["item_info"][0]["left"]
+                            const top_loc = data["item_info"][0]["top"]
+
+                            socket.emit("agent_stream_audio", `${find_item_name}在画面${calcLocation(top_loc, left_loc)}。`);
+                            setTimeout(function () {
+                                captureAndSendFrame()
+                            }, 2000);
+                        }
+                        else { captureAndSendFrame() }
                     }
 
                     else if (state == 0) {
@@ -255,6 +263,33 @@ function captureAndSendFrame() {
                 console.error('Error uploading frame:', error);
             });
     }
+}
+
+function calcLocation(top, left) {
+    let x_describe = '';
+    let y_describe = '';
+    let final_describle = '';
+
+    if (left <= 0.33)
+        x_describe = '左'
+    else if (left <= 0.67)
+        x_describe = '中'
+    else if (left <= 1)
+        x_describe = '右'
+
+    if (top <= 0.33)
+        y_describe = '上'
+    else if (top <= 0.67)
+        y_describe = '中'
+    else if (top <= 1)
+        y_describe = '下'
+
+    if (x_describe != '中' || y_describe != '中')
+        final_describle = x_describe + y_describe;
+    else
+        final_describle = "中央"
+
+    return final_describle
 }
 
 // phone 界面大小适配
@@ -395,6 +430,8 @@ function startAvoidObstacle() {
 }
 
 // 寻物启动函数
+let find_item_name = '';
+
 function startFindItem(item_name) {
     state = 2
     stopCheckSilenceTimer()
@@ -413,6 +450,7 @@ function startFindItem(item_name) {
     if (!find_item) {
         find_item = true;
         startAudio()
+        find_item_name = item_name;
         socket.emit("agent_stream_audio", `##<state=2>开始寻找${item_name}`);
     }
 }
@@ -656,7 +694,7 @@ window.onload = async () => {
             audioPlayer.src = audioURL;
 
             // 音频播放前先确认静音定时器取消
-            stopCheckSilenceTimer() 
+            stopCheckSilenceTimer()
 
             // 播放音频
             audioPlayer.play().then(() => {
@@ -704,13 +742,18 @@ window.onload = async () => {
             startAvoidObstacle()  // 进入避障模式
         }
 
-        if (rec_result.includes("寻")) {
-            startFindItem()  // 进入寻物模式
+        else if (rec_result.includes("寻")) {
+            findItemButton.click()  // 进入寻物模式
         }
 
         // 仅当对话模式是修改speech_rec_ready为true
-        if (state == 0) {
+        else if (state == 0) {
             speech_rec_ready = true;
+            // 使用定位
+            if (rec_result.includes("位置")) { 
+                let prompt = requestLocaion()['prompt']
+                rec_result = prompt + rec_result 
+            }
             formChat()
         }
     })
@@ -806,5 +849,85 @@ window.onload = async () => {
                 });
             })
             .catch(error => console.error('Error fetching images:', error));
+    }
+
+    // 定位逻辑
+    let H5_locate_key, geocode_key;
+    // 获取api_key（存危险，需优化）
+    fetch('/gaode_api')
+        .then(response => response.json())
+        .then(data => {
+            // 将 JSON 数据转换为字符串
+            H5_locate_key = data.gaode.H5_locate;
+            geocode_key = data.gaode.geocode;
+            var script = document.createElement('script');
+            script.src = `https://webapi.amap.com/maps?v=2.0&key=${H5_locate_key}`
+            document.head.appendChild(script);
+            // console.log(jsonString); // 输出获取的 JSON 字符串
+        })
+        .catch(error => {
+            console.error('Error fetching JSON file:', error);
+        });
+
+    //解析定位结果
+    function onComplete(data) {
+        let str = [];
+        const geoLocation = data.position;
+        str.push('定位成功！\n定位结果：' + location);
+        str.push('定位类别：' + data.location_type);
+        if (data.accuracy) {
+            str.push('精度：' + data.accuracy + ' 米');
+        }  // 如为浏览器精确定位结果则没有精度信息
+        str.push('是否经过偏移：' + (data.isConverted ? '是' : '否'));
+        console.log(str.join('\n'))
+        const apiUrl =
+            `https://restapi.amap.com/v3/geocode/regeo?key=${geocode_key}&location=${geoLocation}&poitype=&radius=&extensions=all&roadlevel=0`
+        let prompt = '';
+        let location_info = '';
+
+        // 地理逆编码：经纬信息->地理信息
+        fetch(apiUrl)
+            .then(response => response.json())
+            .then(data => {
+                const formattedAddress = data.regeocode.formatted_address;
+                console.log('位置信息:', formattedAddress);
+                prompt = `我当前的位置是：${formattedAddress}，定位精度${data.accuracy}米。请简洁回答。我的提问是：`
+                location_info = `你位于${formattedAddress}，定位精度${data.accuracy}米。`
+            })
+            .catch(error => {
+                console.error('请求出错:', error);
+                prompt = `你地理编码逆解析失败，仅可知我当前经纬坐标为(${geoLocation})。请简洁回答。我的提问是：`
+                location_info = `地理编码逆解析失败，你当前经纬坐标为：${geoLocation}。`
+            });
+        return { 'prompt': prompt, 'location_info': location_info }
+    }
+    // "陕西省西安市长安区西太路西安电子科技大学南校区"
+    // 解析定位错误信息
+    function onError(data) {
+        console.error('定位失败。\n失败原因排查信息:' + data.message + '\n浏览器返回信息：' + data.originMessage)
+        // 失败时默认地理位置为西电（这是为提高西电用户的体验而设计的，待优化）
+        // chat_stream(`你定位失败，无法获得我的位置信息，但我的位置很可能在陕西省西安市长安区西太路西安电子科技大学南校区。我的提问是：${rec_result}请简洁回答。`, current_active)
+        let prompt = "你定位失败，无法获得我的位置信息。请简洁回答。我的提问是："
+        let location_info = "定位超时，无法获得你的位置信息。"
+        return { 'prompt': prompt, 'location_info': location_info }
+    }
+
+    function requestLocaion() {
+        AMap.plugin('AMap.Geolocation', function () {
+            const geolocation = new AMap.Geolocation({
+                enableHighAccuracy: true,  // 是否使用高精度定位，默认:true
+                timeout: 100,  // 超过多少毫秒后停止定位，默认：5s
+            });
+            geolocation.getCurrentPosition(function (status, result) {
+                if (status == 'complete') {
+                    // 成功时的处理
+                    return onComplete(result)
+                } else {
+                    // 失败时的处理
+                    return onError(result)
+                }
+            });
+        });
+
     }
 }

@@ -38,6 +38,7 @@ from agent_files.agent_speech_synthesis import agent_audio_generate
 from lib import logging
 from agent_files.async_task_queue import AsyncTaskQueue
 from agent_files.obstacle_avoid.detect import obstacle_avoid_realize
+from agent_files.vision_seek.detect import detector
 
 # ----- 加载全局应用 -----
 app = Flask(__name__)
@@ -77,7 +78,8 @@ def before_request():
         except Exception as e:
             return (
                 jsonify(
-                    {"message": "Token has expired!", "code": 401, "error": str(e)}
+                    {"message": "Token has expired!",
+                        "code": 401, "error": str(e)}
                 ),
                 401,
             )
@@ -219,7 +221,8 @@ def rename_image():
         return jsonify({"success": False, "error": "Old file not found"}), 400
 
     old_path = os.path.join(IMAGE_FOLDER, old_file)
-    new_path = os.path.join(IMAGE_FOLDER, new_name + os.path.splitext(old_file)[1])
+    new_path = os.path.join(IMAGE_FOLDER, new_name +
+                            os.path.splitext(old_file)[1])
 
     try:
         os.rename(old_path, new_path)
@@ -243,7 +246,8 @@ def save_item_image():
         name, ext = os.path.splitext(filename)
         return (
             jsonify(
-                {"success": True, "image_name": name, "image_url": f"/image/{filename}"}
+                {"success": True, "image_name": name,
+                    "image_url": f"/image/{filename}"}
             ),
             200,
         )
@@ -278,8 +282,8 @@ def delete_image():
 # ----- 加载全局变量 -----
 # 加载 api_key
 with open("./static/api.json", "r", encoding="utf-8") as f:
-    data = json.load(f)
-    api_key_zhipu = data["zhipu"]["api_key"]
+    api_data = json.load(f)
+    api_key_zhipu = api_data["zhipu"]["api_key"]
     client = ZhipuAI(api_key=api_key_zhipu)
 
 
@@ -397,7 +401,8 @@ def encode_message_content(message):
     """对消息内容进行 Base64 编码"""
     if isinstance(message, dict) and "content" in message:
         content = message["content"]
-        encoded_content = base64.b64encode(content.encode("utf-8")).decode("utf-8")
+        encoded_content = base64.b64encode(
+            content.encode("utf-8")).decode("utf-8")
         message["content"] = encoded_content
     return message
 
@@ -479,12 +484,14 @@ def register():
             f.truncate()
 
         # 注册成功后直接生成 token
-        access_token = create_access_token(identity=username, expires_delta=False)
+        access_token = create_access_token(
+            identity=username, expires_delta=False)
         session["username"] = username
         session["nickname"] = nickname
 
         return (
-            jsonify({"message": "注册成功", "code": 200, "access_token": access_token}),
+            jsonify({"message": "注册成功", "code": 200,
+                    "access_token": access_token}),
             200,
         )
 
@@ -593,7 +600,8 @@ def get_chat_history():
         return jsonify({"error": str(e)}), 401
 
     # 对聊天记录进行解码
-    chat_history = [decode_message_content(msg.copy()) for msg in encoded_chat_history]
+    chat_history = [decode_message_content(
+        msg.copy()) for msg in encoded_chat_history]
 
     return jsonify(chat_history)
 
@@ -610,7 +618,8 @@ def init_chat_history(current_user, agent_name, messages):
                 encoded_chat_history = user["agents"][agent_name]["chat_history"]
                 break
     # 对聊天记录进行解码
-    messages = [decode_message_content(msg.copy()) for msg in encoded_chat_history]
+    messages = [decode_message_content(msg.copy())
+                for msg in encoded_chat_history]
 
     return messages
 
@@ -636,7 +645,8 @@ def build_response(current_user, agent_name, user_talk, video_open):
             )
         else:
             dst_messages.append(
-                {"role": "user", "content": [{"type": "text", "text": user_talk}]}
+                {"role": "user", "content": [
+                    {"type": "text", "text": user_talk}]}
             )
             print(f"未找到图片{IAMGE_SAVE_PATH}！")
         # 保存和多模态大模型的聊天
@@ -720,6 +730,11 @@ def message_format_tran(src_messages: list):
         dst_messages.append(temp_msg)
     return dst_messages
 
+@app.route("/gaode_api", methods=["GET"])
+def gaode_api():
+    """返回高德 API 相关信息"""
+    gaode_info = api_data.get("gaode", {})
+    return jsonify(gaode_info)
 
 @app.route("/agent/upload_image", methods=["POST"])
 def upload_image():
@@ -741,20 +756,30 @@ def upload_image():
     state = data["state"]
 
     try:
-        cv2.imread(IAMGE_SAVE_PATH)
+        mat_image = cv2.imread(IAMGE_SAVE_PATH)
     except Exception:
-        return jsonify({"message": "Image is empty", "obstacle_info": []}), 400
+        return jsonify({"message": "Image is empty"}), 400
 
     if state == 1:
         try:
-            obstacle_info = obstacle_avoid_realize(IAMGE_SAVE_PATH)
+            obstacle_info = obstacle_avoid_realize(mat_image)
             print("[run.py][upload_image] obstacle_info:", obstacle_info)
             return jsonify({"message": "Success", "obstacle_info": obstacle_info}), 200
-        except Exception:
-            print("[run.py][upload_image] error:", "图片为空")
-            return jsonify({"message": "Image is empty", "obstacle_info": []}), 400
+        except Exception as e:
+            print("[run.py][upload_image] error:", e)
+            return jsonify({"message": "Error", "obstacle_info": []}), 400
 
-    return jsonify({"message": "Success", "obstacle_info": []}), 200
+    elif state == 2:
+        try:
+            detect_result = detector.detect_main(mat_image)
+            item_info = [] if detect_result == -1 else detect_result
+            print("[run.py][upload_image] item_info:", item_info)
+            return jsonify({"message": "Success", "item_info": item_info}), 200
+        except Exception as e:
+            print("[run.py][upload_image] error:", e)
+            return jsonify({"message": "Error", "item_info": []}), 400
+
+    return jsonify({"message": "Success"}), 200
 
 
 @app.route("/agent/upload_audio", methods=["POST"])
@@ -791,11 +816,12 @@ def agent_upload_audio():
 
     # 语音识别
     # rec_result = speech_rec(resampled_audio_data)
-    rec_result = "请尝试简短地回答"  # 添加测试
+    rec_result = "我现在的位置"  # 添加测试
     print("音频识别结果：", rec_result)
 
     # 音频识别结果发送到前端
-    socketio.emit("agent_speech_recognition_finished", {"rec_result": rec_result})
+    socketio.emit("agent_speech_recognition_finished",
+                  {"rec_result": rec_result})
 
     return jsonify({"message": "File uploaded successfully and processed"}), 200
 
@@ -832,7 +858,7 @@ def agent_stream_audio(current_token: str):
         elif "##<state=2>" in current_token:
             socketio.emit("find_item", {"flag": "begin"})
             audio_chunk = agent_audio_generate(
-                current_token[current_token.find(">") + 1 :]
+                current_token[current_token.find(">") + 1:]
             )
             audio_file_path = ""
         else:
@@ -861,7 +887,8 @@ def agent_stream_audio(current_token: str):
 
         # 如果收到结束标记
         if "<END>" in current_token:
-            logging.info("run.py", "agent_stream_audio", "大模型响应结束", color="red")
+            logging.info("run.py", "agent_stream_audio",
+                         "大模型响应结束", color="red")
 
             # 处理缓冲区中剩余的内容
             if USER_VAR[user]["sentence_buffer"]:
@@ -885,11 +912,12 @@ def agent_stream_audio(current_token: str):
 
         # 如果找到断句符号，则生成完整句子
         complete_sentence = (
-            USER_VAR[user]["sentence_buffer"] + current_token[: pause_index + 1]
+            USER_VAR[user]["sentence_buffer"] +
+            current_token[: pause_index + 1]
         )
 
         # 更新缓冲区
-        USER_VAR[user]["sentence_buffer"] = current_token[pause_index + 1 :]
+        USER_VAR[user]["sentence_buffer"] = current_token[pause_index + 1:]
 
         # 将音频生成任务加入队列
         USER_VAR[user]["task_queue"].add_task_sync(

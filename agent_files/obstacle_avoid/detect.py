@@ -171,7 +171,7 @@ yolo_classes_en_to_zh = {
     'unknown': '未知'
 }
 
-def detect(frame):
+def obstacle_avoid_realize(frame):
     """避障算法实现
 
     Args:
@@ -192,19 +192,20 @@ def detect(frame):
             label = yolo_classes_en_to_zh.get(label_0)
         else:
             label_0 = "unknown"
-            label = "未知障碍物"
+            label = "障碍物"
         if confidence > confidence_threshold:
             p = y + h / 2  # 像素坐标
+
+            # 解算出真实距离
             distance_real = -2.08054369e-12*p**4 + 6.25478630e-09*p**3 - 5.88280567e-06*p**2 + 1.07600182e-03*p + 9.74917750e-01
+            
             distance_dic[label] = distance_real
-            distance_dic_all[label] = [y + h / 2, w, h]
+            distance_dic_all[label] = [p, w, h]
+
     label_min, distance_min = min(distance_dic.items(), key=lambda x: x[1])
     obstacle_info.append({"label": label_min, "distant": distance_min.item(),
-                          "location": {"tl": distance_dic_all[label_min][0].item(), "w": distance_dic_all[label_min][1].item(), "h": distance_dic_all[label_min][2].item()}})
+                          "location": {"tl": distance_dic_all[label_min][0].item(), 
+                                       "w": distance_dic_all[label_min][1].item(), 
+                                       "h": distance_dic_all[label_min][2].item()}})
     # print(f"{label_min}距离{distance_min}:{distance_dic_all[label_min][0]}:{distance_dic_all[label_min][1]}:{distance_dic_all[label_min][2]}")
-    return obstacle_info
-
-def obstacle_avoid_realize(path):
-    frame = cv2.imread(path)
-    obstacle_info = detect(frame)
     return obstacle_info

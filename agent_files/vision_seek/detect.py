@@ -17,6 +17,8 @@ with open('agent_files/vision_seek/class.txt', 'r') as f:
 feature_detector = cv2.ORB_create(nfeatures=10000)
 
 # 目标物品检测器
+
+
 class ObjectDetector:
     def __init__(self):
         # 目标物品
@@ -97,6 +99,8 @@ class ObjectDetector:
 
     # 目标物品检测
     def detect_main(self, img):
+        # 获得图像宽高
+        height, width = img.shape[:2]
         # 物体检测
         results = model.predict(img, conf=0.3)
 
@@ -128,24 +132,31 @@ class ObjectDetector:
                     height, width = self.template_1.shape[:2]
                     template_ratio_1 = width / height
                     template_ratio_2 = height / width
-                    template_ratio_max = max(template_ratio_1, template_ratio_2)
-                    template_ratio_min = min(template_ratio_1, template_ratio_2)
+                    template_ratio_max = max(
+                        template_ratio_1, template_ratio_2)
+                    template_ratio_min = min(
+                        template_ratio_1, template_ratio_2)
                     object_ratio = w / h
                     if object_ratio > template_ratio_max * 1.5 or object_ratio < template_ratio_min / 1.5:
                         continue
 
                     # 使用双三次插值放大图像
-                    roi = cv2.resize(roi, (0, 0), fx=2, fy=2, interpolation=cv2.INTER_CUBIC)
+                    roi = cv2.resize(roi, (0, 0), fx=2, fy=2,
+                                     interpolation=cv2.INTER_CUBIC)
                     # 去噪处理
-                    denoised_image = cv2.fastNlMeansDenoisingColored(roi, None, 10, 10, 7, 21)
+                    denoised_image = cv2.fastNlMeansDenoisingColored(
+                        roi, None, 10, 10, 7, 21)
                     # 增强对比度
-                    gray_image = cv2.cvtColor(denoised_image, cv2.COLOR_BGR2GRAY)
+                    gray_image = cv2.cvtColor(
+                        denoised_image, cv2.COLOR_BGR2GRAY)
                     roi = cv2.equalizeHist(gray_image)
 
                     # 特征点匹配
                     def get_matches(template, roi):
-                        kp1, des1 = feature_detector.detectAndCompute(template, None)
-                        kp2, des2 = feature_detector.detectAndCompute(roi, None)
+                        kp1, des1 = feature_detector.detectAndCompute(
+                            template, None)
+                        kp2, des2 = feature_detector.detectAndCompute(
+                            roi, None)
                         if (des1 is None) or (des2 is None) or len(des2) < 2:
                             return None    # 未检测到特征点或特征点数小于2
                         if des1.dtype != des2.dtype:
@@ -159,11 +170,16 @@ class ObjectDetector:
                     matches_results = []
 
                     with ThreadPoolExecutor(max_workers=5) as executor:
-                        future_matches_1 = executor.submit(get_matches, self.template_1, roi)
-                        future_matches_2 = executor.submit(get_matches, self.template_2, roi)
-                        future_matches_3 = executor.submit(get_matches, self.template_3, roi)
-                        future_matches_4 = executor.submit(get_matches, self.template_4, roi)
-                        future_matches_5 = executor.submit(get_matches, self.template_5, roi)
+                        future_matches_1 = executor.submit(
+                            get_matches, self.template_1, roi)
+                        future_matches_2 = executor.submit(
+                            get_matches, self.template_2, roi)
+                        future_matches_3 = executor.submit(
+                            get_matches, self.template_3, roi)
+                        future_matches_4 = executor.submit(
+                            get_matches, self.template_4, roi)
+                        future_matches_5 = executor.submit(
+                            get_matches, self.template_5, roi)
 
                         for future in as_completed([future_matches_1, future_matches_2, future_matches_3, future_matches_4, future_matches_5]):
                             matches_ = future.result()
@@ -202,7 +218,13 @@ class ObjectDetector:
                             size_min = size
                             x_min, y_min, w_min, h_min = x1, y1, w, h
                     print(f'x: {x_min}, y: {y_min}, w: {w_min}, h: {h_min}')
-                    result = {'x': x_min, 'y': y_min, 'w': w_min, 'h': h_min}
+
+                    left = (x_min + w / 2) / width
+                    top = (y_min + h / 2) / height
+
+                    # result = [{'x': x_min, 'y': y_min, 'w': w_min, 'h': h_min}]
+                    result = [{'left': left, 'top': top}]
+
                     return result
                 else:
                     print('未检测到该物品!')
@@ -210,7 +232,7 @@ class ObjectDetector:
             else:
                 print('未检测到该物品!')
                 return -1
-    
+
     # 释放资源
     def release(self):
         self.template_1 = np.array([])
