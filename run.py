@@ -755,7 +755,7 @@ def agent_chat_stream():
     user_talk = request.args.get("query")
     agent_name = request.args.get("agent", "defaultAgent")  # 获取选择的智能体
     video_open = request.args.get("videoOpen", "false") == "true"  # 获取选择的智能体
-    multi_image_talk = request.args.get("multi_image_talk", False)  # 是否开启多轮对话
+    multi_image_talk = request.args.get("multi_image_talk", "false") == "true" # 是否开启多轮对话
     current_user = get_jwt_identity()
 
     responses, messages = build_response(

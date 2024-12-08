@@ -474,6 +474,10 @@ p {
     height: 30px;
 }
 
+#imageUploadPanel .content .add input {
+    display: none;
+}
+
 #topbar {
     display: flex;
     justify-content: center;

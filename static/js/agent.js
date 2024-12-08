@@ -1,5 +1,5 @@
-var image_impt = null;
-var flag_board = 0;
+let image_impt = null;
+let flag_board = 0;
 
 // 在 DOM 加载完成后获取聊天记录
 document.addEventListener('DOMContentLoaded', function () {
@@ -35,11 +35,11 @@ function loadChatHistory(agent) {
                 history.forEach(msg => {
                     if (msg.role === 'user') {
                         // 创建用户消息
-                        var messagesContainer_user = document.createElement('div');
+                        const messagesContainer_user = document.createElement('div');
                         messagesContainer_user.className = 'chat-messages-user';
-                        var bubble = document.createElement('div');
+                        const bubble = document.createElement('div');
                         bubble.className = 'chat-bubble-user';
-                        var image_user = document.createElement('div');
+                        const image_user = document.createElement('div');
                         image_user.className = 'chat-image-user';
                         bubble.textContent = msg.content;
 
@@ -48,12 +48,12 @@ function loadChatHistory(agent) {
                         messagesContainer_user.appendChild(image_user);
                     } else if (msg.role === 'assistant') {
                         // 创建机器人消息
-                        var image_bot = document.createElement('div');
+                        const image_bot = document.createElement('div');
                         image_bot.className = 'chat-image-bot';
                         image_bot.style.backgroundImage = `url('${botImageUrl}')`;
-                        var messagesContainer_bot = document.createElement('div');
+                        const messagesContainer_bot = document.createElement('div');
                         messagesContainer_bot.className = 'chat-messages-bot';
-                        var bubble_2 = document.createElement('div');
+                        const bubble_2 = document.createElement('div');
                         bubble_2.className = 'chat-bubble-bot';
                         bubble_2.textContent = msg.content;
 
@@ -86,6 +86,8 @@ document.getElementById('send-button').addEventListener('click', function () {
         if (flag_board === 1) {
             document.getElementById('more_function_button_2').click();
         }
+        clearImageDiv(); // 清空图片内容
+        document.getElementById('imageUploadPanel').style.display = 'none'; // 隐藏imageUploadPanel
     }
     document.getElementById('agent-chat-textarea').style.height = 'auto';
 });
@@ -110,14 +112,13 @@ function addMessage(message) {
     --------------------------------------------------------- */
 
     // 获取本地 token
-    const token = localStorage.getItem('token');
 
-    var messagebackground = document.getElementById('chat-container');
-    var messagesContainer_user = document.createElement('div');
+    const messagebackground = document.getElementById('chat-container');
+    const messagesContainer_user = document.createElement('div');
     messagesContainer_user.className = 'chat-messages-user';
-    var bubble = document.createElement('div');
+    const bubble = document.createElement('div');
     bubble.className = 'chat-bubble-user';
-    var image_user = document.createElement('div');
+    const image_user = document.createElement('div');
     image_user.className = 'chat-image-user';
     bubble.textContent = message;
 
@@ -126,8 +127,7 @@ function addMessage(message) {
     // 处理上传的图像
     if (uploadedImages.length > 0) {
         multi_image_talk = true;
-        let index = 0
-        const promises = uploadedImages.map(file => {
+        const promises = uploadedImages.map((file, index) => {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
                 reader.onload = function (event) {
@@ -138,7 +138,6 @@ function addMessage(message) {
                     imageElement.style.height = 'auto';
                     bubble.appendChild(imageElement);
 
-                    const token = localStorage.getItem('token');
                     // 发送图像到后端
                     fetch('/agent/upload_image', {
                         method: 'POST',
@@ -146,7 +145,7 @@ function addMessage(message) {
                             'Content-Type': 'application/json',
                             'Authorization': `Bearer ${token}`
                         },
-                        body: JSON.stringify({ image: imageUrl, multi_image_index: index})
+                        body: JSON.stringify({ image: imageUrl, multi_image_index: index })
                     })
                         .then(response => response.json())
                         .then(data => {
@@ -157,7 +156,6 @@ function addMessage(message) {
                             console.error('图片上传失败:', error);
                             reject(error);
                         });
-                    index += 1;  // 上传的图片序号加一
                 };
                 reader.readAsDataURL(file);
             });
@@ -165,6 +163,7 @@ function addMessage(message) {
 
         // 等待所有图片上传完成后再发送消息
         Promise.all(promises).then(() => {
+            uploadedImages = [];
             sendMessageToAgent(message, multi_image_talk);
         }).catch(error => {
             console.error('图片上传过程中出错:', error);
@@ -172,7 +171,6 @@ function addMessage(message) {
     } else {
         sendMessageToAgent(message, multi_image_talk);
     }
-
     messagebackground.appendChild(messagesContainer_user);
     messagesContainer_user.appendChild(bubble);
     messagesContainer_user.appendChild(image_user);
@@ -185,13 +183,13 @@ function addMessage(message) {
  */
 function sendMessageToAgent(message, multi_image_talk) {
     // 机器人响应
-    var image_bot = document.createElement('div');
+    const image_bot = document.createElement('div');
     image_bot.className = 'chat-image-bot';
     const botImageUrl = selectedAgent === 'psychologicalAgent' ? '../static/images/psychologicalAgent.jpg' : '../static/images/defaultAgent.jpg';
     image_bot.style.backgroundImage = `url('${botImageUrl}')`;
-    var messagesContainer_bot = document.createElement('div');
+    const messagesContainer_bot = document.createElement('div');
     messagesContainer_bot.className = 'chat-messages-bot';
-    var bubble_2 = document.createElement('div');
+    const bubble_2 = document.createElement('div');
     bubble_2.className = 'chat-bubble-bot';
 
     fetch(`/agent/chat_stream?query=${message}&agent=${selectedAgent}&multi_image_talk=${multi_image_talk}`, {
@@ -225,6 +223,7 @@ function sendMessageToAgent(message, multi_image_talk) {
 
     messagesContainer_bot.appendChild(image_bot);
     messagesContainer_bot.appendChild(bubble_2);
+    const messagebackground = document.getElementById('chat-container');
     messagebackground.appendChild(messagesContainer_bot);
     messagebackground.scrollTop = messagebackground.scrollHeight;
 }
@@ -394,24 +393,6 @@ document.getElementById('decorate_photo').addEventListener('click', function () 
     }
 })
 
-// 测试一下元素消失操作
-function main_page_hidden() {
-    document.getElementById('main_page').style.display = 'none';
-}
-
-function main_page_show() {
-    //定时出现
-    setTimeout(() => {
-        document.getElementById('main_page').style.display = 'flex';
-    }, 1000);
-}
-
-function flicker_hidden() {
-    setTimeout(() => {
-        document.getElementById('flicker').style.display = 'none';
-    }, 1000);
-}
-
 document.getElementById('more_function_button_2').style.display = 'none';
 
 /* 音频播放相关 start
@@ -442,7 +423,7 @@ socket.on('agent_play_audio_chunk', function (data) {
     const audioIndex = data['index'];
     const audioData = data['audio_chunk'];
 
-    // 将音频数��添加到队列中
+    // 将音频数据添加到队列中
     audioQueue[audioIndex] = audioData;
 
     // 如果当前没有音频正在播放，开始播放
@@ -474,7 +455,7 @@ function playNextAudio() {
         // 标识音频正在播放
         isPlaying = true;
 
-        // 将音频数据转换为 Blob 对象，并对其创建资源 URL，从而设置音频播放器的播放源（播放源只能是 URL）
+        // 将音频数据转换为 Blob 对象，并对其创建资源 URL，从而设置音频播放器的播放源（播放��只能是 URL）
         const audioBlob = new Blob([nextAudioData], { type: 'audio/mp3' });
         const audioURL = URL.createObjectURL(audioBlob);
         audioPlayer.src = audioURL;
