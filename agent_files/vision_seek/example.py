@@ -7,7 +7,7 @@ from detect import detector
 cap = cv2.VideoCapture(0)
 
 # 获取初始目标物品图像
-temp_1 = cv2.imread('agent_files/vision_seek/template.jpg', 1)
+temp_1 = cv2.imread('agent_files/vision_seek/template1.jpg', 1)
 temp_2 = cv2.imread('agent_files/vision_seek/template2.jpg', 1)
 temp_3 = cv2.imread('agent_files/vision_seek/template3.jpg', 1)
 temp_4 = cv2.imread('agent_files/vision_seek/template4.jpg', 1)
@@ -19,7 +19,8 @@ new_frame_time = 0
 
 # 提取出目标物品的分割图像
 init_state = detector.detect_init(temp_1, temp_2, temp_3, temp_4, temp_5)
-if init_state == -1:
+if init_state != 0:
+    print(f'未检测到第 {init_state} 张图片中的目标物品, 请重新上传目标物品图片')
     print('初始化失败')
     exit()
 
@@ -35,6 +36,8 @@ while True:
         h = result['h']
         cvzone.cornerRect(frame, (x, y, w, h))
         # cvzone.putTextRect(frame, f'{classNames[cls]} {conf}', (max(0, x1), max(35, y1)), scale=1, thickness=1)
+    else:
+        print('未检测到该物品!')
 
     cv2.imshow('Img', cv2.flip(frame, 1))
 
