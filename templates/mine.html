@@ -8,22 +8,22 @@
     <link rel="icon" href="../static/favicon.ico" />
   </head>
   <body>
-    <div class="profile">
+    <div class="profile" aria-label="用户资料">
       <img src="../static/images/user.jpg" alt="用户头像" class="avatar">
       <div class="user-info">
-        <div class="username">不知名的大侠</div>
-        <div class="user-account">账号: 获取失败</div>
+        <div class="username" aria-label="用户名">不知名的大侠</div>
+        <div class="user-account" aria-label="用户账号">账号: 获取失败</div>
       </div>
     </div>
 
-    <div class="options">
-      <a href="/photo_manage" class="option">寻物画廊</a>
-      <a href="" class="option">联系我们</a>
-      <a href="" class="option">设置</a>
-      <a class="option logout">退出登录</a>
+    <div class="options" aria-label="用户选项">
+      <a href="/photo_manage" class="option" aria-label="前往寻物画廊">寻物画廊</a>
+      <a href="" class="option" aria-label="联系我们">联系我们</a>
+      <a href="" class="option" aria-label="进入设置">设置</a>
+      <a class="option logout" aria-label="退出登录">退出登录</a>
     </div>
 
-    <div id="navbar" role="navigation">
+    <div id="navbar" role="navigation" aria-label="主导航栏">
       <a href="/agent" aria-label="首页">首页</a>
       <a href="/chat" aria-label="消息">消息</a>
       <a href="/create" aria-label="创建">

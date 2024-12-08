@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 
 <head>
     <meta charset="UTF-8">
@@ -11,29 +11,31 @@
 </head>
 
 <body>
-    <div class="header">
-        <button class="back-button" onclick="window.location.href='/mine'">&#8592;</button>
+    <div class="header" role="banner" aria-label="页眉">
+        <button class="back-button" onclick="window.location.href='/mine'" aria-label="返回我的页面">&#8592;</button>
         视界之声-寻物画廊
     </div>
 
-    <div class="gallery" id="gallery"></div>
+    <div class="gallery" id="gallery" role="region" aria-label="照片画廊"></div>
 
-    <div id="footer" class="footer">
-        <button id="addButton" style="height: 85%; width: 80%;">&#10010;</button>
-        <button id="cameraButton" style="display: none;">从摄像头获取</button>
-        <button id="albumButton" style="display: none;">从相册获取</button>
-        <button id="cancelButton" style="display: none; width: 80%;">取消</button>
-        <input type="file" id="fileInput" accept="image/*" capture="camera" style="display: none;">
+    <div id="footer" class="footer" role="contentinfo" aria-label="页脚">
+        <button id="addButton" aria-label="添加照片" style="height: 85%; width: 80%;">&#10010;</button>
+        <button id="cameraButton" aria-label="从摄像头获取照片" style="display: none;">从摄像头获取</button>
+        <button id="albumButton" aria-label="从相册获取照片" style="display: none;">从相册获取</button>
+        <button id="cancelButton" aria-label="取消" style="display: none; width: 80%;">取消</button>
+        <input type="file" id="fileInput" accept="image/*" capture="camera" aria-label="选择图片文件" style="display: none;">
     </div>
 
-    <div id="myModal" class="modal">
+    <div id="myModal" class="modal" role="dialog" aria-labelledby="modalTitle" aria-modal="true">
         <div class="modal-content">
-            <img id="modalImage" src="" alt="">
-            <input type="text" id="imageName" value="">
-            <button id="saveButton">修改</button>
-            <button id="deleteButton">删除</button>
-            <span id="statusMessage" style="margin-left: 50px;"></span>
-            <button id="backButton" style="display: block; margin-top: 10px;">返回</button>
+            <h2 id="modalTitle" style="display: none;">照片详情</h2>
+            <img id="modalImage" src="" alt="照片预览" aria-labelledby="modalImageDescription">
+            <p id="modalImageDescription" style="display: none;">照片预览</p>
+            <input type="text" id="imageName" value="" aria-label="照片名称">
+            <button id="saveButton" aria-label="保存更改">修改</button>
+            <button id="deleteButton" aria-label="删除照片">删除</button>
+            <span id="statusMessage" aria-live="polite" style="margin-left: 50px;"></span>
+            <button id="backButton" aria-label="返回" style="display: block; margin-top: 10px;">返回</button>
         </div>
     </div>
 
