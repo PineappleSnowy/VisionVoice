@@ -32,7 +32,7 @@ p {
 
 #navbar {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
     background-color: #44498c;
     /* 保持原有颜色 */
@@ -49,10 +49,10 @@ p {
     text-decoration: none;
     color: inherit;
     margin: 0px 2px;
-    padding: 10px 20px;
+    padding: 10px 15px;
     border-radius: 5px;
     transition: background-color 0.3s ease;
-    font-size: 13px;
+    font-size: 1rem;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -86,8 +86,17 @@ p {
     padding: 0;
 }
 
-#send-button {
+/* ------------------ 输入框内的按钮 ------------------ */
+#more_function_button #more_function_start {
     display: flex;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 25px;
+    height: 25px;
+}
+
+#send-button {
     position: relative;
     top: 5px;
     padding: 10px;
@@ -118,7 +127,6 @@ p {
 }
 
 #more_function_button {
-    display: none;
     position: relative;
     top: 5px;
     padding: 10px;
@@ -139,14 +147,6 @@ p {
     background-color: #0056b3;
 }
 
-#more_function_button #more_function_start {
-    display: flex;
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    width: 25px;
-    height: 25px;
-}
 
 #more_function_button_2 {
     display: none;
@@ -194,7 +194,7 @@ p {
     background-color: rgba(0, 0, 0, 0.8);
     color: #ffffff;
     border-radius: 10px 10px 0 0;
-    padding: 10px 100px 10px 15px;
+    padding: 10px 100px 10px 45px;
     font-size: 16px;
     border: 1px solid rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(10px);
@@ -491,4 +491,21 @@ p {
 #agent-name {
     font-size: 20px;
     font-weight: bold;
+}
+
+#microphone-button {
+    position: absolute;
+    left: 0.3rem;
+    bottom: 0.7rem;
+    width: 2.4rem;
+    height: 2.4rem;
+    background-image: url('../images/microphone.png');
+    background-size: 2rem;
+    background-repeat: no-repeat;
+    background-position: center;
+    border-radius: 50%;
+    border: none;
+    background-color: #007bff;
+    cursor: pointer;
+    z-index: 1;
 }

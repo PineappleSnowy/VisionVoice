@@ -23,6 +23,10 @@
     <div id="chat-container" aria-live="polite" aria-atomic="true"></div>
     <!-- 下部功能区 -->
     <div id="chat-input-container" role="form">
+
+      <!-- 语音输入按钮 -->
+      <button id="microphone-button" aria-label="语音输入"></button>
+
       <div id="imageUploadPanel" style="display: none;">
         <div class="content">
           <!-- 图片列表在这里 -->
@@ -61,10 +65,11 @@
     </div>
   </div>
 
-  <!-- 音频��放标签 -->
+  <!-- 音频放标签 -->
   <audio id="audioPlayer" controls autoplay style="display: none" aria-label="音频播放器"></audio>
   <script src="../static/js/auth.js"></script>
   <script src="../static/js/chat.js"></script>
+  <script src="../static/js/lib/recorder.js"></script>
   <script src="../static/js/agent.js"></script>
 </body>
 
