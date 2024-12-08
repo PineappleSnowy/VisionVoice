@@ -2,8 +2,9 @@ var image_impt = null;
 var flag_board = 0;
 
 // 在 DOM 加载完成后获取聊天记录
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     loadChatHistory(selectedAgent);
+    updateAgentName(selectedAgent);
 });
 
 // 创建socket连接，并附上token用于后端验证
@@ -21,7 +22,8 @@ const socket = io({
  */
 function loadChatHistory(agent) {
     const messagebackground = document.getElementById('chat-container');
-    
+    const botImageUrl = agent === 'psychologicalAgent' ? '../static/images/psychologicalAgent.jpg' : '../static/images/defaultAgent.jpg';
+
     fetch(`/get-chat-history?agent=${agent}`, {
         headers: {
             "Authorization": `Bearer ${localStorage.getItem('token')}`
@@ -48,6 +50,7 @@ function loadChatHistory(agent) {
                         // 创建机器人消息
                         var image_bot = document.createElement('div');
                         image_bot.className = 'chat-image-bot';
+                        image_bot.style.backgroundImage = `url('${botImageUrl}')`;
                         var messagesContainer_bot = document.createElement('div');
                         messagesContainer_bot.className = 'chat-messages-bot';
                         var bubble_2 = document.createElement('div');
@@ -174,6 +177,8 @@ function addMessage(message) {
     // 机器人响应
     var image_bot = document.createElement('div');
     image_bot.className = 'chat-image-bot';
+    const botImageUrl = selectedAgent === 'psychologicalAgent' ? '../static/images/psychologicalAgent.jpg' : '../static/images/defaultAgent.jpg';
+    image_bot.style.backgroundImage = `url('${botImageUrl}')`;
     var messagesContainer_bot = document.createElement('div');
     messagesContainer_bot.className = 'chat-messages-bot';
     var bubble_2 = document.createElement('div');
@@ -327,36 +332,6 @@ function clearImageDiv() {
     addDiv.appendChild(input);
     content.appendChild(addDiv);
 }
-// //捕捉用户选择的图像
-// document.getElementById('photo').addEventListener('change', function (e) {
-//     var file = e.target.files[0];
-//     var reader = new FileReader();
-//     reader.onload = function (event) {
-//         image_impt = event.target.result;
-//         console.log('用户上传图片');
-//         document.getElementById('photo').value = '';
-//         // 显示图片预览
-//         document.getElementById('preview-image').src = image_impt;
-//         document.getElementById('image-preview').style.display = 'block';
-
-//         // 将图片数据发送到后端
-//         fetch('/agent/upload_image', {
-//             method: 'POST',
-//             headers: {
-//                 'Content-Type': 'application/json'
-//             },
-//             body: JSON.stringify({ image: image_impt })
-//         })
-//             .then(response => response.json())
-//             .then(data => {
-//                 console.log('图片上传成功:', data);
-//             })
-//             .catch(error => {
-//                 console.error('图片上传失败:', error);
-//             });
-//     };
-//     // reader.readAsDataURL(file);
-// })
 
 // 按下回车键也可以发送消息
 document.getElementById('agent-chat-textarea').addEventListener('keypress', function (e) {
@@ -462,7 +437,7 @@ document.getElementById('more_function_button_2').style.display = 'none';
 - 前端需要将这些分段的音频数据存储到队列（本质是 list 列表）中。
 - 当音频开始播放时，队列的第一个元素出栈，并播放。
 - 当元素播放结束后，继续播放下一个元素，直到队列中没有元素为止
---------------------------------------------------------- */ 
+--------------------------------------------------------- */
 
 // 获取暂停按钮元素
 const pauseDiv = document.querySelector('.pause');
@@ -485,7 +460,7 @@ socket.on('agent_play_audio_chunk', function (data) {
     const audioIndex = data['index'];
     const audioData = data['audio_chunk'];
 
-    // 将音频数据添加到队列中
+    // 将音频数��添加到队列中
     audioQueue[audioIndex] = audioData;
 
     // 如果当前没有音频正在播放，开始播放
@@ -558,3 +533,19 @@ pauseDiv.addEventListener('click', function () {
 
 /* 音频播放相关 end
 --------------------------------------------------------- */
+
+/**
+ * @function updateAgentName
+ * @description 更新顶栏中显示的智能体名称
+ * @param {string} agent 智能体名称
+ */
+function updateAgentName(agent) {
+    let agent_name = '';
+    if (agent == 'defaultAgent')
+        agent_name = "生活助手";
+    else if (agent == 'psychologicalAgent')
+        agent_name = "心灵树洞";
+    else
+        agent_name = '智能体名称';
+    document.getElementById('agent-name').textContent = agent_name;
+}

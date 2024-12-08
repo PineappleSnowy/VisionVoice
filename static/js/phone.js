@@ -437,6 +437,14 @@ window.startFindItem = function(item_name) {
 }
 
 window.onload = async () => {
+    // 根据当前智能体选择设置智能体头像
+    const botImage = document.querySelector('.container img');
+    if (selectedAgent === 'psychologicalAgent') {
+        botImage.src = '../static/images/psychologicalAgent.jpg';
+    } else {
+        botImage.src = '../static/images/defaultAgent.jpg';
+    }
+
     // 检查 URL 中的查询参数
     const urlParams = new URLSearchParams(window.location.search);
     const camera = urlParams.get('camera');

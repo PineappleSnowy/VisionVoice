@@ -451,7 +451,7 @@ def register():
 
             # 注册完后向用户信息中添加预设智能体，此处可以后续智能体定制兼容
             sys_prompt = "你是视界之声，一位乐于助人的对话助手。为了能让用户能尽快解决问题，你的话语总是十分简洁而概要。"
-            background_info = "（旁白：苏梦远主演了陆星辰导演的一部音乐题材电影，在拍摄期间，两人因为一场戏的表现有分歧。） 导演，关于这场戏，我觉得可以尝试从角色的内心情感出发，让表现更加真实。"
+            background_info = "嗨，亲爱的朋友，我是小天，很高兴能和你在这心灵的角落相遇。不管你眼前的世界是怎样的，我都在这儿陪着你，准备好和你一起聊聊内心的喜怒哀乐啦。"
             users.append(
                 {
                     "username": username,
@@ -660,17 +660,17 @@ def build_response(current_user, agent_name, user_talk, video_open):
         )
     else:
         if agent_name == "psychologicalAgent":
-            model_name = "charglm-3"
+            model_name = "emohaa"
             messages = init_chat_history(current_user, agent_name, messages)
 
             # 添加用户消息
             messages.append({"role": "user", "content": user_talk})
 
             meta = {
-                "user_info": "我是陆星辰，是一个男性...",
-                "bot_info": "苏梦远，本名苏远心...（说话的结尾一定有句号等结尾符���）",
-                "bot_name": "苏梦远",
-                "user_name": "陆星辰",
+                "user_info": "一位视障人士，失去光明，心情沉重",
+                "bot_info": "一位阳光开朗而耐心的年轻女孩，是视障朋友的心灵树洞，乐于帮助他们走出心灵的阴霾",
+                "bot_name": "盲人朋友",
+                "user_name": "小天",
             }
             # 调用大模型
             responses = client.chat.completions.create(
