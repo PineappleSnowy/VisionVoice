@@ -14,10 +14,5 @@
 # less 文件
 *.less
 
-<<<<<<< HEAD
-# pt 文件
-*.pt
-=======
 # yolo大体积模型
 yolo11x-seg.pt
->>>>>>> e286216b743c3d202c7bed2c69f23b070a095ec9
