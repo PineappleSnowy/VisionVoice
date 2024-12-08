@@ -105,7 +105,7 @@ class ObjectDetector:
                         targets.append(roi)
                         targets_origin.append(roi_)
                 else:
-                    return None
+                    return None, None
 
             areas = []
             for t in targets:
@@ -124,11 +124,15 @@ class ObjectDetector:
         self.templates_features = []
         for temp in templates:
             result, result_origin = get_target_img(temp)
-            self.templates.append(result)
-            # self.templates_features.append(extract_features(result))
-            self.templates_features.append(extract_features(result_origin))
+            if result is not None and result_origin is not None:
+                self.templates.append(result)
+                # self.templates_features.append(extract_features(result))
+                self.templates_features.append(extract_features(result_origin))
+            else:
+                self.templates.append(None)
+                self.templates_features.append(None)
+                break
 
-        i = 1
         for template in self.templates:
             if template is None:
                 self.templates = []
@@ -163,7 +167,7 @@ class ObjectDetector:
     # 目标物品检测
     def detect_main(self, img):
         # 获取图像的宽高
-        height, width, _ = img.shape
+        img_height, img_width, _ = img.shape
 
         # 物体检测
         results = model.predict(img, conf=0.3)
@@ -296,18 +300,18 @@ class ObjectDetector:
                             x_min, y_min, w_min, h_min = x1, y1, w, h
                     print(f'x: {x_min}, y: {y_min}, w: {w_min}, h: {h_min}')
 
-                    left = (x_min + w_min / 2) / width
-                    top = (y_min + h_min / 2) / height
+                    left = (x_min + w_min / 2) / img_width
+                    top = (y_min + h_min / 2) / img_height
 
                     # result = [{'x': x_min, 'y': y_min, 'w': w_min, 'h': h_min}]
                     result = [{'left': left, 'top': top}]
                     return result
                 else:
                     # print('未检测到该物品!')
-                    return -1
+                    return []
             else:
                 # print('未检测到该物品!')
-                return -1
+                return []
 
     # 释放资源
     def release(self):
