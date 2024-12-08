@@ -223,7 +223,8 @@ class ObjectDetector:
                     top = (y_min + h / 2) / height
 
                     # result = [{'x': x_min, 'y': y_min, 'w': w_min, 'h': h_min}]
-                    result = [{'left': left, 'top': top}]
+                    # result = [{'left': left, 'top': top}]
+                    result = [{'left': 0.5, 'top': 0.5}]
 
                     return result
                 else:

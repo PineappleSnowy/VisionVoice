@@ -406,8 +406,8 @@ function startAvoidObstacle() {
     }
     if (!obstacle_avoid) {
         obstacle_avoid = true;
-        startAudio()
         socket.emit("agent_stream_audio", "##<state=1>");
+        startAudio()
     }
 }
 
@@ -431,9 +431,9 @@ function startFindItem(item_name) {
     }
     if (!find_item) {
         find_item = true;
-        startAudio()
         find_item_name = item_name;
         socket.emit("agent_stream_audio", `##<state=2>开始寻找${item_name}`);
+        startAudio()
     }
 }
 
@@ -808,8 +808,8 @@ window.onload = async () => {
     findItemButton.addEventListener('click', () => {
         overlay.style.display = 'block';
         findItemModal.style.display = 'block';
-        loadGallery();
         closeOptionsBar();
+        loadGallery();
     });
 
     closeModalButton.addEventListener('click', () => {
@@ -920,5 +920,31 @@ window.onload = async () => {
         });
     }
 
-    
+    const currLocButton = document.querySelector('.optionButton.currentLocation');
+    currLocButton.addEventListener('click', async () => {
+        closeOptionsBar();
+        stopCheckSilenceTimer();
+        stopAudio();
+        finishShutUpStatus();
+        statusDiv.textContent = '获取位置';
+        if (vudio.dance()) { vudio.pause() }
+        let location_result = await requestLocaion();
+        let location_info = location_result['location_info']
+        socket.emit("agent_stream_audio", location_info);
+        startAudio();
+    });
+
+    const envDesButton = document.querySelector('.optionButton.environmentDescription');
+    envDesButton.addEventListener('click', () => {
+        if (!videoChat) { openCamera.click() }
+        closeOptionsBar();
+        stopCheckSilenceTimer();
+        stopAudio();
+        finishShutUpStatus();
+        statusDiv.textContent = '环境描述';
+        if (vudio.dance()) { vudio.pause() }
+        rec_result = "请简洁地描述环境";
+        speech_rec_ready = true;
+        captureAndSendFrame();
+    });
 }
