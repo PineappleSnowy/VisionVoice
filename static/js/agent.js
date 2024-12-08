@@ -433,6 +433,7 @@ document.getElementById('decorate_photo').addEventListener('click', function () 
         imageUploadPanel.style.display = 'none';
     } else {
         imageUploadPanel.style.display = 'flex';
+        document.querySelector('#imageUploadPanel .content .add input').click();
     }
 })
 
