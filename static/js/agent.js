@@ -209,7 +209,9 @@ function sendMessageToAgent(message, multi_image_talk) {
 
                 // 如果当前不是结束标志，则将文本添加到气泡中
                 if (!(jsonString.includes("<END>"))) {
-                    socket.emit("agent_stream_audio", jsonString);
+                    if (!isMuted) {
+                        socket.emit("agent_stream_audio", jsonString);
+                    }
                     bubble_2.textContent += jsonString;
                 }
 
@@ -413,6 +415,35 @@ let audioQueue = [];
 
 // 标识是否正在播放音频
 let isPlaying = false;
+
+// 标识用户是否静音
+let isMuted = localStorage.getItem('isMuted') === 'true';
+
+window.addEventListener('DOMContentLoaded', function () {
+    if (isMuted) {
+        console.log('[agent.js][DOMContentLoaded] localStorage 中用户已经设置过静音，展示静音图标...');
+        document.getElementById('audio-control').classList.add('muted');
+    }
+});
+
+document.getElementById('audio-control').addEventListener('click', function () {
+    isMuted = !isMuted;
+
+    // 将用户是否静音的状态写入 localStorage：防止刷新后静音状态丢失
+    localStorage.setItem('isMuted', isMuted);
+
+    // 切换按钮样式
+    this.classList.toggle('muted');
+
+    // 如果用户静音，则暂停音频播放
+    if (isMuted && isPlaying) {
+        console.log('[agent.js][audio-control] 用户静音，暂停音频播放...');
+        audioQueue = [];
+        audioPlayer.pause();
+        isPlaying = false;
+        pauseDiv.style.backgroundImage = `url('${'./static/images/pause_inactive.png'}')`;
+    }
+})
 
 /**
  * @description 监听后端发送的 agent_play_audio_chunk 事件

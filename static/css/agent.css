@@ -496,3 +496,22 @@ p {
     cursor: pointer;
     z-index: 1;
 }
+
+/* 音频控制按钮样式 */
+#audio-control {
+    position: absolute;
+    right: 10px;
+    width: 24px;
+    height: 24px;
+    background-image: url('../images/audio.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+}
+
+#audio-control.muted {
+    background-image: url('../images/audio_mute.png');
+}
