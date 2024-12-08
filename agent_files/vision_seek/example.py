@@ -28,8 +28,9 @@ while True:
     new_frame_time = time.time()
 
     ret, frame = cap.read()
-    result = detector.detect_main(frame)
-    if result != -1:
+    result_list = detector.detect_main(frame)
+    if result_list != []:
+        result = result_list[0]
         x = result['x']
         y = result['y']
         w = result['w']

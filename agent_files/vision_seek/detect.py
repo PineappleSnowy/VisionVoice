@@ -9,9 +9,10 @@ from tensorflow.keras.applications.resnet50 import preprocess_input
 from sklearn.metrics.pairwise import cosine_similarity
 
 
-MIN_MATCH_COUNT = 1
-GOOD_MATCHES_DIFF = 0.95
+SIMILARITY_SCORE_THRESHOLD = 0.3
 MIN_DETECT_COUNT = 1
+GOOD_MATCHES_DIFF = 0.95
+MIN_MATCH_COUNT = 1
 
 # 加载模型
 model = YOLO("agent_files/vision_seek/yolo11x-seg.pt")
@@ -132,7 +133,8 @@ class ObjectDetector:
                 self.templates.append(None)
                 self.templates_features.append(None)
                 break
-
+        
+        i = 1
         for template in self.templates:
             if template is None:
                 self.templates = []
@@ -228,7 +230,7 @@ class ObjectDetector:
                             similarity_score = similarity_score_cur
                     print(f'相似度: {similarity_score}')
 
-                    if similarity_score < 0.3:
+                    if similarity_score < SIMILARITY_SCORE_THRESHOLD:
                         continue
 
                     # 放大图像, 去噪处理, 增强对比度
