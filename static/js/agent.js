@@ -512,3 +512,133 @@ function updateAgentName(agent) {
         agent_name = '智能体名称';
     document.getElementById('agent-name').textContent = agent_name;
 }
+
+/* 语音输入 start
+--------------------------------------------------------- */
+
+// 添加录音相关变量
+let mediaRecorder = null;
+let audioChunks = [];
+let isRecording = false;
+
+// 添加录音按钮点击事件监听器
+document.getElementById('microphone-button').addEventListener('click', async function () {
+    const microphoneButton = document.getElementById('microphone-button');
+
+    try {
+        if (!isRecording) {
+            console.log('[agent.js][microphone-button] start recording');
+            // 开始录音
+            startRecording();
+            isRecording = true;
+
+            // 改变麦克风按钮样式为红色
+            microphoneButton.style.backgroundColor = 'red';
+
+        } else {
+            console.log('[agent.js][microphone-button] stop recording');
+            
+            // 停止录音
+            stopRecording();
+            isRecording = false;
+
+            // 上传音频数据
+            rec.exportWAV(upload_audio);
+
+            // 恢复麦克风按钮原始样式
+            microphoneButton.style.backgroundColor = '';
+        }
+    } catch (error) {
+        console.error("录音权限获取失败:", error);
+    }
+});
+
+
+/* 语音输入 end
+--------------------------------------------------------- */
+
+/* 处理音频录制 start 
+------------------------------------------------------------*/
+
+// 音频上下文
+let audioContext;
+// 录制器
+let rec;
+// 音频流
+let input;
+
+async function startRecording() {
+    // 创建新的音频上下文，这是 Web Audio API 的核心对象
+    audioContext = new AudioContext();
+
+    // 获取音频流
+    let audioStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+    console.log("[agent.js][startRecording] 创建 getUserMedia 音频流成功...");
+
+    // 将麦克风的音频流 (stream) 转换为音频源节点
+    input = audioContext.createMediaStreamSource(audioStream);
+
+    // 创建一个新的 Recorder 实例，用于录制音频
+    // numChannels: 1 表示使用单声道录音，用于减少文件大小，如果声道为 2，文件会变成两倍大小
+    rec = new Recorder(input, { numChannels: 1 })
+
+    // 启动录制过程
+    rec.record()
+
+}
+
+async function stopRecording() {
+    console.log("[agent.js][stopRecording] 停止录音...");
+
+    // 告诉录制器停止录制
+    rec.stop();
+
+}
+
+/**
+ * @description 上传音频数据到后端进行识别，识别完成后，后端会通过 socket 将识别结果发送至前端
+ * - socket 事件为 agent_speech_recognition_finished
+ * @param {Blob} blob 音频的 blob 数据
+ */
+function upload_audio(blob) {
+    const xhr = new XMLHttpRequest();
+    xhr.onload = function (e) {
+        if (this.readyState === 4) {
+            // console.log("[agent.js][upload_audio] response:", e.target.responseText);
+        }
+    };
+    const fd = new FormData();
+    fd.append("audio_data", blob, "recorded_audio.wav");
+    const sampleRate = audioContext.sampleRate;
+    fd.append("sample_rate", sampleRate);
+    const token = localStorage.getItem('token');
+    console.log("[agent.js][upload_audio] 上传音频数据...");
+    xhr.open("POST", "/agent/upload_audio", true);
+    xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+    xhr.send(fd);
+}
+/* 处理音频录制 end 
+------------------------------------------------------------*/
+
+
+/* 处理音频识别 start 
+------------------------------------------------------------*/
+
+/**
+ * @description 语音识别结束后，将识别结果发送给后端，并开始语音对话
+ */
+
+socket.on('agent_speech_recognition_finished', async function (data) {
+    rec_result = data['rec_result'];
+
+    if (!rec_result) {
+        console.log('[agent.js][socket.on][agent_speech_recognition_finished] 音频识别结果为空.');
+        return;
+    }
+    console.log('[agent.js][socket.on][agent_speech_recognition_finished] 音频识别结果: %s', rec_result);
+
+    addMessage(rec_result);
+})
+
+/* 处理音频识别 end 
+--------------------------------------------------------- */

@@ -4,7 +4,9 @@
 <head>
   <meta charset="UTF-8" />
   <title>视界之声-智能聊天</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0">
+  <link rel="stylesheet" href="../static/css/base.css" />
   <link rel="stylesheet" href="../static/css/agent.css" />
   <link rel="icon" href="../static/favicon.ico" />
   <!-- PWA配置文件 -->
@@ -23,6 +25,10 @@
     <div id="chat-container" aria-live="polite" aria-atomic="true"></div>
     <!-- 下部功能区 -->
     <div id="chat-input-container" role="form">
+
+      <!-- 语音输入按钮 -->
+      <button id="microphone-button" aria-label="语音输入"></button>
+
       <div id="imageUploadPanel" style="display: none;">
         <div class="content">
           <!-- 图片列表在这里 -->
@@ -51,13 +57,21 @@
       <div id="decorate_photo"></div>
     </div>
     <div id="navbar" role="navigation">
-      <a href="/agent" aria-label="首页">首页</a>
-      <a href="/chat" aria-label="消息">消息</a>
+      <a href="/agent" aria-label="首页">
+        <span>首页</span>
+      </a>
+      <a href="/chat" aria-label="消息">
+        <span>消息</span>
+      </a>
       <a href="/create" aria-label="创建">
         <img src="../static/images/star.png" id="star" alt="创建图标" />
       </a>
-      <a href="/square" aria-label="广场">广场</a>
-      <a href="/mine" aria-label="我的">我的</a>
+      <a href="/square" aria-label="广场">
+        <span>广场</span>
+      </a>
+      <a href="/mine" aria-label="我的">
+        <span>我的</span>
+      </a>
     </div>
   </div>
 
@@ -65,6 +79,7 @@
   <audio id="audioPlayer" controls autoplay style="display: none" aria-label="音频播放器"></audio>
   <script src="../static/js/auth.js"></script>
   <script src="../static/js/chat.js"></script>
+  <script src="../static/js/lib/recorder.js"></script>
   <script src="../static/js/agent.js"></script>
 </body>
 
