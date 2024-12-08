@@ -30,19 +30,11 @@ p {
     background-size: cover;
 }
 
+/* 底部导航栏 start
+------------------------------------------ */
+
 #navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
     background-color: #44498c;
-    /* 保持原有颜色 */
-    color: #fff;
-    height: 50px;
-    padding: 0;
-    position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 0;
 }
 
 #navbar a {
@@ -56,10 +48,12 @@ p {
     display: flex;
     align-items: center;
     justify-content: center;
+    white-space: nowrap;
 }
 
 #navbar a[href="/agent"] {
-    font-weight: bold; /* 加粗字体 */
+    font-weight: bold;
+    /* 加粗字体 */
 }
 
 #navbar a:hover {
@@ -74,6 +68,9 @@ p {
     margin-right: 0;
     /* 移除图片与文字之间的间距 */
 }
+
+/* 底部导航栏 end 
+------------------------------------------ */
 
 #chat-input-container {
     position: absolute;
@@ -345,7 +342,7 @@ p {
     justify-content: center;
     align-items: center;
 }
-  
+
 #preview-image {
     max-width: 100%;
     max-height: 100%;
@@ -419,7 +416,7 @@ p {
     justify-content: center;
 }
 
-#imageUploadPanel .content{
+#imageUploadPanel .content {
     overflow: hidden;
     height: 90px;
     border-radius: 10px;
