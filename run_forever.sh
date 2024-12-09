@@ -1,13 +1,24 @@
 #!/bin/bash
 
-while true
-do
-    # 使用指定的Python解释器运行run.py程序
-    /usr/bin/python3 run.py &
+# 定义Python程序的路径，替换成你实际的Python脚本路径
+python_script_path="run.py"
+
+while true; do
+    # 启动Python程序，后台运行，你可以根据Python程序的实际需求调整启动参数等情况
+    /usr/bin/python3 $python_script_path &
     pid=$!
-    # 每三小时（10800秒，可按需调整为6小时即21600秒）重启一次
-    sleep 10800
-    # 终止正在运行的程序
-    kill $pid
-    wait $pid
+    echo "Python program started with PID: $pid"
+
+    # 睡眠6小时（6 * 60 * 60 秒）
+    sleep $((3 * 60 * 60))
+
+    # 尝试杀死之前启动的Python程序进程
+    if kill -0 $pid 2>/dev/null; then
+        echo "Stopping the Python program..."
+        kill $pid
+        wait $pid 2>/dev/null
+        echo "Python program stopped"
+    else
+        echo "Python program already stopped"
+    fi
 done

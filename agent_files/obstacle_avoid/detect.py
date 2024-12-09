@@ -190,7 +190,7 @@ def obstacle_avoid_realize(frame):
             label = yolo_classes_en_to_zh.get(label_0)
         else:
             label_0 = "unknown"
-            label = "未知障碍物"
+            label = "障碍物"
         label_1 = label_0 + f"{i}"
         if confidence > confidence_threshold:
             p = y + h / 2  # 像素坐标

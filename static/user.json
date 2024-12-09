@@ -1,1 +1,69 @@
-[]
+[
+    {
+        "username": "23009201380",
+        "password": "c02c24326a977b9dad7c759de29be49e9c0d78a873bf15704a5776bd9895c6b0",
+        "nickname": "23009201380",
+        "agents": {
+            "defaultAgent": {
+                "chat_history": [
+                    {
+                        "role": "system",
+                        "content": "5L2g5piv6KeG55WM5LmL5aOw77yM5LiA5L2N5LmQ5LqO5Yqp5Lq655qE5a+56K+d5Yqp5omL44CC5Li65LqG6IO96K6p55So5oi36IO95bC95b+r6Kej5Yaz6Zeu6aKY77yM5L2g55qE6K+d6K+t5oC75piv5Y2B5YiG566A5rSB6ICM5qaC6KaB44CC"
+                    },
+                    {
+                        "role": "assistant",
+                        "content": "5oiR5piv6KeG55WM5LmL5aOw77yM5L2g55qE55Sf5rS75Yqp5omL77yM5pyJ5LuA5LmI5oiR5Y+v5Lul5biu5L2g55qE5LmI77yf"
+                    },
+                    {
+                        "role": "user",
+                        "content": "5L2g5aW944CC"
+                    },
+                    {
+                        "role": "assistant",
+                        "content": "5L2g5aW977yB6ZyA6KaB5biu5Yqp5ZCX77yf"
+                    },
+                    {
+                        "role": "user",
+                        "content": "6ICM5LiU5L2g6YKj5Liq5piv5LuOYeS7tueahOWPke+8jOaIkeeOsOWcqOWAkui/h+adpeaYr+WQl++8nw=="
+                    },
+                    {
+                        "role": "assistant",
+                        "content": "5oqx5q2J77yM5oiR5LiN5piO55m95oKo55qE6Zeu6aKY44CC5aaC5p6c5oKo5pyJ5YW25LuW6Zeu6aKY5oiW6ZyA6KaB5biu5Yqp77yM6K+35ZGK6K+J5oiR44CC"
+                    },
+                    {
+                        "role": "user",
+                        "content": "5L2g5aW944CC"
+                    },
+                    {
+                        "role": "assistant",
+                        "content": "5L2g5aW977yB6ZyA6KaB5biu5Yqp5ZCX77yf"
+                    },
+                    {
+                        "role": "user",
+                        "content": "55+l6YGT5Zu+54mH44CC"
+                    },
+                    {
+                        "role": "assistant",
+                        "content": "5piv55qE77yM6L+Z5piv6KW/5a6J55S15a2Q56eR5oqA5aSn5a2m55qE5LiA5Liq5pWZ5a6k5oiW6ICF5Yqe5YWs5a6k44CC6KW/5a6J55S15a2Q56eR5oqA5aSn5a2m77yIWGlkaWFuIFVuaXZlcnNpdHnvvInvvIznroDnp7DigJzopb/nlLXigJ0g77yM5Z2Q6JC95LqO6ZmV6KW/55yB6KW/5a6J5biC77yM5piv5pWZ6IKy6YOo55u05bGe55qE5YWo5Zu96YeN54K55aSn5a2m77yM5L2N5YiX5Zu95a624oCc5Y+M5LiA5rWB4oCd77yI5LiW55WM5LiA5rWB5a2m56eR77yJ5bu66K6+6auY5qCh44CB4oCcOTg15bel56iL5LyY5Yq/5a2m56eR5Yib5paw5bmz5Y+w4oCd44CBMjEx5bel56iL44CB5YWl6YCJMjAxMeiuoeWIkuOAgTExMeiuoeWIkuOAgeWNk+i2iuW3peeoi+W4iOaVmeiCsuWfueWFu+iuoeWIkuOAgeWbveWutuW7uuiuvumrmOawtOW5s+Wkp+WtpuWFrOa0vueglOeptueUn+mhueebruOAgeS4reWbveaUv+W6nOWlluWtpumHkeadpeWNjueVmeWtpueUn+aOpeaUtumZouagoeOAgeWFqOWbvea3seWMluWIm+aWsOWIm+S4muaVmeiCsuaUuemdqeekuuiMg+mrmOagoeOAgeWtpuS9jeaOiOadg+iHquS4u+WuoeaguOWNleS9je+8jOaYr+S4reWbveeUteWtkOS/oeaBr+mihuWfn+enkeWtpueglOeptuWSjOS6uuaJjeWfueWFu+eahOmHjeimgeWfuuWcsOOAgg=="
+                    },
+                    {
+                        "role": "user",
+                        "content": "5L2g5omN6IO95ZCD5Yiw6IKJ44CC"
+                    },
+                    {
+                        "role": "assistant",
+                        "content": "6L+Z5Y+l6K+d5ZCs6LW35p2l5YOP5piv5LiA5Liq546p56yR5oiW6ICF5piv5q+U5Za744CC5aaC5p6c5oKo5piv5Zyo5byA546p56yR77yM6YKj5LmI6L+Z5Y+v6IO95piv5Zyo6K+04oCc5Y+q5pyJ5b2T5oiR77yI5oiW6ICF5p+Q5Liq5Lq677yJ5pyJ5LqG5LiA5a6a55qE5oiQ5bCx5oiW6ICF5p2h5Lu25pe277yM5oiR5omN6IO95Lqr5Y+X5Yiw5p+Q56eN5aW95aSE5oiW6ICF5oiQ5bCx4oCd44CC5aaC5p6c5oKo5piv5Zyo5q+U5Za777yM6YKj5LmI4oCc5ZCD5Yiw6IKJ4oCd5Y+v6IO95piv5oyH6I635b6X5a6e6ZmF55qE5Yip55uK5oiW6ICF5Lqr5Y+X5oiQ5Yqf55qE5p6c5a6e44CCCgrlpoLmnpzmgqjpnIDopoHmm7TlhbfkvZPnmoTluK7liqnmiJbogIXmg7PopoHop6Pph4rov5nlj6Xor53nmoTog4zmma/vvIzor7fmj5Dkvpvmm7TlpJrkv6Hmga/jgII="
+                    }
+                ]
+            },
+            "psychologicalAgent": {
+                "chat_history": [
+                    {
+                        "role": "assistant",
+                        "content": "嗨，亲爱的朋友，我是小天，很高兴能和你在这心灵的角落相遇。不管你眼前的世界是怎样的，我都在这儿陪着你，准备好和你一起聊聊内心的喜怒哀乐啦。"
+                    }
+                ]
+            }
+        }
+    }
+]
