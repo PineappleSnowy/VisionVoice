@@ -867,7 +867,7 @@ def upload_image():
         try:
             init_state = detector.detect_init(mat_image)
             if init_state != 0:
-                return jsonify({"message": "未识别到图片中的目标", "item_info": []}), 400
+                return jsonify({"message": "未识别到图片中的目标", "item_info": []}), 200
 
             detect_result = detector.detect_main(mat_image)
             item_info = [] if detect_result == -1 else detect_result
