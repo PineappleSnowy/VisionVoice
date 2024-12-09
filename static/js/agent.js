@@ -231,15 +231,14 @@ function sendMessageToAgent(message, multi_image_talk) {
 
 // 删除图片
 // 为 #imageUploadPanel 添加事件委托
-const content = document.querySelector('#imageUploadPanel .content');
-document.getElementById('imageUploadPanel').addEventListener('click', function (event) {
+const imageList = document.querySelector('#imageUploadPanel .content .imageList');
+imageList.addEventListener('click', function (event) {
     if (event.target.classList.contains('remove')) {
-        console.log('remove button clicked');
         // 找到当前按钮的父元素 .image
         const imageContainer = event.target.closest('.image');
         if (imageContainer) {
             // 获取图片容器的索引
-            const index = Array.from(content.children).indexOf(imageContainer);
+            const index = Array.from(imageList.children).indexOf(imageContainer);
             if (index !== -1) {
                 // 从数组中移除对应的图片信息
                 uploadedImages.splice(index, 1);
@@ -268,7 +267,7 @@ document.querySelector('#imageUploadPanel .content .add input').addEventListener
     uploadedImages.push(file);
 
     // 在 .content 最前面插入包含上传图片的 <div> 结构
-    const content = document.querySelector('#imageUploadPanel .content');
+    const imageList = document.querySelector('#imageUploadPanel .content .imageList');
     const imageDiv = document.createElement('div');
     imageDiv.className = 'image';
     const userImg = document.createElement('img');
@@ -284,8 +283,8 @@ document.querySelector('#imageUploadPanel .content .add input').addEventListener
     imageDiv.appendChild(userImg);
     imageDiv.appendChild(removeImg);
 
-    // 插入到 .content 最前面
-    content.insertBefore(imageDiv, content.firstChild);
+    // 插入到 .imageList 最后面
+    imageList.appendChild(imageDiv);
 
     // 清空文件输入以允许重新选择同一文件
     e.target.value = '';
@@ -293,26 +292,10 @@ document.querySelector('#imageUploadPanel .content .add input').addEventListener
 
 // 清空图片div
 function clearImageDiv() {
-    const content = document.querySelector('#imageUploadPanel .content');
-    content.innerHTML = ''; // 清空内容
-    // 重新添加添加图片的HTML结构
-    const addDiv = document.createElement('div');
-    addDiv.className = 'add';
-
-    const img = document.createElement('img');
-    img.src = '../static/images/more_function_start.png';
-    img.alt = '添加图片';
-
-    const input = document.createElement('input');
-    input.id = 'photo';
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.setAttribute('aria-label', '选择图片');
-    input.style.display = 'none';
-
-    addDiv.appendChild(img);
-    addDiv.appendChild(input);
-    content.appendChild(addDiv);
+    const imageList = document.querySelector('#imageUploadPanel .content .imageList');
+    imageList.innerHTML = ''; // 清空内容
+    // 清空 uploadedImages 数组
+    uploadedImages = [];
 }
 
 // 按下回车键也可以发送消息
@@ -394,7 +377,7 @@ document.getElementById('decorate_photo').addEventListener('click', function () 
         imageUploadPanel.style.display = 'flex';
         document.querySelector('#imageUploadPanel .content .add input').click();
     } else {
-        clearImageDiv()
+        // clearImageDiv();
         imageUploadPanel.style.display = 'none';
     }
 })
