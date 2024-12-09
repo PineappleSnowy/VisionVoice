@@ -34,7 +34,7 @@ function loadChatHistory(agent) {
             if (history.length > 0) {
                 history.forEach(msg => {
                     if (msg.role === 'user') {
-                        // 创建用户消息
+                        // 创建用户��息
                         const messagesContainer_user = document.createElement('div');
                         messagesContainer_user.className = 'chat-messages-user';
                         const bubble = document.createElement('div');
@@ -179,7 +179,7 @@ function addMessage(message) {
 /**
  * @description 发送消息到智能体
  * @param {string} message 用户的消息内容
- * @param {boolean} multi_image_talk 是否��含多张图片
+ * @param {boolean} multi_image_talk 是否包含多张图片
  */
 function sendMessageToAgent(message, multi_image_talk) {
     // 机器人响应
@@ -384,6 +384,12 @@ document.getElementById('decorate_photo').addEventListener('click', function () 
 
 document.getElementById('more_function_button_2').style.display = 'none';
 
+document.getElementById('agent-chat-textarea').addEventListener('click', function () {
+    if (flag_board === 1) {
+        document.getElementById('more_function_button_2').click();
+    }
+});
+
 /* 音频播放相关 start
 - 由于大模型的音频回答应该要有断句，所以需要将音频数据分段由后端发送至前端，
 - 前端需要将这些分段的音频数据存储到队列（本质是 list 列表）中。
@@ -473,7 +479,7 @@ function playNextAudio() {
         // 标识音频正在播放
         isPlaying = true;
 
-        // 将音频数据转换为 Blob 对象，并对其创建资源 URL，从而设置音频播放器的播放源（播放��只能是 URL）
+        // 将音频数据转换为 Blob 对象，并对其创建资源 URL，从而设置音频播放器的播放源（播放源只能是 URL）
         const audioBlob = new Blob([nextAudioData], { type: 'audio/mp3' });
         const audioURL = URL.createObjectURL(audioBlob);
         audioPlayer.src = audioURL;
@@ -555,7 +561,7 @@ document.getElementById('microphone-button').addEventListener('click', async fun
 
         } else {
             console.log('[agent.js][microphone-button] stop recording');
-            
+
             // 停止录音
             stopRecording();
             isRecording = false;
