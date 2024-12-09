@@ -8,9 +8,8 @@ flask-jwt-extended==4.6.0
 
 zhipuai==2.1.5.20230904
 
+# VisionSeek and ObstacleAvoid
 ultralytics==8.3.39
-
-# VisionSeek
 cvzone==1.5.6
 numpy==1.26.4
 opencv_python==4.9.0.80
