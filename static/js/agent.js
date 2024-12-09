@@ -180,7 +180,7 @@ function addMessage(message) {
 /**
  * @description 发送消息到智能体
  * @param {string} message 用户的消息内容
- * @param {boolean} multi_image_talk 是否包含多张图片
+ * @param {boolean} multi_image_talk 是否��含多张图片
  */
 function sendMessageToAgent(message, multi_image_talk) {
     // 机器人响应
@@ -353,7 +353,9 @@ document.getElementById('more_function_button').addEventListener('click', functi
         document.getElementById('more_function_board').classList.add('slide-up');
     }
     document.getElementById('navbar').style.display = 'none';
-})
+    // 当 more_function_board 出现时，调整 chat-container 的 bottom 值
+    document.getElementById('chat-container').style.bottom = '250px';
+});
 
 document.getElementById('more_function_button_2').addEventListener('click', function () {
     flag_board = 0;
@@ -376,6 +378,8 @@ document.getElementById('more_function_button_2').addEventListener('click', func
         document.getElementById('more_function_board').classList.add('slide-down');
     }
     document.getElementById('navbar').style.display = 'flex';
+    // 当 more_function_board 隐藏时，恢复 chat-container 的 bottom 值
+    document.getElementById('chat-container').style.bottom = '100px';
 })
 
 //输入框随着输入字数改变高度
@@ -388,11 +392,11 @@ document.getElementById('agent-chat-textarea').addEventListener(
 
 document.getElementById('decorate_photo').addEventListener('click', function () {
     const imageUploadPanel = document.getElementById('imageUploadPanel');
-    if (imageUploadPanel.style.display === 'flex') {
-        imageUploadPanel.style.display = 'none';
-    } else {
+    if (imageUploadPanel.style.display === 'none') {
         imageUploadPanel.style.display = 'flex';
         document.querySelector('#imageUploadPanel .content .add input').click();
+    } else {
+        imageUploadPanel.style.display = 'none';
     }
 })
 
