@@ -300,7 +300,9 @@ def delete_image():
 
 # ----- 加载全局变量 -----
 # 加载 api_key
-with open("./static/api.json", "r", encoding="utf-8") as f:
+module_dir = os.path.dirname(__file__)
+json_path = os.path.join(module_dir, 'static', 'api.json')
+with open(json_path, "r", encoding="utf-8") as f:
     api_data = json.load(f)
     api_key_zhipu = api_data["zhipu"]["api_key"]
     client = ZhipuAI(api_key=api_key_zhipu)

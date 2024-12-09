@@ -30,6 +30,7 @@ yarn-error.log*
 # 缓存文件
 *.pyc
 **/__pycache__
+**/api.json
 
 # 临时文件夹不保存有时会运行报错，无 .cache 文件夹
 # .cache/*
