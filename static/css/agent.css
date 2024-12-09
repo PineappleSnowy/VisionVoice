@@ -433,6 +433,12 @@ p {
     padding: 5px;
 }
 
+#imageUploadPanel .content .imageList {
+    overflow-x: auto;
+    display: flex;
+    align-items: center;
+}
+
 #imageUploadPanel .content .image {
     width: 80px;
     height: 80px;
