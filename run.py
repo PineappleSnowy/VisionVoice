@@ -835,8 +835,8 @@ def upload_image():
         if data["multi_image_index"] == 0:
             # 清空历史图片
             delete_file_from_dir(MULTI_IMAGE_DIRECTORY)
-        # 以8位随机数作为文件名
-        image_save_path = f'{MULTI_IMAGE_DIRECTORY}{random.randint(10000000, 99999999)}.jpg'
+        # 以8位随机数加上图片序号作为文件名，图片序号使大模型能知道图片次序
+        image_save_path = f'{MULTI_IMAGE_DIRECTORY}{data["multi_image_index"]}{random.randint(10000000, 99999999)}.jpg'
     else:
         image_save_path = IMAGE_SAVE_PATH
 
