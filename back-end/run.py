@@ -953,7 +953,7 @@ def agent_stream_audio(current_token: str):
     if "##" in current_token:
         if current_token == "##<state=1>":
             socketio.emit("obstacle_avoid", {"flag": "begin"})
-            audio_file_path = ".cache/obstacle_start.wav"
+            audio_file_path = "./agent_files/obstacle_start.wav"
         elif "##<state=2>" in current_token:
             socketio.emit("find_item", {"flag": "begin"})
             audio_chunk = agent_audio_generate(
