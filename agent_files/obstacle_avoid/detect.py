@@ -171,6 +171,10 @@ yolo_classes_en_to_zh = {
 def obstacle_avoid_realize(frame):
     """避障算法实现
 
+    注意使用条件：
+    1.竖直方向离地1米左右
+    2.同时与竖直方向夹45度角
+
     Args:
         frame(cv2.Mat): 用于检测的图片
     return:
@@ -196,7 +200,8 @@ def obstacle_avoid_realize(frame):
             p = y + h / 2  # 像素坐标
 
             # 解算出真实距离
-            distance_real = -2.08054369e-12*p**4 + 6.25478630e-09*p**3 - 5.88280567e-06*p**2 + 1.07600182e-03*p + 9.74917750e-01
+            # distance_real = -2.08054369e-12*p**4 + 6.25478630e-09*p**3 - 5.88280567e-06*p**2 + 1.07600182e-03*p + 9.74917750e-01
+            distance_real = 6.88448838e-13*p**4 - 2.27144172e-09*p**3 + 3.19109921e-06*p**2 - 3.16104347e-03*p + 2.06059217e+00
             distance_dic[label_1] = distance_real
             distance_dic_all[label_1] = [label, distance_real, x/width, y/height]
     label_min, distance_min = min(distance_dic.items(), key=lambda x: x[1])
