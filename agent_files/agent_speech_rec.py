@@ -3,7 +3,7 @@
 import json
 from urllib.request import urlopen
 from urllib.request import Request
-from urllib.error import URLError
+from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
 
 with open("./static/api.json", "r", encoding="utf-8") as f:
@@ -128,9 +128,11 @@ def speech_rec(speech_data="", filename: str = "") -> str:
             return "".join(result)
         else:
             return "语音识别错误！"
-    except URLError as err:
+    except HTTPError as err:
         print("asr http response http code : " + str(err.code))
-        # result_str = err.read()
+        return "语音识别错误！"
+    except URLError as err:
+        print("asr http response error : " + str(err.reason))
         return "语音识别错误！"
 
 
