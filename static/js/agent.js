@@ -26,7 +26,7 @@ function loadChatHistory(agent) {
 
     fetch(`/get-chat-history?agent=${agent}`, {
         headers: {
-            "Authorization": `Bearer ${localStorage.getItem('token')}`
+            "Authorization": `Bearer ${token}`
         }
     })
         .then(response => response.json())

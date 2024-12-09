@@ -1,7 +1,13 @@
 /* 该文件为帮我寻物物品模板管理模块的内容 */
 
+const token = localStorage.getItem('token');
+
 document.addEventListener('DOMContentLoaded', function () {
-    fetch('/images')
+    fetch('/images', {
+        headers: {
+            "Authorization": `Bearer ${token}`
+        }
+    })
         .then(response => response.json())
         .then(data => {
             const gallery = document.getElementById('gallery');
@@ -63,7 +69,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
             fetch('/save_item_image', {
                 method: 'POST',
-                body: formData
+                body: formData,
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
             })
                 .then(response => response.json())
                 .then(data => {
@@ -105,7 +114,8 @@ document.addEventListener('DOMContentLoaded', function () {
         fetch('/delete_image', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                "Authorization": `Bearer ${token}`
             },
             body: JSON.stringify({ name: imageName })
         })
@@ -165,7 +175,8 @@ function openModal(url, name, button) {
         fetch('/rename_image', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                "Authorization": `Bearer ${token}`
             },
             body: JSON.stringify({ oldName: oldName, newName: newName })
         })
