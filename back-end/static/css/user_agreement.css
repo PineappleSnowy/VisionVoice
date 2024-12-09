@@ -1,0 +1,36 @@
+body {
+    background-color: #121212;
+    color: #e0e0e0;
+    margin: 0;
+    padding: 0;
+}
+
+p {
+    color: #ffffff;
+    margin: 5px;
+}
+
+.header {
+    width: 100%;
+    background-color: #333;
+    color: #e0e0e0;
+    text-align: center;
+    padding: 10px 0;
+}
+
+.back-button {
+    position: absolute;
+    left: 10px;
+    top: 5px;
+    background: none;
+    border: none;
+    color: #e0e0e0;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+#agreement-content {
+    text-align: center;
+
+}
+

@@ -189,8 +189,23 @@ IMAGE_FOLDER = "./user_images/"
 
 @app.route("/photo_manage", methods=["GET"])
 def photo_manage():
-    """我的路由"""
+    """画廊路由"""
     return render_template("photo_manage.html")
+
+@app.route("/user_agreement", methods=["GET"])
+def user_agreement():
+    """用户须知路由"""
+    return render_template("user_agreement.html")
+
+@app.route('/get_user_agreement_text')
+def get_user_agreement_text():
+    file_path = './configs/user_agreement.txt'
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+        return content.replace('\n', '<br>')
+    except FileNotFoundError:
+        return "File not found", 404
 
 
 @app.route("/images", methods=["GET"])
@@ -320,7 +335,8 @@ def save_chat_history(current_user, agent_name, messages):
     encoded_messages = [encode_message_content(msg.copy()) for msg in messages]
 
     # 更新用户聊天记录
-    with open("./static/user.json", "r+", encoding="utf-8") as f:
+    user_path = os.path.join(module_dir, 'static', 'user.json')
+    with open(user_path, "r+", encoding="utf-8") as f:
         users = json.load(f)
         for user in users:
             if user["username"] == current_user:
@@ -463,6 +479,7 @@ def register():
 
     try:
         # 读取现有用户
+        
         with open("./static/user.json", "r+", encoding="utf-8") as f:
             users = json.load(f)
 
