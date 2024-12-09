@@ -427,18 +427,10 @@ p {
 }
 
 #imageUploadPanel .content {
-    overflow: hidden;
-    height: 90px;
-    border-radius: 10px;
-    background-color: rgba(33, 31, 31, 0.8);
-    margin-top: 5px;
-    margin-left: 5px;
-    margin-right: 5px;
+    overflow-x: auto;
     display: flex;
     align-items: center;
-    justify-content: flex-start;
-    padding-left: 5px;
-    padding-right: 5px;
+    padding: 5px;
 }
 
 #imageUploadPanel .content .image {
@@ -468,10 +460,11 @@ p {
     width: 80px;
     height: 80px;
     border-radius: 10px;
-    background-color: rgba(107, 107, 107, 0.5);
+    background-color: rgba(201, 85, 32, 0.8);
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
 }
 
 #imageUploadPanel .content .add img {
