@@ -1,0 +1,67 @@
+{
+  "package": "com.visionvoice.quick.app",
+  "name": "visionvoice",
+  "versionName": "5.0.1",
+  "versionCode": 1,
+  "minPlatformVersion": 1070,
+  "icon": "/assets/images/logo.png",
+  "features": [
+    {
+      "name": "system.prompt"
+    },
+    {
+      "name": "system.router"
+    },
+    {
+      "name": "system.shortcut"
+    },
+    {
+      "name": "system.fetch"
+    },
+    {
+      "name": "system.webview"
+    }
+  ],
+  "permissions": [
+    {
+      "origin": "*"
+    }
+  ],
+  "config": {
+    "logLevel": "debug"
+  },
+  "router": {
+    "entry": "pages/Home",
+    "pages": {
+      "pages/Home": {
+        "component": "index"
+      }
+    },
+    "widgets": {
+      "IntroCard": {
+        "name": "IntroCard",
+        "description": "VisionVoice 快应用卡片展示",
+        "component": "index",
+        "path": "/IntroCard",
+        "minPlatformVersion": 1032,
+        "targetManufactorys": [
+          "vivo"
+        ],
+        "features": [
+          {
+            "name": "system.webview"
+          }
+        ]
+      }
+    }
+  },
+  "display": {
+    "titleBarBackgroundColor": "#f2f2f2",
+    "titleBarTextColor": "#414141",
+    "pages": {
+      "pages/Home": {
+        "titleBarText": "VisionVoice 快应用"
+      }
+    }
+  }
+}

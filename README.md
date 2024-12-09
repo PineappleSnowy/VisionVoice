@@ -1,73 +1,109 @@
-# 项目说明
+# 视界之声
 
-**技术栈：**
+## 摘要
 
-后端：`Flask` 、 `ZhipuAI`
+视界之声 V4.0 是一款帮助视障人士拍照和出行、寻物的无障碍软件，是生活中的贴心助手。通过人脸检测、语音识别和语音播报等高新技术，帮助用户完成自拍、场景识别和环境检测等功能。
 
-前端：`HTML`、`CSS`、`JavaScript`
+## 开放源码许可证
 
-**项目结构：**
+本项目采用以下开放源码许可证发布：
 
-```bash
-├── agent_files        // 智能体语音工具
-├── configs            // 语音配置文件
-├── lib                // 自定义工具函数
-├── static             // 静态文件（图片、css、js）
-├── templates          // 模板文件（html页面）
-├── test               // 测试文件
-├── run.py             // 主程序
-├── requirements.txt   // pip 依赖文件
-├── README.md          // 项目说明
-```
 
-## 一些 coding 规范
 
-### 前端
+## 软件基本信息
 
-1. 静态资源文件夹（css、js）内的文件名与 `html` 文件名要一一对应（符合一致性原则）
+- **作品标题**：视界之声 VisionVoice
+- **版本**：5.0.1
+- **作者/团队**：西安电子科技大学 PineappleSnowy 团队（寒菠创想团队）
+- **联系方式**：hdgong2766@qq.com
 
-2. 不需要在 `css` 目录下给文件添加 `_css` 后缀，`js` 、 `images` 文件夹同理。
+## 作品概述
 
-3. 养成写注释的好习惯。
+### 背景及应用领域
 
-> 注释的目的在于解释代码中无法明示的内容，使协作者能够更好地完成项目合作，提高办公效率。除此之外，注释也是为了程序以后的易维护性。
+帮助视障人士进行日常生活中的拍照、出行和寻物等活动。
 
-### 后端
+### 功能描述
 
-1. 开发环境的 `requirements.txt` 要加上版本号、不加注释，因为不同版本之间可能具有兼容性的差异，而加注释可能无法进行 `pip install`。
+- **核心功能**：
+  - 智慧拍照：协助用户自拍，通过语音提示校正脸部位置
+  - 环境识别：分析周围环境，帮助避开障碍物
+  - 智能体：提供聊天互动、专业知识问答和情感交流
+  - 帮我寻物：通过手机内置雷达和摄像头寻找物品
+- **附加功能**：无
 
-### 其他
+### 体系结构和关键技术点
 
-1. `src` 全拼 `source`，表示源码，应该用于存放源码，图片一般存放在 `static/images` 文件夹中（`static` 文件夹是存放静态文件的文件夹，所有静态文件都放在这里）
+- **目录结构**
 
-2. 资源的命名请不要使用中文，因为有些系统可能不支持包含中文的文件路径。
+  ```sh
+  .
+  ├── backend # 服务端
+  │   ├── .cache                  # 缓存文件目录
+  │   ├── agent_files             # AI 业务逻辑处理文件
+  │   ├── configs                 # 配置文件目录
+  │   │   └── audio_settings.json # 语音配置文件
+  │   ├── lib                     # 核心库文件
+  │   │   └── logging.py          # 日志记录
+  │   ├── static                  # 静态资源文件
+  │   │   ├── css
+  │   │   ├── js
+  │   │   └── images
+  │   ├── templates               # html 模板文件
+  │   ├── test                    # 测试用例目录
+  │   │   ├── test_ai.py 
+  │   │   └── test_image.py 
+  │   ├── user_images             # 用户图片存储
+  │   ├── .gitignore              # Git 忽略文件
+  │   ├── gunicorn_config.py      # Gunicorn 配置
+  │   ├── README.md               # 后端说明文档
+  │   ├── requirements.txt        # 依赖包列表
+  │   ├── run_forever.sh          # 持续运行脚本
+  │   └── run.py                  # 主程序入口
+  └── frontend                    # 客户端
+      ├── VisionVoiceProject      # 蓝河手机端项目
+      │   ├── README.md
+      │   ├── package.json
+      │   ├── pnpm-lock.yaml
+      │   ├── .quickapp.preview.json
+      │   ├── .prettierignore
+      │   ├── .gitignore
+      │   └── src
+      │       ├── assets
+      │       ├── helpers
+      │       ├── IntroCard
+      │       ├── app.ux
+      │       ├── sitemap.json
+      │       ├── manifest.json
+      │       └── pages
+      │           └── Home
+      │               └── index.ux # 主页面：主要使用 webView 实现蓝河快应用移动端适配
+      └── README.md
+  ```
 
-# 快速开始
+- **技术栈**
 
-在根目录打开终端，进行如下操作：
+  - 前端：蓝河系统手机应用
+  - 后台：Python 的 Flask 框架
 
-1. 安装依赖
+- **关键技术**：
 
-```bash
+  - 蓝河应用调用服务端接口识别图片
+  - 服务端使用 Python 调用 AI 能力返回给客户端
 
-pip install -r requirements.txt
+## 创新点
 
-```
+## 如何运行
 
-2. 运行项目
+### 安装方式
 
-```bash
+### 使用说明
 
-python run.py
+## 致谢
 
-```
+感谢所有为本项目做出贡献的开发者！团队信息请访问：
+https://github.com/PineappleSnowy/
 
-3. 访问项目
+---
 
-   打开浏览器，访问本地 80 端口
-
-```bash
-
-http://127.0.0.1:80
-
-```
+版权所有 © 2024 西安电子科技大学 PineappleSnowy 团队. 保留所有权利。

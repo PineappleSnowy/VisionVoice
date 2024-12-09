@@ -1,0 +1,144 @@
+<template>
+  <div class="intro-page">
+    <image class="logo" src="/assets/images/logo.png" aria-label="VisionVoice 团队图标"></image>
+    <text class="title">视界之声 VisionVoice</text>
+    <text class="subtitle">您的智能助盲伙伴</text>
+    
+    <div class="feature-list">
+      <text class="feature-title">功能简介</text>
+      <text class="feature-item">🤖 智能体交互</text>
+      <text class="feature-item">🚸 辅助避障</text>
+      <text class="feature-item">🌍 环境识别</text>
+      <text class="feature-item">🔍 帮我寻物</text>
+    </div>
+    
+    <div class="description">
+      <text>视界之声是一款帮助视障人士拍照和出行、寻物的无障碍软件，是您生活中的贴心助手。</text>
+    </div>
+
+    <div class="contact-info">
+      <text>如果您有任何疑问或建议，欢迎访问我们的官方网站：https://visionvoice.life</text>
+    </div>
+
+    <div class="version-info">
+      <text class="version-text">当前版本: 5·0·0</text>
+      <text class="copyright">© 二零二四 寒菠创想团队</text>
+    </div>
+  </div>
+</template>
+
+<style lang="less">
+@import './../assets/styles/style.less';
+
+.intro-page {
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  padding: 5 * @size-factor;
+  background-color: @white;
+
+  .logo {
+    width: 35 * @size-factor;
+    height: 35 * @size-factor;
+    margin-bottom: 5 * @size-factor;
+    border-radius: 17.5 * @size-factor;
+    box-shadow: 0 2px 8px fade(@black, 10%);
+  }
+
+  .title {
+    font-size: 8 * @size-factor;
+    font-weight: bold;
+    margin-bottom: 2 * @size-factor;
+    color: @brand;
+    text-shadow: 0 1px 2px fade(@black, 10%);
+  }
+
+  .subtitle {
+    font-size: 6 * @size-factor;
+    margin-bottom: 5 * @size-factor;
+    color: @grey;
+    opacity: 0.9;
+  }
+
+  .feature-list {
+    .flex-box-mixins(column, center, center);
+    margin: 4 * @size-factor 0;
+    background-color: @white;
+    padding: 3 * @size-factor;
+    border-radius: 4 * @size-factor;
+    width: 85%;
+    border: 1px solid @grey;
+
+    .feature-title {
+      font-size: 5.5 * @size-factor;
+      color: @brand;
+      margin-bottom: 3 * @size-factor;
+      font-weight: bold;
+    }
+
+    .feature-item {
+      font-size: 5.5 * @size-factor;
+      margin: 2 * @size-factor 0;
+      color: @black;
+      padding: 2.5 * @size-factor 4 * @size-factor;
+      border-radius: 2 * @size-factor;
+      background-color: fade(@brand, 10%);
+      width: 90%;
+      text-align: center;
+    }
+  }
+
+  .description {
+    text-align: center;
+    color: @grey;
+    padding: 2.5 * @size-factor 5 * @size-factor;
+    line-height: 1.6;
+    width: 85%;
+    border-radius: 2 * @size-factor;
+    
+    background-color: fade(@brand, 5%);
+    border: 1px solid fade(@grey, 15%);
+    box-shadow: 0 2px 6px fade(@black, 5%);
+    
+    flex-wrap: wrap;
+    flex-direction: column;
+    white-space: normal;
+    word-break: break-word;
+
+    text {
+      font-size: 5 * @size-factor;
+      text-indent: 2em;
+      text-align: left;
+    }
+  }
+
+  .contact-info {
+    text-align: center;
+    color: @grey;
+    opacity: 0.8;
+    margin: 4 * @size-factor 0;
+    width: 85%;
+    text {
+      text-align: center;
+      font-size: 4 * @size-factor;
+    }
+  }
+
+  .version-info {
+    .flex-box-mixins(column, center, center);
+    margin-bottom: 4 * @size-factor;
+    
+    .version-text {
+      font-size: 4.5 * @size-factor;
+      color: @grey;
+      margin-bottom: 1 * @size-factor;
+    }
+
+    .copyright {
+      font-size: 4 * @size-factor;
+      color: @grey;
+      opacity: 0.8;
+    }
+  }
+}
+</style>
