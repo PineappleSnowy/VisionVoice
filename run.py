@@ -73,6 +73,10 @@ def before_request():
         request.path == "/agent/chat_stream"
         or request.path == "/agent/upload_audio"
         or request.path == "/agent/upload_image"
+        or request.path == "/rename_image"
+        or request.path == "/save_item_image"
+        or request.path == "/delete_image"
+        or request.path == "/images"
     ):
         try:
             verify_jwt_in_request()
@@ -180,7 +184,7 @@ def logout():
 """寻物画廊路由"""
 
 # 设置图片文件夹路径
-IMAGE_FOLDER = "./user_images/images"
+IMAGE_FOLDER = "./user_images/"
 
 
 @app.route("/photo_manage", methods=["GET"])
@@ -192,27 +196,35 @@ def photo_manage():
 @app.route("/images", methods=["GET"])
 def get_images():
     images = []
-    for filename in os.listdir(IMAGE_FOLDER):
+    curr_user = get_jwt_identity()
+    user_image_folder = os.path.join(IMAGE_FOLDER, curr_user)
+    if not os.path.exists(user_image_folder):
+        os.mkdir(user_image_folder)
+    for filename in os.listdir(user_image_folder):
         if filename.endswith((".png", ".jpg", ".jpeg", ".gif")):
             name, ext = os.path.splitext(filename)
-            images.append({"name": name, "url": f"/image/{filename}"})
+            images.append({"name": name, "url": f"/image/{curr_user}/{filename}"})
     return jsonify(images)
 
 
-@app.route("/image/<filename>", methods=["GET"])
-def get_image(filename):
-    return send_from_directory(IMAGE_FOLDER, filename)
+@app.route("/image/<user>/<filename>", methods=["GET"])
+def get_image(user, filename):
+    user_image_folder = os.path.join(IMAGE_FOLDER, user)
+    return send_from_directory(user_image_folder, filename)
 
 
 @app.route("/rename_image", methods=["POST"])
 def rename_image():
+    curr_user = get_jwt_identity()
+    user_image_folder = os.path.join(IMAGE_FOLDER, curr_user)
+
     data = request.get_json()
     old_name = data["oldName"]
     new_name = data["newName"]
 
     # 查找旧文件名对应的文件
     old_file = None
-    for filename in os.listdir(IMAGE_FOLDER):
+    for filename in os.listdir(user_image_folder):
         name, ext = os.path.splitext(filename)
         if name == old_name:
             old_file = filename
@@ -221,8 +233,8 @@ def rename_image():
     if old_file is None:
         return jsonify({"success": False, "error": "Old file not found"}), 400
 
-    old_path = os.path.join(IMAGE_FOLDER, old_file)
-    new_path = os.path.join(IMAGE_FOLDER, new_name +
+    old_path = os.path.join(user_image_folder, old_file)
+    new_path = os.path.join(user_image_folder, new_name +
                             os.path.splitext(old_file)[1])
 
     try:
@@ -234,6 +246,9 @@ def rename_image():
 
 @app.route("/save_item_image", methods=["POST"])
 def save_item_image():
+    curr_user = get_jwt_identity()
+    user_image_folder = os.path.join(IMAGE_FOLDER, curr_user)
+
     if "file" not in request.files:
         return jsonify({"success": False, "error": "No file part"}), 400
     file = request.files["file"]
@@ -241,14 +256,14 @@ def save_item_image():
     if filename == "":
         return jsonify({"success": False, "error": "No selected file"}), 400
     if file:
-        if os.path.exists(os.path.join(IMAGE_FOLDER, filename)):
+        if os.path.exists(os.path.join(user_image_folder, filename)):
             return jsonify({"success": False, "error": "File already exists"}), 400
-        file.save(os.path.join(IMAGE_FOLDER, filename))
+        file.save(os.path.join(user_image_folder, filename))
         name, ext = os.path.splitext(filename)
         return (
             jsonify(
                 {"success": True, "image_name": name,
-                    "image_url": f"/image/{filename}"}
+                    "image_url": f"/image/{curr_user}/{filename}"}
             ),
             200,
         )
@@ -257,12 +272,15 @@ def save_item_image():
 
 @app.route("/delete_image", methods=["POST"])
 def delete_image():
+    curr_user = get_jwt_identity()
+    user_image_folder = os.path.join(IMAGE_FOLDER, curr_user)
+
     data = request.get_json()
     name = data["name"]
 
     # 查找文件名对应的文件
     file_to_delete = None
-    for filename in os.listdir(IMAGE_FOLDER):
+    for filename in os.listdir(user_image_folder):
         name_without_ext, ext = os.path.splitext(filename)
         if name_without_ext == name:
             file_to_delete = filename
@@ -271,11 +289,11 @@ def delete_image():
     if file_to_delete is None:
         return jsonify({"success": False, "error": "File not found"}), 400
 
-    file_path = os.path.join(IMAGE_FOLDER, file_to_delete)
+    file_path = os.path.join(user_image_folder, file_to_delete)
 
     try:
         os.remove(file_path)
-        return jsonify({"success": True, "url": f"/image/{file_to_delete}"}), 200
+        return jsonify({"success": True, "url": f"/image/{curr_user}/{file_to_delete}"}), 200
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 400
 
@@ -384,7 +402,7 @@ def find_pause(sentence: str) -> int:
         "：",
         "？",
         "，",
-        "；",  # 全���符号
+        "；",  # 全角符号
         # ".", "!", ":", "?", ",", ";",  # 半角符号
     ]
 

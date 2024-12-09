@@ -413,7 +413,7 @@ function startAvoidObstacle() {
 // 寻物启动函数
 let find_item_name = '';
 
-window.startFindItem = function(item_name) {
+window.startFindItem = function (item_name) {
     state = 2;
     stopCheckSilenceTimer();
     stopAudio();
@@ -827,7 +827,11 @@ window.onload = async () => {
     });
 
     function loadGallery() {
-        fetch('/images')
+        fetch('/images', {
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        })
             .then(response => response.json())
             .then(data => {
                 const gallery = document.getElementById('gallery');
