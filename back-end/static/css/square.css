@@ -1,0 +1,28 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #121212;
+    color: #e0e0e0;
+    margin: 0;
+    padding: 0;
+}
+
+#navbar {
+    background-color: #525255;
+}
+
+#navbar a[href="/square"] {
+    font-weight: bold; /* 加粗字体 */
+}
+
+#navbar a:hover {
+    background-color: #211f1f;
+}
+
+#navbar img {
+    width: 35px;
+    /* 增加图片的宽度 */
+    height: 35px;
+    /* 增加图片的高度 */
+    margin-right: 0;
+    /* 移除图片与文字之间的间距 */
+}

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0">
+    <title>视界之声-消息列表</title>
+  <link rel="stylesheet" href="../static/css/base.css" />
+  <link rel="stylesheet" href="../static/css/chat.css">
+    <link rel="icon" href="../static/favicon.ico" />
+</head>
+
+<body>
+    <div class="header" role="banner">视界之声</div>
+    <div class="message-list" role="list">
+        <div class="message-item" data-agent="defaultAgent" onclick="selectChatAgent('defaultAgent'); window.location.href='/agent'" role="listitem">
+            <img src="../static/images/defaultAgent.jpg" alt="生活助手头像" class="avatar">
+            <div class="content">
+                <div class="name" aria-label="生活助手">生活助手</div>
+                <div class="description" aria-label="环境识别、帮我寻物、辅助避障">环境识别、帮我寻物、辅助避障</div>
+            </div>
+            <div class="buttons">
+                <button class="button phone" onclick="event.stopPropagation(); selectChatAgent('defaultAgent'); window.location.href='/phone'" aria-label="电话联系生活助手"></button>
+                <button class="button video" onclick="event.stopPropagation(); selectChatAgent('defaultAgent'); window.location.href='/phone?camera=on'" aria-label="视频联系生活助手"></button>
+            </div>
+        </div>
+        <div class="message-item" data-agent="psychologicalAgent" onclick="selectChatAgent('psychologicalAgent'); window.location.href='/agent'" role="listitem">
+            <img src="../static/images/psychologicalAgent.jpg" alt="心灵树洞头像" class="avatar">
+            <div class="content">
+                <div class="name" aria-label="心灵树洞">心灵树洞</div>
+                <div class="description" aria-label="今天心情怎么样啊？">今天心情怎么样啊？</div>
+            </div>
+            <div class="buttons">
+                <button class="button phone" onclick="event.stopPropagation(); selectChatAgent('psychologicalAgent'); window.location.href='/phone'" aria-label="电话联系心灵树洞"></button>
+                <button class="button video" onclick="event.stopPropagation(); selectChatAgent('psychologicalAgent'); window.location.href='/phone?camera=on'" aria-label="视频联系心灵树洞"></button>
+            </div>
+        </div>
+        <!-- 可以继续添加更多消息项 -->
+    </div>
+    <div id="navbar" role="navigation">
+        <a href="/agent" aria-label="首页">
+            <span>首页</span>
+        </a>
+        <a href="/chat" aria-label="消息">
+            <span>消息</span>
+        </a>
+        <a href="/create" aria-label="创建">
+            <img src="../static/images/star.png" id="star" alt="创建图标" />
+        </a>
+        <a href="/square" aria-label="广场">
+            <span>广场</span>
+        </a>
+        <a href="/mine" aria-label="我的">
+            <span>我的</span>
+        </a>
+    </div>
+    <script src="../static/js/chat.js"></script>
+</body>
+
+</html>

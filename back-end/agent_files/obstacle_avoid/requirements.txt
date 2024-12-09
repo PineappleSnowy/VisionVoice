@@ -1,0 +1,5 @@
+numpy~=1.26.4
+matplotlib~=3.9.2
+opencv-python~=4.9.0.80
+shapely~=2.0.6
+ultralytics~=8.3.34

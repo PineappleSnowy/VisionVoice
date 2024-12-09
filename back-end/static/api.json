@@ -1,0 +1,24 @@
+{
+  "bailian": {
+    "app_id_VisionVoice": "cbb4fc849eb0428ca4d9959fd4a1ffdb",
+    "app_id_HistoryTalk_Qin": "00525fe6f0d443558b656ec63f42b592",
+    "app_id_Xidian": "e05400bc4437428590a85a6886f857c7",
+    "api_key": "sk-82e2bb3efd3c444f88526892d482aec9"
+  },
+  "baidu": {
+    "api_key": "rd5C8plm9iNiKfSr4RFhps7I",
+    "api_secret": "HA9LmFCIpKrGh0Cy1nT9nvZpbOHRbKf5"
+  },
+  "xunfei": {
+    "app_id": "3c1ed4b2",
+    "api_key": "24b916c096bda93d9da64ae6909cd35f",
+    "api_secret": "MWJlZmU0NTdhNGIwMjYyYmM5YjI4NWYz"
+  },
+  "gaode": {
+    "H5_locate": "6fe6825e15f5e912de8dca7aa9827c49",
+    "geocode": "239b5b2209f2a036dac265d05728da19"
+  },
+  "zhipu": {
+    "api_key": "8f016297dcc19310c12b260d0a73c66a.84t6kan5ZNnKElOq"
+  }
+}
