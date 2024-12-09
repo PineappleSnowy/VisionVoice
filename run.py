@@ -895,8 +895,7 @@ def agent_upload_audio():
     )
 
     # 语音识别
-    # rec_result = speech_rec(resampled_audio_data)
-    rec_result = "我现在的位置"  # 添加测试
+    rec_result = speech_rec(resampled_audio_data)
     print("音频识别结果：", rec_result)
 
     # 音频识别结果发送到前端

@@ -2,20 +2,17 @@ import numpy as np
 import cv2
 from concurrent.futures import ThreadPoolExecutor
 
-from ultralytics import YOLO
 from tensorflow.keras.applications import ResNet50
 from tensorflow.keras.preprocessing import image
 from tensorflow.keras.applications.resnet50 import preprocess_input
 from sklearn.metrics.pairwise import cosine_similarity
-
+from agent_files.yolo_model import model
 
 SIMILARITY_SCORE_THRESHOLD = 0.3
 MIN_DETECT_COUNT = 1
 GOOD_MATCHES_DIFF = 0.95
 MIN_MATCH_COUNT = 1
 
-# 加载模型
-model = YOLO("agent_files/vision_seek/yolo11x-seg.pt")
 with open('agent_files/vision_seek/class.txt', 'r') as f:
     classNames = f.read().strip().split('\n')
 

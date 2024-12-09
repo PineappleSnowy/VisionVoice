@@ -1,8 +1,4 @@
-from ultralytics import YOLO
-import cv2
-
-# model = YOLO("yolo11n.yaml").load("./agent_files/obstacle_avoid/best.pt")  # 加载模型
-model = YOLO("./agent_files/obstacle_avoid/yolo11x-seg.pt")
+from agent_files.yolo_model import model
 
 # YOLO检测种类字典
 yolo_classes = {

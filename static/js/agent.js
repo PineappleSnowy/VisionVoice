@@ -122,6 +122,10 @@ function addMessage(message) {
     image_user.className = 'chat-image-user';
     bubble.textContent = message;
 
+    messagebackground.appendChild(messagesContainer_user);
+    messagesContainer_user.appendChild(bubble);
+    messagesContainer_user.appendChild(image_user);
+
     let multi_image_talk = false;
 
     // 处理上传的图像
@@ -171,9 +175,6 @@ function addMessage(message) {
     } else {
         sendMessageToAgent(message, multi_image_talk);
     }
-    messagebackground.appendChild(messagesContainer_user);
-    messagesContainer_user.appendChild(bubble);
-    messagesContainer_user.appendChild(image_user);
 }
 
 /**
