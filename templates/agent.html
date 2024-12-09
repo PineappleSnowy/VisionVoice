@@ -18,7 +18,7 @@
   <!-- 顶栏 -->
   <div id="topbar" role="banner">
     <span id="agent-name">智能体名称</span>
-    <button type="button" id="audio-control" aria-label="静音"></button>
+    <button id="audio-control" aria-label="静音"></button>
   </div>
   <div id="main_page" role="main">
 
@@ -41,13 +41,15 @@
           </div>
         </div>
       </div>
-      <div class="pause" aria-hidden="true"></div>
-      <a id="phone-button" href="/phone" aria-label="电话">
-        <img src="../static/images/phone.png" id="phone_icon" alt="电话图标" />
-      </a>
+      <button id="pause_button" aria-label="暂停语音输出">
+        <img src="../static/images/pause_inactive.png" id="pause_icon" alt="暂停语音输出" />
+      </button>
+      <button id="phone-button" aria-label="语音聊天">
+        <img src="../static/images/phone.png" id="phone_icon" alt="语音聊天" />
+      </button>
       <textarea id="agent-chat-textarea" placeholder="输入消息..." aria-label="输入消息"></textarea>
       <button id="send-button" aria-label="发送消息">
-        <img src="../static/images/arrow_right.png" id="arrow_right" alt="发送图标" />
+        <img src="../static/images/arrow_right.png" id="arrow_right" alt="发送消息" />
       </button>
       <button id="more_function_button" aria-label="更多功能">
         <img src="../static/images/more_function_start.png" id="more_function_start" alt="更多功能图标" />
@@ -67,7 +69,7 @@
         <span>消息</span>
       </a>
       <a href="/create" aria-label="创建">
-        <img src="../static/images/star.png" id="star" alt="创建图标" />
+        <img src="../static/images/star.png" id="star" alt="创建" />
       </a>
       <a href="/square" aria-label="广场">
         <span>广场</span>

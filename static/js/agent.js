@@ -72,6 +72,10 @@ function loadChatHistory(agent) {
         });
 }
 
+document.getElementById('phone-button').addEventListener('click', function () {
+    window.location.href = '/phone';
+});
+
 document.getElementById('send-button').addEventListener('click', function () {
     let input = document.getElementById('agent-chat-textarea');
     let message = input.value.trim();
@@ -398,7 +402,7 @@ document.getElementById('agent-chat-textarea').addEventListener('click', functio
 --------------------------------------------------------- */
 
 // 获取暂停按钮元素
-const pauseDiv = document.querySelector('.pause');
+const pauseDiv = document.querySelector('#pause_icon');
 
 // 获取音频播放器 DOM 元素
 const audioPlayer = document.getElementById('audioPlayer');
@@ -434,7 +438,7 @@ document.getElementById('audio-control').addEventListener('click', function () {
         audioQueue = [];
         audioPlayer.pause();
         isPlaying = false;
-        pauseDiv.style.backgroundImage = `url('${'./static/images/pause_inactive.png'}')`;
+        pauseDiv.src = `../static/images/pause_inactive.png`;
     }
 })
 
@@ -452,7 +456,7 @@ socket.on('agent_play_audio_chunk', function (data) {
 
     // 如果当前没有音频正在播放，开始播放
     if (!isPlaying) {
-        pauseDiv.style.backgroundImage = `url('${'./static/images/pause.png'}')`;
+        pauseDiv.src = `../static/images/pause.png`;
         playNextAudio();
     }
 });
@@ -465,7 +469,7 @@ function playNextAudio() {
     // 如果音频队列中没有音频数据（即后端还没有发送音频数据），则停止播放
     if (audioQueue.length === 0) {
         isPlaying = false;
-        pauseDiv.style.backgroundImage = `url('${'./static/images/pause_inactive.png'}')`;
+        pauseDiv.src = `../static/images/pause_inactive.png`;
         return;
     }
     console.log('[agent.js][playNextAudio] audioQueue:', audioQueue);
@@ -515,7 +519,7 @@ pauseDiv.addEventListener('click', function () {
     // 清空音频队列
     audioQueue = [];
 
-    pauseDiv.style.backgroundImage = `url('${'./static/images/pause_inactive.png'}')`;
+    pauseDiv.src = `../static/images/pause_inactive.png`;
 });
 
 /* 音频播放相关 end
