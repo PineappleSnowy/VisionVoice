@@ -14,6 +14,7 @@ const socket = io({
         token: token
     }
 });
+const messagebackground = document.getElementById('chat-container');  // 获取消息列表容器
 
 /**
  * @function loadChatHistory
@@ -21,7 +22,6 @@ const socket = io({
  * @param {string} agent 智能体名称
  */
 function loadChatHistory(agent) {
-    const messagebackground = document.getElementById('chat-container');
     const botImageUrl = agent === 'psychologicalAgent' ? '../static/images/psychologicalAgent.jpg' : '../static/images/defaultAgent.jpg';
 
     fetch(`/get-chat-history?agent=${agent}`, {
@@ -113,7 +113,6 @@ function addMessage(message) {
 
     // 获取本地 token
 
-    const messagebackground = document.getElementById('chat-container');
     const messagesContainer_user = document.createElement('div');
     messagesContainer_user.className = 'chat-messages-user';
     const bubble = document.createElement('div');
@@ -226,7 +225,6 @@ function sendMessageToAgent(message, multi_image_talk) {
 
     messagesContainer_bot.appendChild(image_bot);
     messagesContainer_bot.appendChild(bubble_2);
-    const messagebackground = document.getElementById('chat-container');
     messagebackground.appendChild(messagesContainer_bot);
     messagebackground.scrollTop = messagebackground.scrollHeight;
 }
