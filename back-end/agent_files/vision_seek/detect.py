@@ -235,6 +235,7 @@ class ObjectDetector:
                     cur_img[mask_[..., 0] != 255] = outer_color
 
                     roi = cur_img[y1:y2, x1:x2]
+                    roi_origin = img[y1:y2, x1:x2]
 
                     # 排除掉长宽比不一致的物体
                     # height, width = self.template_1.shape[:2]
@@ -257,8 +258,10 @@ class ObjectDetector:
                     #         continue
 
                     # 若余弦相似度过低, 跳过该物体
-                    roi_features = extract_features(img[y1:y2, x1:x2], 0)
-                    # roi_features = extract_features(roi)
+                    if w * h < 20000:
+                        # 使用双三次插值放大图像
+                        roi_origin = cv2.resize(roi_origin, (0, 0), fx=2, fy=2, interpolation=cv2.INTER_CUBIC)
+                    roi_features = extract_features(roi_origin, 0)
 
                     similarity_score = 0
                     for template_feature_ in self.templates_features_0:
