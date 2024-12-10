@@ -184,7 +184,7 @@ def logout():
 """寻物画廊路由"""
 
 # 设置图片文件夹路径
-IMAGE_FOLDER = "./user_images/"
+USER_IMAGE_FOLDER = "./user_images/"
 
 
 @app.route("/photo_manage", methods=["GET"])
@@ -197,26 +197,27 @@ def photo_manage():
 def get_images():
     images = []
     curr_user = get_jwt_identity()
-    user_image_folder = os.path.join(IMAGE_FOLDER, curr_user)
+    user_image_folder = os.path.join(USER_IMAGE_FOLDER, curr_user)
     if not os.path.exists(user_image_folder):
         os.mkdir(user_image_folder)
     for filename in os.listdir(user_image_folder):
         if filename.endswith((".png", ".jpg", ".jpeg", ".gif")):
             name, ext = os.path.splitext(filename)
-            images.append({"name": name, "url": f"/image/{curr_user}/{filename}"})
+            images.append(
+                {"name": name, "url": f"/image/{curr_user}/{filename}"})
     return jsonify(images)
 
 
 @app.route("/image/<user>/<filename>", methods=["GET"])
 def get_image(user, filename):
-    user_image_folder = os.path.join(IMAGE_FOLDER, user)
+    user_image_folder = os.path.join(USER_IMAGE_FOLDER, user)
     return send_from_directory(user_image_folder, filename)
 
 
 @app.route("/rename_image", methods=["POST"])
 def rename_image():
     curr_user = get_jwt_identity()
-    user_image_folder = os.path.join(IMAGE_FOLDER, curr_user)
+    user_image_folder = os.path.join(USER_IMAGE_FOLDER, curr_user)
 
     data = request.get_json()
     old_name = data["oldName"]
@@ -247,7 +248,7 @@ def rename_image():
 @app.route("/save_item_image", methods=["POST"])
 def save_item_image():
     curr_user = get_jwt_identity()
-    user_image_folder = os.path.join(IMAGE_FOLDER, curr_user)
+    user_image_folder = os.path.join(USER_IMAGE_FOLDER, curr_user)
 
     if "file" not in request.files:
         return jsonify({"success": False, "error": "No file part"}), 400
@@ -273,7 +274,7 @@ def save_item_image():
 @app.route("/delete_image", methods=["POST"])
 def delete_image():
     curr_user = get_jwt_identity()
-    user_image_folder = os.path.join(IMAGE_FOLDER, curr_user)
+    user_image_folder = os.path.join(USER_IMAGE_FOLDER, curr_user)
 
     data = request.get_json()
     name = data["name"]
@@ -710,7 +711,8 @@ def build_response(current_user, agent_name, user_talk, video_open, multi_image_
             img_path = os.path.join(MULTI_IMAGE_DIRECTORY, image_file)
             with open(img_path, "rb") as f:
                 img_base = base64.b64encode(f.read()).decode("utf-8")
-            content.append({"type": "image_url", "image_url": {"url": img_base}})
+            content.append(
+                {"type": "image_url", "image_url": {"url": img_base}})
         delete_file_from_dir(MULTI_IMAGE_DIRECTORY)  # 及时清空图片缓存
 
         content.append({"type": "text", "text": user_talk})
@@ -773,7 +775,8 @@ def agent_chat_stream():
     user_talk = request.args.get("query")
     agent_name = request.args.get("agent", "defaultAgent")  # 获取选择的智能体
     video_open = request.args.get("videoOpen", "false") == "true"  # 获取选择的智能体
-    multi_image_talk = request.args.get("multi_image_talk", "false") == "true" # 是否开启多轮对话
+    multi_image_talk = request.args.get(
+        "multi_image_talk", "false") == "true"  # 是否开启多轮对话
     current_user = get_jwt_identity()
 
     responses, messages = build_response(
@@ -814,6 +817,7 @@ def delete_file_from_dir(directory):
             os.remove(file_path)
         except Exception as e:
             print("[run.py][delete_file_from_dir]删除文件时出错：", e)
+
 
 @app.route("/agent/upload_image", methods=["POST"])
 def upload_image():
@@ -865,10 +869,6 @@ def upload_image():
 
     elif state == 2:
         try:
-            init_state = detector.detect_init(mat_image)
-            if init_state != 0:
-                return jsonify({"message": "未识别到图片中的目标", "item_info": []}), 200
-
             detect_result = detector.detect_main(mat_image)
             item_info = [] if detect_result == -1 else detect_result
             print("[run.py][upload_image] item_info:", item_info)
@@ -949,15 +949,27 @@ def agent_stream_audio(current_token: str):
         return
     # 功能性处理
     if "##" in current_token:
+        # 状态1处理
         if current_token == "##<state=1>":
             socketio.emit("obstacle_avoid", {"flag": "begin"})
             audio_file_path = "./agent_files/obstacle_start.wav"
-        elif "##<state=2>" in current_token:
-            socketio.emit("find_item", {"flag": "begin"})
-            audio_chunk = agent_audio_generate(
-                current_token[current_token.find(">") + 1:]
-            )
-            audio_file_path = ""
+        # 状态2处理
+        elif "##<state=2" in current_token:
+            if "##<state=2>" in current_token:
+                # 使用用户模板初始化寻物检测器
+                file_path = os.path.join(
+                    USER_IMAGE_FOLDER, user, current_token[current_token.find(">") + 1:]+'.jpg')
+                init_state = detector.detect_init(cv2.imread(file_path, 1))
+                if init_state != 0:
+                    return jsonify({"message": "未识别到图片中的目标", "item_info": []}), 200
+
+                socketio.emit("find_item", {"flag": "begin"})
+                audio_chunk = agent_audio_generate(
+                    "开始寻找"+current_token[current_token.find(">") + 1:]
+                )
+                audio_file_path = ""
+            elif current_token == "##<state=2 exit>":
+                detector.release()
         else:
             return
 
