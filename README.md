@@ -105,17 +105,17 @@ https://github.com/user-attachments/assets/d16b3817-3bae-4576-9115-ed4c9166b2ec
 
 用户可以在“视界之声”的消息列表中找到所有智能助手：
 
-<img src="readme_files/all_agents.jpg" width="50%">
+<img src="readme_files/all_agents.jpg" width="40%">
 
 用户可以直接通过语音或视频的方式和智能体进行交流对话。
 
 当用户说话时，智能体助手将倾听用户的需求。此时“视界之声”的界面如下：
 
-<img src="readme_files/agent_listen.jpg" width="50%">
+<img src="readme_files/agent_listen.jpg" width="40%">
 
 在用户说完话后，智能体助手将自动启用与用户需求最接近的功能，并根据具体功能的需要通过语音向用户发送信息。此时“视界之声”的界面如下：
 
-<img src="readme_files/agent_tell.jpg" width="50%">
+<img src="readme_files/agent_tell.jpg" width="40%">
 
 用户随时可以通过点击界面下方的红色正方形打断智能体助手的输出。
 
@@ -147,8 +147,8 @@ https://github.com/user-attachments/assets/d16b3817-3bae-4576-9115-ed4c9166b2ec
 
 |                     [避障模式](https://pineapplesnowy.cn/phone)                  |                [寻物模式](https://pineapplesnowy.cn/phone)                 
 | :-----------------------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------------------: |
-| <a href="https://pineapplesnowy.cn/phonet"> <img src="readme_files/feature_avoid.jpg" width="120%"> </a> | <a href="https://pineapplesnowy.cn/phone"> <img src="readme_files/feature_seek.jpg" width="80%"> </a> |
-|                                       “避障模式”开启时，生活助手将通过手机后置摄像头不断获取周围环境的信息，并实时通过语音向用户提醒其附近的障碍物以及障碍物与用户的间距，依此帮助用户前行时绕开障碍物。                                       |                        当用户找不到自己的个人物品时，用户可以使用“寻物模式”功能，通过手机后置摄像头的实时录像，找到用户事先已经在手机中保存好的照片所对应的物品。（照片保存在“寻物画廊”中，用户需要在保存照片时对物品命名，且拍照时背景应尽可能干净整洁以凸显目标物品）                      |
+| <a href="https://pineapplesnowy.cn/phonet"> <img src="readme_files/feature_avoid.jpg" width="100%"> </a> | <a href="https://pineapplesnowy.cn/phone"> <img src="readme_files/feature_seek.jpg" width="100%"> </a> |
+|                                       “避障模式”开启时，生活助手将通过手机后置摄像头不断获取周围环境的信息，并实时通过语音向用户提醒其附近的障碍物以及障碍物与用户的间距，依此帮助用户前行时绕开障碍物。                                       |                        当用户找不到自己的个人物品时，用户可以使用“寻物模式”功能，通过手机后置摄像头的实时录像，找到用户事先已经在手机中保存好的照片所对应的物品（照片在“寻物画廊”中）。                      |
 
 #### 心灵树洞
 
