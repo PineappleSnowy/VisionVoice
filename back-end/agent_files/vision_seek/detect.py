@@ -321,6 +321,7 @@ class ObjectDetector:
         # self.template_average_color_R = 0
         # self.template_average_color_G = 0
         # self.template_average_color_B = 0
+        print("[detect.py][detector.release]寻物检测器资源释放完毕")
 
 
 # 创建目标物品检测器

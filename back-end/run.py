@@ -989,6 +989,7 @@ def agent_stream_audio(current_token: str):
                 audio_file_path = ""
             elif current_token == "##<state=2 exit>":
                 detector.release()
+                return
         else:
             return
 
