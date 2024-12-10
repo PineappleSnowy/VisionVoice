@@ -31,8 +31,10 @@ yarn-error.log*
 *.pyc
 **/__pycache__
 
-# 临时文件夹不保存有时会运行报错，无 .cache 文件夹
-# .cache/*
+# 临时文件
+audio.wav
+uploaded_image.jpg
+**/multi_image/*
 
 # 虚拟环境
 .venv
@@ -45,3 +47,9 @@ yarn-error.log*
 
 # yolo大体积模型
 yolo11x-seg.pt
+
+# api文件
+api.json
+
+# 用户文件
+**/user_images/*

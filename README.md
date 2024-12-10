@@ -98,6 +98,7 @@
 ### 安装方式
 
 ### 使用说明
+请参照backend/static/api_template.json的样式添加api_key等信息，并将api_template.json重名为api.json以正确运行程序。
 
 ## 致谢
 
