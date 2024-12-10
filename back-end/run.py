@@ -911,6 +911,7 @@ def agent_upload_audio():
     socketio.emit:
         agent_speech_recognition_finished {string} 本次音频数据的完整语音识别结果
     """
+    user= get_jwt_identity()
     logging.info("run.py", "agent_upload_audio", "开始音频处理...")
     if "audio_data" not in request.files:
         return "No file part in the request", 400
@@ -936,8 +937,7 @@ def agent_upload_audio():
     print("音频识别结果：", rec_result)
 
     # 音频识别结果发送到前端
-    socketio.emit("agent_speech_recognition_finished",
-                  {"rec_result": rec_result})
+    socketio.emit("agent_speech_recognition_finished", {"user": user, "rec_result": rec_result})
 
     return jsonify({"message": "File uploaded successfully and processed"}), 200
 
@@ -970,7 +970,7 @@ def agent_stream_audio(current_token: str):
     if "##" in current_token:
         # 状态1处理
         if current_token == "##<state=1>":
-            socketio.emit("obstacle_avoid", {"flag": "begin"})
+            socketio.emit("obstacle_avoid", {"user": user, "flag": "begin"})
             audio_file_path = "./agent_files/obstacle_start.wav"
         # 状态2处理
         elif "##<state=2" in current_token:
@@ -982,7 +982,7 @@ def agent_stream_audio(current_token: str):
                 if init_state != 0:
                     return jsonify({"message": "未识别到图片中的目标", "item_info": []}), 200
 
-                socketio.emit("find_item", {"flag": "begin"})
+                socketio.emit("find_item", {"user": user, "flag": "begin"})
                 audio_chunk = agent_audio_generate(
                     "开始寻找"+current_token[current_token.find(">") + 1:]
                 )
@@ -998,7 +998,7 @@ def agent_stream_audio(current_token: str):
                 audio_chunk = audio_file.read()
 
         socketio.emit(
-            "agent_play_audio_chunk", {"index": 0, "audio_chunk": audio_chunk}
+            "agent_play_audio_chunk", {"user": user, "index": 0, "audio_chunk": audio_chunk}
         )
 
     else:
@@ -1066,6 +1066,7 @@ def process_audio_stream(user):
                 socketio.emit(
                     "agent_play_audio_chunk",
                     {
+                        "user": user,
                         "index": USER_VAR[user]["sentence_index"],
                         "audio_chunk": audio_chunk,
                     },

@@ -15,6 +15,7 @@ const socket = io({
     }
 });
 const messagebackground = document.getElementById('chat-container');  // 获取消息列表容器
+const user = localStorage.getItem('user');
 
 /**
  * @function loadChatHistory
@@ -34,7 +35,7 @@ function loadChatHistory(agent) {
             if (history.length > 0) {
                 history.forEach(msg => {
                     if (msg.role === 'user') {
-                        // 创建用户��息
+                        // 创建用户消息
                         const messagesContainer_user = document.createElement('div');
                         messagesContainer_user.className = 'chat-messages-user';
                         const bubble = document.createElement('div');
@@ -451,6 +452,7 @@ document.getElementById('audio-control').addEventListener('click', function () {
  * - 后端会将音频数据分段发送过来，该函数需要将这些音频数据分段存储到队列中，并开始播放
  */
 socket.on('agent_play_audio_chunk', function (data) {
+    if (data.user !== user) return;
     const audioIndex = data['index'];
     const audioData = data['audio_chunk'];
 
@@ -660,6 +662,7 @@ function upload_audio(blob) {
  */
 
 socket.on('agent_speech_recognition_finished', async function (data) {
+    if (data.user !== user) return;
     rec_result = data['rec_result'];
 
     if (!rec_result) {
