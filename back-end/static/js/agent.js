@@ -452,6 +452,7 @@ document.getElementById('audio-control').addEventListener('click', function () {
  * - 后端会将音频数据分段发送过来，该函数需要将这些音频数据分段存储到队列中，并开始播放
  */
 socket.on('agent_play_audio_chunk', function (data) {
+    console.log('curr_user', user)
     if (data.user !== user) return;
     const audioIndex = data['index'];
     const audioData = data['audio_chunk'];
