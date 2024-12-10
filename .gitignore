@@ -1,7 +1,6 @@
 # ----------------- front-end -----------------
 .DS_Store
 node_modules
-/dist
 /build
 
 # sign
