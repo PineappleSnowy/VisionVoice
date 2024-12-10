@@ -1,8 +1,7 @@
 /* 该文件为帮我寻物物品模板管理模块的内容 */
 
-const token = localStorage.getItem('token');
-
 document.addEventListener('DOMContentLoaded', function () {
+    const token = localStorage.getItem('token');
     fetch('/images', {
         headers: {
             "Authorization": `Bearer ${token}`

@@ -372,7 +372,7 @@ function exit_obstacle_void() {
 function exit_find_item() {
     state = 0
     find_item = false;
-    // socket.emit("agent_stream_audio", "##<state=2 exit>");
+    socket.emit("agent_stream_audio", "##<state=2 exit>");
 }
 
 // 退出功能模式
@@ -431,7 +431,7 @@ window.startFindItem = function (item_name) {
     if (!find_item) {
         find_item = true;
         find_item_name = item_name;
-        socket.emit("agent_stream_audio", `##<state=2>开始寻找${item_name}`);
+        socket.emit("agent_stream_audio", `##<state=2>${item_name}`);
         startAudio();
     }
 }
@@ -632,6 +632,8 @@ window.onload = async () => {
      * - 后端会将音频数据分段发送过来，该函数需要将这些音频数据分段存储到队列中，并开始播放
      */
     socket.on('agent_play_audio_chunk', function (data) {
+        const user = localStorage.getItem('user');
+        if (data.user !== user) return;
         if (!audio_stop) {
             const audioIndex = data['index'];
             const audioData = data['audio_chunk'];
@@ -724,6 +726,8 @@ window.onload = async () => {
      */
 
     socket.on('agent_speech_recognition_finished', async function (data) {
+        const user = localStorage.getItem('user');
+        if (data.user !== user) return;
         rec_result = data['rec_result'];
 
         if (!rec_result) {
@@ -756,6 +760,8 @@ window.onload = async () => {
 
     // 避障socket
     socket.on('obstacle_avoid', function (data) {
+        const user = localStorage.getItem('user');
+        if (data.user !== user) return;
         const flag = data["flag"];
         if (flag == "begin") {
             captureAndSendFrame();
@@ -764,6 +770,8 @@ window.onload = async () => {
 
     // 寻物socket
     socket.on('find_item', function (data) {
+        const user = localStorage.getItem('user');
+        if (data.user !== user) return;
         const flag = data["flag"];
         if (flag == "begin") {
             captureAndSendFrame();
@@ -827,6 +835,7 @@ window.onload = async () => {
     });
 
     function loadGallery() {
+        const token = localStorage.getItem('token');
         fetch('/images', {
             headers: {
                 "Authorization": `Bearer ${token}`

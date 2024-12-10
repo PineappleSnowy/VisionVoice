@@ -23,7 +23,7 @@ const messagebackground = document.getElementById('chat-container');  // 获取�
  */
 function loadChatHistory(agent) {
     const botImageUrl = agent === 'psychologicalAgent' ? '../static/images/psychologicalAgent.jpg' : '../static/images/defaultAgent.jpg';
-
+    const token = localStorage.getItem('token');
     fetch(`/get-chat-history?agent=${agent}`, {
         headers: {
             "Authorization": `Bearer ${token}`
@@ -34,7 +34,7 @@ function loadChatHistory(agent) {
             if (history.length > 0) {
                 history.forEach(msg => {
                     if (msg.role === 'user') {
-                        // 创建用户��息
+                        // 创建用户消息
                         const messagesContainer_user = document.createElement('div');
                         messagesContainer_user.className = 'chat-messages-user';
                         const bubble = document.createElement('div');
@@ -76,16 +76,19 @@ document.getElementById('phone-button').addEventListener('click', function () {
     window.location.href = '/phone';
 });
 
+let message = ''  // 用户发送的消息
+
 document.getElementById('send-button').addEventListener('click', function () {
     let input = document.getElementById('agent-chat-textarea');
-    let message = input.value.trim();
+    message += input.value.trim();
     message = message.replace(/(\r\n|\n|\r)/gm, '');
     if (message || uploadedImages.length > 0) {
         audioPlayer.pause();
-        pauseDiv.style.backgroundImage = `url('${'./static/images/pause_inactive.png'}')`;
         audioDict = {};
         audioIndex = 0;
+        pauseDiv.style.backgroundImage = `url('${'./static/images/pause_inactive.png'}')`;
         addMessage(message);
+        message = ''
         input.value = ''; // 清空输入框
         if (flag_board === 1) {
             document.getElementById('more_function_button_2').click();
@@ -145,6 +148,7 @@ function addMessage(message) {
                     imageElement.style.height = 'auto';
                     bubble.appendChild(imageElement);
 
+                    const token = localStorage.getItem('token');
                     // 发送图像到后端
                     fetch('/agent/upload_image', {
                         method: 'POST',
@@ -196,6 +200,7 @@ function sendMessageToAgent(message, multi_image_talk) {
     const bubble_2 = document.createElement('div');
     bubble_2.className = 'chat-bubble-bot';
 
+    const token = localStorage.getItem('token');
     fetch(`/agent/chat_stream?query=${message}&agent=${selectedAgent}&multi_image_talk=${multi_image_talk}`, {
         headers: {
             "Authorization": `Bearer ${token}`
@@ -448,6 +453,9 @@ document.getElementById('audio-control').addEventListener('click', function () {
  * - 后端会将音频数据分段发送过来，该函数需要将这些音频数据分段存储到队列中，并开始播放
  */
 socket.on('agent_play_audio_chunk', function (data) {
+    const user = localStorage.getItem('user');
+    console.log('curr_user', user)
+    if (data.user !== user) return;
     const audioIndex = data['index'];
     const audioData = data['audio_chunk'];
 
@@ -657,6 +665,9 @@ function upload_audio(blob) {
  */
 
 socket.on('agent_speech_recognition_finished', async function (data) {
+    const user = localStorage.getItem('user');
+    console.log('curr_user', user)
+    if (data.user !== user) return;
     rec_result = data['rec_result'];
 
     if (!rec_result) {
@@ -664,8 +675,9 @@ socket.on('agent_speech_recognition_finished', async function (data) {
         return;
     }
     console.log('[agent.js][socket.on][agent_speech_recognition_finished] 音频识别结果: %s', rec_result);
-
-    addMessage(rec_result);
+    
+    message += rec_result;
+    document.getElementById('send-button').click();
 })
 
 /* 处理音频识别 end 
