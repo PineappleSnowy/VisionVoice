@@ -1,12 +1,15 @@
 # coding=utf-8
 
 import json
+import os
 from urllib.request import urlopen
 from urllib.request import Request
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
 
-with open("./static/api.json", "r", encoding="utf-8") as f:
+module_dir = os.path.dirname(__file__)
+json_path = os.path.join(module_dir, '..', 'static', 'api.json')
+with open(json_path, "r", encoding="utf-8") as f:
     data = json.load(f)
     API_KEY = data["baidu"]["api_key"]
     SECRET_KEY = data["baidu"]["api_secret"]

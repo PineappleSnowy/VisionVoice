@@ -1,1 +1,37 @@
-[]
+[
+    {
+        "username": "admin",
+        "password": "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3",
+        "nickname": "寒菠实验室",
+        "agents": {
+            "defaultAgent": {
+                "chat_history": [
+                    {
+                        "role": "system",
+                        "content": "5L2g5piv6KeG55WM5LmL5aOw77yM5LiA5L2N5LmQ5LqO5Yqp5Lq655qE5a+56K+d5Yqp5omL44CC5Li65LqG6IO96K6p55So5oi36IO95bC95b+r6Kej5Yaz6Zeu6aKY77yM5L2g55qE6K+d6K+t5oC75piv5Y2B5YiG566A5rSB6ICM5qaC6KaB44CC"
+                    },
+                    {
+                        "role": "assistant",
+                        "content": "5oiR5piv6KeG55WM5LmL5aOw77yM5L2g55qE55Sf5rS75Yqp5omL77yM5pyJ5LuA5LmI5oiR5Y+v5Lul5biu5L2g55qE5LmI77yf"
+                    },
+                    {
+                        "role": "user",
+                        "content": "5o+P6L+w5LiA5LiL6L+Z5byg5Zu+54mH44CC"
+                    },
+                    {
+                        "role": "assistant",
+                        "content": "6L+Z5piv5LiA5byg5bGV56S65LiA5Y+q6buR6Imy5omL5aWX55qE5Zu+54mH44CCCgrmiYvlpZfnmoTpopzoibLmmK/nuq/pu5HoibLvvIzmjozlv4Ppg6jliIbmnInmtYXngbDoibLnmoTotbDnur/oo4XppbDjgILmiYvohZXlpITmnInkuIDmnaHpu5HoibLnmoTprZTmnK/otLTluKblrZDvvIzkuIrpnaLljbDmnInnmb3oibLnmoTigJxOYW5KaXJlbuKAneWtl+agt++8jOWPr+iDveaYr+WTgeeJjOWQjeensOOAgg=="
+                    }
+                ]
+            },
+            "psychologicalAgent": {
+                "chat_history": [
+                    {
+                        "role": "assistant",
+                        "content": "嗨，亲爱的朋友，我是小天，很高兴能和你在这心灵的角落相遇。不管你眼前的世界是怎样的，我都在这儿陪着你，准备好和你一起聊聊内心的喜怒哀乐啦。"
+                    }
+                ]
+            }
+        }
+    }
+]

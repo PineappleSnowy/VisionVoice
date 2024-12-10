@@ -5,7 +5,9 @@ import os
 from lib import logging
 import re
 
-with open("./static/api.json", "r", encoding="utf-8") as f:
+module_dir = os.path.dirname(__file__)
+json_path = os.path.join(module_dir, '..', 'static', 'api.json')
+with open(json_path, "r", encoding="utf-8") as f:
     data = json.load(f)
     api_key = data["baidu"]["api_key"]
     api_secret = data["baidu"]["api_secret"]
@@ -59,7 +61,9 @@ init_params = {
     "ctp": 1,
 }  # lan ctp 固定参数
 
-with open("./configs/audio_settings.json", "w", encoding="utf-8") as f:
+
+audio_json_path = os.path.join(module_dir, '..', 'configs', 'audio_settings.json')
+with open(audio_json_path, "w", encoding="utf-8") as f:
     json.dump(init_params, f, ensure_ascii=False, indent=4)
 
 

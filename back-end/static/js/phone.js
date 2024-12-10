@@ -372,7 +372,7 @@ function exit_obstacle_void() {
 function exit_find_item() {
     state = 0
     find_item = false;
-    // socket.emit("agent_stream_audio", "##<state=2 exit>");
+    socket.emit("agent_stream_audio", "##<state=2 exit>");
 }
 
 // 退出功能模式
@@ -431,7 +431,7 @@ window.startFindItem = function (item_name) {
     if (!find_item) {
         find_item = true;
         find_item_name = item_name;
-        socket.emit("agent_stream_audio", `##<state=2>开始寻找${item_name}`);
+        socket.emit("agent_stream_audio", `##<state=2>${item_name}`);
         startAudio();
     }
 }

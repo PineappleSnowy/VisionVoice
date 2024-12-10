@@ -76,9 +76,11 @@ document.getElementById('phone-button').addEventListener('click', function () {
     window.location.href = '/phone';
 });
 
+let message = ''  // 用户发送的消息
+
 document.getElementById('send-button').addEventListener('click', function () {
     let input = document.getElementById('agent-chat-textarea');
-    let message = input.value.trim();
+    message += input.value.trim();
     message = message.replace(/(\r\n|\n|\r)/gm, '');
     if (message || uploadedImages.length > 0) {
         audioPlayer.pause();
@@ -86,6 +88,7 @@ document.getElementById('send-button').addEventListener('click', function () {
         audioDict = {};
         audioIndex = 0;
         addMessage(message);
+        message = ''
         input.value = ''; // 清空输入框
         if (flag_board === 1) {
             document.getElementById('more_function_button_2').click();
@@ -664,8 +667,9 @@ socket.on('agent_speech_recognition_finished', async function (data) {
         return;
     }
     console.log('[agent.js][socket.on][agent_speech_recognition_finished] 音频识别结果: %s', rec_result);
-
-    addMessage(rec_result);
+    
+    message += rec_result;
+    document.getElementById('send-button').click();
 })
 
 /* 处理音频识别 end 

@@ -1,7 +1,7 @@
 import numpy as np
 import cv2
 from concurrent.futures import ThreadPoolExecutor
-
+import os
 from tensorflow.keras.applications import ResNet50
 from tensorflow.keras.preprocessing import image
 from tensorflow.keras.applications.resnet50 import preprocess_input
@@ -13,7 +13,9 @@ MIN_DETECT_COUNT = 1
 GOOD_MATCHES_DIFF = 0.95
 MIN_MATCH_COUNT = 1
 
-with open('agent_files/vision_seek/class.txt', 'r') as f:
+module_dir = os.path.dirname(__file__)
+class_path = os.path.join(module_dir, 'class.txt')
+with open(class_path, 'r') as f:
     classNames = f.read().strip().split('\n')
 
 # 创建特征点检测器
@@ -319,6 +321,7 @@ class ObjectDetector:
         # self.template_average_color_R = 0
         # self.template_average_color_G = 0
         # self.template_average_color_B = 0
+        print("[detect.py][detector.release]寻物检测器资源释放完毕")
 
 
 # 创建目标物品检测器
