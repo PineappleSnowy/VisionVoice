@@ -2,7 +2,7 @@
     {
         "username": "admin",
         "password": "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3",
-        "nickname": "寒菠实验室",
+        "nickname": "GongHedong",
         "agents": {
             "defaultAgent": {
                 "chat_history": [
@@ -16,11 +16,19 @@
                     },
                     {
                         "role": "user",
-                        "content": "5o+P6L+w5LiA5LiL6L+Z5byg5Zu+54mH44CC"
+                        "content": "5L2g5aW9"
                     },
                     {
                         "role": "assistant",
-                        "content": "6L+Z5piv5LiA5byg5bGV56S65LiA5Y+q6buR6Imy5omL5aWX55qE5Zu+54mH44CCCgrmiYvlpZfnmoTpopzoibLmmK/nuq/pu5HoibLvvIzmjozlv4Ppg6jliIbmnInmtYXngbDoibLnmoTotbDnur/oo4XppbDjgILmiYvohZXlpITmnInkuIDmnaHpu5HoibLnmoTprZTmnK/otLTluKblrZDvvIzkuIrpnaLljbDmnInnmb3oibLnmoTigJxOYW5KaXJlbuKAneWtl+agt++8jOWPr+iDveaYr+WTgeeJjOWQjeensOOAgg=="
+                        "content": "5L2g5aW977yB5pyJ5LuA5LmI6Zeu6aKY5oiR5Y+v5Lul5biu5b+Z6Kej562U5oiW5o+Q5L6b5L+h5oGv5ZCX77yf"
+                    },
+                    {
+                        "role": "user",
+                        "content": "6L+Z5Liq5piv5LuA5LmI"
+                    },
+                    {
+                        "role": "assistant",
+                        "content": "6L+Z5piv5LiA5Liq6JOd6Imy55qE5L+d5rip5p2v77yM5LiK6Z2i5pyJ6buE6Imy55qE4oCcU1RJQ+enkeWIm+ekvuKAneWtl+agt+WSjOilv+WuieeUteWtkOenkeaKgOWkp+Wtpu+8iFhpZGlhbiBVbml2ZXJzaXR577yJ55qE5Zu+5qGI5qCH5b+X44CCCgrkv53muKnmna/pgJrluLjnlKjkuo7kv53mjIHppa7mlpnnmoTmuKnluqbvvIzpgILlkIjlnKjmiLflpJbmtLvliqjjgIHkuIrnj63miJblrabkuaDml7bkvb/nlKjjgILov5nnp43orr7orqHkuI3ku4Xlrp7nlKjvvIzogIzkuJTlhbfmnInkuIDlrprnmoToo4XppbDmgKfvvIzog73lpJ/kvZPnjrDlh7rkvb/nlKjogIXnmoTkuKrmgKflkozmiYDlsZ7nu4Tnu4fjgII="
                     }
                 ]
             },

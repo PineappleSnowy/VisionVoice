@@ -1,24 +1,29 @@
-import cv2
+import os, time, cv2
 import cvzone
-import time
 from detect import detector
 
 # 打开相机
 cap = cv2.VideoCapture(0)
 
-# 获取初始目标物品图像
-temp_1 = cv2.imread('agent_files/vision_seek/template1.jpg', 1)
-temp_2 = cv2.imread('agent_files/vision_seek/template2.jpg', 1)
-temp_3 = cv2.imread('agent_files/vision_seek/template3.jpg', 1)
-temp_4 = cv2.imread('agent_files/vision_seek/template4.jpg', 1)
-temp_5 = cv2.imread('agent_files/vision_seek/template5.jpg', 1)
+# 获取初始目标物品图
+module_dir = os.path.dirname(__file__)
+pic_path_1 = os.path.join(module_dir, 'templates/template1.jpg')
+pic_path_2 = os.path.join(module_dir, 'templates/template2.jpg')
+pic_path_3 = os.path.join(module_dir, 'templates/template3.jpg')
+pic_path_4 = os.path.join(module_dir, 'templates/template4.jpg')
+pic_path_5 = os.path.join(module_dir, 'templates/template5.jpg')
+temp_1 = cv2.imread(pic_path_1, 1)
+temp_2 = cv2.imread(pic_path_2, 1)
+temp_3 = cv2.imread(pic_path_3, 1)
+temp_4 = cv2.imread(pic_path_4, 1)
+temp_5 = cv2.imread(pic_path_5, 1)
 
 # 用于计算帧率
 prev_frame_time = 0
 new_frame_time = 0
 
 # 提取出目标物品的分割图像
-init_state = detector.detect_init(temp_1, temp_2, temp_3, temp_4, temp_5)
+init_state = detector.detect_init(temp_1, temp_2, temp_3, temp_4)
 if init_state != 0:
     print(f'未检测到第 {init_state} 张图片中的目标物品, 请重新上传目标物品图片')
     print('初始化失败')
