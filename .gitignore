@@ -33,9 +33,7 @@ yarn-error.log*
 **/api.json
 
 # 临时文件
-audio.wav
-uploaded_image.jpg
-**/multi_image/*
+**/.cache/*
 
 # 虚拟环境
 .venv
