@@ -1,4 +1,4 @@
-![视界之声logo](back-end\static\images\visionvoice_logo.jpg)
+![视界之声logo](back-end/static/images/visionvoice_logo.jpg)
 
 # 视界之声
 
