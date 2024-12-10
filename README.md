@@ -20,9 +20,9 @@
 - [📃 开放源码许可证](#-开放源码许可证)
 - [🧑‍💻 软件基本信息](#-软件基本信息)
 - [👋🏻 作品概述](#-作品概述)
+- [💻 演示视频与软件使用说明书](#-演示视频与软件使用说明书)
 - [📃 功能描述与在线演示](#-功能描述与在线演示)
 - [🏁 快速开始](#-快速开始)
-- [💻 演示视频与软件使用说明书](#-演示视频与软件使用说明书)
 - [🚗 体系结构和关键技术点](#-体系结构和关键技术点)
 - [🧑‍💻 产品创新点](#-产品创新点)
 - [🆚 “视界之声”与其它助盲产品的比较](#-“视界之声”与其它助盲产品的比较)
@@ -80,6 +80,20 @@
 ![star-us](readme_files/star-us.png)
 
 <br>
+
+
+## 💻 演示视频与软件使用说明书
+
+### 演示视频
+
+可以在这里查看“视界之声”的使用 [演示视频](videos/demo2.mp4)。也可以在这里查看手机无障碍功能中的[读屏功能演示](videos/demo1.mp4)
+
+https://github.com/user-attachments/assets/d16b3817-3bae-4576-9115-ed4c9166b2ec
+
+
+### 软件使用说明书
+
+我们为用户编写了详细的用户手册和使用说明！前往 <a href="https://visionvoice.life/html.child/user_manual.html">📃 用户文档</a> 和  [软件使用说明书](readme_files/manual.pdf) 查看用户文档和使用说明。
 
 ## 📃 功能描述与在线演示
 
@@ -140,7 +154,7 @@
 
 |                    [情感陪护](https://pineapplesnowy.cn/agent)                    |                [专业问答](https://pineapplesnowy.cn/agent)                 |
 | :----------------------------------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------------------------------: |
-| <a href="https://pineapplesnowy.cn/agent"> <img src="readme_files/example-feature4_1.png"> </a> | <a href="https://pineapplesnowy.cn/agent"> <img src="readme_files/example-feature4_2.png"> </a> |
+| <a href="https://pineapplesnowy.cn/agent"> <img src="readme_files/agent2_emotion.jpg"> </a> | <a href="https://pineapplesnowy.cn/agent"> <img src="readme_files/agent2_profession.jpg"> </a> |
 |                                          用户可以和智能体进行聊天互动与情感交流。                                          |                             用户可以和智能体进行专业知识问答。                              |
 
 
@@ -325,18 +339,6 @@
 用户使用完毕后，可以直接在手机后台关闭应用程序即可退出登录并退出程序。用户也可以点击界面右下角的“我的”进入个人信息界面，然后点击“退出登录“即可退出登录并自动返回登录界面。
 
 ![Android_quit](readme_files/Android_quit.jpg)
-
-
-
-## 💻 演示视频与软件使用说明书
-
-### 演示视频
-
-可以在这里查看“视界之声”的使用 [演示视频](https://github.com/user-attachments/assets/d16b3817-3bae-4576-9115-ed4c9166b2ec) 。也可以在这里查看手机无障碍功能中的[读屏功能演示](videos/demo1.mp4)
-
-### 软件使用说明书
-
-我们为用户编写了详细的用户手册和使用说明！前往 <a href="https://visionvoice.life/html.child/user_manual.html">📃 用户文档</a> 和  [软件使用说明书](readme_files/manual.pdf) 查看用户文档和使用说明。
 
 
 ## 🚗 体系结构和关键技术点
