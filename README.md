@@ -160,7 +160,7 @@ https://github.com/user-attachments/assets/d16b3817-3bae-4576-9115-ed4c9166b2ec
 
 |                    [情感陪护](https://pineapplesnowy.cn/agent)                    |                [专业问答](https://pineapplesnowy.cn/agent)                 |
 | :----------------------------------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------------------------------: |
-| <a href="https://pineapplesnowy.cn/agent"> <img src="readme_files/agent2_emotion.jpg"> </a> | <a href="https://pineapplesnowy.cn/agent"> <img src="readme_files/agent2_profession.jpg"> </a> |
+| <a href="https://pineapplesnowy.cn/agent"> <img src="readme_files/agent2_emotion.jpg" width="70%"> </a> | <a href="https://pineapplesnowy.cn/agent"> <img src="readme_files/agent2_profession.jpg" width="70%"> </a> |
 |                                          用户可以和智能体进行聊天互动与情感交流。                                          |                             用户可以和智能体进行专业知识问答。                              |
 
 
@@ -185,15 +185,21 @@ https://github.com/user-attachments/assets/d16b3817-3bae-4576-9115-ed4c9166b2ec
 
 电脑体验版“VisionVoice”文件夹:
 
-![windows_files](readme_files/windows_files.png)
+<div align=center>
+<img src="readme_files/windows_files.png" width="35%">
+</div>
 
 电脑体验版启动界面:
 
-![windows_open](readme_files/windows_open.png)
+<div align=center>
+<img src="readme_files/windows_open.png" width="35%">
+</div>
 
 电脑体验版使用界面：
 
-![windows_use](readme_files/windows_use.png)
+<div align=center>
+<img src="readme_files/windows_use.png" width="35%">
+</div>
 
 
 #### 手机正式版安装
@@ -202,25 +208,36 @@ https://github.com/user-attachments/assets/d16b3817-3bae-4576-9115-ed4c9166b2ec
 
 扫描二维码，免费安装“视界之声”手机版。
 
-![download_app](readme_files/download_andriod_app.png)
+<div align=center>
+<img src="readme_files/download_andriod_app.png" width="80%">
+</div>
 
 ### 2.免费注册并登录“视界之声”
 
 安装完成后，点击以下红色方框内的图标即可启动“视界之声”手机版。
 
-![Android_icon](readme_files/Android_icon.jpg)
+<div align=center>
+<img src="readme_files/Android_icon.jpg" width="35%">
+</div>
+
 
 启动界面如下：
 
-![Android_open](readme_files/Android_open.jpg)
+<div align=center>
+<img src="readme_files/Android_open.jpg" width="35%">
+</div>
 
 启动后，在登录界面输入用户名和密码即可登录：
 
-![Android_login](readme_files/Android_login.jpg)
+<div align=center>
+<img src="readme_files/Android_login.jpg" width="35%">
+</div>
 
 如果用户还没有注册账号，可以点击登录界面下方的“点击注册”进入注册界面，在注册界面输入用户名、昵称和密码，点击“注册”即可成功注册：
 
-![Android_register](readme_files/Android_register.jpg)
+<div align=center>
+<img src="readme_files/Android_register.jpg" width="35%">
+</div>
 
 也可以在这里免费[注册账号](https://pineapplesnowy.cn/)。成功注册账号后，用户将自动登录。
 
@@ -230,21 +247,29 @@ https://github.com/user-attachments/assets/d16b3817-3bae-4576-9115-ed4c9166b2ec
 
 登录后，默认直接和生活助手对话。
 
-![Android_begin](readme_files/Android_begin.jpg)
+<div align=center>
+<img src="readme_files/Android_begin.jpg" width="35%">
+</div>
 
 用户可以在界面下方的聊天框输入文字和智能体交流，也可以点击界面下方的“电话”符号按钮开始和智能助手进行语音和视频通话，此时智能助手将倾听用户的发言：
 
-![agent_listen](readme_files/agent_listen.jpg)
+<div align=center>
+<img src="readme_files/agent_listen.jpg" width="35%">
+</div>
 
 如果用户想要正常使用生活助手中“环境识别”“帮我定位”“寻物模式”“避障模式”等功能，请点击界面左下角的“视频”按钮打开手机摄像头，并把用户的需求通过语音告诉智能助手：
 
-![Android_listen](readme_files/Android_listen.jpg)
+<div align=center>
+<img src="readme_files/Android_listen.jpg" width="35%">
+</div>
 
 用户可以通过点击界面右上角的转换箭头转换手机前置或后置摄像模式。
 
 用户还可以通过点击界面下方中央的栏目按钮展开功能栏，功能栏中的四个按钮从左至右依次为“避障模式”“寻物模式”“环境识别”“帮我定位”这四个功能，点击按钮即可快速启动对应功能：
 
-![feature_menu_choose](readme_files/feature_menu2.jpg)
+<div align=center>
+<img src="readme_files/feature_menu2.jpg" width="35%">
+</div>
 
 
 生活助手中的功能使用示例如下：
@@ -253,73 +278,105 @@ https://github.com/user-attachments/assets/d16b3817-3bae-4576-9115-ed4c9166b2ec
 
 用户告诉助手“帮我躲避障碍物”等需求，智能助手将自动开启“避障模式”功能：
 
-![feature_avoid](readme_files/feature_avoid.jpg)
+<div align=center>
+<img src="readme_files/feature_avoid.jpg" width="35%">
+</div>
 
 用户也可以点击以下按钮快速开启“避障模式”：
 
-![feature_menu_avoid](readme_files/feature_menu_avoid.jpg)
+<div align=center>
+<img src="readme_files/feature_menu_avoid.jpg" width="35%">
+</div>
 
 #### 寻物模式
 
 用户需要在保存照片时对物品命名，且拍照时背景应尽可能干净整洁以凸显目标物品。照片保存在“寻物画廊”中，用户可以在“寻物画廊”中增加、删除、查看并修改照片及物品命名：
 
-![feature_seek_menu](readme_files/feature_seek_menu.jpg)
+<div align=center>
+<img src="readme_files/feature_seek_menu.jpg" width="35%">
+</div>
 
 用户告诉助手“帮我寻找物品”等需求，智能助手将自动开启“寻物模式”功能。此时，“视界之声”将弹出“寻物画廊”展示该用户所有拍照并命名的物品，用户在手机无障碍功能的帮助下点击本次需要寻找的目标物品对应的照片：
 
-![feature_seek_choose](readme_files/feature_seek_choose.jpg)
+<div align=center>
+<img src="readme_files/feature_seek_choose.jpg" width="35%">
+</div>
 
 之后，“寻物模式”将通过手机摄像头寻找目标物品，并在检测到目标物品后向用户语音播报物品位置，直到物品处于镜头正中央和用户附近：
 
-![feature_seek](readme_files/feature_seek.jpg)
+<div align=center>
+<img src="readme_files/feature_seek.jpg" width="35%">
+</div>
 
 用户也可以点击以下按钮快速开启“寻物模式”：
 
-![feature_menu_seek](readme_files/feature_menu_seek.jpg)
+<div align=center>
+<img src="readme_files/feature_menu_seek.jpg" width="35%">
+</div>
 
 #### 环境识别
 
 用户告诉助手“我附近都有什么？”“我周围都是什么？”“请描述四周环境”等需求，智能助手将自动开启“环境识别”功能：
 
-![feature_identify](readme_files/feature_identify.jpg)
+<div align=center>
+<img src="readme_files/feature_identify.jpg" width="35%">
+</div>
 
 下面是识别结果展示（实际使用时，生活助手将通过语音向用户播报识别结果）
 
-![feature_identify2](readme_files/feature_identify2.jpg)
+<div align=center>
+<img src="readme_files/feature_identify2.jpg" width="35%">
+</div>
 
 用户也可以点击以下按钮快速开启“环境识别”：
 
-![feature_menu_identify](readme_files/feature_menu_identify.jpg)
+<div align=center>
+<img src="readme_files/feature_menu_identify.jpg" width="35%">
+</div>
 
 #### 帮我定位
 
 用户告诉助手“我在哪里？”“我的位置是什么？”“请描述我现在所处的位置”等需求，智能助手将自动开启“帮我定位”功能：
 
-![feature_locate](readme_files/feature_locate.jpg)
+<div align=center>
+<img src="readme_files/feature_locate.jpg" width="35%">
+</div>
 
 下面是定位结果展示（实际使用时，生活助手将通过语音向用户播报识别结果）
 
-![feature_locate2](readme_files/feature_locate2.jpg)
+<div align=center>
+<img src="readme_files/feature_locate2.jpg" width="35%">
+</div>
 
 用户也可以点击以下按钮快速开启“帮我定位”：
 
-![feature_menu_locate](readme_files/feature_menu_locate.jpg)
+<div align=center>
+<img src="readme_files/feature_menu_locate.jpg" width="35%">
+</div>
 
 
 
 用户可以点击界面下方的“消息”进入智能体助手菜单，然后选择自己想要的智能助手，点击对应的智能助手即可和它交流。
 
-![agent_menu](readme_files/agent_menu.jpg)
+<div align=center>
+<img src="readme_files/agent_menu.jpg" width="35%">
+</div>
 
 点击“心灵树洞”进入如下对话界面：
 
-![agent2](readme_files/agent2.jpg)
+<div align=center>
+<img src="readme_files/agent2.jpg" width="35%">
+</div>
 
 用户可以通过在界面下方聊天框输入文字的信息和“心灵树洞”进行交谈，也可以点击界面左下角的“电话”按钮和智能助手进行语音和视频通话。
 
-![agent2_listen](readme_files/agent2_listen.jpg)
+<div align=center>
+<img src="readme_files/agent2_listen.jpg" width="35%">
+</div>
 
-![agent2_tell](readme_files/agent2_tell.jpg)
+<div align=center>
+<img src="readme_files/agent2_tell.jpg" width="35%">
+</div>
 
 “心灵树洞”中的功能使用示例如下：
 
@@ -327,7 +384,9 @@ https://github.com/user-attachments/assets/d16b3817-3bae-4576-9115-ed4c9166b2ec
 
 用户可以和“心灵树洞”进行情感方面的问题交流：
 
-![agent2_emotion](readme_files/agent2_emotion.jpg)
+<div align=center>
+<img src="readme_files/agent2_emotion.jpg" width="35%">
+</div>
 
 当智能助手输出时，点击该界面右下角的正方形即可打断。
 
@@ -335,7 +394,9 @@ https://github.com/user-attachments/assets/d16b3817-3bae-4576-9115-ed4c9166b2ec
 
 用户可以和“心灵树洞”进行专业问题交流：
 
-![agent2_profession](readme_files/agent2_profession.jpg)
+<div align=center>
+<img src="readme_files/agent2_profession.jpg" width="35%">
+</div>
 
 当智能助手输出时，点击该界面右下角的正方形即可打断。
 
@@ -344,7 +405,9 @@ https://github.com/user-attachments/assets/d16b3817-3bae-4576-9115-ed4c9166b2ec
 
 用户使用完毕后，可以直接在手机后台关闭应用程序即可退出登录并退出程序。用户也可以点击界面右下角的“我的”进入个人信息界面，然后点击“退出登录“即可退出登录并自动返回登录界面。
 
-![Android_quit](readme_files/Android_quit.jpg)
+<div align=center>
+<img src="readme_files/Android_quit.jpg" width="35%">
+</div>
 
 
 ## 🚗 体系结构和关键技术点
@@ -496,6 +559,10 @@ https://github.com/user-attachments/assets/d16b3817-3bae-4576-9115-ed4c9166b2ec
 ### 下载 Icon
 
 [VisionVoice-Icon-SVG](readme_files/VisionVoice_logo.svg)
+
+<div align=center>
+<img src="readme_files/VisionVoice_logo.svg" width="35%">
+</div>
 
 <br>
 
