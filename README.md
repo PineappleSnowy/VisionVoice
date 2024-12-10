@@ -105,17 +105,23 @@ https://github.com/user-attachments/assets/d16b3817-3bae-4576-9115-ed4c9166b2ec
 
 用户可以在“视界之声”的消息列表中找到所有智能助手：
 
+<div align=center>
 <img src="readme_files/all_agents.jpg" width="40%">
+</div>
 
 用户可以直接通过语音或视频的方式和智能体进行交流对话。
 
 当用户说话时，智能体助手将倾听用户的需求。此时“视界之声”的界面如下：
 
+<div align=center>
 <img src="readme_files/agent_listen.jpg" width="40%">
+</div>
 
 在用户说完话后，智能体助手将自动启用与用户需求最接近的功能，并根据具体功能的需要通过语音向用户发送信息。此时“视界之声”的界面如下：
 
+<div align=center>
 <img src="readme_files/agent_tell.jpg" width="40%">
+</div>
 
 用户随时可以通过点击界面下方的红色正方形打断智能体助手的输出。
 
