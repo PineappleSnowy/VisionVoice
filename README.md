@@ -105,7 +105,7 @@ https://github.com/user-attachments/assets/d16b3817-3bae-4576-9115-ed4c9166b2ec
 
 用户可以在“视界之声”的消息列表中找到所有智能助手：
 
-![all_agent](readme_files/all_agents.jpg)
+<img src="readme_files/all_agents.jpg" width="30%">
 
 用户可以直接通过语音或视频的方式和智能体进行交流对话。
 
@@ -142,12 +142,12 @@ https://github.com/user-attachments/assets/d16b3817-3bae-4576-9115-ed4c9166b2ec
 
 |                    [环境识别](https://pineapplesnowy.cn/phone)                    |                [帮我定位](https://pineapplesnowy.cn/phone)                 |
 | :----------------------------------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------------------------------: |
-| <a href="https://pineapplesnowy.cn/phone"> <img src="readme_files/feature_identify.jpg"> </a> | <a href="https://pineapplesnowy.cn/phone"> <img src="readme_files/feature_locate.jpg"> </a> |
+| <a href="https://pineapplesnowy.cn/phone"> <img src="readme_files/feature_identify.jpg"  width="30%"> </a> | <a href="https://pineapplesnowy.cn/phone"> <img src="readme_files/feature_locate.jpg" width="30%"> </a> |
 |                                          “环境识别”将通过用户的手机后置摄像头进行拍照，通过照片中的信息来分析用户周围的环境。                                          |                                          “帮我定位”将通过用户的手机定位帮助用户确定自己当前所在位置。                                          |
 
 |                     [避障模式](https://pineapplesnowy.cn/phone)                  |                [寻物模式](https://pineapplesnowy.cn/phone)                 
 | :-----------------------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------------------: |
-| <a href="https://pineapplesnowy.cn/phonet"> <img src="readme_files/feature_avoid.jpg"> </a> | <a href="https://pineapplesnowy.cn/phone"> <img src="readme_files/feature_seek.jpg"> </a> |
+| <a href="https://pineapplesnowy.cn/phonet"> <img src="readme_files/feature_avoid.jpg" width="30%"> </a> | <a href="https://pineapplesnowy.cn/phone"> <img src="readme_files/feature_seek.jpg" width="30%"> </a> |
 |                                       “避障模式”开启时，生活助手将通过手机后置摄像头不断获取周围环境的信息，并实时通过语音向用户提醒其附近的障碍物以及障碍物与用户的间距，依此帮助用户前行时绕开障碍物。                                       |                        当用户找不到自己的个人物品时，用户可以使用“寻物模式”功能，通过手机后置摄像头的实时录像，找到用户事先已经在手机中保存好的照片所对应的物品。（照片保存在“寻物画廊”中，用户需要在保存照片时对物品命名，且拍照时背景应尽可能干净整洁以凸显目标物品）                      |
 
 #### 心灵树洞
