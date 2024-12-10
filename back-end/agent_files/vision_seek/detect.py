@@ -12,9 +12,9 @@ from yolo_model import model
 
 
 # 参数设置
-SIMILARITY_SCORE_THRESHOLD = 0.45
+SIMILARITY_SCORE_THRESHOLD = 0.44
 MIN_DETECT_COUNT = 1
-GOOD_MATCHES_DIFF = 0.95
+GOOD_MATCHES_DIFF = 1.95
 MIN_MATCH_COUNT = 1
 
 # 读取类别名称
@@ -209,7 +209,7 @@ class ObjectDetector:
         img_height, img_width, _ = img.shape
 
         # 物体检测
-        results = model.predict(img, conf=0.3)
+        results = model.predict(img, conf=0.2)
 
         for result in results:
             if result.masks is not None:
@@ -299,7 +299,7 @@ class ObjectDetector:
                         continue
 
                     # 放大图像, 去噪处理, 增强对比度
-                    if w * h < 10000:
+                    if w * h < 20000:
                         # 使用双三次插值放大图像
                         roi = cv2.resize(roi, (0, 0), fx=2, fy=2, interpolation=cv2.INTER_CUBIC)
                         # 去噪处理
