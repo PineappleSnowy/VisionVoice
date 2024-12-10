@@ -30,6 +30,7 @@ yarn-error.log*
 # 缓存文件
 *.pyc
 **/__pycache__
+**/api.json
 
 # 临时文件
 audio.wav

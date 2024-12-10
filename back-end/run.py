@@ -189,8 +189,23 @@ USER_IMAGE_FOLDER = "./user_images/"
 
 @app.route("/photo_manage", methods=["GET"])
 def photo_manage():
-    """我的路由"""
+    """画廊路由"""
     return render_template("photo_manage.html")
+
+@app.route("/user_agreement", methods=["GET"])
+def user_agreement():
+    """用户须知路由"""
+    return render_template("user_agreement.html")
+
+@app.route('/get_user_agreement_text')
+def get_user_agreement_text():
+    file_path = './configs/user_agreement.txt'
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+        return content.replace('\n', '<br>')
+    except FileNotFoundError:
+        return "File not found", 404
 
 
 @app.route("/images", methods=["GET"])
@@ -301,7 +316,9 @@ def delete_image():
 
 # ----- 加载全局变量 -----
 # 加载 api_key
-with open("./static/api.json", "r", encoding="utf-8") as f:
+module_dir = os.path.dirname(__file__)
+json_path = os.path.join(module_dir, 'static', 'api.json')
+with open(json_path, "r", encoding="utf-8") as f:
     api_data = json.load(f)
     api_key_zhipu = api_data["zhipu"]["api_key"]
     client = ZhipuAI(api_key=api_key_zhipu)
@@ -319,7 +336,8 @@ def save_chat_history(current_user, agent_name, messages):
     encoded_messages = [encode_message_content(msg.copy()) for msg in messages]
 
     # 更新用户聊天记录
-    with open("./static/user.json", "r+", encoding="utf-8") as f:
+    user_path = os.path.join(module_dir, 'static', 'user.json')
+    with open(user_path, "r+", encoding="utf-8") as f:
         users = json.load(f)
         for user in users:
             if user["username"] == current_user:
@@ -462,6 +480,7 @@ def register():
 
     try:
         # 读取现有用户
+        
         with open("./static/user.json", "r+", encoding="utf-8") as f:
             users = json.load(f)
 
