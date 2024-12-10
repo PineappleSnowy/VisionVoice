@@ -646,9 +646,9 @@ def get_chat_history():
 
 
 # 图片保存地址
-IMAGE_SAVE_PATH = ".cache/uploaded_image.jpg"
+IMAGE_SAVE_NAME = "uploaded_image.jpg"
 # 多图片对话保存目录
-MULTI_IMAGE_DIRECTORY = ".cache/multi_image/"
+MULTI_IMAGE_DIRECTORY = "multi_image/"
 
 
 def init_chat_history(current_user, agent_name, messages):
@@ -681,14 +681,17 @@ def get_image_filenames(directory):
 
 def build_response(current_user, agent_name, user_talk, video_open, multi_image_talk):
     messages = []
+    user_cache_dir = os.path.join(".cache", current_user)
+    multi_image_dir = os.path.join(user_cache_dir, MULTI_IMAGE_DIRECTORY)
+    user_image_path = os.path.join(user_cache_dir, IMAGE_SAVE_NAME)
 
     if video_open:
         model_name = "glm-4v-flash"
         messages = init_chat_history(current_user, agent_name, messages)
 
         dst_messages = message_format_tran(messages[-MAX_HISTORY:])
-        if os.path.exists(IMAGE_SAVE_PATH):
-            with open(IMAGE_SAVE_PATH, "rb") as img_file:
+        if os.path.exists(user_image_path):
+            with open(user_image_path, "rb") as img_file:
                 img_base = base64.b64encode(img_file.read()).decode("utf-8")
             dst_messages.append(
                 {
@@ -704,7 +707,7 @@ def build_response(current_user, agent_name, user_talk, video_open, multi_image_
                 {"role": "user", "content": [
                     {"type": "text", "text": user_talk}]}
             )
-            print(f"未找到图片{IMAGE_SAVE_PATH}！")
+            print(f"未找到图片{user_image_path}！")
         # 保存和多模态大模型的聊天
         messages.append({"role": "user", "content": user_talk})
 
@@ -718,7 +721,10 @@ def build_response(current_user, agent_name, user_talk, video_open, multi_image_
     elif multi_image_talk:
         if user_talk == '':
             user_talk = '请描述图片内容'
-        image_path_list = get_image_filenames(MULTI_IMAGE_DIRECTORY)
+        if os.path.exists(multi_image_dir):
+            image_path_list = get_image_filenames(multi_image_dir)
+        else:
+            image_path_list = []
         model_name = 'glm-4v-flash' if len(
             image_path_list) == 1 else 'glm-4v-plus'
 
@@ -727,12 +733,12 @@ def build_response(current_user, agent_name, user_talk, video_open, multi_image_
 
         content = []
         for image_file in image_path_list:
-            img_path = os.path.join(MULTI_IMAGE_DIRECTORY, image_file)
+            img_path = os.path.join(multi_image_dir, image_file)
             with open(img_path, "rb") as f:
                 img_base = base64.b64encode(f.read()).decode("utf-8")
             content.append(
                 {"type": "image_url", "image_url": {"url": img_base}})
-        delete_file_from_dir(MULTI_IMAGE_DIRECTORY)  # 及时清空图片缓存
+        delete_file_from_dir(multi_image_dir)  # 及时清空图片缓存
 
         content.append({"type": "text", "text": user_talk})
 
@@ -848,20 +854,27 @@ def upload_image():
         return jsonify({"error": "No image data in the request"}), 400
 
     image_data = data["image"]
+    current_user = get_jwt_identity()
+    user_cache_dir = os.path.join(".cache", current_user)
+    if not os.path.exists(user_cache_dir):
+        os.makedirs(user_cache_dir)
 
     # 去掉base64前缀
     image_data = image_data.split(",")[1]
 
     # 获取当前是否是多图片对话
     if "multi_image_index" in data:
+        multi_image_dir = os.path.join(user_cache_dir, MULTI_IMAGE_DIRECTORY)
+        if not os.path.exists(multi_image_dir):
+            os.makedirs(multi_image_dir)
         print(data["multi_image_index"])
         if data["multi_image_index"] == 0:
             # 清空历史图片
-            delete_file_from_dir(MULTI_IMAGE_DIRECTORY)
+            delete_file_from_dir(multi_image_dir)
         # 以8位随机数加上图片序号作为文件名，图片序号使大模型能知道图片次序
-        image_save_path = f'{MULTI_IMAGE_DIRECTORY}{data["multi_image_index"]}{random.randint(10000000, 99999999)}.jpg'
+        image_save_path = os.path.join(multi_image_dir, f'{data["multi_image_index"]}{random.randint(10000000, 99999999)}.jpg')
     else:
-        image_save_path = IMAGE_SAVE_PATH
+        image_save_path = os.path.join(user_cache_dir, IMAGE_SAVE_NAME)
 
     # 将图片保存为文件
     with open(image_save_path, "wb") as f:
@@ -873,7 +886,7 @@ def upload_image():
         return {"message": "Image upload success"}
 
     try:
-        mat_image = cv2.imread(IMAGE_SAVE_PATH)
+        mat_image = cv2.imread(image_save_path)
     except Exception:
         return jsonify({"message": "Image is empty"}), 400
 
@@ -898,7 +911,6 @@ def upload_image():
 
     return jsonify({"message": "Success"}), 200
 
-
 @app.route("/agent/upload_audio", methods=["POST"])
 def agent_upload_audio():
     """
@@ -911,6 +923,11 @@ def agent_upload_audio():
     socketio.emit:
         agent_speech_recognition_finished {string} 本次音频数据的完整语音识别结果
     """
+    user = get_jwt_identity()
+    user_cache_dir = os.path.join(".cache", user)
+    if not os.path.exists(user_cache_dir):
+        os.makedirs(user_cache_dir)
+
     logging.info("run.py", "agent_upload_audio", "开始音频处理...")
     if "audio_data" not in request.files:
         return "No file part in the request", 400
@@ -924,11 +941,12 @@ def agent_upload_audio():
         return "file is empty", 400
 
     # 保存文件为.wav格式
-    file.save(".cache/audio.wav")
+    audio_file_path = os.path.join(user_cache_dir, "audio.wav")
+    file.save(audio_file_path)
 
     # 修改采样率
     resampled_audio_data = change_sample_rate(
-        ".cache/audio.wav", 16000, ori_sample_rate
+        audio_file_path, 16000, ori_sample_rate
     )
 
     # 语音识别
@@ -936,8 +954,7 @@ def agent_upload_audio():
     print("音频识别结果：", rec_result)
 
     # 音频识别结果发送到前端
-    socketio.emit("agent_speech_recognition_finished",
-                  {"rec_result": rec_result})
+    socketio.emit("agent_speech_recognition_finished", {"user": user, "rec_result": rec_result})
 
     return jsonify({"message": "File uploaded successfully and processed"}), 200
 
@@ -970,19 +987,19 @@ def agent_stream_audio(current_token: str):
     if "##" in current_token:
         # 状态1处理
         if current_token == "##<state=1>":
-            socketio.emit("obstacle_avoid", {"flag": "begin"})
+            socketio.emit("obstacle_avoid", {"user": user, "flag": "begin"})
             audio_file_path = "./agent_files/obstacle_start.wav"
         # 状态2处理
         elif "##<state=2" in current_token:
             if "##<state=2>" in current_token:
-                # 使用用户模板初始化寻物检测器
+                # 使用用户��板初始化寻物检测器
                 file_path = os.path.join(
                     USER_IMAGE_FOLDER, user, current_token[current_token.find(">") + 1:]+'.jpg')
                 init_state = detector.detect_init(cv2.imread(file_path, 1))
                 if init_state != 0:
                     return jsonify({"message": "未识别到图片中的目标", "item_info": []}), 200
 
-                socketio.emit("find_item", {"flag": "begin"})
+                socketio.emit("find_item", {"user": user, "flag": "begin"})
                 audio_chunk = agent_audio_generate(
                     "开始寻找"+current_token[current_token.find(">") + 1:]
                 )
@@ -998,7 +1015,7 @@ def agent_stream_audio(current_token: str):
                 audio_chunk = audio_file.read()
 
         socketio.emit(
-            "agent_play_audio_chunk", {"index": 0, "audio_chunk": audio_chunk}
+            "agent_play_audio_chunk", {"user": user, "index": 0, "audio_chunk": audio_chunk}
         )
 
     else:
@@ -1015,7 +1032,7 @@ def agent_stream_audio(current_token: str):
             socketio.start_background_task(process_audio_stream, user)
 
         # 如果收到结束标记
-        if "<END>" in current_token:
+        if ("<END>" in current_token):
             logging.info("run.py", "agent_stream_audio",
                          "大模型响应结束", color="red")
 
@@ -1066,6 +1083,7 @@ def process_audio_stream(user):
                 socketio.emit(
                     "agent_play_audio_chunk",
                     {
+                        "user": user,
                         "index": USER_VAR[user]["sentence_index"],
                         "audio_chunk": audio_chunk,
                     },
