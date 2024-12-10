@@ -1,18 +1,23 @@
+import os, sys, cv2
 import numpy as np
-import cv2
 from concurrent.futures import ThreadPoolExecutor
-import os
 from tensorflow.keras.applications import ResNet50
 from tensorflow.keras.preprocessing import image
 from tensorflow.keras.applications.resnet50 import preprocess_input
 from sklearn.metrics.pairwise import cosine_similarity
-from agent_files.yolo_model import model
 
-SIMILARITY_SCORE_THRESHOLD = 0.3
+parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.append(parent_dir)
+from yolo_model import model
+
+
+# 参数设置
+SIMILARITY_SCORE_THRESHOLD = 0.45
 MIN_DETECT_COUNT = 1
 GOOD_MATCHES_DIFF = 0.95
 MIN_MATCH_COUNT = 1
 
+# 读取类别名称
 module_dir = os.path.dirname(__file__)
 class_path = os.path.join(module_dir, 'class.txt')
 with open(class_path, 'r') as f:
@@ -27,18 +32,24 @@ ResNet_Model = ResNet50(weights='imagenet', include_top=False, pooling='avg')
 
 
 # 读取和预处理图像
-def preprocess_image(img, target_size=(224, 224)):
+def preprocess_image(img, target_size=(224, 224), rotation_angle=0):
     img = image.img_to_array(img)
     img = image.array_to_img(img)
+
+    if rotation_angle != 0:
+        img = img.rotate(rotation_angle, expand=True)  # expand=True 以保持旋转后图像完整
+
     img = img.resize(target_size)
+
     img_array = image.img_to_array(img)
     img_array = np.expand_dims(img_array, axis=0)
     img_array = preprocess_input(img_array)
+    
     return img_array
 
 # 提取图像的特征向量
-def extract_features(img):
-    img_array = preprocess_image(img)
+def extract_features(img, rotation_angle=0):
+    img_array = preprocess_image(img, (224, 224), rotation_angle)
     features = ResNet_Model.predict(img_array)
     return features.flatten()
 
@@ -73,7 +84,14 @@ def compute_similarity(feature1, feature2):
 class ObjectDetector:
     def __init__(self):
         self.templates = []
-        self.templates_features = []
+        self.templates_features_0 = []    # 0°
+        self.templates_features_1 = []    # 45°
+        self.templates_features_2 = []    # 90°
+        self.templates_features_3 = []    # 135°
+        self.templates_features_4 = []    # 180°
+        self.templates_features_5 = []    # 225°
+        self.templates_features_6 = []    # 270°
+        self.templates_features_7 = []    # 315°
         # self.template_average_color_R = 0
         # self.template_average_color_G = 0
         # self.template_average_color_B = 0
@@ -121,23 +139,43 @@ class ObjectDetector:
             return template_r, template_r_origin
 
         self.templates = []
-        self.templates_features = []
+        self.templates_features_0 = []
+        self.templates_features_1 = []
+        self.templates_features_2 = []
+        self.templates_features_3 = []
+        self.templates_features_4 = []
+        self.templates_features_5 = []
+        self.templates_features_6 = []
+        self.templates_features_7 = []
         for temp in templates:
             result, result_origin = get_target_img(temp)
             if result is not None and result_origin is not None:
                 self.templates.append(result)
                 # self.templates_features.append(extract_features(result))
-                self.templates_features.append(extract_features(result_origin))
+                self.templates_features_0.append(extract_features(result_origin, 0))
+                self.templates_features_1.append(extract_features(result_origin, 45))
+                self.templates_features_2.append(extract_features(result_origin, 90))
+                self.templates_features_3.append(extract_features(result_origin, 135))
+                self.templates_features_4.append(extract_features(result_origin, 180))
+                self.templates_features_5.append(extract_features(result_origin, 225))
+                self.templates_features_6.append(extract_features(result_origin, 270))
+                self.templates_features_7.append(extract_features(result_origin, 315))
             else:
                 self.templates.append(None)
-                self.templates_features.append(None)
                 break
         
         i = 1
         for template in self.templates:
             if template is None:
                 self.templates = []
-                self.templates_features = []
+                self.templates_features_0 = []
+                self.templates_features_1 = []
+                self.templates_features_2 = []
+                self.templates_features_3 = []
+                self.templates_features_4 = []
+                self.templates_features_5 = []
+                self.templates_features_6 = []
+                self.templates_features_7 = []
                 # print(f'未检测到第 {i} 张图片中的目标物品, 请重新上传目标物品图片')
                 return i
             i += 1
@@ -179,7 +217,7 @@ class ObjectDetector:
                 for mask, box in zip(result.masks.xy, result.boxes):
                     # 排除掉一些不可能的事物
                     cls = int(box.cls[0])
-                    if classNames[cls] in ['person', 'tv', 'book', 'laptop', 'bench', 'chair', 'couch', 'bed', 'dining table', 'refrigerator', 'toilet']:
+                    if classNames[cls] in ['person', 'tv', 'laptop', 'bench', 'chair', 'couch', 'bed', 'dining table', 'refrigerator', 'toilet']:
                         continue
 
                     # 获取识别框的位置信息
@@ -219,14 +257,42 @@ class ObjectDetector:
                     #         continue
 
                     # 若余弦相似度过低, 跳过该物体
-                    roi_features = extract_features(img[y1:y2, x1:x2])
+                    roi_features = extract_features(img[y1:y2, x1:x2], 0)
                     # roi_features = extract_features(roi)
 
                     similarity_score = 0
-                    for template_feature_ in self.templates_features:
+                    for template_feature_ in self.templates_features_0:
                         similarity_score_cur = compute_similarity(template_feature_, roi_features)
                         if similarity_score_cur > similarity_score:
                             similarity_score = similarity_score_cur
+                    for template_feature_ in self.templates_features_1:
+                        similarity_score_cur = compute_similarity(template_feature_, roi_features)
+                        if similarity_score_cur > similarity_score:
+                            similarity_score = similarity_score_cur
+                    for template_feature_ in self.templates_features_2:
+                        similarity_score_cur = compute_similarity(template_feature_, roi_features)
+                        if similarity_score_cur > similarity_score:
+                            similarity_score = similarity_score_cur
+                    for template_feature_ in self.templates_features_3:
+                        similarity_score_cur = compute_similarity(template_feature_, roi_features)
+                        if similarity_score_cur > similarity_score:
+                            similarity_score = similarity_score_cur
+                    for template_feature_ in self.templates_features_4:
+                        similarity_score_cur = compute_similarity(template_feature_, roi_features)
+                        if similarity_score_cur > similarity_score:
+                            similarity_score = similarity_score_cur
+                    for template_feature_ in self.templates_features_5:
+                        similarity_score_cur = compute_similarity(template_feature_, roi_features)
+                        if similarity_score_cur > similarity_score:
+                            similarity_score = similarity_score_cur
+                    for template_feature_ in self.templates_features_6:
+                        similarity_score_cur = compute_similarity(template_feature_, roi_features)
+                        if similarity_score_cur > similarity_score:
+                            similarity_score = similarity_score_cur
+                    for template_feature_ in self.templates_features_7:
+                        similarity_score_cur = compute_similarity(template_feature_, roi_features)
+                        if similarity_score_cur > similarity_score:
+                            similarity_score = similarity_score_cur                    
                     # print(f'相似度: {similarity_score}')
 
                     if similarity_score < SIMILARITY_SCORE_THRESHOLD:
@@ -304,7 +370,7 @@ class ObjectDetector:
                     left = (x_min + w_min / 2) / img_width
                     top = (y_min + h_min / 2) / img_height
 
-                    # result = [{'x': x_min, 'y': y_min, 'w': w_min, 'h': h_min}]
+                    # result = [{'x': x_min, 'y': y_min, 'w': w_min, 'h': h_min}]     # 测试用
                     result = [{'left': left, 'top': top}]
                     return result
                 else:
@@ -317,7 +383,14 @@ class ObjectDetector:
     # 释放资源
     def release(self):
         self.templates = []
-        self.templates_features = []
+        self.templates_features_0 = []
+        self.templates_features_1 = []
+        self.templates_features_2 = []
+        self.templates_features_3 = []
+        self.templates_features_4 = []
+        self.templates_features_5 = []
+        self.templates_features_6 = []
+        self.templates_features_7 = []
         # self.template_average_color_R = 0
         # self.template_average_color_G = 0
         # self.template_average_color_B = 0
