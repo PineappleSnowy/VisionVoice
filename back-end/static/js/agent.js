@@ -15,7 +15,6 @@ const socket = io({
     }
 });
 const messagebackground = document.getElementById('chat-container');  // 获取消息列表容器
-const user = localStorage.getItem('user');
 
 /**
  * @function loadChatHistory
@@ -24,7 +23,7 @@ const user = localStorage.getItem('user');
  */
 function loadChatHistory(agent) {
     const botImageUrl = agent === 'psychologicalAgent' ? '../static/images/psychologicalAgent.jpg' : '../static/images/defaultAgent.jpg';
-
+    const token = localStorage.getItem('token');
     fetch(`/get-chat-history?agent=${agent}`, {
         headers: {
             "Authorization": `Bearer ${token}`
@@ -149,6 +148,7 @@ function addMessage(message) {
                     imageElement.style.height = 'auto';
                     bubble.appendChild(imageElement);
 
+                    const token = localStorage.getItem('token');
                     // 发送图像到后端
                     fetch('/agent/upload_image', {
                         method: 'POST',
@@ -200,6 +200,7 @@ function sendMessageToAgent(message, multi_image_talk) {
     const bubble_2 = document.createElement('div');
     bubble_2.className = 'chat-bubble-bot';
 
+    const token = localStorage.getItem('token');
     fetch(`/agent/chat_stream?query=${message}&agent=${selectedAgent}&multi_image_talk=${multi_image_talk}`, {
         headers: {
             "Authorization": `Bearer ${token}`
@@ -452,6 +453,7 @@ document.getElementById('audio-control').addEventListener('click', function () {
  * - 后端会将音频数据分段发送过来，该函数需要将这些音频数据分段存储到队列中，并开始播放
  */
 socket.on('agent_play_audio_chunk', function (data) {
+    const user = localStorage.getItem('user');
     console.log('curr_user', user)
     if (data.user !== user) return;
     const audioIndex = data['index'];
@@ -663,6 +665,8 @@ function upload_audio(blob) {
  */
 
 socket.on('agent_speech_recognition_finished', async function (data) {
+    const user = localStorage.getItem('user');
+    console.log('curr_user', user)
     if (data.user !== user) return;
     rec_result = data['rec_result'];
 

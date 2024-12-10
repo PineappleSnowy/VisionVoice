@@ -3,7 +3,6 @@ import { initAudioAnalyser } from './lib/audioUtils.js';
 
 // 创建socket连接，并附上token用于后端验证
 const token = localStorage.getItem('token');
-const user = localStorage.getItem('user');
 const socket = io({
     query: {
         token: token
@@ -633,6 +632,7 @@ window.onload = async () => {
      * - 后端会将音频数据分段发送过来，该函数需要将这些音频数据分段存储到队列中，并开始播放
      */
     socket.on('agent_play_audio_chunk', function (data) {
+        const user = localStorage.getItem('user');
         if (data.user !== user) return;
         if (!audio_stop) {
             const audioIndex = data['index'];
@@ -726,6 +726,7 @@ window.onload = async () => {
      */
 
     socket.on('agent_speech_recognition_finished', async function (data) {
+        const user = localStorage.getItem('user');
         if (data.user !== user) return;
         rec_result = data['rec_result'];
 
@@ -759,6 +760,7 @@ window.onload = async () => {
 
     // 避障socket
     socket.on('obstacle_avoid', function (data) {
+        const user = localStorage.getItem('user');
         if (data.user !== user) return;
         const flag = data["flag"];
         if (flag == "begin") {
@@ -768,6 +770,7 @@ window.onload = async () => {
 
     // 寻物socket
     socket.on('find_item', function (data) {
+        const user = localStorage.getItem('user');
         if (data.user !== user) return;
         const flag = data["flag"];
         if (flag == "begin") {
@@ -832,6 +835,7 @@ window.onload = async () => {
     });
 
     function loadGallery() {
+        const token = localStorage.getItem('token');
         fetch('/images', {
             headers: {
                 "Authorization": `Bearer ${token}`
