@@ -186,19 +186,19 @@ https://github.com/user-attachments/assets/d16b3817-3bae-4576-9115-ed4c9166b2ec
 电脑体验版“VisionVoice”文件夹:
 
 <div align=center>
-<img src="readme_files/windows_files.png" width="35%">
+<img src="readme_files/windows_files.png" width="60%">
 </div>
 
 电脑体验版启动界面:
 
 <div align=center>
-<img src="readme_files/windows_open.png" width="35%">
+<img src="readme_files/windows_open.png" width="60%">
 </div>
 
 电脑体验版使用界面：
 
 <div align=center>
-<img src="readme_files/windows_use.png" width="35%">
+<img src="readme_files/windows_use.png" width="60%">
 </div>
 
 
@@ -209,7 +209,7 @@ https://github.com/user-attachments/assets/d16b3817-3bae-4576-9115-ed4c9166b2ec
 扫描二维码，免费安装“视界之声”手机版。
 
 <div align=center>
-<img src="readme_files/download_andriod_app.png" width="80%">
+<img src="readme_files/download_andriod_app.png" width="50%">
 </div>
 
 ### 2.免费注册并登录“视界之声”
