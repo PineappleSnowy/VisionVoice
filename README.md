@@ -589,7 +589,7 @@
 [VisionVoice-Icon-SVG](assets/images/VisionVoice_logo.svg)
 
 <div align=center>
-<img src="assets/images/aboutus1.jpg" width="35%">
+<img src="assets/images/about_us1.png" width="100%">
 </div>
 
 <br>
@@ -597,7 +597,7 @@
 ### 项目贡献者
 
 <a href="https://github.com/PineappleSnowy/VisionVoice_new/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=PineappleSnowy/VisionVoice_new" />
+  <img src="https://contrib.rocks/image?repo=PineappleSnowy/VisionVoice" />
 </a>
 
 <br>
@@ -607,30 +607,26 @@
 本产品开发团队（简称为“我们”）是来自 西安电子科技大学 的 PineappleSnowy 团队，是一个全部由 00 后大学生组成的充满爱心、活力满满的团队！
 为了开发出更符合视障人士需求的产品，我们联系了陕西省盲人协会并参与了“黑暗跑团”西安站的志愿活动，成为帮助视障人士跑步运动的盲人助跑员等志愿者，并在帮助盲人跑步时和盲人进行深入交流，实地调研视障人士群体的真实需求，并以此改进我们的产品。
 下列图片为我们 PineappleSnowy 团队参与志愿活动的实地照片：
-
-<div align=center>
-<img src="assets/images/about_us1.png" width="35%">
+<div style="display: flex; justify-content: space-around; gap: 20px;">
+  <img src="assets/images/about_us1.png" width="40%">
+  <img src="assets/images/about_us2.png" width="40%">
 </div>
 
-<div align=center>
-<img src="assets/images/about_us2.png" width="35%">
+<br>
+
+<div style="display: flex; justify-content: space-around; gap: 20px;">
+  <img src="assets/images/about_us3.png" width="40%">
+  <img src="assets/images/about_us4.png" width="40%">
 </div>
 
-<div align=center>
-<img src="assets/images/about_us3.png" width="35%">
+<br>
+
+<div style="display: flex; justify-content: space-around; gap: 20px;">
+  <img src="assets/images/about_us5.png" width="40%">
+  <img src="assets/images/about_us6.png" width="40%">
 </div>
 
-<div align=center>
-<img src="assets/images/about_us4.png" width="35%">
-</div>
-
-<div align=center>
-<img src="assets/images/about_us5.png" width="35%">
-</div>
-
-<div align=center>
-<img src="assets/images/about_us6.png" width="35%">
-</div>
+<br>
 
 下图为视障人士正在现场体验我们的产品：
 
