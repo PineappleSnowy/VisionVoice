@@ -539,7 +539,7 @@
 
 ## 更新日志
 
-在这里，你可以查看我们对“视界之声”的开发历史。 [更新日志](https://visionvoice.life/html.child/%E6%9B%B4%E6%96%B0%E6%97%A5%E5%BF%97.child/%E4%BB%8E%E9%9B%B6%E5%88%B0%E4%B8%80.html)
+在这里，您可以查看我们对“视界之声”的开发历史。 [更新日志](https://visionvoice.life/html.child/%E6%9B%B4%E6%96%B0%E6%97%A5%E5%BF%97.child/%E4%BB%8E%E9%9B%B6%E5%88%B0%E4%B8%80.html)
 
 ## 🌟 产品创新点
 
