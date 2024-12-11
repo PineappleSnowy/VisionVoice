@@ -7,7 +7,6 @@ import random
 import cv2
 import time
 import os
-from datetime import timedelta
 from flask import (
     Flask,
     send_from_directory,
