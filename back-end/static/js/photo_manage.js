@@ -57,11 +57,11 @@ document.addEventListener('DOMContentLoaded', function () {
         cancelButton.style.display = 'none';
     });
 
-    fileInput.addEventListener('click', function () {
+    fileInput.addEventListener('change', function () {
+        disableButtons(true);
         const file = fileInput.files[0];
         if (file) {
             // 禁用所有按钮
-            disableButtons(true);
             const formData = new FormData();
             formData.append('file', file);
 
@@ -75,18 +75,16 @@ document.addEventListener('DOMContentLoaded', function () {
             })
                 .then(response => response.json())
                 .then(data => {
-                    // 启用所有按钮
-                    disableButtons(false);
                     if (data.success) {
                         const gallery = document.getElementById('gallery');
                         const item = document.createElement('div');
                         item.className = 'gallery-item';
                         item.innerHTML = `
-                                <button onclick="openModal('${data.image_url}', '${data.image_name}', this)">
-                                    <img src="${data.image_url}" alt="${data.image_name}">
-                                    <p>${data.image_name}</p>
-                                </button>
-                            `;
+                        <button onclick="openModal('${data.image_url}', '${data.image_name}', this)">
+                        <img src="${data.image_url}" alt="${data.image_name}">
+                        <p>${data.image_name}</p>
+                        </button>
+                        `;
                         gallery.appendChild(item);
                         // 显示myModal窗口
                         openModal(data.image_url, data.image_name, item.querySelector('button'));
@@ -94,6 +92,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         console.error('Error uploading image:', data.error);
                         showError(data.error);
                     }
+                    // 启用所有按钮
+                    disableButtons(false);
                 })
                 .catch(error => {
                     console.error('Error:', error);
@@ -101,6 +101,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     disableButtons(false);
                     showError('上传图片时发生错误！');
                 });
+        }
+        else {
+            disableButtons(false);
+            console.log("Inputed file is empty")
         }
         footer.classList.remove('expanded');
         addButton.style.display = 'block';
