@@ -88,7 +88,7 @@
 
 可以在这里查看“视界之声”的使用 [演示视频](videos/产品主要功能演示.mp4)。也可以在这里查看手机无障碍功能中的[读屏功能演示](videos/手机盲人模式兼容演示.mp4)
 
-https://github.com/user-attachments/assets/d16b3817-3bae-4576-9115-ed4c9166b2ec
+[演示视频在线播放链接](https://github.com/user-attachments/assets/d16b3817-3bae-4576-9115-ed4c9166b2ec)
 
 
 ### 软件使用说明书
