@@ -1,4 +1,4 @@
-[![Overview](readme_files/visionvoice_cover.jpg)](https://visionvoice.life/)
+[![Overview](assets/images/visionvoice_cover.jpg)](https://visionvoice.life/)
 
 <div align="center">
 
@@ -74,7 +74,7 @@
 >
 > **收藏项目**，你将无延迟地接收所有发布通知～ ⭐️
 
-![star-us](readme_files/star-us.png)
+![star-us](assets/images/star-us.png)
 
 <br>
 
@@ -88,7 +88,7 @@
 
 ### 软件使用说明书
 
-我们为用户编写了详细的用户手册和使用说明！前往 <a href="https://visionvoice.life/html.child/user_manual.html">📃 用户文档</a> 和 [软件使用说明书](readme_files/manual.pdf) 查看用户文档和软件使用说明书。
+我们为用户编写了详细的用户手册和使用说明！前往 <a href="https://visionvoice.life/html.child/user_manual.html">📃 用户文档</a> 和 [软件使用说明书](assets/images/manual.pdf) 查看用户文档和软件使用说明书。
 
 ## 📃 功能描述与在线演示
 
@@ -101,7 +101,7 @@
 用户可以在“视界之声”的消息列表中找到所有智能助手：
 
 <div align=center>
-<img src="readme_files/all_agents.jpg" width="35%">
+<img src="assets/images/all_agents.jpg" width="35%">
 </div>
 
 用户可以直接通过语音或视频的方式和智能体进行交流对话。
@@ -109,13 +109,13 @@
 当用户说话时，智能体助手将倾听用户的需求。此时“视界之声”的界面如下：
 
 <div align=center>
-<img src="readme_files/agent_listen.jpg" width="35%">
+<img src="assets/images/agent_listen.jpg" width="35%">
 </div>
 
 在用户说完话后，智能体助手将自动启用与用户需求最接近的功能，并根据具体功能的需要通过语音向用户发送信息。此时“视界之声”的界面如下：
 
 <div align=center>
-<img src="readme_files/agent_tell.jpg" width="35%">
+<img src="assets/images/agent_tell.jpg" width="35%">
 </div>
 
 用户随时可以通过点击界面下方的红色正方形打断智能体助手的输出。
@@ -142,19 +142,19 @@
 
 |                                [环境识别](https://pineapplesnowy.cn/phone)                                 |                               [帮我定位](https://pineapplesnowy.cn/phone)                               |
 | :--------------------------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------------: |
-| <a href="https://pineapplesnowy.cn/phone"> <img src="readme_files/feature_identify.jpg"  width="70%"> </a> | <a href="https://pineapplesnowy.cn/phone"> <img src="readme_files/feature_locate.jpg" width="70%"> </a> |
+| <a href="https://pineapplesnowy.cn/phone"> <img src="assets/images/feature_identify.jpg"  width="70%"> </a> | <a href="https://pineapplesnowy.cn/phone"> <img src="assets/images/feature_locate.jpg" width="70%"> </a> |
 |            “环境识别”将通过用户的手机后置摄像头进行拍照，通过照片中的信息来分析用户周围的环境。            |                      “帮我定位”将通过用户的手机定位帮助用户确定自己当前所在位置。                       |
 
 |                                                            [避障模式](https://pineapplesnowy.cn/phone)                                                             |                                                           [寻物模式](https://pineapplesnowy.cn/phone)                                                            |
 | :----------------------------------------------------------------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------------------------: |
-|                              <a href="https://pineapplesnowy.cn/phonet"> <img src="readme_files/feature_avoid.jpg" width="70%"> </a>                               |                              <a href="https://pineapplesnowy.cn/phone"> <img src="readme_files/feature_seek.jpg" width="70%"> </a>                               |
+|                              <a href="https://pineapplesnowy.cn/phonet"> <img src="assets/images/feature_avoid.jpg" width="70%"> </a>                               |                              <a href="https://pineapplesnowy.cn/phone"> <img src="assets/images/feature_seek.jpg" width="70%"> </a>                               |
 | “避障模式”开启时，生活助手将通过手机后置摄像头不断获取周围环境的信息，并实时通过语音向用户提醒其附近的障碍物以及障碍物与用户的间距，依此帮助用户前行时绕开障碍物。 | 当用户找不到自己的个人物品时，用户可以使用“寻物模式”功能，通过手机后置摄像头的实时录像，找到用户事先已经在手机中保存好的照片所对应的物品（照片在“寻物画廊”中）。 |
 
 #### 心灵树洞
 
 |                               [情感陪护](https://pineapplesnowy.cn/agent)                               |                                [专业问答](https://pineapplesnowy.cn/agent)                                 |
 | :-----------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------: |
-| <a href="https://pineapplesnowy.cn/agent"> <img src="readme_files/agent2_emotion.jpg" width="70%"> </a> | <a href="https://pineapplesnowy.cn/agent"> <img src="readme_files/agent2_profession.jpg" width="70%"> </a> |
+| <a href="https://pineapplesnowy.cn/agent"> <img src="assets/images/agent2_emotion.jpg" width="70%"> </a> | <a href="https://pineapplesnowy.cn/agent"> <img src="assets/images/agent2_profession.jpg" width="70%"> </a> |
 |                                用户可以和智能体进行聊天互动与情感交流。                                 |                                     用户可以和智能体进行专业知识问答。                                     |
 
 <br>
@@ -174,7 +174,7 @@
 扫描二维码，免费安装“视界之声”手机版。
 
 <div align=center>
-<img src="readme_files/download_andriod_app.png" width="30%">
+<img src="assets/images/download_andriod_app.png" width="30%">
 </div>
 
 #### 电脑体验版安装
@@ -188,19 +188,19 @@
 电脑体验版“VisionVoice”文件夹:
 
 <div align=center>
-<img src="readme_files/windows_files.png" width="85%">
+<img src="assets/images/windows_files.png" width="85%">
 </div>
 
 电脑体验版启动界面:
 
 <div align=center>
-<img src="readme_files/windows_open.png" width="85%">
+<img src="assets/images/windows_open.png" width="85%">
 </div>
 
 电脑体验版使用界面：
 
 <div align=center>
-<img src="readme_files/windows_use.png" width="85%">
+<img src="assets/images/windows_use.png" width="85%">
 </div>
 
 ### 2.免费注册并登录“视界之声”
@@ -208,25 +208,25 @@
 安装完成后，点击以下红色方框内的图标即可启动“视界之声”手机版。
 
 <div align=center>
-<img src="readme_files/Android_icon.jpg" width="35%">
+<img src="assets/images/Android_icon.jpg" width="35%">
 </div>
 
 启动界面如下：
 
 <div align=center>
-<img src="readme_files/Android_open.jpg" width="35%">
+<img src="assets/images/Android_open.jpg" width="35%">
 </div>
 
 启动后，在登录界面输入用户名和密码即可登录：
 
 <div align=center>
-<img src="readme_files/Android_login.jpg" width="35%">
+<img src="assets/images/Android_login.jpg" width="35%">
 </div>
 
 如果用户还没有注册账号，可以点击登录界面下方的“点击注册”进入注册界面，在注册界面输入用户名、昵称和密码，点击“注册”即可成功注册：
 
 <div align=center>
-<img src="readme_files/Android_register.jpg" width="35%">
+<img src="assets/images/Android_register.jpg" width="35%">
 </div>
 
 也可以在这里免费[注册账号](https://pineapplesnowy.cn/)。成功注册账号后，用户将自动登录。
@@ -238,19 +238,19 @@
 登录后，默认直接和生活助手对话。
 
 <div align=center>
-<img src="readme_files/Android_begin.jpg" width="35%">
+<img src="assets/images/Android_begin.jpg" width="35%">
 </div>
 
 用户可以在界面下方的聊天框输入文字和智能体交流，也可以点击界面下方的“电话”符号按钮开始和智能助手进行语音和视频通话，此时智能助手将倾听用户的发言：
 
 <div align=center>
-<img src="readme_files/agent_listen.jpg" width="35%">
+<img src="assets/images/agent_listen.jpg" width="35%">
 </div>
 
 如果用户想要正常使用生活助手中“环境识别”“帮我定位”“寻物模式”“避障模式”等功能，请点击界面左下角的“视频”按钮打开手机摄像头，并把用户的需求通过语音告诉智能助手：
 
 <div align=center>
-<img src="readme_files/Android_listen.jpg" width="35%">
+<img src="assets/images/Android_listen.jpg" width="35%">
 </div>
 
 用户可以通过点击界面右上角的转换箭头转换手机前置或后置摄像模式。
@@ -258,7 +258,7 @@
 用户还可以通过点击界面下方中央的栏目按钮展开功能栏，功能栏中的四个按钮从左至右依次为“避障模式”“寻物模式”“环境识别”“帮我定位”这四个功能，点击按钮即可快速启动对应功能：
 
 <div align=center>
-<img src="readme_files/feature_menu2.jpg" width="35%">
+<img src="assets/images/feature_menu2.jpg" width="35%">
 </div>
 
 生活助手中的功能使用示例如下：
@@ -268,13 +268,13 @@
 用户告诉助手“帮我躲避障碍物”等需求，智能助手将自动开启“避障模式”功能：
 
 <div align=center>
-<img src="readme_files/feature_avoid.jpg" width="35%">
+<img src="assets/images/feature_avoid.jpg" width="35%">
 </div>
 
 用户也可以点击以下按钮快速开启“避障模式”：
 
 <div align=center>
-<img src="readme_files/feature_menu_avoid.jpg" width="35%">
+<img src="assets/images/feature_menu_avoid.jpg" width="35%">
 </div>
 
 #### 寻物模式
@@ -282,25 +282,25 @@
 用户需要在保存照片时对物品命名，且拍照时背景应尽可能干净整洁以凸显目标物品。照片保存在“寻物画廊”中，用户可以在“寻物画廊”中增加、删除、查看并修改照片及物品命名：
 
 <div align=center>
-<img src="readme_files/feature_seek_menu.jpg" width="35%">
+<img src="assets/images/feature_seek_menu.jpg" width="35%">
 </div>
 
 用户告诉助手“帮我寻找物品”等需求，智能助手将自动开启“寻物模式”功能。此时，“视界之声”将弹出“寻物画廊”展示该用户所有拍照并命名的物品，用户在手机无障碍功能的帮助下点击本次需要寻找的目标物品对应的照片：
 
 <div align=center>
-<img src="readme_files/feature_seek_choose.jpg" width="35%">
+<img src="assets/images/feature_seek_choose.jpg" width="35%">
 </div>
 
 之后，“寻物模式”将通过手机摄像头寻找目标物品，并在检测到目标物品后向用户语音播报物品位置，直到物品处于镜头正中央和用户附近：
 
 <div align=center>
-<img src="readme_files/feature_seek.jpg" width="35%">
+<img src="assets/images/feature_seek.jpg" width="35%">
 </div>
 
 用户也可以点击以下按钮快速开启“寻物模式”：
 
 <div align=center>
-<img src="readme_files/feature_menu_seek.jpg" width="35%">
+<img src="assets/images/feature_menu_seek.jpg" width="35%">
 </div>
 
 #### 环境识别
@@ -308,19 +308,19 @@
 用户告诉助手“我附近都有什么？”“我周围都是什么？”“请描述四周环境”等需求，智能助手将自动开启“环境识别”功能：
 
 <div align=center>
-<img src="readme_files/feature_identify.jpg" width="35%">
+<img src="assets/images/feature_identify.jpg" width="35%">
 </div>
 
 下面是识别结果展示（实际使用时，生活助手将通过语音向用户播报识别结果）
 
 <div align=center>
-<img src="readme_files/feature_identify2.jpg" width="35%">
+<img src="assets/images/feature_identify2.jpg" width="35%">
 </div>
 
 用户也可以点击以下按钮快速开启“环境识别”：
 
 <div align=center>
-<img src="readme_files/feature_menu_identify.jpg" width="35%">
+<img src="assets/images/feature_menu_identify.jpg" width="35%">
 </div>
 
 #### 帮我定位
@@ -328,41 +328,41 @@
 用户告诉助手“我在哪里？”“我的位置是什么？”“请描述我现在所处的位置”等需求，智能助手将自动开启“帮我定位”功能：
 
 <div align=center>
-<img src="readme_files/feature_locate.jpg" width="35%">
+<img src="assets/images/feature_locate.jpg" width="35%">
 </div>
 
 下面是定位结果展示（实际使用时，生活助手将通过语音向用户播报识别结果）
 
 <div align=center>
-<img src="readme_files/feature_locate2.jpg" width="35%">
+<img src="assets/images/feature_locate2.jpg" width="35%">
 </div>
 
 用户也可以点击以下按钮快速开启“帮我定位”：
 
 <div align=center>
-<img src="readme_files/feature_menu_locate.jpg" width="35%">
+<img src="assets/images/feature_menu_locate.jpg" width="35%">
 </div>
 
 用户可以点击界面下方的“消息”进入智能体助手菜单，然后选择自己想要的智能助手，点击对应的智能助手即可和它交流。
 
 <div align=center>
-<img src="readme_files/agent_menu.jpg" width="35%">
+<img src="assets/images/agent_menu.jpg" width="35%">
 </div>
 
 点击“心灵树洞”进入如下对话界面：
 
 <div align=center>
-<img src="readme_files/agent2.jpg" width="35%">
+<img src="assets/images/agent2.jpg" width="35%">
 </div>
 
 用户可以通过在界面下方聊天框输入文字的信息和“心灵树洞”进行交谈，也可以点击界面左下角的“电话”按钮和智能助手进行语音和视频通话。
 
 <div align=center>
-<img src="readme_files/agent2_listen.jpg" width="35%">
+<img src="assets/images/agent2_listen.jpg" width="35%">
 </div>
 
 <div align=center>
-<img src="readme_files/agent2_tell.jpg" width="35%">
+<img src="assets/images/agent2_tell.jpg" width="35%">
 </div>
 
 “心灵树洞”中的功能使用示例如下：
@@ -372,7 +372,7 @@
 用户可以和“心灵树洞”进行情感方面的问题交流：
 
 <div align=center>
-<img src="readme_files/agent2_emotion.jpg" width="35%">
+<img src="assets/images/agent2_emotion.jpg" width="35%">
 </div>
 
 当智能助手输出时，点击该界面右下角的正方形即可打断。
@@ -382,7 +382,7 @@
 用户可以和“心灵树洞”进行专业问题交流：
 
 <div align=center>
-<img src="readme_files/agent2_profession.jpg" width="35%">
+<img src="assets/images/agent2_profession.jpg" width="35%">
 </div>
 
 当智能助手输出时，点击该界面右下角的正方形即可打断。
@@ -392,7 +392,7 @@
 用户使用完毕后，可以直接在手机后台关闭应用程序即可退出登录并退出程序。用户也可以点击界面右下角的“我的”进入个人信息界面，然后点击“退出登录“即可退出登录并自动返回登录界面。
 
 <div align=center>
-<img src="readme_files/Android_quit.jpg" width="35%">
+<img src="assets/images/Android_quit.jpg" width="35%">
 </div>
 
 ## 🛠️ 视界之声开发说明
@@ -586,10 +586,10 @@
 
 ### 下载 Icon
 
-[VisionVoice-Icon-SVG](readme_files/VisionVoice_logo.svg)
+[VisionVoice-Icon-SVG](assets/images/VisionVoice_logo.svg)
 
 <div align=center>
-<img src="readme_files/aboutus1.jpg" width="35%">
+<img src="assets/images/aboutus1.jpg" width="35%">
 </div>
 
 <br>
@@ -609,33 +609,33 @@
 下列图片为我们 PineappleSnowy 团队参与志愿活动的实地照片：
 
 <div align=center>
-<img src="readme_files/about_us1.png" width="35%">
+<img src="assets/images/about_us1.png" width="35%">
 </div>
 
 <div align=center>
-<img src="readme_files/about_us2.png" width="35%">
+<img src="assets/images/about_us2.png" width="35%">
 </div>
 
 <div align=center>
-<img src="readme_files/about_us3.png" width="35%">
+<img src="assets/images/about_us3.png" width="35%">
 </div>
 
 <div align=center>
-<img src="readme_files/about_us4.png" width="35%">
+<img src="assets/images/about_us4.png" width="35%">
 </div>
 
 <div align=center>
-<img src="readme_files/about_us5.png" width="35%">
+<img src="assets/images/about_us5.png" width="35%">
 </div>
 
 <div align=center>
-<img src="readme_files/about_us6.png" width="35%">
+<img src="assets/images/about_us6.png" width="35%">
 </div>
 
 下图为视障人士正在现场体验我们的产品：
 
 <div align=center>
-<img src="readme_files/about_us7.png" width="35%">
+<img src="assets/images/about_us7.png" width="35%">
 </div>
 
 “视界之声”之所以这样命名，是为了让我们的软件以智能手机为基础，成为盲人的眼睛，让他们去无障碍地看到感受“视界”。盲人可以在“视界之声”的帮助下与世界对话，去体会到这个世界更精彩的一面。
