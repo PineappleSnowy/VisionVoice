@@ -185,7 +185,7 @@ function formChat() {
                         let jsonString = new TextDecoder().decode(value); // 将字节流转换为字符串
 
                         // 如果当前不是结束标志，则将文本进行语音合成
-                        if (!(jsonString.includes("<END>"))) {
+                        if (!(jsonString.includes("<END>")) && !audio_stop) {
                             socket.emit("agent_stream_audio", jsonString);
                         }
 
