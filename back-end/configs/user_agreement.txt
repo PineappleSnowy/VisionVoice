@@ -42,7 +42,7 @@ Unless required by applicable law or agreed to in writing, software distributed 
 2、因本协议引起的或与本协议有关的任何争议，各方应友好协商解决;协商不成的，任何一方均可将有关争议提交仲裁委员会并按照其届时有效的仲裁规则仲裁；仲裁裁决是终局的，对各方均有约束力。
 3、如果本协议中的任何条款无论因何种原因完全或部分原因或不具有执行性，或违反任何适用的法律，则该条款被视为删除，但本协议的其余条款仍应有效并且具有约束力。
 4、版权人有权根据有关法律、法规的变化以及经营状况和经营策略的调整等修改本协议。修改后的协议会随附于新版本软件。当发生有关争议时，以最新的协议文本为准。如果不同意改动的内容，用户可以卸载删除本软件。如果用户继续使用本软件，则视为接受本协议的变动。
-5、本协议最终切解释权与修改权归“寒菠创想”团队所有。
+5、本协议最终一切解释权与修改权归“寒菠创想”团队所有。
 
 Copyright ©[2024] [PineappleSnowy]
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
