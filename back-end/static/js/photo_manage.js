@@ -57,14 +57,14 @@ document.addEventListener('DOMContentLoaded', function () {
         cancelButton.style.display = 'none';
     });
 
-    fileInput.addEventListener('change', function () {
+    fileInput.addEventListener('click', function () {
         const file = fileInput.files[0];
         if (file) {
+            // 禁用所有按钮
+            disableButtons(true);
             const formData = new FormData();
             formData.append('file', file);
 
-            // 禁用所有按钮
-            disableButtons(true);
             const token = localStorage.getItem('token');
             fetch('/save_item_image', {
                 method: 'POST',

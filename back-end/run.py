@@ -218,7 +218,7 @@ def get_images():
     if not os.path.exists(user_image_folder):
         os.mkdir(user_image_folder)
     for filename in os.listdir(user_image_folder):
-        if filename.endswith((".png", ".jpg", ".jpeg", ".gif")):
+        if filename.endswith((".jpg")):
             name, ext = os.path.splitext(filename)
             images.append(
                 {"name": name, "url": f"/image/{curr_user}/{filename}"})
