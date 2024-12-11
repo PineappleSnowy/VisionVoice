@@ -2,7 +2,7 @@
 
 <div align="center">
 
-<a href="https://visionvoice.life/html.child/%E4%BA%A7%E5%93%81%E6%BC%94%E7%A4%BA.html">🔥视界之声 在线版</a> · <a href="https://visionvoice.life/html.child/user_manual.html">📃 用户文档</a> · <a href="https://github.com/PineappleSnowy/VisionVoice_new/issues">报告问题</a> · <a href="https://github.com/PineappleSnowy/VisionVoice_new/issues">建议反馈</a> · <a href="https://visionvoice.life/html.child/%E6%9B%B4%E6%96%B0%E6%97%A5%E5%BF%97.html">更新日志</a> · <a href="https://visionvoice.life">🌐 官方网站</a>
+<a href="https://visionvoice.life/html.child/%E4%BA%A7%E5%93%81%E6%BC%94%E7%A4%BA.html">🔥视界之声 在线版</a> · <a href="https://visionvoice.life/html.child/user_manual.html">📃 用户文档</a> · <a href="https://github.com/PineappleSnowy/VisionVoice/issues">报告问题</a> · <a href="https://github.com/PineappleSnowy/VisionVoice/issues">建议反馈</a> · <a href="https://visionvoice.life/html.child/%E6%9B%B4%E6%96%B0%E6%97%A5%E5%BF%97.html">更新日志</a> · <a href="https://visionvoice.life">🌐 官方网站</a>
 
 
 <br>
@@ -40,16 +40,16 @@
 
 如果你喜欢在工作中使用 “视界之声”，请将 视界之声 徽章添加到你的 README 中：
 
-[![VisionVoice](https://img.shields.io/badge/powered%20by-VisionVoice-438440)](https://github.com/PineappleSnowy/VisionVoice_new)
+[![VisionVoice](https://img.shields.io/badge/powered%20by-VisionVoice-438440)](https://github.com/PineappleSnowy/VisionVoice)
 
 ```
-[![VisionVoice](https://img.shields.io/badge/powered%20by-VisionVoice-438440)](https://github.com/PineappleSnowy/VisionVoice_new)
+[![VisionVoice](https://img.shields.io/badge/powered%20by-VisionVoice-438440)](https://github.com/PineappleSnowy/VisionVoice)
 ```
 
 ## 📃 开放源码许可证
 
 本项目采用以下开放源码许可证发布：
-- [Apache 2.0 License](https://github.com/PineappleSnowy/VisionVoice_new/tree/main/LICENSE) 
+- [Apache 2.0 License](https://github.com/PineappleSnowy/VisionVoice/tree/main/LICENSE) 
 
 
 ## 🧑‍💻 软件基本信息
@@ -612,8 +612,8 @@ python3 run.py
 
 ### 项目贡献者
 
-<a href="https://github.com/PineappleSnowy/VisionVoice_new/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=PineappleSnowy/VisionVoice_new" />
+<a href="https://github.com/PineappleSnowy/VisionVoice/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=PineappleSnowy/VisionVoice" />
 </a>
 
 <br>
