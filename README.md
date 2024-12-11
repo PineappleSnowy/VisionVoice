@@ -622,7 +622,7 @@
 [VisionVoice-Icon-SVG](assets/images/VisionVoice_logo.svg)
 
 <div align=center>
-<img src="assets/images/about_us1.png" width="100%">
+<img src="assets/images/VisionVoice_logo.svg" width="100%">
 </div>
 
 <br>
