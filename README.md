@@ -23,10 +23,10 @@
 - [💻 演示视频与软件使用说明书](#-演示视频与软件使用说明书)
 - [📃 功能描述与在线演示](#-功能描述与在线演示)
 - [🏁 快速开始](#-快速开始)
-- [🚗 体系结构和关键技术点](#-体系结构和关键技术点)
+- [🚗 视界之声开发说明](#-视界之声开发说明)
 - [🧑‍💻 产品创新点](#-产品创新点)
-- [🆚 “视界之声”与其它助盲产品的比较](#-“视界之声”与其它助盲产品的比较)
-- [👥 致谢](#-致谢)
+- [🆚 视界之声与其它助盲产品的比较](#-视界之声与其它助盲产品的比较)
+- [👥 关于我们](#-关于我们)
 
 <br/>
 
@@ -93,7 +93,7 @@ https://github.com/user-attachments/assets/d16b3817-3bae-4576-9115-ed4c9166b2ec
 
 ### 软件使用说明书
 
-我们为用户编写了详细的用户手册和使用说明！前往 <a href="https://visionvoice.life/html.child/user_manual.html">📃 用户文档</a> 和  [软件使用说明书](readme_files/manual.pdf) 查看用户文档和使用说明。
+我们为用户编写了详细的用户手册和使用说明！前往 <a href="https://visionvoice.life/html.child/user_manual.html">📃 用户文档</a> 和  [软件使用说明书](readme_files/manual.pdf) 查看用户文档和软件使用说明书。
 
 ## 📃 功能描述与在线演示
 
@@ -175,6 +175,16 @@ https://github.com/user-attachments/assets/d16b3817-3bae-4576-9115-ed4c9166b2ec
 
 “视界之声”现已推出电脑体验版和手机正式版。
 
+#### 手机正式版安装
+
+手机正式版（即“视界之声”手机版）拥有 [功能描述与在线演示](#-功能描述与在线演示) 中展示的所有功能。使用手机版“视界之声”需要用户免费注册账号并登录。
+
+扫描二维码，免费安装“视界之声”手机版。
+
+<div align=center>
+<img src="readme_files/download_andriod_app.png" width="30%">
+</div>
+
 #### 电脑体验版安装
 
 电脑体验版只有“智慧拍照”和“环境识别”功能可以体验，目前仍处于0.3.0版本（其中使用说明书为“用户手册”0.3.0版本）。电脑体验版无需注册账号。
@@ -199,17 +209,6 @@ https://github.com/user-attachments/assets/d16b3817-3bae-4576-9115-ed4c9166b2ec
 
 <div align=center>
 <img src="readme_files/windows_use.png" width="85%">
-</div>
-
-
-#### 手机正式版安装
-
-手机正式版（即“视界之声”手机版）拥有 [功能描述与在线演示](#-功能描述与在线演示) 中展示的所有功能。使用手机版“视界之声”需要用户免费注册账号并登录。
-
-扫描二维码，免费安装“视界之声”手机版。
-
-<div align=center>
-<img src="readme_files/download_andriod_app.png" width="30%">
 </div>
 
 ### 2.免费注册并登录“视界之声”
@@ -410,11 +409,10 @@ https://github.com/user-attachments/assets/d16b3817-3bae-4576-9115-ed4c9166b2ec
 </div>
 
 
-## 🚗 体系结构和关键技术点
 
-- **使用说明**
+## 🚗 视界之声开发说明
 
-请参照backend/static/api_template.json的样式添加api_key等信息，并将api_template.json重名为api.json以正确运行程序。
+### 体系结构和关键技术点
 
 - **软件体系结构**
 
@@ -474,6 +472,22 @@ https://github.com/user-attachments/assets/d16b3817-3bae-4576-9115-ed4c9166b2ec
   - 服务端使用 Python 调用 AI 能力返回给客户端
 
 
+### 在本地部署运行“视界之声”
+
+如果你想要在本地部署运行“视界之声”，可按以下步骤执行：
+
+1. 参照backend/static/api_template.json的样式添加api_key等信息，并将api_template.json重名为api.json
+
+2. 打开终端，输入：
+
+```bash
+pip install -r requirements.txt
+cd ./back-end/
+python3 run.py
+```
+
+3. 访问本地80端口即可查看运行结果
+
 ### 更新日志
 
 在这里，你可以查看我们对“视界之声”的开发历史。 [更新日志](https://visionvoice.life/html.child/%E6%9B%B4%E6%96%B0%E6%97%A5%E5%BF%97.child/%E4%BB%8E%E9%9B%B6%E5%88%B0%E4%B8%80.html)
@@ -502,7 +516,7 @@ https://github.com/user-attachments/assets/d16b3817-3bae-4576-9115-ed4c9166b2ec
  
 
 
-## 🆚 “视界之声”与其它助盲产品的比较
+## 🆚 视界之声与其它助盲产品的比较
 
 ### Google盲人眼镜 vs 视界之声
 
@@ -554,14 +568,14 @@ https://github.com/user-attachments/assets/d16b3817-3bae-4576-9115-ed4c9166b2ec
 
 
 
-## 👥 致谢
+## 👥 关于我们
 
 ### 下载 Icon
 
 [VisionVoice-Icon-SVG](readme_files/VisionVoice_logo.svg)
 
 <div align=center>
-<img src="readme_files/VisionVoice_logo.svg" width="35%">
+<img src="readme_files/aboutus1.jpg" width="35%">
 </div>
 
 <br>
@@ -574,7 +588,55 @@ https://github.com/user-attachments/assets/d16b3817-3bae-4576-9115-ed4c9166b2ec
 
 <br>
 
+### 我们的故事
+
+本产品开发团队（简称为“我们”）是来自 西安电子科技大学 的 PineappleSnowy 团队，是一个全部由00后大学生组成的充满爱心、活力满满的团队！
+为了开发出更符合视障人士需求的产品，我们联系了陕西省盲人协会并参与了“黑暗跑团”西安站的志愿活动，成为帮助视障人士跑步运动的盲人助跑员等志愿者，并在帮助盲人跑步时和盲人进行深入交流，实地调研视障人士群体的真实需求，并以此改进我们的产品。
+下列图片为我们PineappleSnowy团队参与志愿活动的实地照片：
+
+<div align=center>
+<img src="readme_files/about_us1.png" width="35%">
+</div>
+
+<div align=center>
+<img src="readme_files/about_us2.png" width="35%">
+</div>
+
+<div align=center>
+<img src="readme_files/about_us3.png" width="35%">
+</div>
+
+<div align=center>
+<img src="readme_files/about_us4.png" width="35%">
+</div>
+
+<div align=center>
+<img src="readme_files/about_us5.png" width="35%">
+</div>
+
+<div align=center>
+<img src="readme_files/about_us6.png" width="35%">
+</div>
+
+下图为视障人士正在现场体验我们的产品：
+
+<div align=center>
+<img src="readme_files/about_us7.png" width="35%">
+</div>
+
+“视界之声”之所以这样命名，是为了让我们的软件以智能手机为基础，成为盲人的眼睛，让他们去无障碍地看到感受“视界”。盲人可以在“视界之声”的帮助下与世界对话，去体会到这个世界更精彩的一面。
+如果您想给您的目的地确定一条大致路径；如果您迷路了，不知道去哪里寻求帮助；如果您想感受回忆，让一个人通过您拍过的图片讲述您过去的生活……请稍微期待一下，我们会一步一步带您找到您所希望的一切。
+
+#### *希望不再有于黑暗中踽踽独行者，每个人都拥有拥抱光彩世界的自由*
+*——这是PineappleSnowy团队的初心*
+
+如果您愿意和我们合作，请联系：**hdgong2766@qq.com**
+
+### 致谢
+
 感谢所有为本项目做出贡献的人们！
+
+感谢您对本产品的支持！我们与您同在！
 
 
 版权声明 © [2024] [PineappleSnowy]. 根据上述许可证条款授权。
