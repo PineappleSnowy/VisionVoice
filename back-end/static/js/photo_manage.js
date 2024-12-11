@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // 禁用所有按钮
             disableButtons(true);
-
+            const token = localStorage.getItem('token');
             fetch('/save_item_image', {
                 method: 'POST',
                 body: formData,
@@ -92,12 +92,14 @@ document.addEventListener('DOMContentLoaded', function () {
                         openModal(data.image_url, data.image_name, item.querySelector('button'));
                     } else {
                         console.error('Error uploading image:', data.error);
+                        showError(data.error);
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
                     // 启用所有按钮
                     disableButtons(false);
+                    showError('上传图片时发生错误！');
                 });
         }
         footer.classList.remove('expanded');
@@ -110,6 +112,7 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('deleteButton').addEventListener('click', function () {
         disableButtons(true);
         const imageName = document.getElementById('modalImage').alt;
+        const token = localStorage.getItem('token');
         fetch('/delete_image', {
             method: 'POST',
             headers: {
@@ -170,6 +173,7 @@ function openModal(url, name, button) {
         const newName = document.getElementById('imageName').value;
         const oldName = button.querySelector('p').innerText;
 
+        const token = localStorage.getItem('token');
         // 发送请求到后端修改图片名称
         fetch('/rename_image', {
             method: 'POST',
@@ -224,3 +228,12 @@ const observer = new ResizeObserver(entries => {
 
 // 开始观察底栏
 observer.observe(footer);
+
+function showError(message) {
+    const errorMessage = document.getElementById('errorMessage');
+    errorMessage.textContent = message;
+    errorMessage.style.display = 'block';
+    setTimeout(() => {
+        errorMessage.style.display = 'none';
+    }, 2000);
+}

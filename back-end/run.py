@@ -192,10 +192,12 @@ def photo_manage():
     """画廊路由"""
     return render_template("photo_manage.html")
 
+
 @app.route("/user_agreement", methods=["GET"])
 def user_agreement():
     """用户须知路由"""
     return render_template("user_agreement.html")
+
 
 @app.route('/get_user_agreement_text')
 def get_user_agreement_text():
@@ -272,14 +274,18 @@ def save_item_image():
     if filename == "":
         return jsonify({"success": False, "error": "No selected file"}), 400
     if file:
-        if os.path.exists(os.path.join(user_image_folder, filename)):
-            return jsonify({"success": False, "error": "File already exists"}), 400
-        file.save(os.path.join(user_image_folder, filename))
         name, ext = os.path.splitext(filename)
+        new_filename = name + '.jpg'
+        if os.path.exists(os.path.join(user_image_folder, new_filename)):
+            return jsonify({"success": False, "error": "该图片已存在！"}), 400
+        try:
+            file.save(os.path.join(user_image_folder, new_filename))
+        except Exception as e:
+            return jsonify({"success": False, "error": "图片保存失败！"}), 400
         return (
             jsonify(
                 {"success": True, "image_name": name,
-                    "image_url": f"/image/{curr_user}/{filename}"}
+                    "image_url": f"/image/{curr_user}/{new_filename}"}
             ),
             200,
         )
@@ -480,7 +486,7 @@ def register():
 
     try:
         # 读取现有用户
-        
+
         with open("./static/user.json", "r+", encoding="utf-8") as f:
             users = json.load(f)
 
@@ -872,7 +878,8 @@ def upload_image():
             # 清空历史图片
             delete_file_from_dir(multi_image_dir)
         # 以8位随机数加上图片序号作为文件名，图片序号使大模型能知道图片次序
-        image_save_path = os.path.join(multi_image_dir, f'{data["multi_image_index"]}{random.randint(10000000, 99999999)}.jpg')
+        image_save_path = os.path.join(
+            multi_image_dir, f'{data["multi_image_index"]}{random.randint(10000000, 99999999)}.jpg')
     else:
         image_save_path = os.path.join(user_cache_dir, IMAGE_SAVE_NAME)
 
@@ -910,6 +917,7 @@ def upload_image():
             return jsonify({"message": "Error", "item_info": []}), 400
 
     return jsonify({"message": "Success"}), 200
+
 
 @app.route("/agent/upload_audio", methods=["POST"])
 def agent_upload_audio():
@@ -954,7 +962,8 @@ def agent_upload_audio():
     print("音频识别结果：", rec_result)
 
     # 音频识别结果发送到前端
-    socketio.emit("agent_speech_recognition_finished", {"user": user, "rec_result": rec_result})
+    socketio.emit("agent_speech_recognition_finished", {
+                  "user": user, "rec_result": rec_result})
 
     return jsonify({"message": "File uploaded successfully and processed"}), 200
 
@@ -987,36 +996,44 @@ def agent_stream_audio(current_token: str):
     if "##" in current_token:
         # 状态1处理
         if current_token == "##<state=1>":
-            socketio.emit("obstacle_avoid", {"user": user, "flag": "begin"})
             audio_file_path = "./agent_files/obstacle_start.wav"
+            with open(audio_file_path, "rb") as audio_file:
+                audio_chunk = audio_file.read()
+            socketio.emit(
+                "agent_play_audio_chunk", {
+                    "user": user, "index": 0, "audio_chunk": audio_chunk}
+            )
+            socketio.emit("obstacle_avoid", {"user": user, "flag": "begin"})
         # 状态2处理
         elif "##<state=2" in current_token:
             if "##<state=2>" in current_token:
-                # 使用用户��板初始化寻物检测器
+                # 使用用户物品模板初始化寻物检测器
                 file_path = os.path.join(
                     USER_IMAGE_FOLDER, user, current_token[current_token.find(">") + 1:]+'.jpg')
-                init_state = detector.detect_init(cv2.imread(file_path, 1))
-                if init_state != 0:
-                    return jsonify({"message": "未识别到图片中的目标", "item_info": []}), 200
 
-                socketio.emit("find_item", {"user": user, "flag": "begin"})
                 audio_chunk = agent_audio_generate(
                     "开始寻找"+current_token[current_token.find(">") + 1:]
                 )
-                audio_file_path = ""
+                socketio.emit(
+                    "agent_play_audio_chunk", {
+                        "user": user, "index": 0, "audio_chunk": audio_chunk}
+                )
+                init_state = detector.detect_init(cv2.imread(file_path, 1))
+                if init_state != 0:
+                    audio_file_path = "./agent_files/find_item_fail.wav"
+                    with open(audio_file_path, "rb") as audio_file:
+                        audio_chunk = audio_file.read()
+                    socketio.emit(
+                        "agent_play_audio_chunk", {
+                            "user": user, "index": 0, "audio_chunk": audio_chunk}
+                    )
+                    return jsonify({"message": "未识别到模板图中的目标", "item_info": []}), 400
+                socketio.emit("find_item", {"user": user, "flag": "begin"})
             elif current_token == "##<state=2 exit>":
                 detector.release()
                 return
         else:
             return
-
-        if audio_file_path:
-            with open(audio_file_path, "rb") as audio_file:
-                audio_chunk = audio_file.read()
-
-        socketio.emit(
-            "agent_play_audio_chunk", {"user": user, "index": 0, "audio_chunk": audio_chunk}
-        )
 
     else:
         if not USER_VAR[user]["is_streaming"]:

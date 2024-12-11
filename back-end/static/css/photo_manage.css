@@ -147,3 +147,16 @@ p {
 .modal-content button#deleteButton:hover {
     background-color: #c9302c;
 }
+
+.error-message {
+    position: fixed;
+    bottom: 70px; /* 确保在footer上方 */
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: transparent;
+    color: red;
+    padding: 10px;
+    border:none;
+    z-index: 0;
+    text-align: center;
+}
