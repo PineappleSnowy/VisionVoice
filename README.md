@@ -654,7 +654,7 @@
 
 <br>
 
-<div style="display: flex; justify-content:  center; align-items: center; gap: 20px;">
+<div style="display: flex; justify-content:  space-around; gap: 20px;">
   <img src="assets/images/about_us5.png" width="40%">
   <img src="assets/images/about_us6.png" width="40%">
 </div>
