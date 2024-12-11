@@ -2,7 +2,8 @@
 
 <div align="center">
 
-<a href="https://visionvoice.life/html.child/%E4%BA%A7%E5%93%81%E6%BC%94%E7%A4%BA.html">🔥 视界之声 在线版</a> · <a href="https://visionvoice.life/html.child/user_manual.html">📃 用户文档</a> · <a href="https://github.com/PineappleSnowy/VisionVoice_new/issues">报告问题</a> · <a href="https://github.com/PineappleSnowy/VisionVoice_new/issues">建议反馈</a> · <a href="https://visionvoice.life/html.child/%E6%9B%B4%E6%96%B0%E6%97%A5%E5%BF%97.html">更新日志</a> · <a href="https://visionvoice.life">🌐 官方网站</a>
+<a href="https://visionvoice.life/html.child/%E4%BA%A7%E5%93%81%E6%BC%94%E7%A4%BA.html">🔥视界之声 在线版</a> · <a href="https://visionvoice.life/html.child/user_manual.html">📃 用户文档</a> · <a href="https://github.com/PineappleSnowy/VisionVoice/issues">报告问题</a> · <a href="https://github.com/PineappleSnowy/VisionVoice/issues">建议反馈</a> · <a href="https://visionvoice.life/html.child/%E6%9B%B4%E6%96%B0%E6%97%A5%E5%BF%97.html">更新日志</a> · <a href="https://visionvoice.life">🌐 官方网站</a>
+
 
 <br>
 
@@ -17,7 +18,7 @@
 - [📝 摘要](#-摘要)
 - [📜 开放源码许可证](#-开放源码许可证) 
 - [ℹ️ 软件基本信息](#-软件基本信息)
-- [📝 作品概述](#-作品概述)
+- [🚗 作品概述](#-作品概述)
 - [🎥 演示视频与软件使用说明书](#-演示视频与软件使用说明书)
 - [📋 功能描述与在线演示](#-功能描述与在线演示)
 - [🚀 快速开始](#-快速开始)
@@ -38,16 +39,15 @@
 
 如果你喜欢在工作中使用 “视界之声”，请将 视界之声 徽章添加到你的 README 中：
 
-[![VisionVoice](https://img.shields.io/badge/powered%20by-VisionVoice-438440)](https://github.com/PineappleSnowy/VisionVoice_new)
+[![VisionVoice](https://img.shields.io/badge/powered%20by-VisionVoice-438440)](https://github.com/PineappleSnowy/VisionVoice)
 
 ```
-[![VisionVoice](https://img.shields.io/badge/powered%20by-VisionVoice-438440)](https://github.com/PineappleSnowy/VisionVoice_new)
+[![VisionVoice](https://img.shields.io/badge/powered%20by-VisionVoice-438440)](https://github.com/PineappleSnowy/VisionVoice)
 ```
 ## 📜 开放源码许可证
 
 本项目采用以下开放源码许可证发布：
-
-- [Apache 2.0 License](https://github.com/PineappleSnowy/VisionVoice_new/tree/main/LICENSE)
+- [Apache 2.0 License](https://github.com/PineappleSnowy/VisionVoice/tree/main/LICENSE) 
 
 ## ℹ️ 软件基本信息
 
@@ -57,7 +57,7 @@
 - **作者/团队**：西安电子科技大学 PineappleSnowy 团队（又名"寒菠创想"团队）
 - **联系方式**：hdgong2766@qq.com
 
-## 📝 作品概述
+## 🚗 作品概述
 
 ### 软件背景及应用领域
 
@@ -124,10 +124,10 @@
 
 - **生活助手**：
 
+  - **避障模式**：分析周围环境，通过单目测距算法解算距离类别信息，帮助用户避开障碍物（需要开启摄像头权限）
+  - **寻物模式**：通过手机摄像头寻找物品（需要用户提前拍下并保存该物品的照片，拍照时背景应尽可能干净整洁以凸显目标物品）（需要开启摄像头权限和存储权限）
   - **环境识别**：实时得到环境的细节描述（需要开启摄像头权限）
   - **帮我定位**：通过手机定位功能确定用户当前所处的具体位置（需要开启定位权限）
-  - **寻物模式**：通过手机摄像头寻找物品（需要用户提前拍下并保存该物品的照片，拍照时背景应尽可能干净整洁以凸显目标物品）（需要开启摄像头权限和存储权限）
-  - **避障模式**：分析周围环境，通过单目测距算法解算距离类别信息，帮助用户避开障碍物（需要开启摄像头权限权限）
 
 - **心灵树洞**：
 
@@ -140,15 +140,15 @@
 
 #### 生活助手
 
+|                                                            [避障模式](https://pineapplesnowy.cn/phone)                                                             |                                                           [寻物模式](https://pineapplesnowy.cn/phone)                                                            |
+| :----------------------------------------------------------------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+|                              <a href="https://pineapplesnowy.cn/phone"> <img src="assets/images/feature_avoid.jpg" width="70%"> </a>                               |                              <a href="https://pineapplesnowy.cn/phone"> <img src="assets/images/feature_seek.jpg" width="70%"> </a>                               |
+| “避障模式”开启时，生活助手将通过手机后置摄像头不断获取周围环境的信息，并实时通过语音向用户提醒其附近的障碍物以及障碍物与用户的间距，依此帮助用户前行时绕开障碍物。 | 当用户找不到自己的个人物品时，用户可以使用“寻物模式”功能，通过手机后置摄像头的实时录像，找到用户事先已经在手机中保存好的照片所对应的物品（照片在“寻物画廊”中）。 |
+
 |                                [环境识别](https://pineapplesnowy.cn/phone)                                 |                               [帮我定位](https://pineapplesnowy.cn/phone)                               |
 | :--------------------------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------------: |
 | <a href="https://pineapplesnowy.cn/phone"> <img src="assets/images/feature_identify.jpg"  width="70%"> </a> | <a href="https://pineapplesnowy.cn/phone"> <img src="assets/images/feature_locate.jpg" width="70%"> </a> |
 |            “环境识别”将通过用户的手机后置摄像头进行拍照，通过照片中的信息来分析用户周围的环境。            |                      “帮我定位”将通过用户的手机定位帮助用户确定自己当前所在位置。                       |
-
-|                                                            [避障模式](https://pineapplesnowy.cn/phone)                                                             |                                                           [寻物模式](https://pineapplesnowy.cn/phone)                                                            |
-| :----------------------------------------------------------------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------------------------: |
-|                              <a href="https://pineapplesnowy.cn/phonet"> <img src="assets/images/feature_avoid.jpg" width="70%"> </a>                               |                              <a href="https://pineapplesnowy.cn/phone"> <img src="assets/images/feature_seek.jpg" width="70%"> </a>                               |
-| “避障模式”开启时，生活助手将通过手机后置摄像头不断获取周围环境的信息，并实时通过语音向用户提醒其附近的障碍物以及障碍物与用户的间距，依此帮助用户前行时绕开障碍物。 | 当用户找不到自己的个人物品时，用户可以使用“寻物模式”功能，通过手机后置摄像头的实时录像，找到用户事先已经在手机中保存好的照片所对应的物品（照片在“寻物画廊”中）。 |
 
 #### 心灵树洞
 
@@ -255,15 +255,29 @@
 
 用户可以通过点击界面右上角的转换箭头转换手机前置或后置摄像模式。
 
-用户还可以通过点击界面下方中央的栏目按钮展开功能栏，功能栏中的四个按钮从左至右依次为“避障模式”“寻物模式”“环境识别”“帮我定位”这四个功能，点击按钮即可快速启动对应功能：
+<div align=center>
+<img src="readme_files/Android_turn.jpg" width="35%">
+</div>
+
+用户还可以通过点击界面下方中央的栏目按钮展开功能栏:
 
 <div align=center>
 <img src="assets/images/feature_menu2.jpg" width="35%">
 </div>
 
-生活助手中的功能使用示例如下：
+功能栏中的四个按钮从左至右依次为 **“避障模式”“寻物模式”“环境识别”“帮我定位”** 这四个功能，点击按钮即可快速启动对应功能：
 
-#### 避障模式
+<div align=center>
+<img src="assets/images/feature_menu3.png" width="35%">
+</div>
+
+下面将详细讲解“视界之声”的所有功能。
+
+#### 生活助手
+
+生活助手拥有“避障模式”、“寻物模式”、“环境识别”、“帮我定位”等功能，以下是功能介绍和使用示例。
+
+##### 避障模式
 
 用户告诉助手“帮我躲避障碍物”等需求，智能助手将自动开启“避障模式”功能：
 
@@ -271,13 +285,15 @@
 <img src="assets/images/feature_avoid.jpg" width="35%">
 </div>
 
-用户也可以点击以下按钮快速开启“避障模式”：
+用户随时可以通过点击界面下方的红色叉号退出“避障模式”。
+
+用户也可以点击以下红色方框中的按钮快速开启“避障模式”：
 
 <div align=center>
 <img src="assets/images/feature_menu_avoid.jpg" width="35%">
 </div>
 
-#### 寻物模式
+##### 寻物模式
 
 用户需要在保存照片时对物品命名，且拍照时背景应尽可能干净整洁以凸显目标物品。照片保存在“寻物画廊”中，用户可以在“寻物画廊”中增加、删除、查看并修改照片及物品命名：
 
@@ -297,13 +313,15 @@
 <img src="assets/images/feature_seek.jpg" width="35%">
 </div>
 
-用户也可以点击以下按钮快速开启“寻物模式”：
+用户随时可以通过点击界面下方的红色叉号退出“寻物模式”。
+
+用户也可以点击以下红色方框中的按钮快速开启“寻物模式”：
 
 <div align=center>
 <img src="assets/images/feature_menu_seek.jpg" width="35%">
 </div>
 
-#### 环境识别
+##### 环境识别
 
 用户告诉助手“我附近都有什么？”“我周围都是什么？”“请描述四周环境”等需求，智能助手将自动开启“环境识别”功能：
 
@@ -317,13 +335,13 @@
 <img src="assets/images/feature_identify2.jpg" width="35%">
 </div>
 
-用户也可以点击以下按钮快速开启“环境识别”：
+用户也可以点击以下红色方框中的按钮快速开启“环境识别”：
 
 <div align=center>
 <img src="assets/images/feature_menu_identify.jpg" width="35%">
 </div>
 
-#### 帮我定位
+##### 帮我定位
 
 用户告诉助手“我在哪里？”“我的位置是什么？”“请描述我现在所处的位置”等需求，智能助手将自动开启“帮我定位”功能：
 
@@ -337,13 +355,17 @@
 <img src="assets/images/feature_locate2.jpg" width="35%">
 </div>
 
-用户也可以点击以下按钮快速开启“帮我定位”：
+用户也可以点击以下红色方框中的按钮快速开启“帮我定位”：
 
 <div align=center>
 <img src="assets/images/feature_menu_locate.jpg" width="35%">
 </div>
 
-用户可以点击界面下方的“消息”进入智能体助手菜单，然后选择自己想要的智能助手，点击对应的智能助手即可和它交流。
+
+#### 心灵树洞
+
+用户可以点击界面下方的“消息”进入智能体助手菜单，然后选择自己想要的智能助手（“视界之声”现在上架了两个智能助手：**生活助手**和**心灵树洞**），点击对应的智能助手即可和它交流。直接点击智能助手的头像将进入对话界面；点击电话或视频按钮将进入语音和视频通话界面。
+
 
 <div align=center>
 <img src="assets/images/agent_menu.jpg" width="35%">
@@ -357,17 +379,21 @@
 
 用户可以通过在界面下方聊天框输入文字的信息和“心灵树洞”进行交谈，也可以点击界面左下角的“电话”按钮和智能助手进行语音和视频通话。
 
+当智能助手倾听用户发言时：
 <div align=center>
 <img src="assets/images/agent2_listen.jpg" width="35%">
 </div>
 
+当智能助手回答用户时：
 <div align=center>
 <img src="assets/images/agent2_tell.jpg" width="35%">
 </div>
 
+用户随时可以通过点击界面下方的红色正方形打断智能助手的回答。
+
 “心灵树洞”中的功能使用示例如下：
 
-#### 情感陪护
+##### 情感陪护
 
 用户可以和“心灵树洞”进行情感方面的问题交流：
 
@@ -377,7 +403,7 @@
 
 当智能助手输出时，点击该界面右下角的正方形即可打断。
 
-#### 专业问答
+##### 专业问答
 
 用户可以和“心灵树洞”进行专业问题交流：
 
@@ -389,11 +415,18 @@
 
 ### 4.退出“视界之声”
 
-用户使用完毕后，可以直接在手机后台关闭应用程序即可退出登录并退出程序。用户也可以点击界面右下角的“我的”进入个人信息界面，然后点击“退出登录“即可退出登录并自动返回登录界面。
+#### 退出Android端正式版
+
+当以上功能使用完毕后，用户可以选择继续使用对应功能，或直接在手机后台关闭应用程序即可退出登录并退出程序。用户也可以点击界面右下角的“我的”进入个人信息界面，然后点击“退出登录“即可退出登录并自动返回登录界面。
 
 <div align=center>
 <img src="assets/images/Android_quit.jpg" width="35%">
 </div>
+
+#### 退出Windows端体验版
+
+当以上功能使用完毕后，本产品将提醒用户“您可以说“退出”以退出程序，或继续选择服务：1.智慧拍照；2.环境识别”。用户可以根据提示通过说“智慧拍照”或“环境识别”的方式或通过点击左侧对应按钮继续选择使用对应功能。用户可以通过说“退出”的方式退出本产品，或通过直接关闭程序的方式退出本产品。
+
 
 ## 🛠️ 视界之声开发说明
 
@@ -589,14 +622,14 @@
 [VisionVoice-Icon-SVG](assets/images/VisionVoice_logo.svg)
 
 <div align=center>
-<img src="assets/images/about_us1.png" width="100%">
+<img src="assets/images/VisionVoice_logo.svg" width="20%">
 </div>
 
 <br>
 
 ### 项目贡献者
 
-<a href="https://github.com/PineappleSnowy/VisionVoice_new/graphs/contributors">
+<a href="https://github.com/PineappleSnowy/VisionVoice/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=PineappleSnowy/VisionVoice" />
 </a>
 
@@ -607,21 +640,21 @@
 本产品开发团队（简称为“我们”）是来自 西安电子科技大学 的 PineappleSnowy 团队，是一个全部由 00 后大学生组成的充满爱心、活力满满的团队！
 为了开发出更符合视障人士需求的产品，我们联系了陕西省盲人协会并参与了“黑暗跑团”西安站的志愿活动，成为帮助视障人士跑步运动的盲人助跑员等志愿者，并在帮助盲人跑步时和盲人进行深入交流，实地调研视障人士群体的真实需求，并以此改进我们的产品。
 下列图片为我们 PineappleSnowy 团队参与志愿活动的实地照片：
-<div style="display: flex; justify-content: space-around; gap: 20px;">
+<div style="display: flex; justify-content:  center; align-items: center; gap: 20px;">
   <img src="assets/images/about_us1.png" width="40%">
   <img src="assets/images/about_us2.png" width="40%">
 </div>
 
 <br>
 
-<div style="display: flex; justify-content: space-around; gap: 20px;">
+<div style="display: flex; justify-content:  center; align-items: center; gap: 20px;">
   <img src="assets/images/about_us3.png" width="40%">
   <img src="assets/images/about_us4.png" width="40%">
 </div>
 
 <br>
 
-<div style="display: flex; justify-content: space-around; gap: 20px;">
+<div style="display: flex; justify-content:  space-around; gap: 20px;">
   <img src="assets/images/about_us5.png" width="40%">
   <img src="assets/images/about_us6.png" width="40%">
 </div>
