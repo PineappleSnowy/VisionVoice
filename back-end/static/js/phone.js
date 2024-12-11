@@ -920,7 +920,7 @@ window.onload = async () => {
             AMap.plugin('AMap.Geolocation', function () {
                 const geolocation = new AMap.Geolocation({
                     enableHighAccuracy: true,  // 是否使用高精度定位，默认:true
-                    timeout: 2000,  // 超过多少毫秒后停止定位，默认：5s
+                    timeout: 5000,  // 超过多少毫秒后停止定位，默认：5s
                 });
                 geolocation.getCurrentPosition(function (status, result) {
                     if (status == 'complete') {

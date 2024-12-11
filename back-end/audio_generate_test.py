@@ -2,6 +2,6 @@
 from agent_files.agent_speech_synthesis import agent_audio_generate
 
 if __name__ == "__main__":
-    audio_file_path = ".cache/find_end.wav"
+    audio_file_path = "./agent_files/find_item_fail.wav"
     with open(audio_file_path, "wb") as audio_file:
-        audio_file.write(agent_audio_generate("寻物模式已关闭。"))
+        audio_file.write(agent_audio_generate("未识别到模板图中的目标。"))
