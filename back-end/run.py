@@ -200,7 +200,7 @@ def user_agreement():
 
 @app.route('/get_user_agreement_text')
 def get_user_agreement_text():
-    file_path = './configs/user_agreement.txt'
+    file_path = './configs/user_announcement.txt'
     try:
         with open(file_path, 'r', encoding='utf-8') as f:
             content = f.read()
