@@ -449,8 +449,8 @@
   - 帮我寻物架构图：
 
   <div align=center>
-<img src="assets/images/帮我寻物架构图.jpg" width="70%">
-</div>
+  <img src="assets/images/帮我寻物架构图.jpg" width="70%">
+  </div>
 
 
 - **目录结构**
