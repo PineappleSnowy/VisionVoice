@@ -25,7 +25,7 @@ def convert_images_to_jpg(folder_path):
                 print(f"Converted {filename} to {name}.jpg")
 
 # 指定文件夹路径
-folder_path = './user_images/images'
+folder_path = './back-end/user_images/'
 
 # 调用函数进行转换
 convert_images_to_jpg(folder_path)
