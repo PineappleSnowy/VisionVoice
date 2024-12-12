@@ -256,7 +256,7 @@
 用户可以通过点击界面右上角的转换箭头转换手机前置或后置摄像模式。
 
 <div align=center>
-<img src="readme_files/Android_turn.jpg" width="35%">
+<img src="assets/images/Android_turn.jpg" width="35%">
 </div>
 
 用户还可以通过点击界面下方中央的栏目按钮展开功能栏:
@@ -539,7 +539,7 @@
 
 ## 更新日志
 
-在这里，你可以查看我们对“视界之声”的开发历史。 [更新日志](https://visionvoice.life/html.child/%E6%9B%B4%E6%96%B0%E6%97%A5%E5%BF%97.child/%E4%BB%8E%E9%9B%B6%E5%88%B0%E4%B8%80.html)
+在这里，您可以查看我们对“视界之声”的开发历史。 [更新日志](https://visionvoice.life/html.child/%E6%9B%B4%E6%96%B0%E6%97%A5%E5%BF%97.child/%E4%BB%8E%E9%9B%B6%E5%88%B0%E4%B8%80.html)
 
 ## 🌟 产品创新点
 
@@ -640,14 +640,14 @@
 本产品开发团队（简称为“我们”）是来自 西安电子科技大学 的 PineappleSnowy 团队，是一个全部由 00 后大学生组成的充满爱心、活力满满的团队！
 为了开发出更符合视障人士需求的产品，我们联系了陕西省盲人协会并参与了“黑暗跑团”西安站的志愿活动，成为帮助视障人士跑步运动的盲人助跑员等志愿者，并在帮助盲人跑步时和盲人进行深入交流，实地调研视障人士群体的真实需求，并以此改进我们的产品。
 下列图片为我们 PineappleSnowy 团队参与志愿活动的实地照片：
-<div style="display: flex; justify-content:  center; align-items: center; gap: 20px;">
+<div style="display: flex; justify-content:  space-around; align-items: center; gap: 20px;">
   <img src="assets/images/about_us1.png" width="40%">
   <img src="assets/images/about_us2.png" width="40%">
 </div>
 
 <br>
 
-<div style="display: flex; justify-content:  center; align-items: center; gap: 20px;">
+<div style="display: flex; justify-content:  space-around; align-items: center; gap: 20px;">
   <img src="assets/images/about_us3.png" width="40%">
   <img src="assets/images/about_us4.png" width="40%">
 </div>
