@@ -74,7 +74,7 @@
 >
 > **收藏项目**，你将无延迟地接收所有发布通知～ ⭐️
 
-![star-us](assets/images/star-us.png)
+![star-us](assets/images/star-us.jpg)
 
 <br>
 
@@ -174,7 +174,7 @@
 扫描二维码，免费安装“视界之声”手机版。
 
 <div align=center>
-<img src="assets/images/download_andriod_app.png" width="30%">
+<img src="assets/images/download_andriod_app.jpg" width="30%">
 </div>
 
 #### 电脑体验版安装
@@ -188,19 +188,19 @@
 电脑体验版“VisionVoice”文件夹:
 
 <div align=center>
-<img src="assets/images/windows_files.png" width="85%">
+<img src="assets/images/windows_files.jpg" width="85%">
 </div>
 
 电脑体验版启动界面:
 
 <div align=center>
-<img src="assets/images/windows_open.png" width="85%">
+<img src="assets/images/windows_open.jpg" width="85%">
 </div>
 
 电脑体验版使用界面：
 
 <div align=center>
-<img src="assets/images/windows_use.png" width="85%">
+<img src="assets/images/windows_use.jpg" width="85%">
 </div>
 
 ### 2.免费注册并登录“视界之声”
@@ -268,7 +268,7 @@
 功能栏中的四个按钮从左至右依次为 **“避障模式”“寻物模式”“环境识别”“帮我定位”** 这四个功能，点击按钮即可快速启动对应功能：
 
 <div align=center>
-<img src="assets/images/feature_menu3.png" width="35%">
+<img src="assets/images/feature_menu3.jpg" width="35%">
 </div>
 
 下面将详细讲解“视界之声”的所有功能。
@@ -434,11 +434,24 @@
 
 - **架构图**
 
-  - 语音视频对话架构图：![语音视频对话架构图](assets/images/语音视频对话架构图.jpg)
+  - 语音视频对话架构图：
 
-  - 辅助避障架构图：![辅助避障架构图](assets/images/辅助避障架构图.jpg)
+  <div align=center>
+  <img src="assets/images/语音视频对话架构图.jpg" width="70%">
+  </div>
 
-  - 帮我寻物架构图：![帮我寻物架构图](assets/images/帮我寻物架构图.jpg)
+  - 辅助避障架构图：
+
+  <div align=center>
+  <img src="assets/images/辅助避障架构图.jpg" width="70%">
+  </div>
+
+  - 帮我寻物架构图：
+
+  <div align=center>
+<img src="assets/images/帮我寻物架构图.jpg" width="70%">
+</div>
+
 
 - **目录结构**
 
@@ -649,22 +662,22 @@
 为了开发出更符合视障人士需求的产品，我们联系了陕西省盲人协会并参与了“黑暗跑团”西安站的志愿活动，成为帮助视障人士跑步运动的盲人助跑员等志愿者，并在帮助盲人跑步时和盲人进行深入交流，实地调研视障人士群体的真实需求，并以此改进我们的产品。
 下列图片为我们 PineappleSnowy 团队参与志愿活动的实地照片：
 <div style="display: flex; justify-content:  space-around; align-items: center; gap: 20px;">
-  <img src="assets/images/about_us1.png" width="40%">
-  <img src="assets/images/about_us2.png" width="40%">
+  <img src="assets/images/about_us1.jpg" width="40%">
+  <img src="assets/images/about_us2.jpg" width="40%">
 </div>
 
 <br>
 
 <div style="display: flex; justify-content:  space-around; align-items: center; gap: 20px;">
-  <img src="assets/images/about_us3.png" width="40%">
-  <img src="assets/images/about_us4.png" width="40%">
+  <img src="assets/images/about_us3.jpg" width="40%">
+  <img src="assets/images/about_us4.jpg" width="40%">
 </div>
 
 <br>
 
 <div style="display: flex; justify-content:  space-around; gap: 20px;">
-  <img src="assets/images/about_us5.png" width="40%">
-  <img src="assets/images/about_us6.png" width="40%">
+  <img src="assets/images/about_us5.jpg" width="40%">
+  <img src="assets/images/about_us6.jpg" width="40%">
 </div>
 
 <br>
@@ -672,7 +685,7 @@
 下图为视障人士正在现场体验我们的产品：
 
 <div align=center>
-<img src="assets/images/about_us7.png" width="35%">
+<img src="assets/images/about_us7.jpg" width="35%">
 </div>
 
 “视界之声”之所以这样命名，是为了让我们的软件以智能手机为基础，成为盲人的眼睛，让他们去无障碍地看到感受“视界”。盲人可以在“视界之声”的帮助下与世界对话，去体会到这个世界更精彩的一面。
