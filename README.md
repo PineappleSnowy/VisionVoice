@@ -466,36 +466,36 @@
   │   │   ├── test_ai.py
   │   │   └── test_image.py
   │   ├── user_images             # 用户图片存储
-  │   ├── .gitignore              # Git 忽略文件
   │   ├── gunicorn_config.py      # Gunicorn 配置
-  │   ├── README.md               # 后端说明文档
-  │   ├── requirements.txt        # 依赖包列表
   │   ├── run_forever.sh          # 持续运行脚本
   │   └── run.py                  # 主程序入口
-  └── frontend                    # 客户端
-      ├── VisionVoiceProject      # 蓝河手机端项目
-      │   ├── README.md
-      │   ├── package.json
-      │   ├── .quickapp.preview.json
-      │   ├── .prettierignore
-      │   ├── .gitignore
-      │   └── src
-      │       ├── assets
-      │       ├── helpers
-      │       ├── IntroCard
-      │       ├── app.ux
-      │       ├── sitemap.json
-      │       ├── manifest.json
-      │       └── pages
-      │           └── Home
-      │               └── index.ux # 主页面：主要使用 webView 实现蓝河快应用移动端适配
-      └── README.md
+  ├── frontend                    # 客户端
+  │   ├── VisionVoiceProject      # 蓝河手机端项目
+  │   │   ├── README.md
+  │   │   ├── package.json
+  │   │   ├── .quickapp.preview.json
+  │   │   ├── .prettierignore
+  │   │   ├── .gitignore
+  │   │   └── src
+  │   │       ├── assets
+  │   │       ├── helpers
+  │   │       ├── IntroCard
+  │   │       ├── app.ux
+  │   │       ├── sitemap.json
+  │   │       ├── manifest.json
+  │   │       └── pages
+  │   │           └── Home
+  │   │               └── index.ux # 主页面：主要使用 webView 实现蓝河快应用移动端适配
+  │   └── README.md
+  ├── README.md               # 项目说明文档
+  ├── requirements.txt        # 依赖包列表
+  └── .gitignore              # Git 忽略文件
   ```
 
 - **技术栈**
 
   - 前端：蓝河系统手机应用
-  - 后台：Python 的 Flask 框架
+  - 后端：Python 的 Flask 框架
   - AI算法：单目视觉避障算法、寻物算法
 
 - **关键技术点**：
