@@ -34,54 +34,54 @@
   flex: 1;
   flex-direction: column;
   align-items: center;
-  padding: 5 * @size-factor;
+  padding: 0.83 * @size-factor;
   background-color: @white;
 
   .logo {
-    width: 35 * @size-factor;
-    height: 35 * @size-factor;
-    margin-bottom: 5 * @size-factor;
-    border-radius: 17.5 * @size-factor;
+    width: 5.83 * @size-factor;
+    height: 5.83 * @size-factor;
+    margin-bottom: 0.83 * @size-factor;
+    border-radius: 2.92 * @size-factor;
     box-shadow: 0 2px 8px fade(@black, 10%);
   }
 
   .title {
-    font-size: 8 * @size-factor;
+    font-size: 1.33 * @size-factor;
     font-weight: bold;
-    margin-bottom: 2 * @size-factor;
+    margin-bottom: 0.33 * @size-factor;
     color: @brand;
     text-shadow: 0 1px 2px fade(@black, 10%);
   }
 
   .subtitle {
-    font-size: 6 * @size-factor;
-    margin-bottom: 5 * @size-factor;
+    font-size: 1 * @size-factor;
+    margin-bottom: 0.83 * @size-factor;
     color: @grey;
     opacity: 0.9;
   }
 
   .feature-list {
     .flex-box-mixins(column, center, center);
-    margin: 4 * @size-factor 0;
+    margin: 0.67 * @size-factor 0;
     background-color: @white;
-    padding: 3 * @size-factor;
-    border-radius: 4 * @size-factor;
+    padding: 0.5 * @size-factor;
+    border-radius: 0.67 * @size-factor;
     width: 85%;
     border: 1px solid @grey;
 
     .feature-title {
-      font-size: 5.5 * @size-factor;
+      font-size: 0.92 * @size-factor;
       color: @brand;
-      margin-bottom: 3 * @size-factor;
+      margin-bottom: 0.5 * @size-factor;
       font-weight: bold;
     }
 
     .feature-item {
-      font-size: 5.5 * @size-factor;
-      margin: 2 * @size-factor 0;
+      font-size: 0.92 * @size-factor;
+      margin: 0.33 * @size-factor 0;
       color: @black;
-      padding: 2.5 * @size-factor 4 * @size-factor;
-      border-radius: 2 * @size-factor;
+      padding: 0.42 * @size-factor 0.67 * @size-factor;
+      border-radius: 0.33 * @size-factor;
       background-color: fade(@brand, 10%);
       width: 90%;
       text-align: center;
@@ -91,10 +91,10 @@
   .description {
     text-align: center;
     color: @grey;
-    padding: 2.5 * @size-factor 5 * @size-factor;
+    padding: 0.42 * @size-factor 0.83 * @size-factor;
     line-height: 1.6;
     width: 85%;
-    border-radius: 2 * @size-factor;
+    border-radius: 0.33 * @size-factor;
     
     background-color: fade(@brand, 5%);
     border: 1px solid fade(@grey, 15%);
@@ -106,7 +106,7 @@
     word-break: break-word;
 
     text {
-      font-size: 5 * @size-factor;
+      font-size: 0.83 * @size-factor;
       text-indent: 2em;
       text-align: left;
     }
@@ -116,26 +116,26 @@
     text-align: center;
     color: @grey;
     opacity: 0.8;
-    margin: 4 * @size-factor 0;
+    margin: 0.67 * @size-factor 0;
     width: 85%;
     text {
       text-align: center;
-      font-size: 4 * @size-factor;
+      font-size: 0.67 * @size-factor;
     }
   }
 
   .version-info {
     .flex-box-mixins(column, center, center);
-    margin-bottom: 4 * @size-factor;
+    margin-bottom: 0.67 * @size-factor;
     
     .version-text {
-      font-size: 4.5 * @size-factor;
+      font-size: 0.75 * @size-factor;
       color: @grey;
-      margin-bottom: 1 * @size-factor;
+      margin-bottom: 0.17 * @size-factor;
     }
 
     .copyright {
-      font-size: 4 * @size-factor;
+      font-size: 0.67 * @size-factor;
       color: @grey;
       opacity: 0.8;
     }

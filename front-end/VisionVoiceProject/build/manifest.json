@@ -26,6 +26,9 @@
     },
     {
       "name": "system.file"
+    },
+    {
+      "name": "system.notification"
     }
   ],
   "permissions": [
@@ -34,7 +37,8 @@
     }
   ],
   "config": {
-    "logLevel": "debug"
+    "logLevel": "debug",
+    "debug": true
   },
   "router": {
     "entry": "pages/Login",
@@ -77,5 +81,13 @@
     }
   },
   "textSizeAdjust": "auto",
-  "designWidth": "device-width"
+  "designWidth": "device-width",
+  "packageInfo": {
+    "originType": "quickapp-ide",
+    "toolkit": "1.9.14",
+    "timeStamp": "2024-12-18T15:46:38.810Z",
+    "node": "v16.13.0",
+    "platform": "win32",
+    "arch": "x64"
+  }
 }

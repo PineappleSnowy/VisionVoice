@@ -1,0 +1,193 @@
+<template>
+  <!-- template里只能有一个根节点 -->
+  <div class="wrapper">
+    <text class="title">{{ title }}</text>
+    <!-- 点击跳转详情页 -->
+    <input
+      class="btn"
+      type="button"
+      value="开始使用"
+      onclick="gotoVisionVoice"
+    />
+    
+    <!-- 底部导航栏 -->
+    <div class="navbar">
+      <div class="nav-item">
+        <a href="/agent">
+          首页
+        </a>
+      </div>
+      <div class="nav-item">
+        <a href="/chat">
+          消息
+        </a>
+      </div>
+      <div class="nav-item">
+        <image src="../../assets/images/star.png" class="star-icon">
+      </div>
+      <div class="nav-item">
+        <a href="/square">
+          广场
+        </a>
+      </div>
+      <div class="nav-item">
+        <a href="/mine">
+          我的
+        </a>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import webview from '@system.webview'
+import fileUtils from "../../helper/fileUtils"
+import storageUtils from '../../helper/storageUtils'
+
+export default {
+  // 页面级组件的数据模型，影响传入数据的覆盖机制：private内定义的属性不允许被覆盖
+  private: {
+    title: '欢迎使用 VisionVoice 快应用',
+  },
+
+  onInit() {
+    // --------------------------------- Optimize SEO Start
+    // 当 titlebar 的文案与搜索的标题不一致时，请先设置 titlebar
+    // 备注：this.$page.setMeta 需要引擎 1090 版本及以上才支持，因此这段做注释处理；
+    this.$page.setTitleBar({ text: 'VisionVoice 快应用' })
+    if (this.$page.setMeta) {
+      this.$page.setMeta({
+        title: 'VisionVoice 快应用',
+        description:
+          '视界之声是一款帮助视障人士拍照和出行、寻物的无障碍软件，是您生活中的贴心助手。',
+      })
+    }
+    // --------------------------------- Optimize SEO End
+
+  },
+
+  onReady() {
+    console.log("[onReady] Gettiung storage...")
+    // fileUtils.readText();
+    storageUtils.getData("loginUsername")
+    storageUtils.getData("loginPassword")
+  },
+
+  gotoVisionVoice() {
+    webview.setCookie({
+      domain: 'https://pineapplesnowy.cn/',
+      name: 'token',
+      value: '1234567890',
+      maxAge: 3000,
+      path: '/',
+      success: function () {
+        console.log('[webview.setCookie] set cookie success')
+      },
+      fail: function (e) {
+        console.log('[webview.setCookie] set cookie fail')
+      }
+    })
+    webview.loadUrl({
+      url: 'https://pineapplesnowy.cn/',
+      allowthirdpartycookies: true
+    })
+  },
+}
+</script>
+
+<style lang="less">
+@import './../../assets/styles/style.less';
+
+.wrapper {
+  .flex-box-mixins(column, center, center);
+  .title {
+    font-size: 1.5 * @size-factor;
+    text-align: center;
+    color: @black;
+  }
+
+  .btn {
+    width: 15 * @size-factor;
+    height: 2.5 * @size-factor;
+    border-radius: 1.5 * @size-factor;
+    background-color: @brand;
+    color: @white;
+    font-size: @size-factor;
+    margin-top: 2.5 * @size-factor;
+  }
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  color: #fff;
+  height: 4 * @size-factor;
+  padding: 0;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #44498c;
+
+  .nav-item {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    a {
+      text-decoration: none;
+      color: inherit;
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+    }
+  }
+
+  .star-icon {
+    width: 2.5 * @size-factor;
+    height: 2.5 * @size-factor;
+  }
+
+  /* 添加媒体查询，处理小屏幕情况 */
+  @media screen and (max-width: 333px) {
+    .navbar {
+      a {
+        /* 隐藏文字，显示图标 */
+        font-size: 0;
+        padding: 10px;
+        width: 1.5 * @size-factor;
+        height: 1.5 * @size-factor;
+      }
+
+      a::before {
+        content: '';
+        width: 2.5 * @size-factor;
+        height: 2.5 * @size-factor;
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+      }
+
+      a[href='/agent']::before {
+        background-image: url('./../../assets/images/home.png');
+      }
+
+      a[href='/chat']::before {
+        background-image: url('./../../assets/images/chat.png');
+      }
+
+      a[href='/square']::before {
+        background-image: url('./../../assets/images/square.png');
+      }
+
+      a[href='/mine']::before {
+        background-image: url('./../../assets/images/mine.png');
+      }
+    }
+  }
+}
+</style>

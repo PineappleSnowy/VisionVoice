@@ -8,11 +8,11 @@ import $ajax from '../ajax'
  *
  * 备注：如果您不需要发起请求，删除 apis 目录，以及 app.ux 中引用即可；
  */
-const baseUrl = 'https://api.exampel.com/'
+const baseUrl = 'https://pineapplesnowy.cn/'
 
 export default {
-  getApi(data) {
-    return $ajax.get(`${baseUrl}your-project-api`, data)
+  login(data) {
+    return $ajax.get(`${baseUrl}verify-user`, data)
   },
   postOtherApi(data) {
     return $ajax.post(`${baseUrl}your-project-api`, data)
