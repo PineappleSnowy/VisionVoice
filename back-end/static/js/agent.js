@@ -262,7 +262,6 @@ imageList.addEventListener('click', function (event) {
 let uploadedImages = [];
 document.querySelector('#imageUploadPanel .content .add').addEventListener('click', function () {
     const input = document.querySelector('#imageUploadPanel .content .add input');
-    input.setAttribute('accept', 'image/*'); // 从相册上传
     input.removeAttribute('capture'); // 确保不包含 capture 属性
     input.click();
 });
@@ -306,7 +305,6 @@ document.getElementById('album_photo').addEventListener('click', function () {
     const imageUploadPanel = document.getElementById('imageUploadPanel');
     if (imageUploadPanel.style.display === 'none') {
         const input = document.querySelector('#imageUploadPanel .content .add input');
-        input.setAttribute('accept', 'image/*'); // 从相册上传
         input.removeAttribute('capture'); // 确保不包含 capture 属性
         imageUploadPanel.style.display = 'flex';
         input.click();
@@ -318,9 +316,12 @@ document.getElementById('album_photo').addEventListener('click', function () {
 
 document.getElementById('camera_photo').addEventListener('click', function () {
     const imageUploadPanel = document.getElementById('imageUploadPanel');
+    
+    // 查看 input 的属性
+    
     if (imageUploadPanel.style.display === 'none') {
         const input = document.querySelector('#imageUploadPanel .content .add input');
-        input.setAttribute('accept', 'image/*;capture=camera'); // 从相机上传
+        input.setAttribute('capture', 'camera'); // 从相机上传
         imageUploadPanel.style.display = 'flex';
         input.click();
     } else {

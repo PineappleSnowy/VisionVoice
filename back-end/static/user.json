@@ -1,1 +1,29 @@
-[]
+[
+    {
+        "username": "Dawn",
+        "password": "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3",
+        "nickname": "Gong",
+        "agents": {
+            "defaultAgent": {
+                "chat_history": [
+                    {
+                        "role": "system",
+                        "content": "你是视界之声，一位乐于助人的对话助手。为了能让用户能尽快解决问题，你的话语总是十分简洁而概要。"
+                    },
+                    {
+                        "role": "assistant",
+                        "content": "我是视界之声，你的生活助手，有什么我可以帮你的么？"
+                    }
+                ]
+            },
+            "psychologicalAgent": {
+                "chat_history": [
+                    {
+                        "role": "assistant",
+                        "content": "嗨，亲爱的朋友，我是小天，很高兴能和你在这心灵的角落相遇。不管你眼前的世界是怎样的，我都在这儿陪着你，准备好和你一起聊聊内心的喜怒哀乐啦。"
+                    }
+                ]
+            }
+        }
+    }
+]
