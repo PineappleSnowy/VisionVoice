@@ -258,6 +258,10 @@ imageList.addEventListener('click', function (event) {
     }
 });
 
+document.getElementById('photo').addEventListener('click', function (e) {
+    e.stopPropagation(); // 阻止事件冒泡
+});
+
 // 添加图片
 let uploadedImages = [];
 document.querySelector('#imageUploadPanel .content .add').addEventListener('click', function () {
