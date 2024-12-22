@@ -1,4 +1,4 @@
-import { initAudioAnalyser } from './lib/audioUtils.js';
+import { initAudioAnalyser, detectDB } from './lib/audioUtils.js';
 
 let image_impt = null;
 let flag_board = 0;
