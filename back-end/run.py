@@ -43,7 +43,7 @@ from agent_files.vision_seek.detect import detector
 # ----- 加载全局应用 -----
 app = Flask(__name__)
 app.secret_key = "s96cae35ce8a9b0244178bf28e4966c2ce1b83"
-socketio = SocketIO(app, async_mode="threading")
+socketio = SocketIO(app, async_mode="threading", ping_timeout=600, ping_interval=300)  # 设置较大的 pingTimeout 和 pingInterval
 JWTManager(app)
 CORS(app)
 # 设置 JWT 密钥
@@ -725,6 +725,7 @@ def build_response(current_user, agent_name, user_talk, video_open, multi_image_
         if os.path.exists(user_image_path):
             with open(user_image_path, "rb") as img_file:
                 img_base = base64.b64encode(img_file.read()).decode("utf-8")
+            
             dst_messages.append(
                 {
                     "role": "user",
@@ -820,15 +821,15 @@ def build_response(current_user, agent_name, user_talk, video_open, multi_image_
 
     return responses, messages
 
-def error_generator():
-    yield "发生错误，请重试。"
+def error_generator(text):
+    yield text
 
 @app.route("/agent/chat_stream")
 def agent_chat_stream():
     """
     大模型前端流式输出路由
     """
-    user_talk = request.args.get("query")
+    user_talk = request.args.get("query", "（消息为空，发生了错误，请你给出错误警告）")
     agent_name = request.args.get("agent", "defaultAgent")  # 获取选择的智能体
     video_open = request.args.get("videoOpen", "false") == "true"  # 获取选择的智能体
     multi_image_talk = (
@@ -844,8 +845,9 @@ def agent_chat_stream():
         return app.response_class(
             stream_with_context(generate), mimetype="text/event-stream"
         )
-    except Exception:
-        generate = error_generator()
+    except Exception as e:
+        print("[run.py][agent_chat_stream] error:", str(e))
+        generate = error_generator("发生错误，请重试。")
         return app.response_class(
             stream_with_context(generate), mimetype="text/event-stream"
         )
@@ -920,6 +922,10 @@ def upload_image():
         # 将图片保存为文件
         with open(image_save_path, "wb") as f:
             f.write(base64.b64decode(image_data))
+        with open(image_save_path, "rb") as img_file:
+            img_base = base64.b64encode(img_file.read()).decode("utf-8")
+            if not img_base:
+                return {"message": "Image url is empty"}, 400
 
         if "state" in data:
             state = data["state"]

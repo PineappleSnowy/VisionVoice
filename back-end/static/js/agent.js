@@ -11,6 +11,8 @@ document.addEventListener('DOMContentLoaded', function () {
 // 创建socket连接，并附上token用于后端验证
 const token = localStorage.getItem('token');
 const socket = io({
+    pingTimeout: 60000,  // 设置较大的 pingTimeout
+    pingInterval: 30000,  // 设置较大的 pingInterval
     query: {
         token: token
     }
