@@ -14,11 +14,12 @@ p {
     top: 0;
     left: 0;
     width: 100%;
-    background-color: #333;
+    background-color: #1e1e1e;
     color: #e0e0e0;
     text-align: center;
     padding: 10px 0;
     z-index: 1000;
+    font-size: 20px;
 }
 
 .back-button {
@@ -62,7 +63,7 @@ p {
     bottom: 0;
     left: 0;
     width: 100%;
-    background-color: #333;
+    background-color: #1e1e1e;
     text-align: center;
     transition: height 0.3s;
     height: 60px;
@@ -78,14 +79,14 @@ p {
     width: calc(50% - 20px);
     display: block;
     height: calc(50% - 10px);
-    background-color: #444;
+    background-color: #333;
     color: #e0e0e0;
     border: none;
     border-radius: 5px;
 }
 
 .footer button:hover {
-    background-color: #555;
+    background-color: #444;
 }
 
 .modal {

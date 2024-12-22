@@ -65,7 +65,7 @@ body {
     margin-top: 30px;
 }
 
-.options .option:first-child {
+.option:first-child {
     border-top: 1px solid #333;
 }
 
