@@ -1,6 +1,5 @@
 import { initAudioAnalyser, detectDB } from './lib/audioUtils.js';
 
-let image_impt = null;
 let flag_board = 0;
 
 // 在 DOM 加载完成后获取聊天记录
@@ -87,7 +86,6 @@ document.getElementById('send-button').addEventListener('click', function () {
     if (message || uploadedImages.length > 0) {
         audioPlayer.pause();
         audioQueue = [];
-        audioIndex = 0;
         pauseDiv.style.backgroundImage = `url('${'./static/images/pause_inactive.png'}')`;
         addMessage(message);
         message = ''
@@ -191,7 +189,14 @@ function addMessage(message) {
  * @param {string} message 用户的消息内容
  * @param {boolean} multi_image_talk 是否包含多张图片
  */
+var curr_talk_index = 0;  // 标识当前对话
+
 function sendMessageToAgent(message, multi_image_talk) {
+    if (curr_talk_index >= Number.MAX_SAFE_INTEGER) {
+        curr_talk_index = 0;
+    }
+    curr_talk_index += 1;
+    const talk_index = curr_talk_index;
     // 机器人响应
     const image_bot = document.createElement('div');
     image_bot.className = 'chat-image-bot';
@@ -210,12 +215,17 @@ function sendMessageToAgent(message, multi_image_talk) {
     })
         .then(response => {
             let reader = response.body.getReader();
-
+            
             // 逐块读取并处理数据
             return reader.read().then(function processText({ done, value }) {
                 if (done) {
                     return;
                 }
+                // 如果对话序号对不上，则停止响应
+                if (talk_index !== curr_talk_index) {
+                    return;
+                }
+
                 let jsonString = new TextDecoder().decode(value); // 将字节流转换为字符串
 
                 // 如果当前不是结束标志，则将文本添加到气泡中
@@ -579,8 +589,6 @@ function updateAgentName(agent) {
 --------------------------------------------------------- */
 
 // 添加录音相关变量
-let mediaRecorder = null;
-let audioChunks = [];
 let isRecording = false;
 
 // 添加录音按钮点击事件监听器
