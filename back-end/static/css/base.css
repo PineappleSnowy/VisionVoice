@@ -58,8 +58,8 @@
         background-image: url('../images/chat.png');
     }
 
-    #navbar a[href="/square"]::before {
-        background-image: url('../images/square.png');
+    #navbar a[href="/skills"]::before {
+        background-image: url('../images/skills.png');
     }
     
     #navbar a[href="/mine"]::before {

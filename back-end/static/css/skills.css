@@ -18,7 +18,7 @@ body {
     background-color: #1e1e1e;
 }
 
-#navbar a[href="/square"] {
+#navbar a[href="/skills"] {
     font-weight: bold; /* 加粗字体 */
 }
 

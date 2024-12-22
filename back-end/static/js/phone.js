@@ -112,8 +112,8 @@ openCamera.addEventListener('click', async () => {
             goBack.style.color = 'white';
             toggleCamera.style.color = 'white';
         } else {
-            // 关闭摄像头时退出避障模式
-            exitFuncModel()
+            // 关闭摄像头时退出部分功能模式
+            document.querySelector('.endFunc').click();
 
             stream.getTracks().forEach((track) => {
                 track.stop();
@@ -377,13 +377,16 @@ function exit_find_item() {
 
 // 退出功能模式
 function exitFuncModel() {
-    stopAudio()
-    startCheckSilenceTimer()
-    finishShutUpStatus()
     if (obstacle_avoid) {
+        stopAudio()
+        startCheckSilenceTimer()
+        finishShutUpStatus()
         exit_obstacle_void()
     }
     else if (find_item) {
+        stopAudio()
+        startCheckSilenceTimer()
+        finishShutUpStatus()
         exit_find_item()
     }
 }
@@ -917,21 +920,32 @@ window.onload = async () => {
 
     function requestLocaion() {
         return new Promise((resolve, reject) => {
-            AMap.plugin('AMap.Geolocation', function () {
-                const geolocation = new AMap.Geolocation({
-                    enableHighAccuracy: true,  // 是否使用高精度定位，默认:true
-                    timeout: 5000,  // 超过多少毫秒后停止定位，默认：5s
-                });
-                geolocation.getCurrentPosition(function (status, result) {
-                    if (status == 'complete') {
-                        // 成功时的处理
-                        onComplete(result).then(resolve).catch(reject);
-                    } else {
-                        // 失败时的处理
-                        resolve(onError(result));
-                    }
-                });
-            });
+            const timeout = 5000; // 设置超时时间
+            const startTime = Date.now();
+
+            const checkAmapReady = setInterval(() => {
+                if (typeof AMap !== 'undefined') {
+                    clearInterval(checkAmapReady);
+                    AMap.plugin('AMap.Geolocation', function () {
+                        const geolocation = new AMap.Geolocation({
+                            enableHighAccuracy: true,  // 是否使用高精度定位，默认:true
+                            timeout: 5000,  // 超过多少毫秒后停止定位，默认：5s
+                        });
+                        geolocation.getCurrentPosition(function (status, result) {
+                            if (status == 'complete') {
+                                // 成功时的处理
+                                onComplete(result).then(resolve).catch(reject);
+                            } else {
+                                // 失败时的处理
+                                resolve(onError(result));
+                            }
+                        });
+                    });
+                } else if (Date.now() - startTime > timeout) {
+                    clearInterval(checkAmapReady);
+                    reject(new Error('AMap is not defined within the timeout period'));
+                }
+            }, 100);
         });
     }
 
@@ -974,7 +988,7 @@ window.onload = async () => {
     if (avoidObstacle === 'true') {
         document.querySelector('.optionButton.avoidObstacle').click();
     }
-    
+
     // 如果查询参数中包含 findItem=true，则触发寻物按钮点击事件
     else if (findItem === 'true') {
         document.querySelector('.optionButton.findItem').click();
