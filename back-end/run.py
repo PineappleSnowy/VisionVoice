@@ -886,70 +886,73 @@ def upload_image():
     """
     接收前端发来的图片的路由
     """
-    data = request.get_json()
-    if "image" not in data or not data["image"]:
-        return jsonify({"error": "No image data in the request"}), 400
+    try: 
+        data = request.get_json()
+        if "image" not in data or not data["image"]:
+            return jsonify({"message": "No image data in the request"}), 400
 
-    image_data = data["image"]
-    current_user = get_jwt_identity()
-    user_cache_dir = os.path.join(".cache", current_user)
-    if not os.path.exists(user_cache_dir):
-        os.makedirs(user_cache_dir)
+        image_data = data["image"]
+        current_user = get_jwt_identity()
+        user_cache_dir = os.path.join(".cache", current_user)
+        if not os.path.exists(user_cache_dir):
+            os.makedirs(user_cache_dir)
 
-    # 去掉base64前缀
-    image_data = image_data.split(",")[1]
+        # 去掉base64前缀
+        image_data = image_data.split(",")[1]
 
-    # 获取当前是否是多图片对话
-    if "multi_image_index" in data:
-        multi_image_dir = os.path.join(user_cache_dir, MULTI_IMAGE_DIRECTORY)
-        if not os.path.exists(multi_image_dir):
-            os.makedirs(multi_image_dir)
-        print(data["multi_image_index"])
-        if data["multi_image_index"] == 0:
-            # 清空历史图片
-            delete_file_from_dir(multi_image_dir)
-        # 以8位随机数加上图片序号作为文件名，图片序号使大模型能知道图片次序
-        image_save_path = os.path.join(
-            multi_image_dir,
-            f'{data["multi_image_index"]}{random.randint(10000000, 99999999)}.jpg',
-        )
-    else:
-        image_save_path = os.path.join(user_cache_dir, IMAGE_SAVE_NAME)
+        # 获取当前是否是多图片对话
+        if "multi_image_index" in data:
+            multi_image_dir = os.path.join(user_cache_dir, MULTI_IMAGE_DIRECTORY)
+            if not os.path.exists(multi_image_dir):
+                os.makedirs(multi_image_dir)
+            print(data["multi_image_index"])
+            if data["multi_image_index"] == 0:
+                # 清空历史图片
+                delete_file_from_dir(multi_image_dir)
+            # 以8位随机数加上图片序号作为文件名，图片序号使大模型能知道图片次序
+            image_save_path = os.path.join(
+                multi_image_dir,
+                f'{data["multi_image_index"]}{random.randint(10000000, 99999999)}.jpg',
+            )
+        else:
+            image_save_path = os.path.join(user_cache_dir, IMAGE_SAVE_NAME)
 
-    # 将图片保存为文件
-    with open(image_save_path, "wb") as f:
-        f.write(base64.b64decode(image_data))
+        # 将图片保存为文件
+        with open(image_save_path, "wb") as f:
+            f.write(base64.b64decode(image_data))
 
-    if "state" in data:
-        state = data["state"]
-    else:
-        return {"message": "Image upload success"}
+        if "state" in data:
+            state = data["state"]
+        else:
+            return {"message": "Image upload success"}
 
-    try:
-        mat_image = cv2.imread(image_save_path)
+        try:
+            mat_image = cv2.imread(image_save_path)
+        except Exception:
+            return jsonify({"message": "Image is empty"}), 400
+
+        if state == 1:
+            try:
+                obstacle_info = obstacle_avoid_realize(mat_image)
+                print("[run.py][upload_image] obstacle_info:", obstacle_info)
+                return jsonify({"message": "Success", "obstacle_info": obstacle_info}), 200
+            except Exception as e:
+                print("[run.py][upload_image] error:", e)
+                return jsonify({"message": "Error", "obstacle_info": []}), 400
+
+        elif state == 2:
+            try:
+                detect_result = detector.detect_main(mat_image)
+                item_info = [] if detect_result == -1 else detect_result
+                print("[run.py][upload_image] item_info:", item_info)
+                return jsonify({"message": "Success", "item_info": item_info}), 200
+            except Exception as e:
+                print("[run.py][upload_image] error:", e)
+                return jsonify({"message": "Error", "item_info": []}), 400
+
+        return jsonify({"message": "Success"}), 200
     except Exception:
-        return jsonify({"message": "Image is empty"}), 400
-
-    if state == 1:
-        try:
-            obstacle_info = obstacle_avoid_realize(mat_image)
-            print("[run.py][upload_image] obstacle_info:", obstacle_info)
-            return jsonify({"message": "Success", "obstacle_info": obstacle_info}), 200
-        except Exception as e:
-            print("[run.py][upload_image] error:", e)
-            return jsonify({"message": "Error", "obstacle_info": []}), 400
-
-    elif state == 2:
-        try:
-            detect_result = detector.detect_main(mat_image)
-            item_info = [] if detect_result == -1 else detect_result
-            print("[run.py][upload_image] item_info:", item_info)
-            return jsonify({"message": "Success", "item_info": item_info}), 200
-        except Exception as e:
-            print("[run.py][upload_image] error:", e)
-            return jsonify({"message": "Error", "item_info": []}), 400
-
-    return jsonify({"message": "Success"}), 200
+        return jsonify({"message": "Error"}), 400
 
 
 @app.route("/agent/upload_audio", methods=["POST"])
