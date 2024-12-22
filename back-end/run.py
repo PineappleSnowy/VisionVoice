@@ -175,10 +175,10 @@ def create():
     return render_template("create.html")
 
 
-@app.route("/square", methods=["GET"])
-def square():
+@app.route("/skills", methods=["GET"])
+def skills():
     """广场路由"""
-    return render_template("square.html")
+    return render_template("skills.html")
 
 
 @app.route("/mine", methods=["GET"])
@@ -204,6 +204,11 @@ def photo_manage():
     """画廊路由"""
     return render_template("photo_manage.html")
 
+
+@app.route("/contact", methods=["GET"])
+def contact():
+    """用户须知路由"""
+    return render_template("contact.html")
 
 @app.route("/user_agreement", methods=["GET"])
 def user_agreement():
@@ -1150,7 +1155,6 @@ def run_server():
         socketio.run(
             app,
             port=80,
-            host="0.0.0.0",
             allow_unsafe_werkzeug=True,
             debug=True,  # 调试模式（开发环境）
         )

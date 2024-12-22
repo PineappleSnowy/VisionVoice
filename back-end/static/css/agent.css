@@ -40,7 +40,7 @@ p {
 }
 
 #navbar a:hover {
-    background-color: #211f1f;
+    background-color: rgba(0, 0, 0, 0.5);
 }
 
 #navbar img {
@@ -303,19 +303,29 @@ p {
     visibility: hidden;
 }
 
-#decorate_photo {
+#album_photo {
     display: flex;
     position: absolute;
-    top: 10px;
-    left: 10px;
-    width: 50px;
-    height: 50px;
-    background-image: url('../images/camera.png');
-    background-size: cover;
-    background-color: #4b4242;
+    top: 15px;
+    left: 1.0rem;
+    color: white;
+    font-size: 3.0rem;
 }
 
-#decorate_photo:hover {
+#album_photo:hover {
+    background-color: #726c6c;
+}
+
+#camera_photo {
+    display: flex;
+    position: absolute;
+    top: 15px;
+    left: 6.0rem;
+    color: white;
+    font-size: 3.0rem;
+}
+
+#camera_photo:hover {
     background-color: #726c6c;
 }
 

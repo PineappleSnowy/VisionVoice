@@ -258,10 +258,16 @@ imageList.addEventListener('click', function (event) {
     }
 });
 
+document.getElementById('photo').addEventListener('click', function (e) {
+    e.stopPropagation(); // 阻止事件冒泡
+});
+
 // 添加图片
 let uploadedImages = [];
 document.querySelector('#imageUploadPanel .content .add').addEventListener('click', function () {
-    document.querySelector('#imageUploadPanel .content .add input').click();
+    const input = document.querySelector('#imageUploadPanel .content .add input');
+    input.removeAttribute('capture'); // 确保不包含 capture 属性
+    input.click();
 });
 
 document.querySelector('#imageUploadPanel .content .add input').addEventListener('change', function (e) {
@@ -297,6 +303,35 @@ document.querySelector('#imageUploadPanel .content .add input').addEventListener
 
     // 清空文件输入以允许重新选择同一文件
     e.target.value = '';
+});
+
+document.getElementById('album_photo').addEventListener('click', function () {
+    const imageUploadPanel = document.getElementById('imageUploadPanel');
+    if (imageUploadPanel.style.display === 'none') {
+        const input = document.querySelector('#imageUploadPanel .content .add input');
+        input.removeAttribute('capture'); // 确保不包含 capture 属性
+        imageUploadPanel.style.display = 'flex';
+        input.click();
+    } else {
+        clearImageDiv();
+        imageUploadPanel.style.display = 'none';
+    }
+});
+
+document.getElementById('camera_photo').addEventListener('click', function () {
+    const imageUploadPanel = document.getElementById('imageUploadPanel');
+    
+    // 查看 input 的属性
+    
+    if (imageUploadPanel.style.display === 'none') {
+        const input = document.querySelector('#imageUploadPanel .content .add input');
+        input.setAttribute('capture', 'camera'); // 从相机上传
+        imageUploadPanel.style.display = 'flex';
+        input.click();
+    } else {
+        clearImageDiv();
+        imageUploadPanel.style.display = 'none';
+    }
 });
 
 // 清空图片div
@@ -379,17 +414,6 @@ document.getElementById('agent-chat-textarea').addEventListener(
         this.style.height = this.scrollHeight + 'px';
     }
 )
-
-document.getElementById('decorate_photo').addEventListener('click', function () {
-    const imageUploadPanel = document.getElementById('imageUploadPanel');
-    if (imageUploadPanel.style.display === 'none') {
-        imageUploadPanel.style.display = 'flex';
-        document.querySelector('#imageUploadPanel .content .add input').click();
-    } else {
-        // clearImageDiv();
-        imageUploadPanel.style.display = 'none';
-    }
-})
 
 document.getElementById('more_function_button_2').style.display = 'none';
 
@@ -675,7 +699,7 @@ socket.on('agent_speech_recognition_finished', async function (data) {
         return;
     }
     console.log('[agent.js][socket.on][agent_speech_recognition_finished] 音频识别结果: %s', rec_result);
-    
+
     message += rec_result;
     document.getElementById('send-button').click();
 })

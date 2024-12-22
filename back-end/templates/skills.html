@@ -2,13 +2,14 @@
 <html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
-    <title>视界之声-创建</title>
+    <title>视界之声-能力</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0">
   <link rel="stylesheet" href="../static/css/base.css" />
-  <link rel="stylesheet" href="../static/css/create.css" />
+  <link rel="stylesheet" href="../static/css/skills.css" />
     <link rel="icon" href="../static/favicon.ico" />
   </head>
   <body>
+    <div class="header" role="banner">视界之声-能力</div>
     <div id="navbar" role="navigation">
       <a href="/agent" aria-label="首页">
         <span>首页</span>
@@ -16,7 +17,7 @@
       <a href="/chat" aria-label="消息">
         <span>消息</span>
       </a>
-      <a href="/create" aria-label="创建">
+      <a aria-label="创建">
         <img src="../static/images/star.png" id="star" alt="创建图标" />
       </a>
       <a href="/skills" aria-label="能力">
@@ -26,7 +27,12 @@
         <span>我的</span>
       </a>
     </div>
-
-    <!-- <script src="../static/js/create.js"></script> -->
+    <div class="button-container">
+      <button class="func_button" onclick="location.href='/agent'">🤖 智能体交互</button>
+      <button class="func_button" onclick="location.href='/phone?avoidObstacle=true'">🚧 辅助避障</button>
+      <button class="func_button" onclick="location.href='/phone?findItem=true'">🔍 帮我寻物</button>
+      <button class="func_button" onclick="location.href='/phone?envDescription=true'">🌳 环境识别</button>
+      <button class="func_button" onclick="location.href='/phone?currentLocation=true'">📍 获取位置</button>
+    </div>
   </body>
 </html>

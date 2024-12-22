@@ -12,6 +12,7 @@
   <!-- PWA配置文件 -->
   <link rel="manifest" href="../static/manifest.json" />
   <script src="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/socket.io/4.4.1/socket.io.min.js"></script>
+  <script src="https://kit.fontawesome.com/11023f265d.js" crossorigin="anonymous"></script>
 </head>
 
 <body>
@@ -37,7 +38,7 @@
           </div>
           <div class="add" aria-label="添加图片">
             <img src="../static/images/more_function_start.png" alt="添加图片">
-            <input id="photo" type="file" accept="image/*" style="display: none;" />
+            <input id="photo" type="file" accept="image/*" capture="camera" style="display: none;"/>
           </div>
         </div>
       </div>
@@ -59,7 +60,8 @@
       </button>
     </div>
     <div id="more_function_board" role="region" aria-labelledby="more_function_label">
-      <div id="decorate_photo" aria-label="添加图片"></div>
+      <div id="album_photo" aria-label="添加图片"><i class="fa-solid fa-image"></i></div>
+      <div id="camera_photo" aria-label="使用相机上传图片"><i class="fa-solid fa-camera"></i></div>
     </div>
     <div id="navbar" role="navigation">
       <a href="/agent" aria-label="首页">
@@ -68,11 +70,11 @@
       <a href="/chat" aria-label="消息">
         <span>消息</span>
       </a>
-      <a href="/create" aria-label="创建">
+      <a aria-label="创建">
         <img src="../static/images/star.png" id="star" alt="创建" />
       </a>
-      <a href="/square" aria-label="广场">
-        <span>广场</span>
+      <a href="/skills" aria-label="能力">
+        <span>能力</span>
       </a>
       <a href="/mine" aria-label="我的">
         <span>我的</span>
