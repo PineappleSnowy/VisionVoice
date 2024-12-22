@@ -820,6 +820,8 @@ def build_response(current_user, agent_name, user_talk, video_open, multi_image_
 
     return responses, messages
 
+def error_generator():
+    yield "发生错误，请重试。"
 
 @app.route("/agent/chat_stream")
 def agent_chat_stream():
@@ -834,14 +836,19 @@ def agent_chat_stream():
     )  # 是否开启多轮对话
     current_user = get_jwt_identity()
 
-    responses, messages = build_response(
-        current_user, agent_name, user_talk, video_open, multi_image_talk
-    )
-
-    generate = predict(current_user, agent_name, messages, responses)
-    return app.response_class(
-        stream_with_context(generate), mimetype="text/event-stream"
-    )
+    try:
+        responses, messages = build_response(
+            current_user, agent_name, user_talk, video_open, multi_image_talk
+        )
+        generate = predict(current_user, agent_name, messages, responses)
+        return app.response_class(
+            stream_with_context(generate), mimetype="text/event-stream"
+        )
+    except Exception:
+        generate = error_generator()
+        return app.response_class(
+            stream_with_context(generate), mimetype="text/event-stream"
+        )
 
 
 def message_format_tran(src_messages: list):
