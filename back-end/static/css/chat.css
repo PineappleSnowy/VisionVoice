@@ -98,7 +98,7 @@ body {
 }
 
 #navbar {
-    background-color: #525255;
+    background-color: #1e1e1e;
 }
 
 #navbar a[href="/chat"] {
@@ -106,7 +106,7 @@ body {
 }
 
 #navbar a:hover {
-    background-color: #211f1f;
+    background-color: rgba(0, 0, 0, 0.5);
 }
 
 #navbar img {

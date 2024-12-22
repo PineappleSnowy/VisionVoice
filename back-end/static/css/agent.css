@@ -40,7 +40,7 @@ p {
 }
 
 #navbar a:hover {
-    background-color: #211f1f;
+    background-color: rgba(0, 0, 0, 0.5);
 }
 
 #navbar img {

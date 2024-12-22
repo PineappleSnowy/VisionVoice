@@ -11,6 +11,7 @@
     left: 0;
     right: 0;
     bottom: 0;
+    border-top: 1px solid #333;
 }
 
 #navbar a {
