@@ -218,7 +218,7 @@ export default {
         // storageUtils.saveData("token", data.access_token);
         // storageUtils.saveData("username", this.registerUsername);
         // storageUtils.saveData("nickname", data.user_info.nickname);
-        this.gotoVisionVoice(data.access_token, this.registerUsername, data.user_info.nickname);
+        this.gotoVisionVoice(data.access_token, this.registerUsername, this.registerNickname);
 
         // router.replace({
         //   // uri: "https://pineapplesnowy.cn/",
