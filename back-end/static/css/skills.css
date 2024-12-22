@@ -19,7 +19,8 @@ body {
 }
 
 #navbar a[href="/skills"] {
-    font-weight: bold; /* 加粗字体 */
+    font-weight: bold;
+    /* 加粗字体 */
 }
 
 #navbar a:hover {
@@ -41,6 +42,10 @@ body {
     align-items: center;
     margin-top: 0px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.button-container:first-child {
+    border-top: 1px solid #333;
 }
 
 .func_button {

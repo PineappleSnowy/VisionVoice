@@ -33,8 +33,8 @@ body {
     /* 添加过渡效果 */
 }
 
-.message-item:last-child {
-    border-bottom: none;
+.message-item:first-child {
+    border-top: 1px solid #333;
 }
 
 .message-item:hover {
