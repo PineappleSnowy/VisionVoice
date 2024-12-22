@@ -86,7 +86,7 @@ document.getElementById('send-button').addEventListener('click', function () {
     message = message.replace(/(\r\n|\n|\r)/gm, '');
     if (message || uploadedImages.length > 0) {
         audioPlayer.pause();
-        audioDict = {};
+        audioQueue = [];
         audioIndex = 0;
         pauseDiv.style.backgroundImage = `url('${'./static/images/pause_inactive.png'}')`;
         addMessage(message);
