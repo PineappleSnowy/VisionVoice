@@ -6,7 +6,7 @@ import $ajax from '../ajax'
  * $apis.example.getApi().then().catch().finally()
  */
 // const baseUrl = 'https://pineapplesnowy.cn'
-const baseUrl = 'http://192.168.31.61:80'
+const baseUrl = $server_url
 
 export default {
   /**
