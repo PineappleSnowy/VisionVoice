@@ -52,8 +52,8 @@ api.json
 
 # 用户文件
 **/user_images/*
+user.json
 
 # 服务器脚本
 run_forever.sh
 gunicorn_config.py
-user.json
