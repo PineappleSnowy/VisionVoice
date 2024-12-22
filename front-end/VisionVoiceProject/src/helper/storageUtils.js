@@ -1,7 +1,7 @@
 import storage from '@system.storage'
 
 // 存储数据
-function saveData(key, value) {
+async function saveData(key, value) {
   storage.set({
     key: key,
     value: value,
@@ -15,22 +15,24 @@ function saveData(key, value) {
 }
 
 // 获取数据
-function getData(key) {
-  storage.get({
-    key: key,
-    success: function (data) {
-      console.log(`获取的数据: ${key}:${data}`)
-      return data
-    },
-    fail: function (data, code) {
-      console.log(`获取数据失败, code = ${code}`)
-      return null
-    }
+async function getData(key) {
+  return new Promise((resolve, reject) => {
+    storage.get({
+      key: key,
+      success: function (data) {
+        console.log(`获取的数据: ${key}:${data}`)
+        resolve(data)
+      },
+      fail: function (data, code) {
+        console.log(`获取数据失败, code = ${code}`)
+        reject(null)
+      }
+    })
   })
 }
 
 // 删除数据
-function deleteData(key) {
+async function deleteData(key) {
   storage.delete({
     key: key,
     success: function () {
@@ -43,7 +45,7 @@ function deleteData(key) {
 }
 
 // 清除所有数据
-function clearAll() {
+async function clearAll() {
   storage.clear({
     success: function () {
       console.log('清除所有数据成功')

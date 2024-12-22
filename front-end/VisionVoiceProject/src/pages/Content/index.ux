@@ -11,7 +11,7 @@
     />
     
     <!-- 底部导航栏 -->
-    <div class="navbar">
+    <!-- <div class="navbar">
       <div class="nav-item">
         <a href="/agent">
           首页
@@ -35,13 +35,12 @@
           我的
         </a>
       </div>
-    </div>
+    </div> -->
   </div>
 </template>
 
 <script>
 import webview from '@system.webview'
-import fileUtils from "../../helper/fileUtils"
 import storageUtils from '../../helper/storageUtils'
 
 export default {
@@ -50,7 +49,7 @@ export default {
     title: '欢迎使用 VisionVoice 快应用',
   },
 
-  onInit() {
+  async onInit() {
     // --------------------------------- Optimize SEO Start
     // 当 titlebar 的文案与搜索的标题不一致时，请先设置 titlebar
     // 备注：this.$page.setMeta 需要引擎 1090 版本及以上才支持，因此这段做注释处理；
@@ -63,32 +62,54 @@ export default {
       })
     }
     // --------------------------------- Optimize SEO End
+    const token = await storageUtils.getData("token");
+    const username = await storageUtils.getData("username");
+    const nickname = await storageUtils.getData("nickname");
 
-  },
-
-  onReady() {
-    console.log("[onReady] Gettiung storage...")
-    // fileUtils.readText();
-    storageUtils.getData("loginUsername")
-    storageUtils.getData("loginPassword")
+    webview.setCookie({ 
+      domain: $server_url,
+      name: 'token',
+      value: 'token',
+      maxAge: 3000,
+      path: '/',
+      success: function() {
+        console.log('Cookie set success: token=', token)
+      },
+      fail: function(e) {
+        console.log('Cookie set fail: ', e)
+      }
+    })
+    webview.setCookie({ 
+      domain: $server_url,
+      name: 'username',
+      value: username,
+      maxAge: 3000,
+      path: '/',
+      success: function() {
+        console.log('Cookie set success: username=', username)
+      },
+      fail: function(e) {
+        console.log('Cookie set fail: ', e)
+      }
+    })
+    webview.setCookie({ 
+      domain: $server_url,
+      name: 'nickname',
+      value: nickname,
+      maxAge: 3000,
+      path: '/',
+      success: function() {
+        console.log('Cookie set success: nickname=', nickname)
+      },
+      fail: function(e) {
+        console.log('Cookie set fail: ', e)
+      }
+    })
   },
 
   gotoVisionVoice() {
-    webview.setCookie({
-      domain: 'https://pineapplesnowy.cn/',
-      name: 'token',
-      value: '1234567890',
-      maxAge: 3000,
-      path: '/',
-      success: function () {
-        console.log('[webview.setCookie] set cookie success')
-      },
-      fail: function (e) {
-        console.log('[webview.setCookie] set cookie fail')
-      }
-    })
     webview.loadUrl({
-      url: 'https://pineapplesnowy.cn/',
+      url: $server_url,
       allowthirdpartycookies: true
     })
   },

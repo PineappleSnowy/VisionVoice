@@ -89,7 +89,7 @@
       </div>
 
       <div class="message" id="register_message" style="display: none"></div>
-      <text id="register_button" aria-label="注册">注册</text>
+      <text id="register_button" aria-label="注册" @click="handleRegister">注册</text>
       <text class="login-link">
         已有账号？<a id="back_to_login" @click="handleLoginVisible">返回登录</a>
       </text>
@@ -99,77 +99,171 @@
 
 <script>
 import router from '@system.router'
-import fileUtils from '../../helper/fileUtils'
 import storageUtils from '../../helper/storageUtils'
 import SHA256 from '../../helper/secretUtils'
 import utils from '../../helper/utils'
-import notification from '@system.notification'
 
 export default {
-    data: {
-        loginUsername: "",
-        loginPassword: "",
-        registerUsername: "",
-        registerNickname: "",
-        registerPassword: "",
-        registerConfirmPassword: "",
-        isLoginVisible: true,
-    },
+  data: {
+    loginUsername: "",
+    loginPassword: "",
+    registerUsername: "",
+    registerNickname: "",
+    registerPassword: "",
+    registerConfirmPassword: "",
+    isLoginVisible: true,
+  },
 
-    handleLoginVisible() {
-        this.isLoginVisible = !this.isLoginVisible;
-    },
+  onInit() {
+    storageUtils.clearAll();
+  },
 
-    async handleLogin() {
-        console.log("handleLogin")
-        storageUtils.getData("loginUsername")
-        storageUtils.getData("loginPassword")
-        console.log(`username: ${this.loginUsername}\n password: ${this.loginPassword}`)
-        storageUtils.saveData("loginUsername", this.loginUsername)
-        storageUtils.saveData("loginPassword", this.loginPassword)
-        
-        if (!this.loginUsername || !this.loginPassword) {
-            console.log("用户名和密码不能为空")
-            utils.showToast("用户名和密码不能为空")
-            return;
-        }
+  async onShow() {
+    await this.checkAuthAndRedirect();
+  },
 
-        try {
-            const encryptedPassword = await SHA256(this.loginPassword);
-            const response = await fetch('/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    username: this.loginUsername,
-                    password: encryptedPassword
-                })
-            });
+  handleLoginVisible() {
+    this.isLoginVisible = !this.isLoginVisible;
+  },
 
-            const data = await response.json();
-            
-            if (data.code === 200) {
-                storageUtils.saveData("token", data.access_token);
-                storageUtils.saveData("username", this.loginUsername);
-                storageUtils.saveData("nickname", data.user_info.nickname);
+  async handleLogin() {
+    // console.log("[handleLogin] ")
+    // storageUtils.getData("loginUsername")
+    // storageUtils.getData("loginPassword")
+    // console.log(`username: ${this.loginUsername}\n password: ${this.loginPassword}`)
+    storageUtils.saveData("loginUsername", this.loginUsername)
+    storageUtils.saveData("loginPassword", this.loginPassword)
 
-                router.push({
-                    uri: "/pages/Content",
-                    params: {
-                        ___PARAM_PAGE_ANIMATION___: {
-                            openEnter: 'none',
-                            closeEnter: 'slide',
-                            openExit: 'slide',
-                            closeExit: 'slide'
-                        }
-                    }
-                });
-            }
-        } catch (error) {
-            console.error('Error:', error);
-        }
+    if (!this.loginUsername || !this.loginPassword) {
+      console.log("用户名和密码不能为空")
+      utils.showToast("用户名和密码不能为空")
+      return;
     }
+
+    try {
+      const encryptedPassword = SHA256(this.loginPassword);
+
+      const response = await $apis.visionvoice.login({
+        data: {
+          username: this.loginUsername,
+          password: encryptedPassword
+        },
+        header: {
+          "Content-Type": "application/json"
+        }
+      });
+
+      console.log("[login][handleLogin] response:", response);
+      const data = JSON.parse(response.data.data);
+      console.log("[login][handleLogin] data:", data);
+      utils.showToast(data.message);
+
+      if (response.data.code === 200) {
+        storageUtils.saveData("token", data.access_token);
+        storageUtils.saveData("username", this.loginUsername);
+        storageUtils.saveData("nickname", data.user_info.nickname);
+
+        router.replace({
+          uri: "/pages/Content",
+          // uri: "https://pineapplesnowy.cn/",
+          params: {
+            ___PARAM_PAGE_ANIMATION___: {
+              openEnter: 'none',
+              closeEnter: 'slide',
+              openExit: 'slide',
+              closeExit: 'slide'
+            }
+          }
+        });
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  },
+
+  async handleRegister() {
+
+    if (!this.registerNickname || !this.registerUsername || !this.registerPassword || !this.registerConfirmPassword) {
+      utils.showToast("请填写完整信息");
+      return;
+    }
+
+    if (this.registerPassword !== this.registerConfirmPassword) {
+      utils.showToast("两次输入的密码不一致，请重新输入");
+      return;
+    }
+
+    try {
+      const encryptedPassword = SHA256(this.registerPassword);
+
+      const response = await $apis.visionvoice.register({
+        data: {
+          username: this.registerUsername,
+          password: encryptedPassword,
+          nickname: this.registerNickname
+        },
+        header: {
+          'Content-Type': 'application/json'
+        },
+      });
+      console.log("[register][handleRegister] response:", response);
+      const data = JSON.parse(response.data.data);
+      console.log("[register][handleRegister] data:", data);
+      utils.showToast(data.message);
+
+      if (response.data.code === 200) {
+        storageUtils.saveData("token", data.access_token);
+        storageUtils.saveData("username", this.registerUsername);
+        storageUtils.saveData("nickname", data.user_info.nickname);
+
+        router.replace({
+          // uri: "https://pineapplesnowy.cn/",
+          uri: "/pages/Content",
+          params: {
+            ___PARAM_PAGE_ANIMATION___: {
+              openEnter: 'none',
+              closeEnter: 'slide',
+              openExit: 'slide',
+              closeExit: 'slide'
+            }
+          }
+        });
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      utils.showToast("注册失败，请重试");
+    }
+  },
+
+  async checkAuthAndRedirect() {
+    const token = await storageUtils.getData("token");
+    console.log("[login][checkAuth] token:", token);
+    if (!token) {
+      utils.showToast("请先登录");
+      return;
+    }
+    const response = await $apis.visionvoice.verifyToken({
+      header: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    const data = JSON.parse(response.data.data);
+    console.log("[login][checkAuth] data:", data);
+    if (data.valid) {
+      router.replace({
+        uri: "/pages/Content",
+        params: {
+          ___PARAM_PAGE_ANIMATION___: {
+            openEnter: 'none',
+            closeEnter: 'slide',
+            openExit: 'slide',
+            closeExit: 'slide'
+          }
+        }
+      });
+    }
+  }
 }
 </script>
 

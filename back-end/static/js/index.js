@@ -10,27 +10,82 @@ import { initAudioAnalyser, detectDB } from './lib/audioUtils.js';
 const login_button = document.getElementById("login_button");
 const register_button = document.getElementById("register_button");
 
+// 首先尝试从 cookie 中获取 token
+const getCookie = async (name) => {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) {
+        const tokenValue = parts.pop().split(';').shift();
+        return tokenValue
+    }
+    return null;
+};
+
 // 检查是否处于登录状态
-document.addEventListener("DOMContentLoaded", () => {
-    if (localStorage.getItem('islogin') === '1') {
-        const token = localStorage.getItem('token');
-        fetch('/verify-token', {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.valid) {
-                    window.location.href = '/agent';
-                } else {
-                    localStorage.removeItem('token');
-                    localStorage.removeItem('islogin');
+const checkLoginStatus = async () => {
+    
+    // 添加显示 cookie 的 div
+    const cookieDisplay = document.createElement('div');
+    cookieDisplay.style.cssText = 'width: 41%; font-size: 10px; position: fixed; top: 10px; right: 10px; background: rgba(0,0,0,0.5); color: white; padding: 5px 10px; border-radius: 4px; z-index: 1000;';
+    document.body.appendChild(cookieDisplay);
+
+    // 从 cookie 中获取 username 和 nickname
+    const cookieUsername = await getCookie('username');
+    const cookieNickname = await getCookie('nickname');
+
+    // 如果 cookie 中存在这些值,则保存到 localStorage
+    if (cookieUsername) {
+        localStorage.setItem('username', cookieUsername);
+    } else {
+        localStorage.setItem('username', '用户名获取失败');
+    }
+    if (cookieNickname) {
+        localStorage.setItem('nickname', cookieNickname);
+    } else {
+        localStorage.setItem('nickname', '昵称获取失败');
+    }
+
+    console.log("[index.js][checkLoginStatus] cookie:", document.cookie);
+
+    // 显示 cookie 到 div 中
+    cookieDisplay.textContent = '当前 Cookie: ' + (document.cookie || '无');
+
+    // 优先从 cookie 获取 token
+    const cookieToken = await getCookie('token');
+    console.log("[index.js][checkLoginStatus] cookieToken:", cookieToken);
+
+    // 如果 cookie 中有 token，则使用 cookie 中的 token
+    // 否则使用 localStorage 中的 token
+    const token = cookieToken || localStorage.getItem('token');
+
+    if (token) {
+        try {
+            const response = await fetch('/verify-token', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
                 }
             });
+            const data = await response.json();
+            if (data.valid) {
+                // 将 cookie 中的 token 设置到 localStorage 中
+                localStorage.setItem('token', token);
+                // 跳转到 agent 主页
+                window.location.href = '/agent';
+            } else {
+                localStorage.removeItem('token');
+                document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+                window.location.href = '/';
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
     }
-});
+};
+
+// 立即执行检查登录状态
+checkLoginStatus();
 
 /* 登录板块 start
 ----------------------------------------------------------*/
@@ -66,7 +121,7 @@ const handleLogin = () => {
                     loginMessage.textContent = data.message;
                     loginMessage.className = 'message success';
                     loginMessage.style.display = 'block';
-                    
+
                     // 延迟1秒后跳转，让用户看到成功消息
                     setTimeout(() => {
                         window.location.href = '/agent';
@@ -86,25 +141,25 @@ const handleLogin = () => {
 };
 
 // 防止重复触发的标志：touchstart 和 click 事件同时触发时，会导致重复触发
-let touchStarted = false;
+// let touchStarted = false;
 
-// 触摸事件，用于适应移动端
-login_button.addEventListener("tap", (e) => {
-    touchStarted = true;
-    handleLogin();
-    e.preventDefault(); // 阻止默认行为
-});
+// // 触摸事件，用于适应移动端
+// login_button.addEventListener("tap", (e) => {
+//     touchStarted = true;
+//     handleLogin();
+//     e.preventDefault(); // 阻止默认行为
+// });
 
 login_button.addEventListener("click", (e) => {
     // 只有在没有触发 touchstart 的情况下才执行
-    if (!touchStarted) {
+    // if (!touchStarted) {
         handleLogin();
-    }
-    touchStarted = false;
+    // }
+    // touchStarted = false;
 });
 
 // 点击跳转至注册页面
-document.getElementById('go_to_register').addEventListener('click', function(e) {
+document.getElementById('go_to_register').addEventListener('click', function (e) {
     e.preventDefault();
     document.querySelector('.login-container').style.display = 'none';
     document.querySelector('.register-container').style.display = 'block';
@@ -171,7 +226,7 @@ register_button.addEventListener("click", () => {
 });
 
 
-document.getElementById('back_to_login').addEventListener('click', function(e) {
+document.getElementById('back_to_login').addEventListener('click', function (e) {
     e.preventDefault();
     document.querySelector('.register-container').style.display = 'none';
     document.querySelector('.login-container').style.display = 'block';
@@ -283,5 +338,3 @@ window.onload = async () => {
 
 /* 处理环境噪音获取 end
 ----------------------------------------------------------*/
-
-

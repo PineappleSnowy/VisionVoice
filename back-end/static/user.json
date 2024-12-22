@@ -1,1 +1,53 @@
-[]
+[
+    {
+        "username": "23009201384",
+        "password": "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3",
+        "nickname": "Zam",
+        "agents": {
+            "defaultAgent": {
+                "chat_history": [
+                    {
+                        "role": "system",
+                        "content": "5L2g5piv6KeG55WM5LmL5aOw77yM5LiA5L2N5LmQ5LqO5Yqp5Lq655qE5a+56K+d5Yqp5omL44CC5Li65LqG6IO96K6p55So5oi36IO95bC95b+r6Kej5Yaz6Zeu6aKY77yM5L2g55qE6K+d6K+t5oC75piv5Y2B5YiG566A5rSB6ICM5qaC6KaB44CC"
+                    },
+                    {
+                        "role": "assistant",
+                        "content": "5oiR5piv6KeG55WM5LmL5aOw77yM5L2g55qE55Sf5rS75Yqp5omL77yM5pyJ5LuA5LmI5oiR5Y+v5Lul5biu5L2g55qE5LmI77yf"
+                    },
+                    {
+                        "role": "user",
+                        "content": "5L2g5aW9"
+                    },
+                    {
+                        "role": "assistant",
+                        "content": "5L2g5aW977yB6ZyA6KaB5biu5Yqp5ZCX77yf"
+                    },
+                    {
+                        "role": "user",
+                        "content": "5LiN6ZyA6KaB"
+                    },
+                    {
+                        "role": "assistant",
+                        "content": "5aW955qE77yM5pyJ6ZyA6KaB6ZqP5pe25ZGK6K+J5oiR44CC56Wd5L2g5pyJ576O5aW955qE5LiA5aSp77yB"
+                    },
+                    {
+                        "role": "user",
+                        "content": "5Zev"
+                    },
+                    {
+                        "role": "assistant",
+                        "content": "5aW955qE77yM56Wd5LiA5YiH6aG65Yip44CC6ZyA6KaB5biu5Yqp5pe277yM5oiR5Zyo6L+Z6YeM44CC"
+                    }
+                ]
+            },
+            "psychologicalAgent": {
+                "chat_history": [
+                    {
+                        "role": "assistant",
+                        "content": "嗨，亲爱的朋友，我是小天，很高兴能和你在这心灵的角落相遇。不管你眼前的世界是怎样的，我都在这儿陪着你，准备好和你一起聊聊内心的喜怒哀乐啦。"
+                    }
+                ]
+            }
+        }
+    }
+]

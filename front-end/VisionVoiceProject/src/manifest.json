@@ -26,6 +26,9 @@
     },
     {
       "name": "system.file"
+    },
+    {
+      "name": "system.fetch"
     }
   ],
   "permissions": [
@@ -37,7 +40,7 @@
     "logLevel": "debug"
   },
   "router": {
-    "entry": "pages/Login",
+    "entry": "pages/Content",
     "pages": {
       "pages/Content": {
         "component": "index"
