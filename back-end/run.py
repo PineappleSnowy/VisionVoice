@@ -43,7 +43,8 @@ from agent_files.vision_seek.detect import detector
 # ----- 加载全局应用 -----
 app = Flask(__name__)
 app.secret_key = "s96cae35ce8a9b0244178bf28e4966c2ce1b83"
-socketio = SocketIO(app, async_mode="threading", ping_timeout=600, ping_interval=300)  # 设置较大的 pingTimeout 和 pingInterval
+socketio = SocketIO(app, async_mode="threading", ping_timeout=600,
+                    ping_interval=300)  # 设置较大的 pingTimeout 和 pingInterval
 JWTManager(app)
 CORS(app)
 # 设置 JWT 密钥
@@ -59,6 +60,11 @@ app.config["JWT_SECRET_KEY"] = "s96cae35ce8a9b0244178bf28e4966c2ce1b83"
 }
 """
 USER_VAR = dict()
+
+# 处理user.json不存在的情况
+if not os.path.exists('./static/user.json'):
+    with open('./static/user.json', 'w') as f:
+        f.write('[]')
 
 # ----- 路由 -----
 
@@ -82,7 +88,8 @@ def before_request():
         except Exception as e:
             return (
                 jsonify(
-                    {"message": "Token has expired!", "code": 401, "error": str(e)}
+                    {"message": "Token has expired!",
+                        "code": 401, "error": str(e)}
                 ),
                 401,
             )
@@ -210,6 +217,7 @@ def contact():
     """用户须知路由"""
     return render_template("contact.html")
 
+
 @app.route("/user_agreement", methods=["GET"])
 def user_agreement():
     """用户须知路由"""
@@ -237,7 +245,8 @@ def get_images():
     for filename in os.listdir(user_image_folder):
         if filename.endswith((".jpg")):
             name, ext = os.path.splitext(filename)
-            images.append({"name": name, "url": f"/image/{curr_user}/{filename}"})
+            images.append(
+                {"name": name, "url": f"/image/{curr_user}/{filename}"})
     return jsonify(images)
 
 
@@ -268,7 +277,8 @@ def rename_image():
         return jsonify({"success": False, "error": "Old file not found"}), 400
 
     old_path = os.path.join(user_image_folder, old_file)
-    new_path = os.path.join(user_image_folder, new_name + os.path.splitext(old_file)[1])
+    new_path = os.path.join(user_image_folder, new_name +
+                            os.path.splitext(old_file)[1])
 
     try:
         os.rename(old_path, new_path)
@@ -334,7 +344,8 @@ def delete_image():
     try:
         os.remove(file_path)
         return (
-            jsonify({"success": True, "url": f"/image/{curr_user}/{file_to_delete}"}),
+            jsonify(
+                {"success": True, "url": f"/image/{curr_user}/{file_to_delete}"}),
             200,
         )
     except Exception as e:
@@ -466,7 +477,8 @@ def encode_message_content(message):
     """对消息内容进行 Base64 编码"""
     if isinstance(message, dict) and "content" in message:
         content = message["content"]
-        encoded_content = base64.b64encode(content.encode("utf-8")).decode("utf-8")
+        encoded_content = base64.b64encode(
+            content.encode("utf-8")).decode("utf-8")
         message["content"] = encoded_content
     return message
 
@@ -549,12 +561,14 @@ def register():
             f.truncate()
 
         # 注册成功后直接生成 token
-        access_token = create_access_token(identity=username, expires_delta=False)
+        access_token = create_access_token(
+            identity=username, expires_delta=False)
         session["username"] = username
         session["nickname"] = nickname
 
         return (
-            jsonify({"message": "注册成功", "code": 200, "access_token": access_token}),
+            jsonify({"message": "注册成功", "code": 200,
+                    "access_token": access_token}),
             200,
         )
 
@@ -672,7 +686,8 @@ def get_chat_history():
         return jsonify({"error": str(e)}), 401
 
     # 对聊天记录进行解码
-    chat_history = [decode_message_content(msg.copy()) for msg in encoded_chat_history]
+    chat_history = [decode_message_content(
+        msg.copy()) for msg in encoded_chat_history]
 
     return jsonify(chat_history)
 
@@ -691,7 +706,8 @@ def init_chat_history(current_user, agent_name, messages):
                 encoded_chat_history = user["agents"][agent_name]["chat_history"]
                 break
     # 对聊天记录进行解码
-    messages = [decode_message_content(msg.copy()) for msg in encoded_chat_history]
+    messages = [decode_message_content(msg.copy())
+                for msg in encoded_chat_history]
 
     return messages
 
@@ -725,7 +741,7 @@ def build_response(current_user, agent_name, user_talk, video_open, multi_image_
         if os.path.exists(user_image_path):
             with open(user_image_path, "rb") as img_file:
                 img_base = base64.b64encode(img_file.read()).decode("utf-8")
-            
+
             dst_messages.append(
                 {
                     "role": "user",
@@ -737,7 +753,8 @@ def build_response(current_user, agent_name, user_talk, video_open, multi_image_
             )
         else:
             dst_messages.append(
-                {"role": "user", "content": [{"type": "text", "text": user_talk}]}
+                {"role": "user", "content": [
+                    {"type": "text", "text": user_talk}]}
             )
             print(f"未找到图片{user_image_path}！")
         # 保存和多模态大模型的聊天
@@ -757,7 +774,8 @@ def build_response(current_user, agent_name, user_talk, video_open, multi_image_
             image_path_list = get_image_filenames(multi_image_dir)
         else:
             image_path_list = []
-        model_name = "glm-4v-flash" if len(image_path_list) == 1 else "glm-4v-plus"
+        model_name = "glm-4v-flash" if len(
+            image_path_list) == 1 else "glm-4v-plus"
 
         messages = init_chat_history(current_user, agent_name, messages)
         dst_messages = message_format_tran(messages[-MAX_HISTORY:])
@@ -767,7 +785,8 @@ def build_response(current_user, agent_name, user_talk, video_open, multi_image_
             img_path = os.path.join(multi_image_dir, image_file)
             with open(img_path, "rb") as f:
                 img_base = base64.b64encode(f.read()).decode("utf-8")
-            content.append({"type": "image_url", "image_url": {"url": img_base}})
+            content.append(
+                {"type": "image_url", "image_url": {"url": img_base}})
         delete_file_from_dir(multi_image_dir)  # 及时清空图片缓存
 
         content.append({"type": "text", "text": user_talk})
@@ -821,8 +840,10 @@ def build_response(current_user, agent_name, user_talk, video_open, multi_image_
 
     return responses, messages
 
+
 def error_generator(text):
     yield text
+
 
 @app.route("/agent/chat_stream")
 def agent_chat_stream():
@@ -888,7 +909,7 @@ def upload_image():
     """
     接收前端发来的图片的路由
     """
-    try: 
+    try:
         data = request.get_json()
         if "image" not in data or not data["image"]:
             return jsonify({"message": "No image data in the request"}), 400
@@ -904,7 +925,8 @@ def upload_image():
 
         # 获取当前是否是多图片对话
         if "multi_image_index" in data:
-            multi_image_dir = os.path.join(user_cache_dir, MULTI_IMAGE_DIRECTORY)
+            multi_image_dir = os.path.join(
+                user_cache_dir, MULTI_IMAGE_DIRECTORY)
             if not os.path.exists(multi_image_dir):
                 os.makedirs(multi_image_dir)
             print(data["multi_image_index"])
@@ -995,7 +1017,8 @@ def agent_upload_audio():
     file.save(audio_file_path)
 
     # 修改采样率
-    resampled_audio_data = change_sample_rate(audio_file_path, 16000, ori_sample_rate)
+    resampled_audio_data = change_sample_rate(
+        audio_file_path, 16000, ori_sample_rate)
 
     # 语音识别
     rec_result = speech_rec(resampled_audio_data)
@@ -1003,7 +1026,8 @@ def agent_upload_audio():
 
     # 音频识别结果发送到前端
     socketio.emit(
-        "agent_speech_recognition_finished", {"user": user, "rec_result": rec_result}
+        "agent_speech_recognition_finished", {
+            "user": user, "rec_result": rec_result}
     )
 
     return jsonify({"message": "File uploaded successfully and processed"}), 200
@@ -1052,11 +1076,11 @@ def agent_stream_audio(current_token: str):
                 file_path = os.path.join(
                     USER_IMAGE_FOLDER,
                     user,
-                    current_token[current_token.find(">") + 1 :] + ".jpg",
+                    current_token[current_token.find(">") + 1:] + ".jpg",
                 )
 
                 audio_chunk = agent_audio_generate(
-                    "开始寻找" + current_token[current_token.find(">") + 1 :]
+                    "开始寻找" + current_token[current_token.find(">") + 1:]
                 )
                 socketio.emit(
                     "agent_play_audio_chunk",
@@ -1097,7 +1121,8 @@ def agent_stream_audio(current_token: str):
 
         # 如果收到结束标记
         if "<END>" in current_token:
-            logging.info("run.py", "agent_stream_audio", "大模型响应结束", color="red")
+            logging.info("run.py", "agent_stream_audio",
+                         "大模型响应结束", color="red")
 
             # 处理缓冲区中剩余的内容
             if USER_VAR[user]["sentence_buffer"]:
@@ -1121,11 +1146,12 @@ def agent_stream_audio(current_token: str):
 
         # 如果找到断句符号，则生成完整句子
         complete_sentence = (
-            USER_VAR[user]["sentence_buffer"] + current_token[: pause_index + 1]
+            USER_VAR[user]["sentence_buffer"] +
+            current_token[: pause_index + 1]
         )
 
         # 更新缓冲区
-        USER_VAR[user]["sentence_buffer"] = current_token[pause_index + 1 :]
+        USER_VAR[user]["sentence_buffer"] = current_token[pause_index + 1:]
 
         # 将音频生成任务加入队列
         USER_VAR[user]["task_queue"].add_task_sync(
