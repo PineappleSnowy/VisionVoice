@@ -446,8 +446,8 @@ window.onload = async () => {
     }
 
     // 检查 URL 中的查询参数
-    const urlParams = new URLSearchParams(window.location.search);
-    const camera = urlParams.get('camera');
+    const urlParams1 = new URLSearchParams(window.location.search);
+    const camera = urlParams1.get('camera');
 
     // 如果查询参数中包含 camera=on，则打开摄像头
     if (camera === 'on') {
@@ -962,4 +962,31 @@ window.onload = async () => {
         speech_rec_ready = true;
         captureAndSendFrame();
     });
+
+    // 检查 URL 中的查询参数
+    const urlParams = new URLSearchParams(window.location.search);
+    const avoidObstacle = urlParams.get('avoidObstacle');
+    const findItem = urlParams.get('findItem');
+    const envDescription = urlParams.get('envDescription');
+    const currentLocation = urlParams.get('currentLocation');
+
+    // 如果查询参数中包含 avoidObstacle=true，则触发避障按钮点击事件
+    if (avoidObstacle === 'true') {
+        document.querySelector('.optionButton.avoidObstacle').click();
+    }
+    
+    // 如果查询参数中包含 findItem=true，则触发寻物按钮点击事件
+    else if (findItem === 'true') {
+        document.querySelector('.optionButton.findItem').click();
+    }
+
+    // 如果查询参数中包含 envDescription=true，则触发环境描述按钮点击事件
+    else if (envDescription === 'true') {
+        document.querySelector('.optionButton.environmentDescription').click();
+    }
+
+    // 如果查询参数中包含 currentLocation=true，则触发获取位置按钮点击事件
+    else if (currentLocation === 'true') {
+        document.querySelector('.optionButton.currentLocation').click();
+    }
 }

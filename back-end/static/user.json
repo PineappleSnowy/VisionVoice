@@ -8,11 +8,27 @@
                 "chat_history": [
                     {
                         "role": "system",
-                        "content": "你是视界之声，一位乐于助人的对话助手。为了能让用户能尽快解决问题，你的话语总是十分简洁而概要。"
+                        "content": "5L2g5piv6KeG55WM5LmL5aOw77yM5LiA5L2N5LmQ5LqO5Yqp5Lq655qE5a+56K+d5Yqp5omL44CC5Li65LqG6IO96K6p55So5oi36IO95bC95b+r6Kej5Yaz6Zeu6aKY77yM5L2g55qE6K+d6K+t5oC75piv5Y2B5YiG566A5rSB6ICM5qaC6KaB44CC"
                     },
                     {
                         "role": "assistant",
-                        "content": "我是视界之声，你的生活助手，有什么我可以帮你的么？"
+                        "content": "5oiR5piv6KeG55WM5LmL5aOw77yM5L2g55qE55Sf5rS75Yqp5omL77yM5pyJ5LuA5LmI5oiR5Y+v5Lul5biu5L2g55qE5LmI77yf"
+                    },
+                    {
+                        "role": "user",
+                        "content": "6K+3566A5rSB5Zyw5o+P6L+w546v5aKD"
+                    },
+                    {
+                        "role": "assistant",
+                        "content": "5Zu+54mH5bGV56S65LqG5LiA5Liq5a6k5YaF5Zy65pmv77yM6IOM5pmv5piv5LiA6Z2i5aKZ77yM5LiK6Z2i5oyC552A5LiJ5bmF5Y2w5pyJ6KW/5a6J55S15a2Q56eR5oqA5aSn5a2m77yIWGlkaWFuIFVuaXZlcnNpdHnvvInmoIflv5fnmoTnmb3oibLnqpfluJjmiJbluLfluZXjgILlnKjliY3mma/kuK3vvIzmnInkuIDkvY3miLTnnYDnnLzplZznmoTkurrlnZDlnKjmpIXlrZDkuIrvvIznnIvotbfmnaXlg4/mmK/lnKjkuJPms6jlnLDnnIvnnYDmiYvkuK3nmoTkuJzopb/miJbogIXmgJ3ogIPmn5DkuKrpl67popjjgII="
+                    },
+                    {
+                        "role": "user",
+                        "content": "6K+3566A5rSB5Zyw5o+P6L+w546v5aKD"
+                    },
+                    {
+                        "role": "assistant",
+                        "content": "5Zu+5Lit5piv5LiA5Liq5oi/6Ze05YaF6YOo77yM5aKZ5LiK5oyC5pyJ5LiJ5bmF5biY5a2Q77yM5biY5a2Q5LiK5Y2w552A6KW/5a6J55S15a2Q56eR5oqA5aSn5a2m55qE5qCh5b695ZKM6YOo5YiG5paH5a2X44CC5biY5a2Q5piv55m96Imy55qE77yM5Lit6Ze05pyJ5LiA5qC55p+x5a2Q44CC5oi/6Ze06YeM6L+Y5pyJ5LiA5Liq5Lq677yM5LuW5oi0552A55y86ZWc77yM56m/552A6buR6Imy6L+e5bi96KGr77yM55uu5YWJ5pyd5ZCR5bem5L6n44CC"
                     }
                 ]
             },

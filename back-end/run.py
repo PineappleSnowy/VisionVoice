@@ -162,10 +162,10 @@ def create():
     return render_template("create.html")
 
 
-@app.route("/square", methods=["GET"])
-def square():
+@app.route("/skills", methods=["GET"])
+def skills():
     """广场路由"""
-    return render_template("square.html")
+    return render_template("skills.html")
 
 
 @app.route("/mine", methods=["GET"])
@@ -1125,7 +1125,6 @@ def run_server():
         socketio.run(
             app,
             port=80,
-            host="0.0.0.0",
             allow_unsafe_werkzeug=True,
             debug=True,  # 调试模式（开发环境）
         )

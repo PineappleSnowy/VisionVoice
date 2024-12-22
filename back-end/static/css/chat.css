@@ -90,7 +90,7 @@ body {
 }
 
 .button.video {
-    background-image: url('../images/camera.png');
+    background-image: url('../images/video.png');
 }
 
 .button:hover {
