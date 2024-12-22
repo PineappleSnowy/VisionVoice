@@ -192,6 +192,11 @@ def photo_manage():
     return render_template("photo_manage.html")
 
 
+@app.route("/contact", methods=["GET"])
+def contact():
+    """用户须知路由"""
+    return render_template("contact.html")
+
 @app.route("/user_agreement", methods=["GET"])
 def user_agreement():
     """用户须知路由"""
