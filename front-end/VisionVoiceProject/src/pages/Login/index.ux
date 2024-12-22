@@ -161,22 +161,23 @@ export default {
       utils.showToast(data.message);
 
       if (response.data.code === 200) {
-        storageUtils.saveData("token", data.access_token);
-        storageUtils.saveData("username", this.loginUsername);
-        storageUtils.saveData("nickname", data.user_info.nickname);
+        // storageUtils.saveData("token", data.access_token);
+        // storageUtils.saveData("username", this.loginUsername);
+        // storageUtils.saveData("nickname", data.user_info.nickname);
+        this.gotoVisionVoice(data.access_token, this.loginUsername, data.user_info.nickname);
 
-        router.replace({
-          uri: "/pages/Content",
-          // uri: "https://pineapplesnowy.cn/",
-          params: {
-            ___PARAM_PAGE_ANIMATION___: {
-              openEnter: 'none',
-              closeEnter: 'slide',
-              openExit: 'slide',
-              closeExit: 'slide'
-            }
-          }
-        });
+        // router.replace({
+        //   uri: "/pages/Content",
+        //   // uri: "https://pineapplesnowy.cn/",
+        //   params: {
+        //     ___PARAM_PAGE_ANIMATION___: {
+        //       openEnter: 'none',
+        //       closeEnter: 'slide',
+        //       openExit: 'slide',
+        //       closeExit: 'slide'
+        //     }
+        //   }
+        // });
       }
     } catch (error) {
       console.error('Error:', error);
@@ -214,22 +215,23 @@ export default {
       utils.showToast(data.message);
 
       if (response.data.code === 200) {
-        storageUtils.saveData("token", data.access_token);
-        storageUtils.saveData("username", this.registerUsername);
-        storageUtils.saveData("nickname", data.user_info.nickname);
+        // storageUtils.saveData("token", data.access_token);
+        // storageUtils.saveData("username", this.registerUsername);
+        // storageUtils.saveData("nickname", data.user_info.nickname);
+        this.gotoVisionVoice(data.access_token, this.registerUsername, data.user_info.nickname);
 
-        router.replace({
-          // uri: "https://pineapplesnowy.cn/",
-          uri: "/pages/Content",
-          params: {
-            ___PARAM_PAGE_ANIMATION___: {
-              openEnter: 'none',
-              closeEnter: 'slide',
-              openExit: 'slide',
-              closeExit: 'slide'
-            }
-          }
-        });
+        // router.replace({
+        //   // uri: "https://pineapplesnowy.cn/",
+        //   uri: "/pages/Content",
+        //   params: {
+        //     ___PARAM_PAGE_ANIMATION___: {
+        //       openEnter: 'none',
+        //       closeEnter: 'slide',
+        //       openExit: 'slide',
+        //       closeExit: 'slide'
+        //     }
+        //   }
+        // });
       }
     } catch (error) {
       console.error('Error:', error);
@@ -237,8 +239,22 @@ export default {
     }
   },
 
+  async gotoVisionVoice(token, username, nickname) {
+    // const token = await storageUtils.getData("token");
+    // const username = await storageUtils.getData("username");
+    // const nickname = await storageUtils.getData("nickname");
+    if (token && username && nickname) {
+      webviewUtils.setCookie("token", token);
+      webviewUtils.setCookie("username", username);
+      webviewUtils.setCookie("nickname", nickname);
+    }
+    webviewUtils.loadUrl($server_url)
+  },
+
   async checkAuthAndRedirect() {
     const token = await storageUtils.getData("token");
+    const username = await storageUtils.getData("username");
+    const nickname = await storageUtils.getData("nickname");
     console.log("[login][checkAuth] token:", token);
     if (!token) {
       utils.showToast("请先登录");
@@ -253,17 +269,7 @@ export default {
     const data = JSON.parse(response.data.data);
     console.log("[login][checkAuth] data:", data);
     if (data.valid) {
-      router.replace({
-        uri: "/pages/Content",
-        params: {
-          ___PARAM_PAGE_ANIMATION___: {
-            openEnter: 'none',
-            closeEnter: 'slide',
-            openExit: 'slide',
-            closeExit: 'slide'
-          }
-        }
-      });
+      this.gotoVisionVoice(token, username, nickname);
     }
   }
 }

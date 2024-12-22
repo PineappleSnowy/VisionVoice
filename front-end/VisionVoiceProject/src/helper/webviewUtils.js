@@ -40,9 +40,11 @@ async function deleteCookie(name) {
 
 // 加载网页
 function loadUrl(url) {
+    console.info("url", url)
   webview.loadUrl({
     url: url,
     allowthirdpartycookies: true,
+    mediaAccess: true
   })
 }
 

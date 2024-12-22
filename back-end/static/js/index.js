@@ -25,9 +25,9 @@ const getCookie = async (name) => {
 const checkLoginStatus = async () => {
     
     // 添加显示 cookie 的 div
-    const cookieDisplay = document.createElement('div');
-    cookieDisplay.style.cssText = 'width: 41%; font-size: 10px; position: fixed; top: 10px; right: 10px; background: rgba(0,0,0,0.5); color: white; padding: 5px 10px; border-radius: 4px; z-index: 1000;';
-    document.body.appendChild(cookieDisplay);
+    // const cookieDisplay = document.createElement('div');
+    // cookieDisplay.style.cssText = 'width: 41%; font-size: 10px; position: fixed; top: 10px; right: 10px; background: rgba(0,0,0,0.5); color: white; padding: 5px 10px; border-radius: 4px; z-index: 1000;';
+    // document.body.appendChild(cookieDisplay);
 
     // 从 cookie 中获取 username 和 nickname
     const cookieUsername = await getCookie('username');
@@ -48,7 +48,7 @@ const checkLoginStatus = async () => {
     console.log("[index.js][checkLoginStatus] cookie:", document.cookie);
 
     // 显示 cookie 到 div 中
-    cookieDisplay.textContent = '当前 Cookie: ' + (document.cookie || '无');
+    // cookieDisplay.textContent = '当前 Cookie: ' + (document.cookie || '无');
 
     // 优先从 cookie 获取 token
     const cookieToken = await getCookie('token');
@@ -84,8 +84,6 @@ const checkLoginStatus = async () => {
     }
 };
 
-// 立即执行检查登录状态
-checkLoginStatus();
 
 /* 登录板块 start
 ----------------------------------------------------------*/
@@ -323,17 +321,37 @@ async function calibrateNoiseLevel(analyser, dataArray, duration = 3000) {
 }
 
 window.onload = async () => {
-    // 获取音频流
-    let audioStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-    console.log("[phone.js][window.onload] 创建 getUserMedia 音频流成功...");
+    try {
+        // 检查是否支持 getUserMedia
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            throw new Error('浏览器不支持 getUserMedia API');
+        }
 
-    // 初始化音频分析器
-    const { analyser, dataArray } = await initAudioAnalyser(audioStream);
+        // 获取音频流
+        let audioStream = await navigator.mediaDevices.getUserMedia({ 
+            audio: true, 
+            video: false 
+        });
+        console.log("[phone.js][window.onload] 创建 getUserMedia 音频流成功...");
 
-    // 在开始录音前进行环境噪音检测
-    SILENCE_THRESHOLD = await calibrateNoiseLevel(analyser, dataArray);
-    console.log('[phone.js][window.onload] 环境噪音校准完成, 静音阈值:', SILENCE_THRESHOLD);
-    localStorage.setItem('SILENCE_THRESHOLD', SILENCE_THRESHOLD);
+        // 初始化音频分析器
+        const { analyser, dataArray } = await initAudioAnalyser(audioStream);
+
+        // 在开始录音前进行环境噪音检测
+        SILENCE_THRESHOLD = await calibrateNoiseLevel(analyser, dataArray);
+        console.log('[phone.js][window.onload] 环境噪音校准完成, 静音阈值:', SILENCE_THRESHOLD);
+        localStorage.setItem('SILENCE_THRESHOLD', SILENCE_THRESHOLD);
+
+        // 立即执行检查登录状态
+        checkLoginStatus();
+    } catch (error) {
+        console.error("[phone.js][window.onload] 获取音频流失败:", error);
+        // 可以显示一个友好的错误提示
+        alert("无法访问麦克风，请确保已授予相关权限");
+        
+        // 继续执行登录状态检查
+        checkLoginStatus();
+    }
 }
 
 /* 处理环境噪音获取 end
