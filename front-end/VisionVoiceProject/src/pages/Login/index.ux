@@ -117,12 +117,12 @@ export default {
     isLoginVisible: true,
   },
 
-  onInit() {
-    storageUtils.clearAll();
-    webviewUtils.deleteCookie("token");
-    webviewUtils.deleteCookie("username");
-    webviewUtils.deleteCookie("nickname");
-  },
+  // onInit() {
+    // storageUtils.clearAll();
+  //   webviewUtils.deleteCookie("token");
+  //   webviewUtils.deleteCookie("username");
+  //   webviewUtils.deleteCookie("nickname");
+  // },
 
   async onShow() {
     await this.checkAuthAndRedirect();
@@ -161,9 +161,9 @@ export default {
       utils.showToast(data.message);
 
       if (response.data.code === 200) {
-        // storageUtils.saveData("token", data.access_token);
-        // storageUtils.saveData("username", this.loginUsername);
-        // storageUtils.saveData("nickname", data.user_info.nickname);
+        storageUtils.saveData("token", data.access_token);
+        storageUtils.saveData("username", this.loginUsername);
+        storageUtils.saveData("nickname", data.user_info.nickname);
         this.gotoVisionVoice(data.access_token, this.loginUsername, data.user_info.nickname);
 
         // router.replace({
@@ -215,10 +215,10 @@ export default {
       utils.showToast(data.message);
 
       if (response.data.code === 200) {
-        // storageUtils.saveData("token", data.access_token);
-        // storageUtils.saveData("username", this.registerUsername);
-        // storageUtils.saveData("nickname", data.user_info.nickname);
-        this.gotoVisionVoice(data.access_token, this.registerUsername, data.user_info.nickname);
+        storageUtils.saveData("token", data.access_token);
+        storageUtils.saveData("username", this.registerUsername);
+        storageUtils.saveData("nickname", data.user_info.nickname);
+        this.gotoVisionVoice(data.access_token, this.registerUsername, this.registerNickname);
 
         // router.replace({
         //   // uri: "https://pineapplesnowy.cn/",

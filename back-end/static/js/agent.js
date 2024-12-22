@@ -835,6 +835,8 @@ window.onload = async () => {
             // 可以显示一个友好的错误提示
             alert("无法访问麦克风，请确保已授予相关权限");
         }
+    } else {
+        avgDbDisplay.style.display = 'none';
     }
 }
 
