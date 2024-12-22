@@ -40,7 +40,7 @@
 </template>
 
 <script>
-import webview from '@system.webview'
+import webviewUtils from '../../helper/webviewUtils'
 import storageUtils from '../../helper/storageUtils'
 
 export default {
@@ -65,53 +65,15 @@ export default {
     const token = await storageUtils.getData("token");
     const username = await storageUtils.getData("username");
     const nickname = await storageUtils.getData("nickname");
-
-    webview.setCookie({ 
-      domain: $server_url,
-      name: 'token',
-      value: 'token',
-      maxAge: 3000,
-      path: '/',
-      success: function() {
-        console.log('Cookie set success: token=', token)
-      },
-      fail: function(e) {
-        console.log('Cookie set fail: ', e)
-      }
-    })
-    webview.setCookie({ 
-      domain: $server_url,
-      name: 'username',
-      value: username,
-      maxAge: 3000,
-      path: '/',
-      success: function() {
-        console.log('Cookie set success: username=', username)
-      },
-      fail: function(e) {
-        console.log('Cookie set fail: ', e)
-      }
-    })
-    webview.setCookie({ 
-      domain: $server_url,
-      name: 'nickname',
-      value: nickname,
-      maxAge: 3000,
-      path: '/',
-      success: function() {
-        console.log('Cookie set success: nickname=', nickname)
-      },
-      fail: function(e) {
-        console.log('Cookie set fail: ', e)
-      }
-    })
+    if (token && username && nickname) {
+      webviewUtils.setCookie("token", token);
+      webviewUtils.setCookie("username", username);
+      webviewUtils.setCookie("nickname", nickname);
+    }
   },
 
   gotoVisionVoice() {
-    webview.loadUrl({
-      url: $server_url,
-      allowthirdpartycookies: true
-    })
+    webviewUtils.loadUrl($server_url)
   },
 }
 </script>

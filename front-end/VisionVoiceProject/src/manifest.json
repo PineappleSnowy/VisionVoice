@@ -40,7 +40,7 @@
     "logLevel": "debug"
   },
   "router": {
-    "entry": "pages/Content",
+    "entry": "pages/Login",
     "pages": {
       "pages/Content": {
         "component": "index"

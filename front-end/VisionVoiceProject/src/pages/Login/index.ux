@@ -89,7 +89,9 @@
       </div>
 
       <div class="message" id="register_message" style="display: none"></div>
-      <text id="register_button" aria-label="注册" @click="handleRegister">注册</text>
+      <text id="register_button" aria-label="注册" @click="handleRegister"
+        >注册</text
+      >
       <text class="login-link">
         已有账号？<a id="back_to_login" @click="handleLoginVisible">返回登录</a>
       </text>
@@ -102,6 +104,7 @@ import router from '@system.router'
 import storageUtils from '../../helper/storageUtils'
 import SHA256 from '../../helper/secretUtils'
 import utils from '../../helper/utils'
+import webviewUtils from '../../helper/webviewUtils'
 
 export default {
   data: {
@@ -116,6 +119,9 @@ export default {
 
   onInit() {
     storageUtils.clearAll();
+    webviewUtils.deleteCookie("token");
+    webviewUtils.deleteCookie("username");
+    webviewUtils.deleteCookie("nickname");
   },
 
   async onShow() {
@@ -127,10 +133,6 @@ export default {
   },
 
   async handleLogin() {
-    // console.log("[handleLogin] ")
-    // storageUtils.getData("loginUsername")
-    // storageUtils.getData("loginPassword")
-    // console.log(`username: ${this.loginUsername}\n password: ${this.loginPassword}`)
     storageUtils.saveData("loginUsername", this.loginUsername)
     storageUtils.saveData("loginPassword", this.loginPassword)
 
