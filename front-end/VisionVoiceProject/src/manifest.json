@@ -20,6 +20,15 @@
     },
     {
       "name": "system.webview"
+    },
+    {
+      "name": "system.storage"
+    },
+    {
+      "name": "system.file"
+    },
+    {
+      "name": "system.fetch"
     }
   ],
   "permissions": [
@@ -31,9 +40,12 @@
     "logLevel": "debug"
   },
   "router": {
-    "entry": "pages/Home",
+    "entry": "pages/Login",
     "pages": {
-      "pages/Home": {
+      "pages/Content": {
+        "component": "index"
+      },
+      "pages/Login": {
         "component": "index"
       }
     },
@@ -59,9 +71,14 @@
     "titleBarBackgroundColor": "#f2f2f2",
     "titleBarTextColor": "#414141",
     "pages": {
-      "pages/Home": {
+      "pages/Content": {
         "titleBarText": "VisionVoice 快应用"
+      },
+      "pages/Login": {
+        "titleBarText": "VisionVoice 登录页"
       }
     }
-  }
+  },
+  "textSizeAdjust": "auto",
+  "designWidth": "device-width"
 }

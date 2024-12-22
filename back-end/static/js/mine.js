@@ -2,6 +2,11 @@ function logout() {
     // 清除 localStorage
     localStorage.clear();
     
+    // 清除 cookie，设置过期时间为过去时间并指定路径
+    document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; tokenx=;';
+    document.cookie = 'username=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; tokenx=;';
+    document.cookie = 'nickname=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; tokenx=;';
+    
     // 重定向到首页
     window.location.href = '/';
 }
@@ -17,4 +22,4 @@ function getUserInfo() {
     document.querySelector('.user-account').textContent = `账号: ${username}`;
 }
 
-window.onload = getUserInfo;
+getUserInfo();

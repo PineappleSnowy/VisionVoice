@@ -5,11 +5,14 @@
 
 const $utils = require('./helper/utils').default
 const $apis = require('./helper/apis').default
+//const $server_url = 'http://192.168.31.61/'
+const $server_url = 'https://pineapplesnowy.cn/'
 
 /* @desc: 注入方法至全局 global,以便页面调用 */
 const hook2global = global.__proto__ || global
 hook2global.$utils = $utils
 hook2global.$apis = $apis
+hook2global.$server_url = $server_url
 
 export default {
   onCreate() {}
