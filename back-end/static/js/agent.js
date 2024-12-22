@@ -86,7 +86,7 @@ document.getElementById('send-button').addEventListener('click', function () {
     message = message.replace(/(\r\n|\n|\r)/gm, '');
     if (message || uploadedImages.length > 0) {
         audioPlayer.pause();
-        audioDict = {};
+        audioQueue = [];
         audioIndex = 0;
         pauseDiv.style.backgroundImage = `url('${'./static/images/pause_inactive.png'}')`;
         addMessage(message);
@@ -798,30 +798,33 @@ async function calibrateNoiseLevel(analyser, dataArray, duration = 1000) {
 }
 
 window.onload = async () => {
-    try {
-        // 检查是否支持 getUserMedia
-        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-            throw new Error('浏览器不支持 getUserMedia API');
+    const localSilenceThreshold = localStorage.getItem('SILENCE_THRESHOLD');
+    if (!localSilenceThreshold) {
+        try {
+            // 检查是否支持 getUserMedia
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                throw new Error('浏览器不支持 getUserMedia API');
+            }
+
+            // 获取音频流
+            let audioStream = await navigator.mediaDevices.getUserMedia({
+                audio: true,
+                video: false
+            });
+            console.log("[phone.js][window.onload] 创建 getUserMedia 音频流成功...");
+
+            // 初始化音频分析器
+            const { analyser, dataArray } = await initAudioAnalyser(audioStream);
+
+            // 在开始录音前进行环境噪音检测
+            SILENCE_THRESHOLD = await calibrateNoiseLevel(analyser, dataArray);
+            console.log('[phone.js][window.onload] 环境噪音校准完成, 静音阈值:', SILENCE_THRESHOLD);
+            localStorage.setItem('SILENCE_THRESHOLD', SILENCE_THRESHOLD);
+        } catch (error) {
+            console.error("[phone.js][window.onload] 获取音频流失败:", error);
+            // 可以显示一个友好的错误提示
+            alert("无法访问麦克风，请确保已授予相关权限");
         }
-
-        // 获取音频流
-        let audioStream = await navigator.mediaDevices.getUserMedia({
-            audio: true,
-            video: false
-        });
-        console.log("[phone.js][window.onload] 创建 getUserMedia 音频流成功...");
-
-        // 初始化音频分析器
-        const { analyser, dataArray } = await initAudioAnalyser(audioStream);
-
-        // 在开始录音前进行环境噪音检测
-        SILENCE_THRESHOLD = await calibrateNoiseLevel(analyser, dataArray);
-        console.log('[phone.js][window.onload] 环境噪音校准完成, 静音阈值:', SILENCE_THRESHOLD);
-        localStorage.setItem('SILENCE_THRESHOLD', SILENCE_THRESHOLD);
-    } catch (error) {
-        console.error("[phone.js][window.onload] 获取音频流失败:", error);
-        // 可以显示一个友好的错误提示
-        alert("无法访问麦克风，请确保已授予相关权限");
     }
 }
 

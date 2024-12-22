@@ -5,8 +5,8 @@ import $ajax from '../ajax'
  * 已将 $apis 挂载在 global，可以通过如下方式进行调用：
  * $apis.example.getApi().then().catch().finally()
  */
-// const baseUrl = 'https://pineapplesnowy.cn'
-const baseUrl = $server_url
+const baseUrl = 'https://pineapplesnowy.cn'
+// const baseUrl = $server_url
 
 export default {
   /**

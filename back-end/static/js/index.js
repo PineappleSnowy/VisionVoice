@@ -28,21 +28,6 @@ const checkLoginStatus = async () => {
     // cookieDisplay.style.cssText = 'width: 41%; font-size: 10px; position: fixed; top: 10px; right: 10px; background: rgba(0,0,0,0.5); color: white; padding: 5px 10px; border-radius: 4px; z-index: 1000;';
     // document.body.appendChild(cookieDisplay);
 
-    // 从 cookie 中获取 username 和 nickname
-    const cookieUsername = await getCookie('username');
-    const cookieNickname = await getCookie('nickname');
-
-    // 如果 cookie 中存在这些值,则保存到 localStorage
-    if (cookieUsername) {
-        localStorage.setItem('username', cookieUsername);
-    } else {
-        localStorage.setItem('username', '用户名获取失败');
-    }
-    if (cookieNickname) {
-        localStorage.setItem('nickname', cookieNickname);
-    } else {
-        localStorage.setItem('nickname', '昵称获取失败');
-    }
 
     console.log("[index.js][checkLoginStatus] cookie:", document.cookie);
 
@@ -70,6 +55,25 @@ const checkLoginStatus = async () => {
             if (data.valid) {
                 // 将 cookie 中的 token 设置到 localStorage 中
                 localStorage.setItem('token', token);
+                
+                // 当 localStorage 中没有 username 和 nickname 时，从 cookie 中获取
+                if (!localStorage.getItem('username')) {
+                    const cookieUsername = await getCookie('username');
+                    if (cookieUsername) {
+                        localStorage.setItem('username', cookieUsername);
+                    } else {
+                        localStorage.setItem('username', '用户名获取失败');
+                    }
+                }
+                
+                if (!localStorage.getItem('nickname')) {
+                    const cookieNickname = await getCookie('nickname');
+                    if (cookieNickname) {
+                        localStorage.setItem('nickname', cookieNickname);
+                    } else {
+                        localStorage.setItem('nickname', '昵称获取失败');
+                    }
+                }
                 // 跳转到 agent 主页
                 window.location.href = '/agent';
             } else {
