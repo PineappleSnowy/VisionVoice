@@ -7,9 +7,10 @@
     <div class="feature-list">
       <text class="feature-title">功能简介</text>
       <text class="feature-item">🤖 智能体交互</text>
-      <text class="feature-item">🚸 辅助避障</text>
-      <text class="feature-item">🌍 环境识别</text>
+      <text class="feature-item">🚧 辅助避障</text>
       <text class="feature-item">🔍 帮我寻物</text>
+      <text class="feature-item">🌳 环境识别</text>
+      <text class="feature-item">📍 获取位置</text>
     </div>
     
     <div class="description">
