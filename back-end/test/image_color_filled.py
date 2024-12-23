@@ -26,4 +26,4 @@ def convert_to_white(image_path, output_path):
     img.save(output_path, "PNG")
 
 # 示例使用
-convert_to_white(r"back-end\test\video.png", r"back-end\static\images\video.png")
+convert_to_white(r"back-end\static\images\arrow_right.png", r"back-end\static\images\arrow_right1.png")
