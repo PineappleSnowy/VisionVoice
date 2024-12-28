@@ -6,6 +6,7 @@ html body {
   margin: 0;
   padding: 0;
   background-color: black;
+  color: white;
 }
 
 html body .goBack {
@@ -30,7 +31,7 @@ html body .controller {
   height: 2.6rem;
   left: 0;
   bottom: 0;
-  background-color: white;
+  background-color: #2c2c2c;
 }
 
 html body .controller .status {
@@ -106,7 +107,7 @@ html body .container {
   width: 100vw;
   height: 100vh;
   transition: transform 0.3s ease;
-  background-color: white;
+  background-color: #2c2c2c;
 }
 
 html body .container img {
@@ -210,7 +211,7 @@ p {
   left: 50%;
   width: 80%;
   height: 6%;
-  background-color: rgba(0, 0, 0, 0.8);
+  background-color: #2c2c2c;
   transform: translateX(-50%);
   z-index: 2;
   /* display: flex; */

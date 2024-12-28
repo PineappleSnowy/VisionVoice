@@ -555,7 +555,7 @@ window.onload = async () => {
             maxHeight: 80,
             minHeight: 0,
             spacing: 5,
-            color: '#000',
+            color: '#fff',
             shadowBlur: 0,
             shadowColor: '#f00',
             fadeSide: true,
