@@ -125,7 +125,7 @@ openCamera.addEventListener('click', async () => {
             container.classList.remove('shifted');
             toggleCamera.style.display = 'none';
             img.style.display = 'block';
-            goBack.style.color = 'black';
+            goBack.style.color = 'white';
         }
     } catch (err) {
         console.log(err);

@@ -63,7 +63,6 @@ body {
     flex-direction: column;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
     margin-top: 30px;
-    padding: 0 15px;
 }
 
 .option:first-child {
@@ -73,15 +72,10 @@ body {
 .option {
     background-color: #1e1e1e;
     color: #e0e0e0;
-    padding: 20px 10px;
-    /* 修改padding为上下20px，左右10px */
+    padding: 25px 13px;
     text-decoration: none;
     transition: background-color 0.3s ease;
     border-bottom: 1px solid #333;
-    display: block;
-    border-radius: 20px;
-    margin-bottom: 10px;
-
 }
 
 

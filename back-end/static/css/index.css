@@ -9,7 +9,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    background-image: url(../images/background.jpg);
+    background-color: #121212;
     background-size: cover;
     font-family: Arial, sans-serif;
 }
@@ -148,4 +148,5 @@ input:focus {
 .message.error {
     color: #f44336;
 }
+
 /* ----- 消息提示样式 end ----- */
