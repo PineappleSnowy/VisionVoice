@@ -138,6 +138,7 @@ html body .container.shifted {
   padding-top: 5%;
   transform: translate(-50%, -50%);
   z-index: 4;
+  border: 1px solid #333;
 }
 
 .overflowArea {
@@ -186,7 +187,9 @@ p {
   background-color: #333;
   text-align: center;
   height: 8%;
-  color: #e0e0e0;
+  color: white;
+  border: none;
+  font-size: large;
 }
 
 .closeModalButton:hover {
