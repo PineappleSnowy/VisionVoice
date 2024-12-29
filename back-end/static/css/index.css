@@ -17,12 +17,13 @@ body {
 /* ----- 登录容器样式 ----- */
 .login-container {
     margin: 0 1rem;
-    background-color: rgba(33, 31, 31, 0.8);
+    background-color: #1e1e1e;
     padding: 1rem;
     border-radius: 10px;
-    width: 300px;
+    width: 80%;
+    max-width: 400px;
     backdrop-filter: blur(10px);
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 h2 {
@@ -59,7 +60,7 @@ input:focus {
 #login_button {
     width: 100%;
     padding: 12px;
-    background-color: #5b61b9;
+    background-color: #3eb575;
     color: white;
     border: none;
     border-radius: 5px;
@@ -69,7 +70,7 @@ input:focus {
 }
 
 #login_button:hover {
-    background-color: #44498c;
+    background-color: #297a4f;
 }
 
 .register-link {
@@ -80,7 +81,7 @@ input:focus {
 }
 
 .register-link a {
-    color: #5b61b9;
+    color: #3eb575;
     text-decoration: none;
 }
 
@@ -94,7 +95,8 @@ input:focus {
     background-color: rgba(33, 31, 31, 0.8);
     padding: 1rem;
     border-radius: 10px;
-    width: 300px;
+    width: 80%;
+    max-width: 400px;
     backdrop-filter: blur(10px);
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
@@ -103,7 +105,7 @@ input:focus {
 #register_button {
     width: 100%;
     padding: 12px;
-    background-color: #5b61b9;
+    background-color: #3eb575;
     color: white;
     border: none;
     border-radius: 5px;
@@ -113,7 +115,7 @@ input:focus {
 }
 
 #register_button:hover {
-    background-color: #44498c;
+    background-color: #297a4f;
 }
 
 /* 返回登录链接样式 */
@@ -125,7 +127,7 @@ input:focus {
 }
 
 .login-link a {
-    color: #5b61b9;
+    color: #3eb575;
     text-decoration: none;
 }
 
@@ -142,7 +144,7 @@ input:focus {
 }
 
 .message.success {
-    color: #4caf50;
+    color: #297a4f;
 }
 
 .message.error {
