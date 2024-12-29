@@ -5,7 +5,7 @@ html {
 html body {
   margin: 0;
   padding: 0;
-  background-color: black;
+  background-color: #121212;
   color: white;
 }
 
@@ -31,7 +31,7 @@ html body .controller {
   height: 2.6rem;
   left: 0;
   bottom: 0;
-  background-color: #2c2c2c;
+  background-color: #121212;
 }
 
 html body .controller .status {
@@ -106,8 +106,8 @@ html body video {
 html body .container {
   width: 100vw;
   height: 100vh;
-  transition: transform 0.3s ease;
-  background-color: #2c2c2c;
+  transition: transform 0.2s ease;
+  /* background-color: #2c2c2c; */
 }
 
 html body .container img {
@@ -183,14 +183,14 @@ p {
   bottom: 0%;
   left: 0;
   width: 100%;
-  background-color: #444;
+  background-color: #333;
   text-align: center;
   height: 8%;
   color: #e0e0e0;
 }
 
 .closeModalButton:hover {
-  background-color: #555;
+  background-color: #444;
 }
 
 #overlay {
@@ -211,7 +211,7 @@ p {
   left: 50%;
   width: 80%;
   height: 6%;
-  background-color: #2c2c2c;
+  background-color:#1e1e1e;
   transform: translateX(-50%);
   z-index: 2;
   /* display: flex; */
