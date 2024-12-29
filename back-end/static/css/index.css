@@ -54,7 +54,7 @@ input {
 
 input:focus {
     outline: none;
-    border-color: #5b61b9;
+    border-color: #3eb575;
 }
 
 #login_button {
