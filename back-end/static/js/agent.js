@@ -88,7 +88,6 @@ document.getElementById('send-button').addEventListener('click', function () {
     if (message || uploadedImages.length > 0) {
         audioPlayer.pause();
         audioQueue = [];
-        pauseDiv.style.backgroundImage = `url('${'./static/images/pause_inactive.png'}')`;
         addMessage(message);
         message = ''
         input.value = ''; // 清空输入框
@@ -217,7 +216,7 @@ function sendMessageToAgent(message, multi_image_talk) {
     })
         .then(response => {
             let reader = response.body.getReader();
-            
+
             // 逐块读取并处理数据
             return reader.read().then(function processText({ done, value }) {
                 if (done) {
@@ -348,6 +347,10 @@ document.getElementById('camera_photo').addEventListener('click', function () {
     }
 });
 
+document.getElementById('camera_icon').addEventListener('click', function () {
+    document.getElementById('camera_photo').click();
+});
+
 // 清空图片div
 function clearImageDiv() {
     const imageList = document.querySelector('#imageUploadPanel .content .imageList');
@@ -444,9 +447,6 @@ document.getElementById('agent-chat-textarea').addEventListener('click', functio
 - 当元素播放结束后，继续播放下一个元素，直到队列中没有元素为止
 --------------------------------------------------------- */
 
-// 获取暂停按钮元素
-const pauseDiv = document.querySelector('#pause_icon');
-
 // 获取音频播放器 DOM 元素
 const audioPlayer = document.getElementById('audioPlayer');
 
@@ -476,12 +476,11 @@ document.getElementById('audio-control').addEventListener('click', function () {
     this.classList.toggle('muted');
 
     // 如果用户静音，则暂停音频播放
-    if (isMuted && isPlaying) {
+    if (isMuted) {
         console.log('[agent.js][audio-control] 用户静音，暂停音频播放...');
         audioQueue = [];
         audioPlayer.pause();
         isPlaying = false;
-        pauseDiv.src = `../static/images/pause_inactive.png`;
     }
 })
 
@@ -494,16 +493,17 @@ socket.on('agent_play_audio_chunk', function (data) {
     const user = localStorage.getItem('user');
     console.log('curr_user', user)
     if (data.user !== user) return;
-    const audioIndex = data['index'];
-    const audioData = data['audio_chunk'];
+    if (!isMuted) {
+        const audioIndex = data['index'];
+        const audioData = data['audio_chunk'];
 
-    // 将音频数据添加到队列中
-    audioQueue[audioIndex] = audioData;
+        // 将音频数据添加到队列中
+        audioQueue[audioIndex] = audioData;
 
-    // 如果当前没有音频正在播放，开始播放
-    if (!isPlaying) {
-        pauseDiv.src = `../static/images/pause.png`;
-        playNextAudio();
+        // 如果当前没有音频正在播放，开始播放
+        if (!isPlaying) {
+            playNextAudio();
+        }
     }
 });
 
@@ -515,7 +515,6 @@ function playNextAudio() {
     // 如果音频队列中没有音频数据（即后端还没有发送音频数据），则停止播放
     if (audioQueue.length === 0) {
         isPlaying = false;
-        pauseDiv.src = `../static/images/pause_inactive.png`;
         return;
     }
     console.log('[agent.js][playNextAudio] audioQueue:', audioQueue);
@@ -553,20 +552,6 @@ function playNextAudio() {
 audioPlayer.onended = function () {
     playNextAudio();
 };
-
-/**
- * @description 暂停音频播放
- * - 暂停音频播放后，清空音频队列，并将暂停按钮设置为未激活状态（灰色）
- */
-pauseDiv.addEventListener('click', function () {
-    // 暂停音频播放
-    audioPlayer.pause()
-
-    // 清空音频队列
-    audioQueue = [];
-
-    pauseDiv.src = `../static/images/pause_inactive.png`;
-});
 
 /* 音频播放相关 end
 --------------------------------------------------------- */

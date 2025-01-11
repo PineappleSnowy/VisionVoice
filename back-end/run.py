@@ -1198,7 +1198,7 @@ def run_server():
             app,
             port=80,
             allow_unsafe_werkzeug=True,
-            debug=True,  # 调试模式（开发环境）
+            debug=True  # 调试模式（开发环境）
         )
     else:
         socketio.run(
@@ -1206,7 +1206,7 @@ def run_server():
             port=443,
             host="0.0.0.0",
             allow_unsafe_werkzeug=True,
-            ssl_context=("/ssl/cert.pem", "/ssl/cert.key"),
+            ssl_context=("/ssl/cert.pem", "/ssl/cert.key")
         )
 
 
