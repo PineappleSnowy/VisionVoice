@@ -32,6 +32,7 @@ html body .controller {
   left: 0;
   bottom: 0;
   background-color: #121212;
+  z-index: 1;
 }
 
 html body .controller .status {
@@ -66,6 +67,46 @@ html body .controller .hangUp {
   right: 0.9rem;
   bottom: 0.63rem;
   font-size: 0.5rem;
+}
+
+html body .controller .micButton {
+  position: absolute;
+  right: 0.4rem;
+  bottom: 1.45rem;
+  width: 0.6rem;
+  height: 0.6rem;
+  background-color: white;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 0.45rem;
+  color: black;
+}
+
+html body .controller .micButton.mic-off {
+  background-color: gray;
+  color: white;
+}
+
+html body .controller .captionButton {
+  position: absolute;
+  left: 0.4rem;
+  bottom: 1.45rem;
+  width: 0.6rem;
+  height: 0.6rem;
+  background-color: white;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 0.45rem;
+  color: black;
+}
+
+html body .controller .captionButton.caption-off {
+  background-color: gray;
+  color: white;
 }
 
 html body .moreFunctions {
@@ -107,7 +148,6 @@ html body .container {
   width: 100vw;
   height: 100vh;
   transition: transform 0.2s ease;
-  /* background-color: #2c2c2c; */
 }
 
 html body .container img {
@@ -192,7 +232,7 @@ p {
   font-size: large;
 }
 
-.closeModalButton:hover {
+closeModalButton:hover {
   background-color: #444;
 }
 
@@ -230,4 +270,21 @@ p {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+.captionModal {
+  position: fixed;
+  bottom: 3rem;
+  width: 94%;
+  background-color: rgba(30, 30, 30, 0.5);
+  color: white;
+  text-align: left;
+  padding: 0.1rem 3%;
+  z-index: 0;
+  display: none;
+}
+
+.captionModal p {
+  margin: 0px;
+  font-size: 0.18rem;
 }

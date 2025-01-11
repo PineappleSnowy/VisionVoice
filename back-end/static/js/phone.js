@@ -89,6 +89,55 @@ function finishShutUpStatus() {
     if (vudio.pause()) { vudio.dance() }
 }
 
+let micClose = localStorage.getItem('micClose');
+if (micClose === null) {
+    micClose = false;
+    localStorage.setItem('micClose', micClose);
+} else {
+    micClose = micClose === 'true';
+}
+
+if (micClose) {
+    document.querySelector('.micButton').classList.add('mic-off');
+}
+document.querySelector('.micButton').addEventListener('click', function () {
+    if (document.querySelector('.micButton').classList.toggle('mic-off')) {
+        micClose = true;
+        localStorage.setItem('micClose', micClose);
+        stopCheckSilenceTimer();
+    } else {
+        micClose = false;
+        localStorage.setItem('micClose', micClose);
+        startCheckSilenceTimer();
+    }
+});
+
+let captionClose = localStorage.getItem('captionClose');
+if (captionClose === null) {
+    captionClose = false;
+    localStorage.setItem('captionClose', captionClose);
+} else {
+    captionClose = captionClose === 'true';
+}
+
+if (captionClose) {
+    document.querySelector('.captionButton').classList.add('caption-off');
+}
+else{
+    document.getElementById('captionModal').style.display = 'block';
+}
+document.querySelector('.captionButton').addEventListener('click', function () {
+    if (document.querySelector('.captionButton').classList.toggle('caption-off')) {
+        captionClose = true;
+        localStorage.setItem('captionClose', captionClose);
+        document.getElementById('captionModal').style.display = 'none';
+    } else {
+        captionClose = false;
+        localStorage.setItem('captionClose', captionClose);
+        document.getElementById('captionModal').style.display = 'block';
+    }
+});
+
 // 摄像头开关逻辑
 openCamera.addEventListener('click', async () => {
     try {
@@ -169,6 +218,7 @@ function formChat() {
         speech_rec_ready = false;
         image_upload_ready = false;
         if (state == 0) {
+            document.getElementById('captionText').textContent = '';
             const token = localStorage.getItem('token');
             startAudio()
             fetch(`/agent/chat_stream?query=${rec_result}&agent=${selectedAgent}&videoOpen=${videoChat}`, {
@@ -188,6 +238,7 @@ function formChat() {
 
                         // 如果当前不是结束标志，则将文本进行语音合成
                         if (!(jsonString.includes("<END>")) && !audio_stop) {
+                            document.getElementById('captionText').textContent += jsonString;
                             socket.emit("agent_stream_audio", jsonString);
                         }
 
@@ -235,7 +286,9 @@ function captureAndSendFrame() {
                             const distant = data["obstacle_info"][0]["distant"]
                             const left_loc = data["obstacle_info"][0]["left"]
                             const top_loc = data["obstacle_info"][0]["top"]
-                            socket.emit("agent_stream_audio", `画面${calcLocation(top_loc, left_loc)}${detected_item}距离${distant.toFixed(2)}米。`);
+                            const obstacle_loc_info = `画面${calcLocation(top_loc, left_loc)}${detected_item}距离${distant.toFixed(2)}米。`;
+                            document.getElementById('captionText').textContent = obstacle_loc_info;
+                            socket.emit("agent_stream_audio", obstacle_loc_info);
                             // 设置等待时间
                             setTimeout(function () {
                                 captureAndSendFrame()
@@ -248,8 +301,9 @@ function captureAndSendFrame() {
                         if (data['item_info'].length != 0) {
                             const left_loc = data["item_info"][0]["left"]
                             const top_loc = data["item_info"][0]["top"]
-
-                            socket.emit("agent_stream_audio", `${find_item_name}在画面${calcLocation(top_loc, left_loc)}。`);
+                            const item_loc_info = `${find_item_name}在画面${calcLocation(top_loc, left_loc)}。`;
+                            document.getElementById('captionText').textContent = item_loc_info;
+                            socket.emit("agent_stream_audio", item_loc_info);
                             setTimeout(function () {
                                 captureAndSendFrame()
                             }, 2000);
@@ -360,7 +414,9 @@ function stopCheckSilenceTimer() {
 // 启动检查静音的计时器
 function startCheckSilenceTimer() {
     // 使用 setInterval，每隔一段时间（ms）检查一次用户是否停止讲话
-    checkSilenceTimer = setInterval(checkSilence, 100);
+    if (!micClose) {
+        checkSilenceTimer = setInterval(checkSilence, 100);
+    }
 }
 
 // 退出避障
@@ -410,6 +466,7 @@ function startAvoidObstacle() {
     }
     if (!obstacle_avoid) {
         obstacle_avoid = true;
+        document.getElementById('captionText').textContent = '避障模式已开启'
         socket.emit("agent_stream_audio", "##<state=1>");
         startAudio()
     }
@@ -436,6 +493,7 @@ window.startFindItem = function (item_name) {
     if (!find_item) {
         find_item = true;
         find_item_name = item_name;
+        document.getElementById('captionText').textContent = `开始寻找${item_name}`
         socket.emit("agent_stream_audio", `##<state=2>${item_name}`);
         startAudio();
     }
@@ -496,7 +554,7 @@ window.onload = async () => {
             // 如果静音定时器不存在，且用户已经说过话了，则设置静音定时器
             if (!silenceTimer && conversationStarted) {
                 silenceTimer = setTimeout(() => {
-                    // 停止检测用户是否说话
+                    // 停止检测用户是否正在说话
                     if (checkSilenceTimer) {
                         stopCheckSilenceTimer()
                     }
@@ -961,6 +1019,7 @@ window.onload = async () => {
         if (vudio.dance()) { vudio.pause() }
         let location_result = await requestLocaion();
         let location_info = location_result['location_info']
+        document.getElementById('captionText').textContent = location_info;
         socket.emit("agent_stream_audio", location_info);
         startAudio();
     });
