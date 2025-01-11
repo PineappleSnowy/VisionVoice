@@ -98,6 +98,7 @@ if (micClose === null) {
 }
 
 if (micClose) {
+    stopCheckSilenceTimer();
     document.querySelector('.micButton').classList.add('mic-off');
 }
 document.querySelector('.micButton').addEventListener('click', function () {
