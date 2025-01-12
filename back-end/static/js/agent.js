@@ -190,7 +190,7 @@ function addMessage(message) {
  * @param {string} message 用户的消息内容
  * @param {boolean} multi_image_talk 是否包含多张图片
  */
-var curr_talk_index = 0;  // 标识当前对话
+let curr_talk_index = 0;  // 标识当前对话
 
 function sendMessageToAgent(message, multi_image_talk) {
     if (curr_talk_index >= Number.MAX_SAFE_INTEGER) {

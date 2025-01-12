@@ -45,6 +45,10 @@ function checkSilence() { }
 
 // 停止音频播放
 function stopAudio() {
+    curr_talk_index += 1;
+    if (curr_talk_index >= Number.MAX_SAFE_INTEGER) {
+        curr_talk_index = 0;
+    }
     audio_stop = true;
     audioPlayer.pause()
     audioQueue = [];
@@ -124,7 +128,7 @@ if (captionClose === null) {
 if (captionClose) {
     document.querySelector('.captionButton').classList.add('caption-off');
 }
-else{
+else {
     document.getElementById('captionModal').style.display = 'block';
 }
 document.querySelector('.captionButton').addEventListener('click', function () {
@@ -211,8 +215,10 @@ toggleCamera.addEventListener('click', async () => {
     }
 });
 
+let curr_talk_index = 0;
+
 // 发起大模型请求
-function formChat() {
+function formChat(talk_index) {
     /*当开启视频聊天时（videoChat==true），要求speech_rec_ready和image_upload_ready都是true；
     否则仅要求speech_rec_ready是true*/
     if (speech_rec_ready && (image_upload_ready || ~videoChat)) {
@@ -238,7 +244,7 @@ function formChat() {
                         let jsonString = new TextDecoder().decode(value); // 将字节流转换为字符串
 
                         // 如果当前不是结束标志，则将文本进行语音合成
-                        if (!(jsonString.includes("<END>")) && !audio_stop) {
+                        if (!(jsonString.includes("<END>")) && !audio_stop && talk_index == curr_talk_index) {
                             document.getElementById('captionText').textContent += jsonString;
                             socket.emit("agent_stream_audio", jsonString);
                         }
@@ -314,7 +320,7 @@ function captureAndSendFrame() {
 
                     else if (state == 0) {
                         image_upload_ready = true;
-                        formChat()
+                        formChat(curr_talk_index)
                     }
                 }
             })
@@ -818,7 +824,7 @@ window.onload = async () => {
                 let prompt = location_result['prompt'];
                 rec_result = prompt + rec_result;
             }
-            formChat();
+            formChat(curr_talk_index);
         }
     })
 
@@ -932,7 +938,7 @@ window.onload = async () => {
             // 将 JSON 数据转换为字符串
             H5_locate_key = data.H5_locate;
             geocode_key = data.geocode;
-            var script = document.createElement('script');
+            let script = document.createElement('script');
             script.src = `https://webapi.amap.com/maps?v=2.0&key=${H5_locate_key}`
             document.head.appendChild(script);
         })
