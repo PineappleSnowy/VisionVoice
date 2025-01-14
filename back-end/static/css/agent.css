@@ -63,10 +63,8 @@ p {
 }
 
 #send-button {
-    display: flex;
     position: relative;
     top: 5px;
-    padding: 10px;
     font-size: 16px;
     background-color: #3eb575;
     color: white;
@@ -74,7 +72,8 @@ p {
     cursor: pointer;
     width: 35px;
     display: inline-block;
-    vertical-align: bottom;
+    vertical-align: center;
+    text-align: center;
     height: 35px;
     border-radius: 90px;
     right: 14px;
@@ -85,12 +84,10 @@ p {
 }
 
 #send-button #arrow_right {
-    display: flex;
-    position: absolute;
-    top: 3px;
-    right: 3px;
-    width: 28px;
-    height: 28px;
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    margin: 3px auto;
 }
 
 #more_function_button {

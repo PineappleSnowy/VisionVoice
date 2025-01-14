@@ -80,6 +80,20 @@ document.getElementById('phone-button').addEventListener('click', function () {
     window.location.href = '/phone';
 });
 
+
+setInterval(()=>{
+    if( document.getElementById('agent-chat-textarea').value.trim() || uploadedImages.length > 0){
+        document.querySelector('#send-button').style.display = 'inline-block';
+        document.querySelector('#more_function_button').style.display = 'none';
+        document.querySelector('#send-button').style.width = '70px';
+    }else{
+        document.querySelector('#send-button').style.display = 'none';
+        document.querySelector('#more_function_button').style.display = 'flex';
+        document.querySelector('#send-button').style.width = '35px';
+    }
+},100);
+
+
 let message = ''  // 用户发送的消息
 
 document.getElementById('send-button').addEventListener('click', function () {
