@@ -66,6 +66,10 @@ if not os.path.exists('./static/user.json'):
     with open('./static/user.json', 'w') as f:
         f.write('[]')
 
+# 处理user_images目录不存在的情况
+if not os.path.exists('./user_images'):
+    os.mkdir('./user_images')
+
 # ----- 路由 -----
 
 # 使用 verify_jwt_in_request 进行 JWT 验证
