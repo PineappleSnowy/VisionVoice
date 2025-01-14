@@ -288,3 +288,17 @@ closeModalButton:hover {
   margin: 0px;
   font-size: 0.18rem;
 }
+
+.frame-window {
+  max-width: 100vw;
+  max-height: 5.24rem;
+  width: auto;
+  height: auto;
+  display: none;
+  margin: 0 auto;
+  position: absolute;
+  top: 2.62rem;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 0;
+}

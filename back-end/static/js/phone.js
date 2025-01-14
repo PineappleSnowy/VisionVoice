@@ -264,7 +264,7 @@ function formChat(talk_index) {
 // 将视频帧发往后端的函数
 function captureAndSendFrame() {
     if (videoChat) {
-        const canvas = document.createElement('canvas');
+        const canvas = document.createElement('.frame-window');
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
         const context = canvas.getContext('2d');
@@ -299,7 +299,7 @@ function captureAndSendFrame() {
                             // 设置等待时间
                             setTimeout(function () {
                                 captureAndSendFrame()
-                            }, 2000);
+                            }, 1);
                         }
                         else { captureAndSendFrame() }
                     }
@@ -313,7 +313,7 @@ function captureAndSendFrame() {
                             socket.emit("agent_stream_audio", item_loc_info);
                             setTimeout(function () {
                                 captureAndSendFrame()
-                            }, 2000);
+                            }, 1);
                         }
                         else { captureAndSendFrame() }
                     }
@@ -328,6 +328,39 @@ function captureAndSendFrame() {
                 console.error('Error uploading frame:', error);
             });
     }
+}
+
+async function loadModel() {
+    const model = await cocoSsd.load();
+    return model;
+}
+
+async function detectFrame(model) {
+    const canvas = document.querySelector('.frame-window');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const context = canvas.getContext('2d');
+    const predictions = await model.detect(video);
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    predictions.forEach(prediction => {
+        context.beginPath();
+        context.rect(...prediction.bbox);
+        context.lineWidth = 2;
+        context.strokeStyle = 'red';
+        context.fillStyle = 'red';
+        context.font = '0.2rem Arial';
+        context.stroke();
+        context.fillText(prediction.class, prediction.bbox[0], prediction.bbox[1] > 10 ? prediction.bbox[1] - 5 : 10);
+    });
+    canvas.style.display = 'block';
+    video.style.display = 'none';
+    requestAnimationFrame(() => detectFrame(model));
+}
+
+async function main() {
+    const model = await loadModel();
+    detectFrame(model);
 }
 
 function calcLocation(top, left) {
@@ -878,8 +911,9 @@ window.onload = async () => {
     // 避障逻辑
     const obstacleAvoidButton = document.querySelector('.optionButton.avoidObstacle');
     obstacleAvoidButton.addEventListener('click', () => {
-        closeOptionsBar();
-        startAvoidObstacle();
+        // closeOptionsBar();
+        // startAvoidObstacle();
+        main()
     });
 
     // 寻物逻辑
@@ -965,13 +999,13 @@ window.onload = async () => {
             .then(data => {
                 const formattedAddress = data.regeocode.formatted_address;
                 console.log('位置信息:', formattedAddress);
-                const prompt = `我当前的位置是：${formattedAddress}，定位精度${location_data.accuracy}米。请简洁回答。我的提问是：`;
+                const prompt = `我当前的位置是：${formattedAddress}，定位精度${location_data.accuracy}米。请结合环境信息简洁回答。我的提问是：`;
                 const location_info = `你位于${formattedAddress}，定位精度${location_data.accuracy}米。`;
                 return { prompt, location_info };
             })
             .catch(error => {
                 console.error('请求出错:', error);
-                const prompt = `你地理编码逆解析失败，仅可知我当前经纬坐标为(${geoLocation})。请简洁回答。我的提问是：`;
+                const prompt = `你地理编码逆解析失败，仅可知我当前经纬坐标为(${geoLocation})。请结合环境信息简洁回答。我的提问是：`;
                 const location_info = `地理编码逆解析失败，你当前经纬坐标为：${geoLocation}。`;
                 return { prompt, location_info };
             });
@@ -980,7 +1014,7 @@ window.onload = async () => {
     // 解析定位错误信息
     function onError(data) {
         console.error('定位失败。\n失败原因排查信息:' + data.message + '\n浏览器返回信息：' + data.originMessage)
-        let prompt = "你定位失败，无法获得我的位置信息。请简洁回答。我的提问是："
+        let prompt = "你定位失败，无法获得我的位置信息。请结合环境信息简洁回答。我的提问是："
         let location_info = "定位超时，无法获得你的位置信息。"
         return { 'prompt': prompt, 'location_info': location_info }
     }
