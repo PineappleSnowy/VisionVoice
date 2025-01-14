@@ -264,7 +264,7 @@ function formChat(talk_index) {
 // 将视频帧发往后端的函数
 function captureAndSendFrame() {
     if (videoChat) {
-        const canvas = document.createElement('.frame-window');
+        const canvas = document.createElement('canvas');
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
         const context = canvas.getContext('2d');
@@ -911,9 +911,10 @@ window.onload = async () => {
     // 避障逻辑
     const obstacleAvoidButton = document.querySelector('.optionButton.avoidObstacle');
     obstacleAvoidButton.addEventListener('click', () => {
-        // closeOptionsBar();
-        // startAvoidObstacle();
-        main()
+        closeOptionsBar();
+        startAvoidObstacle();
+        // 前端避障，处开发阶段，尚未启用
+        // main()
     });
 
     // 寻物逻辑
