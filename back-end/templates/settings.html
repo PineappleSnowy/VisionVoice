@@ -16,8 +16,8 @@
         设置
     </div>
     <div class="settings-items">
-        <div class="settings-item" role="region" aria-live="polite" aria-label="通话界面回答复杂度: 详细">
-            <label for="complexity">通话界面环境描述复杂度</label>
+        <div class="settings-item" role="region" aria-live="polite" aria-label="通话界面 环境描述复杂度设置">
+            <label for="complexity">通话界面 环境描述复杂度</label>
             <select id="complexity" onchange="updateAriaLabel(this)" class="select-left">
                 <option value="detailed">详细</option>
                 <option value="simple">简洁</option>
@@ -25,14 +25,7 @@
         </div>
     </div>
 
-    <script>
-        function updateAriaLabel(selectElement) {
-            const selectedOption = selectElement.options[selectElement.selectedIndex].text;
-            selectElement.parentElement.setAttribute('aria-label', `通话界面回答复杂度: ${selectedOption}`);
-            localStorage.setItem('complexity', selectedOption);
-            console.log(selectedOption)
-        }
-    </script>
+    <script src="../static/js/settings.js"></script>
 </body>
 
 </html>
