@@ -1038,9 +1038,23 @@ window.onload = async () => {
         stopCheckSilenceTimer();
         stopAudio();
         finishShutUpStatus();
+        let complexity = localStorage.getItem('complexity');
+        if (complexity == null)
+        {
+            complexity = "详细";
+            localStorage.setItem('complexity', complexity);
+        }
         statusDiv.textContent = '环境描述';
         if (vudio.dance()) { vudio.pause() }
-        rec_result = "请简洁地描述环境";
+        let prompt_des = "";
+        if(complexity == "详细")
+        {
+            prompt_des = "充分捕捉环境信息，客观详细地";
+        }
+        else{
+            prompt_des = "简洁地";
+        }
+        rec_result = `请${prompt_des}描述环境。`;
         speech_rec_ready = true;
         captureAndSendFrame();
     });

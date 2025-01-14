@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0">
+    <title>设置</title>
+    <link rel="stylesheet" href="../static/css/settings.css" />
+    <link rel="icon" href="../static/favicon.ico" />
+</head>
+
+<body>
+    <div class="header" role="banner" aria-label="页眉">
+        <button class="back-button" onclick="window.location.href='/mine'" aria-label="返回我的页面">&#8592;</button>
+        设置
+    </div>
+    <div class="settings-items">
+        <div class="settings-item" role="region" aria-live="polite" aria-label="通话界面回答复杂度: 详细">
+            <label for="complexity">通话界面回答复杂度</label>
+            <select id="complexity" onchange="updateAriaLabel(this)" class="select-left">
+                <option value="detailed">详细</option>
+                <option value="simple">简洁</option>
+            </select>
+        </div>
+    </div>
+
+    <script>
+        function updateAriaLabel(selectElement) {
+            const selectedOption = selectElement.options[selectElement.selectedIndex].text;
+            selectElement.parentElement.setAttribute('aria-label', `通话界面回答复杂度: ${selectedOption}`);
+            localStorage.setItem('complexity', selectedOption);
+            console.log(selectedOption)
+        }
+    </script>
+</body>
+
+</html>

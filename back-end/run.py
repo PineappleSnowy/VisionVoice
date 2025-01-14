@@ -235,6 +235,12 @@ def get_user_agreement_text():
         return "File not found", 404
 
 
+@app.route("/settings", methods=["GET"])
+def settings():
+    """用户须知路由"""
+    return render_template("settings.html")
+
+
 @app.route("/images", methods=["GET"])
 def get_images():
     images = []
@@ -747,19 +753,19 @@ def build_response(current_user, agent_name, user_talk, video_open, multi_image_
                     "role": "user",
                     "content": [
                         {"type": "image_url", "image_url": {"url": img_base}},
-                        {"type": "text", "text": user_talk},
+                        {"type": "text", "text": f"{user_talk}（请完全用文本格式回答，直接给我相应描述）"},
                     ],
                 }
             )
         else:
             dst_messages.append(
                 {"role": "user", "content": [
-                    {"type": "text", "text": user_talk}]}
+                    {"type": "text",
+                     "text": f"{user_talk}（请完全用文本格式回答）"}]}
             )
             print(f"未找到图片{user_image_path}！")
         # 保存和多模态大模型的聊天
         messages.append({"role": "user", "content": user_talk})
-
         # 调用大模型
         responses = client.chat.completions.create(
             model=model_name,
@@ -774,8 +780,8 @@ def build_response(current_user, agent_name, user_talk, video_open, multi_image_
             image_path_list = get_image_filenames(multi_image_dir)
         else:
             image_path_list = []
-        model_name = "glm-4v-flash" if len(
-            image_path_list) == 1 else "glm-4v-plus"
+        model_name = "glm-4v-plus" if len(
+            image_path_list) == 1 else "glm-4v-plus"  # 选择模型类别
 
         messages = init_chat_history(current_user, agent_name, messages)
         dst_messages = message_format_tran(messages[-MAX_HISTORY:])
@@ -789,7 +795,7 @@ def build_response(current_user, agent_name, user_talk, video_open, multi_image_
                 {"type": "image_url", "image_url": {"url": img_base}})
         delete_file_from_dir(multi_image_dir)  # 及时清空图片缓存
 
-        content.append({"type": "text", "text": user_talk})
+        content.append({"type": "text", "text": f"{user_talk}（请完全用文本格式回答，直接给我相应描述）"})
 
         dst_messages.append({"role": "user", "content": content})
 
@@ -827,9 +833,9 @@ def build_response(current_user, agent_name, user_talk, video_open, multi_image_
             # 根据选择的模型调用大模型
             model_name = "glm-4-flash"
             messages = init_chat_history(current_user, agent_name, messages)
-
             # 添加用户消息
-            messages.append({"role": "user", "content": user_talk})
+            messages.append(
+                {"role": "user", "content": user_talk})
 
             # 调用大模型
             responses = client.chat.completions.create(

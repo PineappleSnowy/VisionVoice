@@ -63,6 +63,7 @@ body {
     flex-direction: column;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
     margin-top: 30px;
+    font-size: large;
 }
 
 .option:first-child {
@@ -77,8 +78,6 @@ body {
     transition: background-color 0.2s ease;
     border-bottom: 1px solid #333;
 }
-
-
 
 .option:hover {
     background-color: #444;
