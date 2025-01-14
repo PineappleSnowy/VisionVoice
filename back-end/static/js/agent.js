@@ -85,11 +85,9 @@ setInterval(()=>{
     if( document.getElementById('agent-chat-textarea').value.trim() || uploadedImages.length > 0){
         document.querySelector('#send-button').style.display = 'inline-block';
         document.querySelector('#more_function_button').style.display = 'none';
-        document.querySelector('#send-button').style.width = '70px';
     }else{
         document.querySelector('#send-button').style.display = 'none';
         document.querySelector('#more_function_button').style.display = 'flex';
-        document.querySelector('#send-button').style.width = '35px';
     }
 },100);
 
@@ -293,7 +291,7 @@ imageList.addEventListener('click', function (event) {
                 document.querySelector('#imageUploadPanel .content .add').style.display = 'none';
                 document.querySelector('#imageUploadPanel').style.display = 'none';
             }
-        },1000);
+        },100);
     }
     
 });
@@ -313,7 +311,7 @@ document.querySelector('#imageUploadPanel .content .add input').addEventListener
     const file = e.target.files[0];
 
     if (!file) return; // 检查文件是否存在
-
+    document.getElementById('more_function_button').click();
     // 创建一个临时的 URL 来显示图片
     const imageUrl = URL.createObjectURL(file);
 
@@ -403,25 +401,11 @@ function clearImageDiv() {
     uploadedImages = [];
 }
 
-// 按下回车键也可以发送消息
-document.getElementById('agent-chat-textarea').addEventListener('keypress', function (e) {
-    if (e.key === 'Enter') {
-        if (e.shiftKey) {
-            document.getElementById('agent-chat-textarea').textContent += '\n';
-        }
-        else {
-            document.getElementById('send-button').click();
-            e.preventDefault();
-            this.style.height = 'auto';
-        }
-    }
-});
-
 //控制多功能板上下移动
 document.getElementById('more_function_button').addEventListener('click', function () {
     if (flag_board === 0) {
         flag_board = 1;
-        document.querySelector('#more_function_button img').src = '../static/images/more_function_end.png';
+        document.querySelector('#more_function_button').style.backgroundImage = "url('../static/images/more_function_end.png')";
         document.querySelector('#more_function_button').ariaLabel = '关闭更多功能面板';
         if (document.getElementById('chat-input-container').classList.contains('slide-up')) {
             document.getElementById('chat-input-container').classList.remove('slide-up');
@@ -446,7 +430,7 @@ document.getElementById('more_function_button').addEventListener('click', functi
 
     else {
         flag_board = 0;
-        document.querySelector('#more_function_button img').src = '../static/images/more_function_start.png';
+        document.querySelector('#more_function_button').style.backgroundImage = "url('../static/images/more_function_start.png')";
         document.querySelector('#more_function_button').ariaLabel = '打开更多功能面板';
         if (document.getElementById('chat-input-container').classList.contains('slide-down')) {
             document.getElementById('chat-input-container').classList.remove('slide-down');
