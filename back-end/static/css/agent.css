@@ -446,6 +446,17 @@ p {
     position: relative;
 }
 
+#imageUploadPanel .content .image .musk{
+    width: 80px;
+    height: 80px;
+    border-radius: 10px;
+    position: absolute;
+    background-color: rgb(152, 10, 10, 0.5);
+    z-index: 2;
+    left: 0;
+    top: 0;
+}
+
 #imageUploadPanel .content .image img {
     width: 100%;
     height: 100%;
