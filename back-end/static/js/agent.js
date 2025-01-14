@@ -81,15 +81,15 @@ document.getElementById('phone-button').addEventListener('click', function () {
 });
 
 
-setInterval(()=>{
-    if( document.getElementById('agent-chat-textarea').value.trim() || uploadedImages.length > 0){
+setInterval(() => {
+    if (document.getElementById('agent-chat-textarea').value.trim() || uploadedImages.length > 0) {
         document.querySelector('#send-button').style.display = 'inline-block';
         document.querySelector('#more_function_button').style.display = 'none';
-    }else{
+    } else {
         document.querySelector('#send-button').style.display = 'none';
         document.querySelector('#more_function_button').style.display = 'flex';
     }
-},100);
+}, 100);
 
 
 let message = ''  // 用户发送的消息
@@ -268,14 +268,14 @@ function sendMessageToAgent(message, multi_image_talk) {
 // 为 #imageUploadPanel 添加事件委托
 const imageList = document.querySelector('#imageUploadPanel .content .imageList');
 imageList.addEventListener('click', function (event) {
-    
+
     // 找到当前按钮的父元素 .image
     const imageContainer = event.target.closest('.image');
     if (imageContainer) {
         const musk = document.createElement('div');
         musk.classList.add('musk');
         imageContainer.appendChild(musk);
-        setTimeout(()=>{
+        setTimeout(() => {
             // 获取图片容器的索引
             const index = Array.from(imageList.children).indexOf(imageContainer);
             if (index !== -1) {
@@ -287,13 +287,13 @@ imageList.addEventListener('click', function (event) {
             if (uploadedImages.length > 0) {
                 document.querySelector('#imageUploadPanel .content .add').style.display = 'flex';
                 document.querySelector('#imageUploadPanel').style.display = 'flex';
-            }else{
+            } else {
                 document.querySelector('#imageUploadPanel .content .add').style.display = 'none';
                 document.querySelector('#imageUploadPanel').style.display = 'none';
             }
-        },100);
+        }, 100);
     }
-    
+
 });
 
 document.getElementById('photo').addEventListener('click', function (e) {
@@ -311,7 +311,9 @@ document.querySelector('#imageUploadPanel .content .add input').addEventListener
     const file = e.target.files[0];
 
     if (!file) return; // 检查文件是否存在
-    document.getElementById('more_function_button').click();
+    if (flag_board === 1) {
+        document.getElementById('more_function_button').click();
+    }
     // 创建一个临时的 URL 来显示图片
     const imageUrl = URL.createObjectURL(file);
 
@@ -343,50 +345,25 @@ document.querySelector('#imageUploadPanel .content .add input').addEventListener
 
     if (uploadedImages.length > 0) {
         document.querySelector('#imageUploadPanel .content .add').style.display = 'flex';
-    }else{
+    } else {
         document.querySelector('#imageUploadPanel .content .add').style.display = 'none';
     }
 });
 
 document.getElementById('album_photo').addEventListener('click', function () {
     const imageUploadPanel = document.getElementById('imageUploadPanel');
-    if (imageUploadPanel.style.display === 'none') {
-        const input = document.querySelector('#imageUploadPanel .content .add input');
-        input.removeAttribute('capture'); // 确保不包含 capture 属性
-        imageUploadPanel.style.display = 'flex';
-        input.click();
-    } else {
-        clearImageDiv();
-        imageUploadPanel.style.display = 'none';
-    }
-
-    if (uploadedImages.length > 0) {
-        document.querySelector('#imageUploadPanel .content .add').style.display = 'flex';
-    }else{
-        document.querySelector('#imageUploadPanel .content .add').style.display = 'none';
-    }
+    const input = document.querySelector('#imageUploadPanel .content .add input');
+    input.removeAttribute('capture'); // 确保不包含 capture 属性
+    imageUploadPanel.style.display = 'flex';
+    input.click();
 });
 
 document.getElementById('camera_photo').addEventListener('click', function () {
     const imageUploadPanel = document.getElementById('imageUploadPanel');
-
-    // 查看 input 的属性
-
-    if (imageUploadPanel.style.display === 'none') {
-        const input = document.querySelector('#imageUploadPanel .content .add input');
-        input.setAttribute('capture', 'camera'); // 从相机上传
-        imageUploadPanel.style.display = 'flex';
-        input.click();
-    } else {
-        clearImageDiv();
-        imageUploadPanel.style.display = 'none';
-    }
-
-    if (uploadedImages.length > 0) {
-        document.querySelector('#imageUploadPanel .content .add').style.display = 'flex';
-    }else{
-        document.querySelector('#imageUploadPanel .content .add').style.display = 'none';
-    }
+    const input = document.querySelector('#imageUploadPanel .content .add input');
+    input.setAttribute('capture', 'camera'); // 从相机上传
+    imageUploadPanel.style.display = 'flex';
+    input.click();
 });
 
 document.getElementById('camera_icon').addEventListener('click', function () {
