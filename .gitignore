@@ -51,7 +51,7 @@ yolo11x-seg.pt
 api.json
 
 # 用户文件
-back-end/user_images/*
+**/user_images/*
 user.json
 
 # 服务器脚本
