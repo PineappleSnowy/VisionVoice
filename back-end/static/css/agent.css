@@ -79,10 +79,6 @@ p {
     z-index: 1;
 }
 
-#send-button:hover {
-    background-color: #297a4f;
-}
-
 #more_function_button {
     position: absolute;
     right: 0.3rem;
@@ -98,10 +94,6 @@ p {
     background-color: #3eb575;
     cursor: pointer;
     z-index: 1;
-}
-
-#more_function_button:hover {
-    background-color: #297a4f;
 }
 
 #agent-chat-textarea {

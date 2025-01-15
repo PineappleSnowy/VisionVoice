@@ -696,7 +696,7 @@ socket.on('agent_speech_recognition_finished', async function (data) {
     const user = localStorage.getItem('user');
     console.log('curr_user', user)
     if (data.user !== user) return;
-    rec_result = data['rec_result'];
+    const rec_result = data['rec_result'];
 
     if (!rec_result) {
         console.log('[agent.js][socket.on][agent_speech_recognition_finished] 音频识别结果为空.');
