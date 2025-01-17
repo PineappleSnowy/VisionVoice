@@ -392,6 +392,7 @@ document.getElementById('more_function_button').addEventListener('click', functi
             document.getElementById('more_function_board').classList.remove('slide-down');
             document.getElementById('more_function_board').classList.add('slide-up');
         }
+        document.getElementById('chat-container').style.bottom = '181px';
     }
 
     else {
@@ -406,6 +407,7 @@ document.getElementById('more_function_button').addEventListener('click', functi
             document.getElementById('more_function_board').classList.remove('slide-up');
             document.getElementById('more_function_board').classList.add('slide-down');
         }
+        document.getElementById('chat-container').style.bottom = '100px';
     }
 });
 

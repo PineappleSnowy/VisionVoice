@@ -460,8 +460,8 @@ p {
 #audio-control {
     position: absolute;
     right: 10px;
-    width: 24px;
-    height: 24px;
+    width: 30px;
+    height: 30px;
     background-image: url('../images/audio.png');
     background-size: contain;
     background-repeat: no-repeat;

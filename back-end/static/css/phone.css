@@ -39,7 +39,7 @@ html body .controller .status {
   display: block;
   position: absolute;
   left: 1.31rem;
-  bottom: 2.24rem;
+  bottom: 2.5rem;
   width: 1.5rem;
   height: 0.3rem;
   font-size: 0.2rem;
@@ -50,31 +50,31 @@ html body .controller canvas {
   display: block;
   position: absolute;
   left: 1.31rem;
-  bottom: 1.24rem;
+  bottom: 1.5rem;
   width: 1.5rem;
   height: 1rem;
 }
 
 html body .controller .openCamera {
   position: absolute;
-  left: 0.9rem;
-  bottom: 0.63rem;
-  font-size: 0.5rem;
+  left: 0.8rem;
+  bottom: 0.9rem;
+  font-size: 0.6rem;
 }
 
 html body .controller .hangUp {
   position: absolute;
-  right: 0.9rem;
-  bottom: 0.63rem;
-  font-size: 0.5rem;
+  right: 0.8rem;
+  bottom: 0.9rem;
+  font-size: 0.6rem;
 }
 
 html body .controller .micButton {
   position: absolute;
-  right: 0.4rem;
-  bottom: 1.45rem;
-  width: 0.6rem;
-  height: 0.6rem;
+  right: 0.35rem;
+  bottom: 1.7rem;
+  width: 0.7rem;
+  height: 0.7rem;
   background-color: white;
   border-radius: 50%;
   display: flex;
@@ -91,10 +91,10 @@ html body .controller .micButton.mic-off {
 
 html body .controller .captionButton {
   position: absolute;
-  left: 0.4rem;
-  bottom: 1.45rem;
-  width: 0.6rem;
-  height: 0.6rem;
+  left: 0.35rem;
+  bottom: 1.7rem;
+  width: 0.7rem;
+  height: 0.7rem;
   background-color: white;
   border-radius: 50%;
   display: flex;
@@ -109,32 +109,34 @@ html body .controller .captionButton.caption-off {
   color: white;
 }
 
-html body .moreFunctions {
-  position: absolute;
-  left: 50%;
-  bottom: 0.63rem;
-  font-size: 0.5rem;
-  transform: translateX(-50%);
-}
-
 html body .endFunc {
+  width: 1.5rem;
+  height: 1.1rem;
   position: absolute;
   left: 50%;
-  bottom: 0.63rem;
-  font-size: 0.5rem;
+  bottom: 1.75rem;
+  font-size: 0.6rem;
   transform: translateX(-50%);
   display: none;
+  justify-content: center;
+  align-items: flex-end;
   color: red;
+  z-index: 1;
 }
 
 html body .shutUpSpeak {
+  width: 1.5rem;
+  height: 1.1rem;
   position: absolute;
   left: 50%;
-  bottom: 1.5rem;
-  font-size: 0.5rem;
+  bottom: 1.75rem;
+  font-size: 0.6rem;
   transform: translateX(-50%);
   display: none;
+  justify-content: center;
+  align-items: flex-end;
   color: red;
+  z-index: 1;
 }
 
 html body video {
@@ -248,28 +250,29 @@ closeModalButton:hover {
 }
 
 .optionsBar {
-  display: none;
   position: fixed;
   bottom: 0;
   left: 50%;
-  width: 80%;
-  height: 6%;
-  background-color:#1e1e1e;
+  width: 95%;
+  background-color: #1e1e1e;
   transform: translateX(-50%);
   z-index: 2;
-  /* display: flex; */
   justify-content: space-around;
   align-items: center;
+  display: flex;
 }
 
 .optionButton {
   background: none;
   border: none;
   color: white;
-  font-size: 0.4rem;
+  font-size: 0.25rem;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center; /* 垂直居中 */
+  height: 0.8rem;
+  width: 23.75%;
 }
 
 .captionModal {
@@ -289,7 +292,7 @@ closeModalButton:hover {
   font-size: 0.18rem;
 }
 
-.frame-window {
+/* .frame-window {
   max-width: 100vw;
   max-height: 5.24rem;
   width: auto;
@@ -301,4 +304,4 @@ closeModalButton:hover {
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 0;
-}
+} */

@@ -79,7 +79,7 @@ function shutUpAgentSpeak() {
 function startShutUpStatus() {
     if (state === 0) {
         statusDiv.textContent = '点击打断';
-        shutUpSpeakButton.style.display = 'block';
+        shutUpSpeakButton.style.display = 'flex';
         waveShape.style.display = 'none';
     }
 }
@@ -476,6 +476,7 @@ function exit_find_item() {
 
 // 退出功能模式
 function exitFuncModel() {
+    document.querySelector('.endFunc').style.display = 'none';
     if (obstacle_avoid) {
         stopAudio()
         startCheckSilenceTimer()
@@ -499,8 +500,8 @@ function startAvoidObstacle() {
     statusDiv.textContent = "避障模式";
     if (vudio.dance()) { vudio.pause() }
 
-    document.querySelector('.moreFunctions').style.display = 'none';
-    document.querySelector('.endFunc').style.display = 'block';
+    waveShape.style.display = 'none';
+    document.querySelector('.endFunc').style.display = 'flex';
 
     if (!videoChat) {
         openCamera.click()
@@ -524,8 +525,7 @@ window.startFindItem = function (item_name) {
     statusDiv.textContent = "寻物模式";
     if (vudio.dance()) { vudio.pause(); }
 
-    document.querySelector('.moreFunctions').style.display = 'none';
-    document.querySelector('.endFunc').style.display = 'block';
+    document.querySelector('.endFunc').style.display = 'flex';
 
     closeModalButton.click();
     if (!videoChat) {
@@ -885,26 +885,9 @@ window.onload = async () => {
     /* 处理音频识别 end 
     ------------------------------------------------------------*/
 
-    // 功能键逻辑
-    const moreFunctionsButton = document.querySelector('.moreFunctions');
-    const optionsBar = document.querySelector('.optionsBar');
-
-    moreFunctionsButton.addEventListener('click', () => {
-        if (optionsBar.style.display === 'none' || optionsBar.style.display === '') {
-            optionsBar.style.display = 'flex';
-        } else {
-            optionsBar.style.display = 'none';
-        }
-    });
-
-    function closeOptionsBar() {
-        optionsBar.style.display = 'none';
-    }
-
     // 退出功能键逻辑
     const endFuncButton = document.querySelector('.endFunc');
     endFuncButton.addEventListener('click', () => {
-        moreFunctionsButton.style.display = 'block';
         endFuncButton.style.display = 'none';
         exitFuncModel()
     });
@@ -912,7 +895,7 @@ window.onload = async () => {
     // 避障逻辑
     const obstacleAvoidButton = document.querySelector('.optionButton.avoidObstacle');
     obstacleAvoidButton.addEventListener('click', () => {
-        closeOptionsBar();
+        exitFuncModel();
         startAvoidObstacle();
         // 前端避障，处开发阶段，尚未启用
         // main()
@@ -925,9 +908,9 @@ window.onload = async () => {
 
     const findItemButton = document.querySelector('.optionButton.findItem');
     findItemButton.addEventListener('click', () => {
+        exitFuncModel();
         overlay.style.display = 'block';
         findItemModal.style.display = 'block';
-        closeOptionsBar();
         loadGallery();
     });
 
@@ -1054,7 +1037,7 @@ window.onload = async () => {
 
     const currLocButton = document.querySelector('.optionButton.currentLocation');
     currLocButton.addEventListener('click', async () => {
-        closeOptionsBar();
+        exitFuncModel();
         stopCheckSilenceTimer();
         stopAudio();
         finishShutUpStatus();
@@ -1070,7 +1053,7 @@ window.onload = async () => {
     const envDesButton = document.querySelector('.optionButton.environmentDescription');
     envDesButton.addEventListener('click', async () => {
         if (!videoChat) { await openCamera.click() }
-        closeOptionsBar();
+        exitFuncModel();
         stopCheckSilenceTimer();
         stopAudio();
         finishShutUpStatus();
