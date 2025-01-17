@@ -1213,10 +1213,10 @@ def run_server():
     else:
         socketio.run(
             app,
-            port=443,
-            host="0.0.0.0",
+            # port=443,
+            # host="0.0.0.0",
             allow_unsafe_werkzeug=True,
-            ssl_context=("/ssl/cert.pem", "/ssl/cert.key")
+            # ssl_context=("/ssl/cert.pem", "/ssl/cert.key")
         )
 
 

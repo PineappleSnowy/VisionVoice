@@ -330,38 +330,39 @@ function captureAndSendFrame() {
     }
 }
 
-async function loadModel() {
-    const model = await cocoSsd.load();
-    return model;
-}
+// 前端避障，尚在开发
+// async function loadModel() {
+//     const model = await cocoSsd.load();
+//     return model;
+// }
 
-async function detectFrame(model) {
-    const canvas = document.querySelector('.frame-window');
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    const context = canvas.getContext('2d');
-    const predictions = await model.detect(video);
-    context.clearRect(0, 0, canvas.width, canvas.height);
-    context.drawImage(video, 0, 0, canvas.width, canvas.height);
-    predictions.forEach(prediction => {
-        context.beginPath();
-        context.rect(...prediction.bbox);
-        context.lineWidth = 2;
-        context.strokeStyle = 'red';
-        context.fillStyle = 'red';
-        context.font = '0.2rem Arial';
-        context.stroke();
-        context.fillText(prediction.class, prediction.bbox[0], prediction.bbox[1] > 10 ? prediction.bbox[1] - 5 : 10);
-    });
-    canvas.style.display = 'block';
-    video.style.display = 'none';
-    requestAnimationFrame(() => detectFrame(model));
-}
+// async function detectFrame(model) {
+//     const canvas = document.querySelector('.frame-window');
+//     canvas.width = video.videoWidth;
+//     canvas.height = video.videoHeight;
+//     const context = canvas.getContext('2d');
+//     const predictions = await model.detect(video);
+//     context.clearRect(0, 0, canvas.width, canvas.height);
+//     context.drawImage(video, 0, 0, canvas.width, canvas.height);
+//     predictions.forEach(prediction => {
+//         context.beginPath();
+//         context.rect(...prediction.bbox);
+//         context.lineWidth = 2;
+//         context.strokeStyle = 'red';
+//         context.fillStyle = 'red';
+//         context.font = '0.2rem Arial';
+//         context.stroke();
+//         context.fillText(prediction.class, prediction.bbox[0], prediction.bbox[1] > 10 ? prediction.bbox[1] - 5 : 10);
+//     });
+//     canvas.style.display = 'block';
+//     video.style.display = 'none';
+//     requestAnimationFrame(() => detectFrame(model));
+// }
 
-async function main() {
-    const model = await loadModel();
-    detectFrame(model);
-}
+// async function main() {
+//     const model = await loadModel();
+//     detectFrame(model);
+// }
 
 function calcLocation(top, left) {
     let x_describe = '';
@@ -1067,8 +1068,8 @@ window.onload = async () => {
     });
 
     const envDesButton = document.querySelector('.optionButton.environmentDescription');
-    envDesButton.addEventListener('click', () => {
-        if (!videoChat) { openCamera.click() }
+    envDesButton.addEventListener('click', async () => {
+        if (!videoChat) { await openCamera.click() }
         closeOptionsBar();
         stopCheckSilenceTimer();
         stopAudio();
