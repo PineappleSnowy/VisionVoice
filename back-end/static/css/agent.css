@@ -247,10 +247,14 @@ p {
 #album_photo {
     display: flex;
     position: absolute;
-    top: 1rem;
-    left: 1.0rem;
+    top: 0.5rem;
+    left: 0rem;
     color: white;
-    font-size: 3.0rem;
+    font-size: 2.5rem;
+    width: 6rem;
+    height: 4rem;
+    justify-content: center;
+    align-items: center;
 }
 
 #album_photo:hover {
@@ -260,10 +264,14 @@ p {
 #camera_photo {
     display: flex;
     position: absolute;
-    top: 1rem;
+    top: 0.5rem;
     left: 6.0rem;
     color: white;
-    font-size: 3.0rem;
+    font-size: 2.5rem;
+    width: 6rem;
+    height: 4rem;
+    justify-content: center;
+    align-items: center;
 }
 
 #camera_photo:hover {
@@ -312,32 +320,42 @@ p {
 
 #phone-button {
     position: absolute;
-    bottom: 60px;
-    left: 3px;
+    bottom: 52px;
+    left: 0px;
     border: none;
     background: transparent;
     cursor: pointer;
     display: flex;
+    width: 6rem;
+    height: 4rem;
+    justify-content: left;
+    align-items: flex-end;
+    padding: 4px 4px;
 }
 
 #phone_icon {
-    width: 3.5rem;
-    height: 3.5rem;
+    width: 3rem;
+    height: 3rem;
 }
 
 #camera-button {
     position: absolute;
-    bottom: 60px;
+    bottom: 52px;
     right: 3px;
     border: none;
     background: transparent;
     cursor: pointer;
     display: flex;
+    width: 6rem;
+    height: 4rem;
+    justify-content: right;
+    align-items: center;
+    padding: 4px 4px;
 }
 
 #camera_icon {
-    width: 3.5rem;
-    height: 3.5rem;
+    width: 3rem;
+    height: 3rem;
 }
 
 /* ...existing code... */
@@ -459,13 +477,14 @@ p {
 /* 音频控制按钮样式 */
 #audio-control {
     position: absolute;
-    right: 10px;
-    width: 30px;
-    height: 30px;
-    background-image: url('../images/audio.png');
-    background-size: contain;
+    top: 0px;
+    right: 0px;
+    width: 80px;
+    height: 45px;
+    background-image: url(../images/audio.png);
+    background-size: 42%;
     background-repeat: no-repeat;
-    background-position: center;
+    background-position: calc(100% - 10px) center;
     border: none;
     background-color: transparent;
     cursor: pointer;

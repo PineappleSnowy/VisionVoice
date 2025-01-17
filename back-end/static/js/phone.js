@@ -102,15 +102,22 @@ if (micClose === null) {
 }
 
 if (micClose) {
+    document.querySelector('.micButton').setAttribute('aria-label', '打开麦克风');
     stopCheckSilenceTimer();
     document.querySelector('.micButton').classList.add('mic-off');
 }
+else {
+    document.querySelector('.micButton').setAttribute('aria-label', '关闭麦克风');
+}
+
 document.querySelector('.micButton').addEventListener('click', function () {
     if (document.querySelector('.micButton').classList.toggle('mic-off')) {
+        document.querySelector('.micButton').setAttribute('aria-label', '打开麦克风');
         micClose = true;
         localStorage.setItem('micClose', micClose);
         stopCheckSilenceTimer();
     } else {
+        document.querySelector('.micButton').setAttribute('aria-label', '关闭麦克风');
         micClose = false;
         localStorage.setItem('micClose', micClose);
         startCheckSilenceTimer();
@@ -126,17 +133,22 @@ if (captionClose === null) {
 }
 
 if (captionClose) {
+    document.querySelector('.captionButton').setAttribute('aria-label', '打开字幕');
     document.querySelector('.captionButton').classList.add('caption-off');
 }
 else {
+    document.querySelector('.captionButton').setAttribute('aria-label', '关闭字幕');
     document.getElementById('captionModal').style.display = 'block';
 }
+
 document.querySelector('.captionButton').addEventListener('click', function () {
     if (document.querySelector('.captionButton').classList.toggle('caption-off')) {
+        document.querySelector('.captionButton').setAttribute('aria-label', '打开字幕');
         captionClose = true;
         localStorage.setItem('captionClose', captionClose);
         document.getElementById('captionModal').style.display = 'none';
     } else {
+        document.querySelector('.captionButton').setAttribute('aria-label', '关闭字幕');
         captionClose = false;
         localStorage.setItem('captionClose', captionClose);
         document.getElementById('captionModal').style.display = 'block';
@@ -1061,17 +1073,15 @@ window.onload = async () => {
         if (vudio.dance()) { vudio.pause() }
 
         let complexity = localStorage.getItem('complexity');
-        if (complexity === null)
-        {
+        if (complexity === null) {
             complexity = "详细";
             localStorage.setItem('complexity', complexity);
         }
         let prompt_des = "";
-        if(complexity == "详细")
-        {
+        if (complexity == "详细") {
             prompt_des = "充分捕捉环境信息，客观详细地";
         }
-        else if(complexity == "简洁"){
+        else if (complexity == "简洁") {
             prompt_des = "简洁地";
         }
         rec_result = `请${prompt_des}描述环境。`;

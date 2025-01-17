@@ -23,15 +23,20 @@ p {
 }
 
 .back-button {
+    display: flex;
     position: absolute;
-    left: 10px;
-    top: 50%;
-    transform: translateY(-50%);
+    left: 0px;
+    top: 0px;
     background: none;
     border: none;
     color: #e0e0e0;
-    font-size: 24px;
+    font-size: 26px;
     cursor: pointer;
+    width: 100px;
+    height: 46px;
+    justify-content: left;
+    align-items: center;
+    padding: 5px 14px;
 }
 
 .gallery {

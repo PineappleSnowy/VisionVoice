@@ -11,18 +11,30 @@ html body {
 
 html body .goBack {
   position: fixed;
-  left: 0.28rem;
-  top: 0.28rem;
+  left: 0rem;
+  top: 0.15rem;
+  width: 0.8rem;
+  height: 0.6rem;
   font-size: 0.3rem;
   z-index: 2;
+  display: flex;
+  justify-content: left;
+  align-items: center;
+  padding: 0 0.2rem;
 }
 
 html body .toggleCamera {
   position: fixed;
-  right: 0.28rem;
-  top: 0.28rem;
+  right: 0rem;
+  top: 0.15rem;
+  width: 0.8rem;
+  height: 0.6rem;
   font-size: 0.3rem;
   z-index: 2;
+  display: flex;
+  justify-content: right;
+  align-items: center;
+  padding: 0 0.2rem;
 }
 
 html body .controller {
@@ -56,17 +68,27 @@ html body .controller canvas {
 }
 
 html body .controller .openCamera {
+  display: flex;
   position: absolute;
-  left: 0.8rem;
-  bottom: 0.9rem;
-  font-size: 0.6rem;
+  left: 0.4rem;
+  bottom: 0.85rem;
+  font-size: 0.5rem;
+  width: 1.2rem;
+  height: 0.8rem;
+  justify-content: center;
+  align-items: center;
 }
 
 html body .controller .hangUp {
+  display: flex;
   position: absolute;
-  right: 0.8rem;
-  bottom: 0.9rem;
-  font-size: 0.6rem;
+  right: 0.4rem;
+  bottom: 0.85rem;
+  font-size: 0.5rem;
+  width: 1.2rem;
+  height: 0.8rem;
+  justify-content: center;
+  align-items: center;
 }
 
 html body .controller .micButton {
@@ -234,7 +256,7 @@ p {
   font-size: large;
 }
 
-closeModalButton:hover {
+.closeModalButton:hover {
   background-color: #444;
 }
 
@@ -264,13 +286,14 @@ closeModalButton:hover {
 
 .optionButton {
   background: none;
-  border: none;
+  border: 1px solid rgba(255, 255, 255, 0.1);
   color: white;
   font-size: 0.25rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center; /* 垂直居中 */
+  justify-content: center;
+  /* 垂直居中 */
   height: 0.8rem;
   width: 23.75%;
 }
