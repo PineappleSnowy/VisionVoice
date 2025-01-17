@@ -62,6 +62,7 @@ p {
     padding: 1px 0px;
     background-color: #2c2c2c;
     border-top: 1px solid #555;
+    border-bottom: 1px solid #333;
 }
 
 #send-button {
