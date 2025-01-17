@@ -54,7 +54,7 @@ p {
 }
 
 .select-left {
-    margin-left: 80px;
+    margin-left: auto;
     font-size: large;
     width: 120px;
     height: 50px;
