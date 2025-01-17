@@ -59,7 +59,9 @@ p {
     display: flex;
     justify-content: right;
     border: 0;
-    padding: 0;
+    padding: 1px 0px;
+    background-color: #2c2c2c;
+    border-top: 1px solid #555;
 }
 
 #send-button {
@@ -104,18 +106,19 @@ p {
     resize: none;
     width: auto;
     position: absolute;
-    bottom: 0px;
-    right: 0px;
-    left: 0px;
+    bottom: 1px;
+    right: 46px;
+    left: 46px;
     background-color: rgba(0, 0, 0, 0.8);
     color: #ffffff;
-    border-radius: 10px 10px 0 0;
-    padding: 10px 5.5rem 10px 3rem;
+    border-radius: 10px 10px 10px 10px;
+    padding: 10px 0.5rem 10px 0.5rem;
     font-size: 16px;
     border: 1px solid rgba(255, 255, 255, 0.1);
     transition: all 0.2s ease;
     line-height: 1.5;
     box-sizing: border-box;
+    align-items: center;
 }
 
 #agent-chat-textarea:focus {
@@ -482,7 +485,7 @@ p {
     width: 80px;
     height: 45px;
     background-image: url(../images/audio.png);
-    background-size: 42%;
+    background-size: 40%;
     background-repeat: no-repeat;
     background-position: calc(100% - 10px) center;
     border: none;

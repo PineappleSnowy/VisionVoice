@@ -448,8 +448,12 @@ let isMuted = localStorage.getItem('isMuted') === 'true';
 
 window.addEventListener('DOMContentLoaded', function () {
     if (isMuted) {
+        document.getElementById('audio-control').setAttribute('aria-label', '关闭静音');
         console.log('[agent.js][DOMContentLoaded] localStorage 中用户已经设置过静音，展示静音图标...');
         document.getElementById('audio-control').classList.add('muted');
+    }
+    else{
+        document.getElementById('audio-control').setAttribute('aria-label', '开启静音');
     }
 });
 
@@ -464,10 +468,14 @@ document.getElementById('audio-control').addEventListener('click', function () {
 
     // 如果用户静音，则暂停音频播放
     if (isMuted) {
+        document.getElementById('audio-control').setAttribute('aria-label', '关闭静音');
         console.log('[agent.js][audio-control] 用户静音，暂停音频播放...');
         audioQueue = [];
         audioPlayer.pause();
         isPlaying = false;
+    }
+    else{
+        document.getElementById('audio-control').setAttribute('aria-label', '开启静音');
     }
 })
 
