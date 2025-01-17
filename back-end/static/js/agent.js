@@ -384,50 +384,28 @@ document.getElementById('more_function_button').addEventListener('click', functi
         flag_board = 1;
         document.querySelector('#more_function_button').style.backgroundImage = "url('../static/images/more_function_end.png')";
         document.querySelector('#more_function_button').ariaLabel = '关闭更多功能面板';
-        if (document.getElementById('chat-input-container').classList.contains('slide-up')) {
-            document.getElementById('chat-input-container').classList.remove('slide-up');
-            document.getElementById('chat-input-container').classList.add('slide-up');
-        }
-        else {
+        if (!document.getElementById('chat-input-container').classList.contains('slide-up')) {
             document.getElementById('chat-input-container').classList.remove('slide-down');
             document.getElementById('chat-input-container').classList.add('slide-up');
         }
-        if (document.getElementById('more_function_board').classList.contains('slide-up')) {
-            document.getElementById('more_function_board').classList.remove('slide-up');
-            document.getElementById('more_function_board').classList.add('slide-up');
-        }
-        else {
+        if (!document.getElementById('more_function_board').classList.contains('slide-up')) {
             document.getElementById('more_function_board').classList.remove('slide-down');
             document.getElementById('more_function_board').classList.add('slide-up');
         }
-        document.getElementById('navbar').style.display = 'none';
-        // 当 more_function_board 出现时，调整 chat-container 的 bottom 值
-        document.getElementById('chat-container').style.bottom = '250px';
     }
 
     else {
         flag_board = 0;
         document.querySelector('#more_function_button').style.backgroundImage = "url('../static/images/more_function_start.png')";
         document.querySelector('#more_function_button').ariaLabel = '打开更多功能面板';
-        if (document.getElementById('chat-input-container').classList.contains('slide-down')) {
-            document.getElementById('chat-input-container').classList.remove('slide-down');
-            document.getElementById('chat-input-container').classList.add('slide-down');
-        }
-        else {
+        if (!document.getElementById('chat-input-container').classList.contains('slide-down')) {
             document.getElementById('chat-input-container').classList.remove('slide-up');
             document.getElementById('chat-input-container').classList.add('slide-down');
         }
-        if (document.getElementById('more_function_board').classList.contains('slide-down')) {
-            document.getElementById('more_function_board').classList.remove('slide-down');
-            document.getElementById('more_function_board').classList.add('slide-down');
-        }
-        else {
+        if (!document.getElementById('more_function_board').classList.contains('slide-down')) {
             document.getElementById('more_function_board').classList.remove('slide-up');
             document.getElementById('more_function_board').classList.add('slide-down');
         }
-        document.getElementById('navbar').style.display = 'flex';
-        // 当 more_function_board 隐藏时，恢复 chat-container 的 bottom 值
-        document.getElementById('chat-container').style.bottom = '100px';
     }
 });
 

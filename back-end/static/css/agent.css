@@ -53,7 +53,7 @@ p {
 
 #chat-input-container {
     position: absolute;
-    bottom: 45px;
+    bottom: 50px;
     width: 100%;
     height: 50px;
     display: flex;
@@ -65,7 +65,7 @@ p {
 #send-button {
     position: absolute;
     right: 0.3rem;
-    bottom: 0.7rem;
+    bottom: 0.4rem;
     width: 5rem;
     height: 2.4rem;
     border-radius: 5px;
@@ -82,7 +82,7 @@ p {
 #more_function_button {
     position: absolute;
     right: 0.3rem;
-    bottom: 0.7rem;
+    bottom: 0.4rem;
     width: 2.4rem;
     height: 2.4rem;
     background-image: url('../images/more_function_start.png');
@@ -104,19 +104,17 @@ p {
     resize: none;
     width: auto;
     position: absolute;
-    bottom: 5px;
-    right: 1px;
-    left: 1px;
+    bottom: 0px;
+    right: 0px;
+    left: 0px;
     background-color: rgba(0, 0, 0, 0.8);
     color: #ffffff;
     border-radius: 10px 10px 0 0;
-    padding: 10px 100px 10px 3rem;
+    padding: 10px 5.5rem 10px 3rem;
     font-size: 16px;
     border: 1px solid rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
     transition: all 0.2s ease;
     line-height: 1.5;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     box-sizing: border-box;
 }
 
@@ -249,7 +247,7 @@ p {
 #album_photo {
     display: flex;
     position: absolute;
-    top: 15px;
+    top: 1rem;
     left: 1.0rem;
     color: white;
     font-size: 3.0rem;
@@ -262,7 +260,7 @@ p {
 #camera_photo {
     display: flex;
     position: absolute;
-    top: 15px;
+    top: 1rem;
     left: 6.0rem;
     color: white;
     font-size: 3.0rem;
@@ -290,13 +288,13 @@ p {
     }
 
     to {
-        transform: translateY(-150px);
+        transform: translateY(-5rem);
     }
 }
 
 @keyframes slidedown {
     from {
-        transform: translateY(-150px);
+        transform: translateY(-5rem);
     }
 
     to {
@@ -314,42 +312,32 @@ p {
 
 #phone-button {
     position: absolute;
-    left: 3px;
     bottom: 60px;
-    width: 50px;
-    height: 50px;
+    left: 3px;
     border: none;
-    border-radius: 50%;
     background: transparent;
     cursor: pointer;
     display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
 }
 
 #phone_icon {
-    width: 50px;
-    height: 50px;
+    width: 3.5rem;
+    height: 3.5rem;
 }
 
 #camera-button {
     position: absolute;
     bottom: 60px;
-    right: 10px;
+    right: 3px;
     border: none;
-    border-radius: 50%;
     background: transparent;
     cursor: pointer;
     display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
 }
 
 #camera_icon {
-    width: 50px;
-    height: 50px;
+    width: 3.5rem;
+    height: 3.5rem;
 }
 
 /* ...existing code... */
@@ -386,7 +374,7 @@ p {
     position: relative;
 }
 
-#imageUploadPanel .content .image .musk{
+#imageUploadPanel .content .image .musk {
     width: 80px;
     height: 80px;
     border-radius: 10px;
@@ -454,7 +442,7 @@ p {
 #microphone-button {
     position: absolute;
     left: 0.3rem;
-    bottom: 0.7rem;
+    bottom: 0.4rem;
     width: 2.4rem;
     height: 2.4rem;
     background-image: url('../images/microphone.png');
