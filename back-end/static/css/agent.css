@@ -108,15 +108,15 @@ p {
     width: auto;
     position: absolute;
     bottom: 1px;
-    right: 46px;
-    left: 46px;
+    right: 2.9rem;
+    left: 2.9rem;
     background-color: rgba(0, 0, 0, 0.8);
     color: #ffffff;
     border-radius: 10px;
     padding: 10px 0.5rem 10px 0.5rem;
     font-size: 16px;
     border: 1px solid rgba(255, 255, 255, 0.1);
-    transition: all 0.2s ease;
+    transition: all 0.1s ease;
     line-height: 1.5;
     box-sizing: border-box;
     align-items: center;

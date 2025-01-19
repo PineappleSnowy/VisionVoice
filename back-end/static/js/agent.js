@@ -85,9 +85,11 @@ setInterval(() => {
     if (document.getElementById('agent-chat-textarea').value.trim() || uploadedImages.length > 0) {
         document.querySelector('#send-button').style.display = 'inline-block';
         document.querySelector('#more_function_button').style.display = 'none';
+        document.getElementById('agent-chat-textarea').style.right = '5.5rem';
     } else {
         document.querySelector('#send-button').style.display = 'none';
         document.querySelector('#more_function_button').style.display = 'flex';
+        document.getElementById('agent-chat-textarea').style.right = '2.9rem';
     }
 }, 100);
 
@@ -452,7 +454,7 @@ window.addEventListener('DOMContentLoaded', function () {
         console.log('[agent.js][DOMContentLoaded] localStorage 中用户已经设置过静音，展示静音图标...');
         document.getElementById('audio-control').classList.add('muted');
     }
-    else{
+    else {
         document.getElementById('audio-control').setAttribute('aria-label', '开启静音');
     }
 });
@@ -474,7 +476,7 @@ document.getElementById('audio-control').addEventListener('click', function () {
         audioPlayer.pause();
         isPlaying = false;
     }
-    else{
+    else {
         document.getElementById('audio-control').setAttribute('aria-label', '开启静音');
     }
 })
