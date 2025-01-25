@@ -18,9 +18,19 @@
     <div class="settings-items">
         <div class="settings-item" role="region" aria-live="polite" aria-label="通话界面 环境描述复杂度设置">
             <label for="complexity">通话界面 环境描述复杂度</label>
-            <select id="complexity" onchange="updateAriaLabel(this)" class="select-left">
+            <select id="complexity" onchange="updateComplexity(this)" class="select-left">
                 <option value="detailed">详细</option>
                 <option value="simple">简洁</option>
+            </select>
+        </div>
+        <div class="settings-item" role="region" aria-live="polite" aria-label="智能对话 语速设置">
+            <label for="speed">智能对话 语速</label>
+            <select id="speed" onchange="updateSpeed(this)" class="select-left">
+                <option value="slow">慢速</option>
+                <option value="slower">较慢</option>
+                <option value="normal">正常</option>
+                <option value="faster">较快</option>
+                <option value="fast">快速</option>
             </select>
         </div>
     </div>

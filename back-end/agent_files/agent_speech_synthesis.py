@@ -110,9 +110,12 @@ def fetch_token() -> str:
 """  TOKEN end """
 
 
-def agent_audio_generate(text: str) -> str:
+def agent_audio_generate(text: str, speed: int = 8) -> str:
     """
     根据文本生成音频
+    :param text: 文本
+    :param speed: 语速
+    :return: 音频二进制文件
     """
     token = fetch_token()
     logging.info("agent_speech_synthesis.py", "agent_audio_generate", "输入:" + text)
@@ -154,7 +157,7 @@ def agent_audio_generate(text: str) -> str:
         print("TTS 输出失败：配置文件丢失")
         exit(0)
 
-    params.update({"tok": token, "tex": url_encoded_text})
+    params.update({"tok": token, "tex": url_encoded_text, "spd": speed})
 
     # print('语音请求参数:', params)
     data = urlencode(params)

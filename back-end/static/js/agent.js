@@ -222,6 +222,7 @@ function sendMessageToAgent(message, multi_image_talk) {
     bubble_2.className = 'chat-bubble-bot';
 
     const token = localStorage.getItem('token');
+    const talk_speed = localStorage.getItem('speed') || 8;
     fetch(`/agent/chat_stream?query=${message}&agent=${selectedAgent}&multi_image_talk=${multi_image_talk}`, {
         headers: {
             "Authorization": `Bearer ${token}`
@@ -245,7 +246,7 @@ function sendMessageToAgent(message, multi_image_talk) {
                 // 如果当前不是结束标志，则将文本添加到气泡中
                 if (!(jsonString.includes("<END>"))) {
                     if (!isMuted) {
-                        socket.emit("agent_stream_audio", jsonString);
+                        socket.emit("agent_stream_audio", jsonString, talk_speed);
                     }
                     bubble_2.textContent += jsonString;
                 }
