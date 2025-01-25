@@ -1,6 +1,7 @@
 import { initAudioAnalyser, detectDB } from './lib/audioUtils.js';
 
 let flag_board = 0;
+let uploadedImages = [];
 
 // 在 DOM 加载完成后获取聊天记录
 document.addEventListener('DOMContentLoaded', function () {
@@ -79,6 +80,18 @@ document.getElementById('phone-button').addEventListener('click', function () {
     window.location.href = '/phone';
 });
 
+
+setInterval(() => {
+    if (document.getElementById('agent-chat-textarea').value.trim() || uploadedImages.length > 0) {
+        document.querySelector('#send-button').style.display = 'inline-block';
+        document.querySelector('#more_function_button').style.display = 'none';
+    } else {
+        document.querySelector('#send-button').style.display = 'none';
+        document.querySelector('#more_function_button').style.display = 'flex';
+    }
+}, 100);
+
+
 let message = ''  // 用户发送的消息
 
 document.getElementById('send-button').addEventListener('click', function () {
@@ -88,12 +101,11 @@ document.getElementById('send-button').addEventListener('click', function () {
     if (message || uploadedImages.length > 0) {
         audioPlayer.pause();
         audioQueue = [];
-        pauseDiv.style.backgroundImage = `url('${'./static/images/pause_inactive.png'}')`;
         addMessage(message);
         message = ''
         input.value = ''; // 清空输入框
         if (flag_board === 1) {
-            document.getElementById('more_function_button_2').click();
+            document.getElementById('more_function_button').click();
         }
         clearImageDiv(); // 清空图片内容
         document.getElementById('imageUploadPanel').style.display = 'none'; // 隐藏imageUploadPanel
@@ -191,7 +203,7 @@ function addMessage(message) {
  * @param {string} message 用户的消息内容
  * @param {boolean} multi_image_talk 是否包含多张图片
  */
-var curr_talk_index = 0;  // 标识当前对话
+let curr_talk_index = 0;  // 标识当前对话
 
 function sendMessageToAgent(message, multi_image_talk) {
     if (curr_talk_index >= Number.MAX_SAFE_INTEGER) {
@@ -217,7 +229,7 @@ function sendMessageToAgent(message, multi_image_talk) {
     })
         .then(response => {
             let reader = response.body.getReader();
-            
+
             // 逐块读取并处理数据
             return reader.read().then(function processText({ done, value }) {
                 if (done) {
@@ -256,10 +268,14 @@ function sendMessageToAgent(message, multi_image_talk) {
 // 为 #imageUploadPanel 添加事件委托
 const imageList = document.querySelector('#imageUploadPanel .content .imageList');
 imageList.addEventListener('click', function (event) {
-    if (event.target.classList.contains('remove')) {
-        // 找到当前按钮的父元素 .image
-        const imageContainer = event.target.closest('.image');
-        if (imageContainer) {
+
+    // 找到当前按钮的父元素 .image
+    const imageContainer = event.target.closest('.image');
+    if (imageContainer) {
+        const musk = document.createElement('div');
+        musk.classList.add('musk');
+        imageContainer.appendChild(musk);
+        setTimeout(() => {
             // 获取图片容器的索引
             const index = Array.from(imageList.children).indexOf(imageContainer);
             if (index !== -1) {
@@ -268,8 +284,16 @@ imageList.addEventListener('click', function (event) {
             }
             // 从 DOM 中移除 .image 元素及其所有子元素
             imageContainer.remove();
-        }
+            if (uploadedImages.length > 0) {
+                document.querySelector('#imageUploadPanel .content .add').style.display = 'flex';
+                document.querySelector('#imageUploadPanel').style.display = 'flex';
+            } else {
+                document.querySelector('#imageUploadPanel .content .add').style.display = 'none';
+                document.querySelector('#imageUploadPanel').style.display = 'none';
+            }
+        }, 100);
     }
+
 });
 
 document.getElementById('photo').addEventListener('click', function (e) {
@@ -277,7 +301,6 @@ document.getElementById('photo').addEventListener('click', function (e) {
 });
 
 // 添加图片
-let uploadedImages = [];
 document.querySelector('#imageUploadPanel .content .add').addEventListener('click', function () {
     const input = document.querySelector('#imageUploadPanel .content .add input');
     input.removeAttribute('capture'); // 确保不包含 capture 属性
@@ -288,7 +311,9 @@ document.querySelector('#imageUploadPanel .content .add input').addEventListener
     const file = e.target.files[0];
 
     if (!file) return; // 检查文件是否存在
-
+    if (flag_board === 1) {
+        document.getElementById('more_function_button').click();
+    }
     // 创建一个临时的 URL 来显示图片
     const imageUrl = URL.createObjectURL(file);
 
@@ -317,35 +342,32 @@ document.querySelector('#imageUploadPanel .content .add input').addEventListener
 
     // 清空文件输入以允许重新选择同一文件
     e.target.value = '';
+
+    if (uploadedImages.length > 0) {
+        document.querySelector('#imageUploadPanel .content .add').style.display = 'flex';
+    } else {
+        document.querySelector('#imageUploadPanel .content .add').style.display = 'none';
+    }
 });
 
 document.getElementById('album_photo').addEventListener('click', function () {
     const imageUploadPanel = document.getElementById('imageUploadPanel');
-    if (imageUploadPanel.style.display === 'none') {
-        const input = document.querySelector('#imageUploadPanel .content .add input');
-        input.removeAttribute('capture'); // 确保不包含 capture 属性
-        imageUploadPanel.style.display = 'flex';
-        input.click();
-    } else {
-        clearImageDiv();
-        imageUploadPanel.style.display = 'none';
-    }
+    const input = document.querySelector('#imageUploadPanel .content .add input');
+    input.removeAttribute('capture'); // 确保不包含 capture 属性
+    imageUploadPanel.style.display = 'flex';
+    input.click();
 });
 
 document.getElementById('camera_photo').addEventListener('click', function () {
     const imageUploadPanel = document.getElementById('imageUploadPanel');
+    const input = document.querySelector('#imageUploadPanel .content .add input');
+    input.setAttribute('capture', 'camera'); // 从相机上传
+    imageUploadPanel.style.display = 'flex';
+    input.click();
+});
 
-    // 查看 input 的属性
-
-    if (imageUploadPanel.style.display === 'none') {
-        const input = document.querySelector('#imageUploadPanel .content .add input');
-        input.setAttribute('capture', 'camera'); // 从相机上传
-        imageUploadPanel.style.display = 'flex';
-        input.click();
-    } else {
-        clearImageDiv();
-        imageUploadPanel.style.display = 'none';
-    }
+document.getElementById('camera_icon').addEventListener('click', function () {
+    document.getElementById('camera_photo').click();
 });
 
 // 清空图片div
@@ -356,70 +378,40 @@ function clearImageDiv() {
     uploadedImages = [];
 }
 
-// 按下回车键也可以发送消息
-document.getElementById('agent-chat-textarea').addEventListener('keypress', function (e) {
-    if (e.key === 'Enter') {
-        if (e.shiftKey) {
-            document.getElementById('agent-chat-textarea').textContent += '\n';
-        }
-        else {
-            document.getElementById('send-button').click();
-            e.preventDefault();
-            this.style.height = 'auto';
-        }
-    }
-});
-
 //控制多功能板上下移动
 document.getElementById('more_function_button').addEventListener('click', function () {
-    flag_board = 1;
-    document.getElementById('more_function_button').style.display = 'none';
-    document.getElementById('more_function_button_2').style.display = 'flex';
-    if (document.getElementById('chat-input-container').classList.contains('slide-up')) {
-        document.getElementById('chat-input-container').classList.remove('slide-up');
-        document.getElementById('chat-input-container').classList.add('slide-up');
+    if (flag_board === 0) {
+        flag_board = 1;
+        document.querySelector('#more_function_button').style.backgroundImage = "url('../static/images/more_function_end.png')";
+        document.querySelector('#more_function_button').ariaLabel = '关闭更多功能面板';
+        if (!document.getElementById('chat-input-container').classList.contains('slide-up')) {
+            document.getElementById('chat-input-container').classList.remove('slide-down');
+            document.getElementById('chat-input-container').classList.add('slide-up');
+        }
+        if (!document.getElementById('more_function_board').classList.contains('slide-up')) {
+            document.getElementById('more_function_board').classList.remove('slide-down');
+            document.getElementById('more_function_board').classList.add('slide-up');
+        }
+        document.getElementById('chat-container').style.bottom = '181px';
     }
+
     else {
-        document.getElementById('chat-input-container').classList.remove('slide-down');
-        document.getElementById('chat-input-container').classList.add('slide-up');
+        flag_board = 0;
+        document.querySelector('#more_function_button').style.backgroundImage = "url('../static/images/more_function_start.png')";
+        document.querySelector('#more_function_button').ariaLabel = '打开更多功能面板';
+        if (!document.getElementById('chat-input-container').classList.contains('slide-down')) {
+            document.getElementById('chat-input-container').classList.remove('slide-up');
+            document.getElementById('chat-input-container').classList.add('slide-down');
+        }
+        if (!document.getElementById('more_function_board').classList.contains('slide-down')) {
+            document.getElementById('more_function_board').classList.remove('slide-up');
+            document.getElementById('more_function_board').classList.add('slide-down');
+        }
+        document.getElementById('chat-container').style.bottom = '100px';
     }
-    if (document.getElementById('more_function_board').classList.contains('slide-up')) {
-        document.getElementById('more_function_board').classList.remove('slide-up');
-        document.getElementById('more_function_board').classList.add('slide-up');
-    }
-    else {
-        document.getElementById('more_function_board').classList.remove('slide-down');
-        document.getElementById('more_function_board').classList.add('slide-up');
-    }
-    document.getElementById('navbar').style.display = 'none';
-    // 当 more_function_board 出现时，调整 chat-container 的 bottom 值
-    document.getElementById('chat-container').style.bottom = '250px';
 });
 
-document.getElementById('more_function_button_2').addEventListener('click', function () {
-    flag_board = 0;
-    document.getElementById('more_function_button_2').style.display = 'none';
-    document.getElementById('more_function_button').style.display = 'flex';
-    if (document.getElementById('chat-input-container').classList.contains('slide-down')) {
-        document.getElementById('chat-input-container').classList.remove('slide-down');
-        document.getElementById('chat-input-container').classList.add('slide-down');
-    }
-    else {
-        document.getElementById('chat-input-container').classList.remove('slide-up');
-        document.getElementById('chat-input-container').classList.add('slide-down');
-    }
-    if (document.getElementById('more_function_board').classList.contains('slide-down')) {
-        document.getElementById('more_function_board').classList.remove('slide-down');
-        document.getElementById('more_function_board').classList.add('slide-down');
-    }
-    else {
-        document.getElementById('more_function_board').classList.remove('slide-up');
-        document.getElementById('more_function_board').classList.add('slide-down');
-    }
-    document.getElementById('navbar').style.display = 'flex';
-    // 当 more_function_board 隐藏时，恢复 chat-container 的 bottom 值
-    document.getElementById('chat-container').style.bottom = '100px';
-})
+
 
 //输入框随着输入字数改变高度
 document.getElementById('agent-chat-textarea').addEventListener(
@@ -429,11 +421,9 @@ document.getElementById('agent-chat-textarea').addEventListener(
     }
 )
 
-document.getElementById('more_function_button_2').style.display = 'none';
-
 document.getElementById('agent-chat-textarea').addEventListener('click', function () {
     if (flag_board === 1) {
-        document.getElementById('more_function_button_2').click();
+        document.getElementById('more_function_button').click();
     }
 });
 
@@ -443,9 +433,6 @@ document.getElementById('agent-chat-textarea').addEventListener('click', functio
 - 当音频开始播放时，队列的第一个元素出栈，并播放。
 - 当元素播放结束后，继续播放下一个元素，直到队列中没有元素为止
 --------------------------------------------------------- */
-
-// 获取暂停按钮元素
-const pauseDiv = document.querySelector('#pause_icon');
 
 // 获取音频播放器 DOM 元素
 const audioPlayer = document.getElementById('audioPlayer');
@@ -461,8 +448,12 @@ let isMuted = localStorage.getItem('isMuted') === 'true';
 
 window.addEventListener('DOMContentLoaded', function () {
     if (isMuted) {
+        document.getElementById('audio-control').setAttribute('aria-label', '关闭静音');
         console.log('[agent.js][DOMContentLoaded] localStorage 中用户已经设置过静音，展示静音图标...');
         document.getElementById('audio-control').classList.add('muted');
+    }
+    else{
+        document.getElementById('audio-control').setAttribute('aria-label', '开启静音');
     }
 });
 
@@ -476,12 +467,15 @@ document.getElementById('audio-control').addEventListener('click', function () {
     this.classList.toggle('muted');
 
     // 如果用户静音，则暂停音频播放
-    if (isMuted && isPlaying) {
+    if (isMuted) {
+        document.getElementById('audio-control').setAttribute('aria-label', '关闭静音');
         console.log('[agent.js][audio-control] 用户静音，暂停音频播放...');
         audioQueue = [];
         audioPlayer.pause();
         isPlaying = false;
-        pauseDiv.src = `../static/images/pause_inactive.png`;
+    }
+    else{
+        document.getElementById('audio-control').setAttribute('aria-label', '开启静音');
     }
 })
 
@@ -494,16 +488,17 @@ socket.on('agent_play_audio_chunk', function (data) {
     const user = localStorage.getItem('user');
     console.log('curr_user', user)
     if (data.user !== user) return;
-    const audioIndex = data['index'];
-    const audioData = data['audio_chunk'];
+    if (!isMuted) {
+        const audioIndex = data['index'];
+        const audioData = data['audio_chunk'];
 
-    // 将音频数据添加到队列中
-    audioQueue[audioIndex] = audioData;
+        // 将音频数据添加到队列中
+        audioQueue[audioIndex] = audioData;
 
-    // 如果当前没有音频正在播放，开始播放
-    if (!isPlaying) {
-        pauseDiv.src = `../static/images/pause.png`;
-        playNextAudio();
+        // 如果当前没有音频正在播放，开始播放
+        if (!isPlaying) {
+            playNextAudio();
+        }
     }
 });
 
@@ -515,7 +510,6 @@ function playNextAudio() {
     // 如果音频队列中没有音频数据（即后端还没有发送音频数据），则停止播放
     if (audioQueue.length === 0) {
         isPlaying = false;
-        pauseDiv.src = `../static/images/pause_inactive.png`;
         return;
     }
     console.log('[agent.js][playNextAudio] audioQueue:', audioQueue);
@@ -553,20 +547,6 @@ function playNextAudio() {
 audioPlayer.onended = function () {
     playNextAudio();
 };
-
-/**
- * @description 暂停音频播放
- * - 暂停音频播放后，清空音频队列，并将暂停按钮设置为未激活状态（灰色）
- */
-pauseDiv.addEventListener('click', function () {
-    // 暂停音频播放
-    audioPlayer.pause()
-
-    // 清空音频队列
-    audioQueue = [];
-
-    pauseDiv.src = `../static/images/pause_inactive.png`;
-});
 
 /* 音频播放相关 end
 --------------------------------------------------------- */
@@ -704,7 +684,7 @@ socket.on('agent_speech_recognition_finished', async function (data) {
     const user = localStorage.getItem('user');
     console.log('curr_user', user)
     if (data.user !== user) return;
-    rec_result = data['rec_result'];
+    const rec_result = data['rec_result'];
 
     if (!rec_result) {
         console.log('[agent.js][socket.on][agent_speech_recognition_finished] 音频识别结果为空.');

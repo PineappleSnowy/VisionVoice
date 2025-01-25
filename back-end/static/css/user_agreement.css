@@ -12,21 +12,28 @@ p {
 
 .header {
     width: 100%;
-    background-color: #333;
+    background-color: #1e1e1e;
     color: #e0e0e0;
     text-align: center;
     padding: 10px 0;
+    font-size: 20px;
 }
 
 .back-button {
+    display: flex;
     position: absolute;
-    left: 10px;
-    top: 5px;
+    left: 0px;
+    top: 0px;
     background: none;
     border: none;
     color: #e0e0e0;
-    font-size: 24px;
+    font-size: 26px;
     cursor: pointer;
+    width: 100px;
+    height: 46px;
+    justify-content: left;
+    align-items: center;
+    padding: 5px 14px;
 }
 
 #agreement-content {

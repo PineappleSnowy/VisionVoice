@@ -45,6 +45,10 @@ function checkSilence() { }
 
 // 停止音频播放
 function stopAudio() {
+    curr_talk_index += 1;
+    if (curr_talk_index >= Number.MAX_SAFE_INTEGER) {
+        curr_talk_index = 0;
+    }
     audio_stop = true;
     audioPlayer.pause()
     audioQueue = [];
@@ -75,7 +79,7 @@ function shutUpAgentSpeak() {
 function startShutUpStatus() {
     if (state === 0) {
         statusDiv.textContent = '点击打断';
-        shutUpSpeakButton.style.display = 'block';
+        shutUpSpeakButton.style.display = 'flex';
         waveShape.style.display = 'none';
     }
 }
@@ -88,6 +92,68 @@ function finishShutUpStatus() {
 
     if (vudio.pause()) { vudio.dance() }
 }
+
+let micClose = localStorage.getItem('micClose');
+if (micClose === null) {
+    micClose = false;
+    localStorage.setItem('micClose', micClose);
+} else {
+    micClose = micClose === 'true';
+}
+
+if (micClose) {
+    document.querySelector('.micButton').setAttribute('aria-label', '打开麦克风');
+    stopCheckSilenceTimer();
+    document.querySelector('.micButton').classList.add('mic-off');
+}
+else {
+    document.querySelector('.micButton').setAttribute('aria-label', '关闭麦克风');
+}
+
+document.querySelector('.micButton').addEventListener('click', function () {
+    if (document.querySelector('.micButton').classList.toggle('mic-off')) {
+        document.querySelector('.micButton').setAttribute('aria-label', '打开麦克风');
+        micClose = true;
+        localStorage.setItem('micClose', micClose);
+        stopCheckSilenceTimer();
+    } else {
+        document.querySelector('.micButton').setAttribute('aria-label', '关闭麦克风');
+        micClose = false;
+        localStorage.setItem('micClose', micClose);
+        startCheckSilenceTimer();
+    }
+});
+
+let captionClose = localStorage.getItem('captionClose');
+if (captionClose === null) {
+    captionClose = false;
+    localStorage.setItem('captionClose', captionClose);
+} else {
+    captionClose = captionClose === 'true';
+}
+
+if (captionClose) {
+    document.querySelector('.captionButton').setAttribute('aria-label', '打开字幕');
+    document.querySelector('.captionButton').classList.add('caption-off');
+}
+else {
+    document.querySelector('.captionButton').setAttribute('aria-label', '关闭字幕');
+    document.getElementById('captionModal').style.display = 'block';
+}
+
+document.querySelector('.captionButton').addEventListener('click', function () {
+    if (document.querySelector('.captionButton').classList.toggle('caption-off')) {
+        document.querySelector('.captionButton').setAttribute('aria-label', '打开字幕');
+        captionClose = true;
+        localStorage.setItem('captionClose', captionClose);
+        document.getElementById('captionModal').style.display = 'none';
+    } else {
+        document.querySelector('.captionButton').setAttribute('aria-label', '关闭字幕');
+        captionClose = false;
+        localStorage.setItem('captionClose', captionClose);
+        document.getElementById('captionModal').style.display = 'block';
+    }
+});
 
 // 摄像头开关逻辑
 openCamera.addEventListener('click', async () => {
@@ -125,7 +191,7 @@ openCamera.addEventListener('click', async () => {
             container.classList.remove('shifted');
             toggleCamera.style.display = 'none';
             img.style.display = 'block';
-            goBack.style.color = 'black';
+            goBack.style.color = 'white';
         }
     } catch (err) {
         console.log(err);
@@ -161,14 +227,17 @@ toggleCamera.addEventListener('click', async () => {
     }
 });
 
+let curr_talk_index = 0;
+
 // 发起大模型请求
-function formChat() {
+function formChat(talk_index) {
     /*当开启视频聊天时（videoChat==true），要求speech_rec_ready和image_upload_ready都是true；
     否则仅要求speech_rec_ready是true*/
     if (speech_rec_ready && (image_upload_ready || ~videoChat)) {
         speech_rec_ready = false;
         image_upload_ready = false;
         if (state == 0) {
+            document.getElementById('captionText').textContent = '';
             const token = localStorage.getItem('token');
             startAudio()
             fetch(`/agent/chat_stream?query=${rec_result}&agent=${selectedAgent}&videoOpen=${videoChat}`, {
@@ -187,7 +256,8 @@ function formChat() {
                         let jsonString = new TextDecoder().decode(value); // 将字节流转换为字符串
 
                         // 如果当前不是结束标志，则将文本进行语音合成
-                        if (!(jsonString.includes("<END>")) && !audio_stop) {
+                        if (!(jsonString.includes("<END>")) && !audio_stop && talk_index == curr_talk_index) {
+                            document.getElementById('captionText').textContent += jsonString;
                             socket.emit("agent_stream_audio", jsonString);
                         }
 
@@ -235,11 +305,13 @@ function captureAndSendFrame() {
                             const distant = data["obstacle_info"][0]["distant"]
                             const left_loc = data["obstacle_info"][0]["left"]
                             const top_loc = data["obstacle_info"][0]["top"]
-                            socket.emit("agent_stream_audio", `画面${calcLocation(top_loc, left_loc)}${detected_item}距离${distant.toFixed(2)}米。`);
+                            const obstacle_loc_info = `画面${calcLocation(top_loc, left_loc)}${detected_item}距离${distant.toFixed(2)}米。`;
+                            document.getElementById('captionText').textContent = obstacle_loc_info;
+                            socket.emit("agent_stream_audio", obstacle_loc_info);
                             // 设置等待时间
                             setTimeout(function () {
                                 captureAndSendFrame()
-                            }, 2000);
+                            }, 1);
                         }
                         else { captureAndSendFrame() }
                     }
@@ -248,18 +320,19 @@ function captureAndSendFrame() {
                         if (data['item_info'].length != 0) {
                             const left_loc = data["item_info"][0]["left"]
                             const top_loc = data["item_info"][0]["top"]
-
-                            socket.emit("agent_stream_audio", `${find_item_name}在画面${calcLocation(top_loc, left_loc)}。`);
+                            const item_loc_info = `${find_item_name}在画面${calcLocation(top_loc, left_loc)}。`;
+                            document.getElementById('captionText').textContent = item_loc_info;
+                            socket.emit("agent_stream_audio", item_loc_info);
                             setTimeout(function () {
                                 captureAndSendFrame()
-                            }, 2000);
+                            }, 1);
                         }
                         else { captureAndSendFrame() }
                     }
 
                     else if (state == 0) {
                         image_upload_ready = true;
-                        formChat()
+                        formChat(curr_talk_index)
                     }
                 }
             })
@@ -268,6 +341,40 @@ function captureAndSendFrame() {
             });
     }
 }
+
+// 前端避障，尚在开发
+// async function loadModel() {
+//     const model = await cocoSsd.load();
+//     return model;
+// }
+
+// async function detectFrame(model) {
+//     const canvas = document.querySelector('.frame-window');
+//     canvas.width = video.videoWidth;
+//     canvas.height = video.videoHeight;
+//     const context = canvas.getContext('2d');
+//     const predictions = await model.detect(video);
+//     context.clearRect(0, 0, canvas.width, canvas.height);
+//     context.drawImage(video, 0, 0, canvas.width, canvas.height);
+//     predictions.forEach(prediction => {
+//         context.beginPath();
+//         context.rect(...prediction.bbox);
+//         context.lineWidth = 2;
+//         context.strokeStyle = 'red';
+//         context.fillStyle = 'red';
+//         context.font = '0.2rem Arial';
+//         context.stroke();
+//         context.fillText(prediction.class, prediction.bbox[0], prediction.bbox[1] > 10 ? prediction.bbox[1] - 5 : 10);
+//     });
+//     canvas.style.display = 'block';
+//     video.style.display = 'none';
+//     requestAnimationFrame(() => detectFrame(model));
+// }
+
+// async function main() {
+//     const model = await loadModel();
+//     detectFrame(model);
+// }
 
 function calcLocation(top, left) {
     let x_describe = '';
@@ -360,7 +467,9 @@ function stopCheckSilenceTimer() {
 // 启动检查静音的计时器
 function startCheckSilenceTimer() {
     // 使用 setInterval，每隔一段时间（ms）检查一次用户是否停止讲话
-    checkSilenceTimer = setInterval(checkSilence, 100);
+    if (!micClose) {
+        checkSilenceTimer = setInterval(checkSilence, 100);
+    }
 }
 
 // 退出避障
@@ -379,6 +488,7 @@ function exit_find_item() {
 
 // 退出功能模式
 function exitFuncModel() {
+    document.querySelector('.endFunc').style.display = 'none';
     if (obstacle_avoid) {
         stopAudio()
         startCheckSilenceTimer()
@@ -402,14 +512,15 @@ function startAvoidObstacle() {
     statusDiv.textContent = "避障模式";
     if (vudio.dance()) { vudio.pause() }
 
-    document.querySelector('.moreFunctions').style.display = 'none';
-    document.querySelector('.endFunc').style.display = 'block';
+    waveShape.style.display = 'none';
+    document.querySelector('.endFunc').style.display = 'flex';
 
     if (!videoChat) {
         openCamera.click()
     }
     if (!obstacle_avoid) {
         obstacle_avoid = true;
+        document.getElementById('captionText').textContent = '避障模式已开启'
         socket.emit("agent_stream_audio", "##<state=1>");
         startAudio()
     }
@@ -426,8 +537,7 @@ window.startFindItem = function (item_name) {
     statusDiv.textContent = "寻物模式";
     if (vudio.dance()) { vudio.pause(); }
 
-    document.querySelector('.moreFunctions').style.display = 'none';
-    document.querySelector('.endFunc').style.display = 'block';
+    document.querySelector('.endFunc').style.display = 'flex';
 
     closeModalButton.click();
     if (!videoChat) {
@@ -436,6 +546,7 @@ window.startFindItem = function (item_name) {
     if (!find_item) {
         find_item = true;
         find_item_name = item_name;
+        document.getElementById('captionText').textContent = `开始寻找${item_name}`
         socket.emit("agent_stream_audio", `##<state=2>${item_name}`);
         startAudio();
     }
@@ -496,7 +607,7 @@ window.onload = async () => {
             // 如果静音定时器不存在，且用户已经说过话了，则设置静音定时器
             if (!silenceTimer && conversationStarted) {
                 silenceTimer = setTimeout(() => {
-                    // 停止检测用户是否说话
+                    // 停止检测用户是否正在说话
                     if (checkSilenceTimer) {
                         stopCheckSilenceTimer()
                     }
@@ -555,7 +666,7 @@ window.onload = async () => {
             maxHeight: 80,
             minHeight: 0,
             spacing: 5,
-            color: '#000',
+            color: '#fff',
             shadowBlur: 0,
             shadowColor: '#f00',
             fadeSide: true,
@@ -759,7 +870,7 @@ window.onload = async () => {
                 let prompt = location_result['prompt'];
                 rec_result = prompt + rec_result;
             }
-            formChat();
+            formChat(curr_talk_index);
         }
     })
 
@@ -786,26 +897,9 @@ window.onload = async () => {
     /* 处理音频识别 end 
     ------------------------------------------------------------*/
 
-    // 功能键逻辑
-    const moreFunctionsButton = document.querySelector('.moreFunctions');
-    const optionsBar = document.querySelector('.optionsBar');
-
-    moreFunctionsButton.addEventListener('click', () => {
-        if (optionsBar.style.display === 'none' || optionsBar.style.display === '') {
-            optionsBar.style.display = 'flex';
-        } else {
-            optionsBar.style.display = 'none';
-        }
-    });
-
-    function closeOptionsBar() {
-        optionsBar.style.display = 'none';
-    }
-
     // 退出功能键逻辑
     const endFuncButton = document.querySelector('.endFunc');
     endFuncButton.addEventListener('click', () => {
-        moreFunctionsButton.style.display = 'block';
         endFuncButton.style.display = 'none';
         exitFuncModel()
     });
@@ -813,8 +907,10 @@ window.onload = async () => {
     // 避障逻辑
     const obstacleAvoidButton = document.querySelector('.optionButton.avoidObstacle');
     obstacleAvoidButton.addEventListener('click', () => {
-        closeOptionsBar();
+        exitFuncModel();
         startAvoidObstacle();
+        // 前端避障，处开发阶段，尚未启用
+        // main()
     });
 
     // 寻物逻辑
@@ -824,9 +920,9 @@ window.onload = async () => {
 
     const findItemButton = document.querySelector('.optionButton.findItem');
     findItemButton.addEventListener('click', () => {
+        exitFuncModel();
         overlay.style.display = 'block';
         findItemModal.style.display = 'block';
-        closeOptionsBar();
         loadGallery();
     });
 
@@ -873,7 +969,7 @@ window.onload = async () => {
             // 将 JSON 数据转换为字符串
             H5_locate_key = data.H5_locate;
             geocode_key = data.geocode;
-            var script = document.createElement('script');
+            let script = document.createElement('script');
             script.src = `https://webapi.amap.com/maps?v=2.0&key=${H5_locate_key}`
             document.head.appendChild(script);
         })
@@ -900,13 +996,13 @@ window.onload = async () => {
             .then(data => {
                 const formattedAddress = data.regeocode.formatted_address;
                 console.log('位置信息:', formattedAddress);
-                const prompt = `我当前的位置是：${formattedAddress}，定位精度${location_data.accuracy}米。请简洁回答。我的提问是：`;
+                const prompt = `我当前的位置是：${formattedAddress}，定位精度${location_data.accuracy}米。请结合环境信息简洁回答。我的提问是：`;
                 const location_info = `你位于${formattedAddress}，定位精度${location_data.accuracy}米。`;
                 return { prompt, location_info };
             })
             .catch(error => {
                 console.error('请求出错:', error);
-                const prompt = `你地理编码逆解析失败，仅可知我当前经纬坐标为(${geoLocation})。请简洁回答。我的提问是：`;
+                const prompt = `你地理编码逆解析失败，仅可知我当前经纬坐标为(${geoLocation})。请结合环境信息简洁回答。我的提问是：`;
                 const location_info = `地理编码逆解析失败，你当前经纬坐标为：${geoLocation}。`;
                 return { prompt, location_info };
             });
@@ -915,7 +1011,7 @@ window.onload = async () => {
     // 解析定位错误信息
     function onError(data) {
         console.error('定位失败。\n失败原因排查信息:' + data.message + '\n浏览器返回信息：' + data.originMessage)
-        let prompt = "你定位失败，无法获得我的位置信息。请简洁回答。我的提问是："
+        let prompt = "你定位失败，无法获得我的位置信息。请结合环境信息简洁回答。我的提问是："
         let location_info = "定位超时，无法获得你的位置信息。"
         return { 'prompt': prompt, 'location_info': location_info }
     }
@@ -953,7 +1049,7 @@ window.onload = async () => {
 
     const currLocButton = document.querySelector('.optionButton.currentLocation');
     currLocButton.addEventListener('click', async () => {
-        closeOptionsBar();
+        exitFuncModel();
         stopCheckSilenceTimer();
         stopAudio();
         finishShutUpStatus();
@@ -961,20 +1057,34 @@ window.onload = async () => {
         if (vudio.dance()) { vudio.pause() }
         let location_result = await requestLocaion();
         let location_info = location_result['location_info']
+        document.getElementById('captionText').textContent = location_info;
         socket.emit("agent_stream_audio", location_info);
         startAudio();
     });
 
     const envDesButton = document.querySelector('.optionButton.environmentDescription');
-    envDesButton.addEventListener('click', () => {
-        if (!videoChat) { openCamera.click() }
-        closeOptionsBar();
+    envDesButton.addEventListener('click', async () => {
+        if (!videoChat) { await openCamera.click() }
+        exitFuncModel();
         stopCheckSilenceTimer();
         stopAudio();
         finishShutUpStatus();
         statusDiv.textContent = '环境描述';
         if (vudio.dance()) { vudio.pause() }
-        rec_result = "请简洁地描述环境";
+
+        let complexity = localStorage.getItem('complexity');
+        if (complexity === null) {
+            complexity = "详细";
+            localStorage.setItem('complexity', complexity);
+        }
+        let prompt_des = "";
+        if (complexity == "详细") {
+            prompt_des = "充分捕捉环境信息，客观详细地";
+        }
+        else if (complexity == "简洁") {
+            prompt_des = "简洁地";
+        }
+        rec_result = `请${prompt_des}描述环境。`;
         speech_rec_ready = true;
         captureAndSendFrame();
     });

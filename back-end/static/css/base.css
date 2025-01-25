@@ -21,11 +21,12 @@
     padding: 10px;
     border-radius: 5px;
     transition: background-color 0.3s ease;
-    font-size: 1rem;
+    font-size: 1.1rem;
     display: flex;
     align-items: center;
     justify-content: center;
     white-space: nowrap;
+    width: 25%;
 }
 
 /* 添加媒体查询，处理小屏幕情况 */

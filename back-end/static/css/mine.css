@@ -11,7 +11,8 @@ body {
 }
 
 #navbar a[href="/mine"] {
-    font-weight: bold; /* 加粗字体 */
+    font-weight: bold;
+    /* 加粗字体 */
 }
 
 #navbar a:hover {
@@ -62,14 +63,19 @@ body {
     flex-direction: column;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
     margin-top: 30px;
+    font-size: large;
+}
+
+.option:first-child {
+    border-top: 1px solid #333;
 }
 
 .option {
     background-color: #1e1e1e;
     color: #e0e0e0;
-    padding: 20px 10px; /* 修改padding为上下20px，左右10px */
+    padding: 25px 13px;
     text-decoration: none;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.2s ease;
     border-bottom: 1px solid #333;
 }
 
@@ -81,6 +87,7 @@ body {
     background-color: #d32f2f;
     color: white;
     margin-top: 20px;
+    border-top: 1px solid #333;
 }
 
 .logout:hover {

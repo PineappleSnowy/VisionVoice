@@ -19,6 +19,10 @@
     <div aria-label="切换摄像头" style="display: none;" class="toggleCamera"><i class="fa-solid fa-repeat toggleCamera"></i>
     </div>
     <video autoplay style="display: none;" aria-label="视频通话窗口">您的浏览器不支持视频通话</video>
+    <!-- <canvas class="frame-window"></canvas> -->
+    <div id="captionModal" class="captionModal" aria-label="字幕模态窗口">
+        <p id="captionText"></p>
+    </div>
     <div class="container">
         <img src="../static/images/bot.jpg" alt="智能体头像" aria-label="智能体头像">
     </div>
@@ -30,21 +34,22 @@
         <audio autoplay id="audio" aria-label="通话音频"></audio>
         <div aria-label="打开摄像头"><i class="fa-solid fa-video openCamera"></i></div>
         <div aria-label="挂断电话"><i class="fa-solid fa-phone-slash hangUp"></i></div>
-        <div aria-label="更多功能"><i class="fa-solid fa-bars moreFunctions"></i></div>
         <div aria-label="结束功能"><i class="fa-solid fa-times endFunc"></i></div>
         <div aria-label="打断说话"><i class="fa-solid fa-stop shutUpSpeak"></i></div>
+        <div aria-label="麦克风按钮" class="micButton"><i class="fa-solid fa-microphone"></i></div>
+        <div aria-label="字幕按钮" class="captionButton"><i class="fa-solid fa-font"></i></div>
     </div>
 
     <!-- 选项栏 -->
     <div class="optionsBar">
-        <button class="optionButton avoidObstacle" aria-label="辅助避障"><p>🚧</p></button>
-        <button class="optionButton findItem" aria-label="帮我寻物"><p>🔍</p></button>
-        <button class="optionButton environmentDescription" aria-label="环境描述"><p>🌳</p></button>
-        <button class="optionButton currentLocation" aria-label="当前位置"><p>📍</p></button>
+        <button class="optionButton avoidObstacle" aria-label="辅助避障">避障</button>
+        <button class="optionButton findItem" aria-label="帮我寻物">寻物</button>
+        <button class="optionButton currentLocation" aria-label="当前位置">位置</button>
+        <button class="optionButton environmentDescription" aria-label="环境描述">环境</button>
     </div>
 
     <!-- 小窗部分 -->
-    <div id="findItemModal" class="modal">
+    <div id="findItemModal" class="modal" aria-label="请选择要寻找的物品模板。来自：我的，寻物画廊">
         <div class="overflowArea">
             <div class="gallery" id="gallery"></div>
         </div>
@@ -62,6 +67,8 @@
     <script src="../static/js/lib/recorder.js"></script>
     <script type="module" src="../static/js/lib/audioUtils.js"></script>
     <script type="module" src="../static/js/phone.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"></script> -->
     <script>
         function startFindItem(item_name) {
             // 这里可以是一个空函数，具体实现已经在phone.js中

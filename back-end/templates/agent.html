@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8" />
-  <title>视界之声-智能聊天</title>
+  <title>智能体交互</title>
   <meta name="viewport"
     content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0">
   <link rel="stylesheet" href="../static/css/base.css" />
@@ -19,7 +19,7 @@
   <!-- 顶栏 -->
   <div id="topbar" role="banner">
     <span id="agent-name">智能体名称</span>
-    <button id="audio-control" aria-label="静音"></button>
+    <button id="audio-control" aria-label="静音开关"></button>
   </div>
   <div id="main_page" role="main">
 
@@ -36,28 +36,21 @@
           <div class="imageList">
             <!-- 图片列表在这里 -->
           </div>
-          <div class="add" aria-label="添加图片">
+          <div class="add" aria-label="添加图片" style="display: none;">
             <img src="../static/images/more_function_start.png" alt="添加图片">
             <input id="photo" type="file" accept="image/*" capture="camera" style="display: none;"/>
           </div>
         </div>
       </div>
-      <button id="pause_button" aria-label="暂停语音输出">
-        <img src="../static/images/pause_inactive.png" id="pause_icon" alt="暂停语音输出" />
+      <button id="camera-button" aria-label="使用相机上传图片">
+        <img src="../static/images/camera.png" id="camera_icon" alt="使用相机上传图片" />
       </button>
       <button id="phone-button" aria-label="语音聊天">
         <img src="../static/images/phone.png" id="phone_icon" alt="语音聊天" />
       </button>
       <textarea id="agent-chat-textarea" placeholder="输入消息..." aria-label="输入消息"></textarea>
-      <button id="send-button" aria-label="发送消息">
-        <img src="../static/images/arrow_right.png" id="arrow_right" alt="发送消息" />
-      </button>
-      <button id="more_function_button" aria-label="更多功能">
-        <img src="../static/images/more_function_start.png" id="more_function_start" alt="更多功能图标" />
-      </button>
-      <button id="more_function_button_2" aria-label="关闭更多功能">
-        <img src="../static/images/more_function_end.png" id="more_function_end" alt="关闭更多功能图标" />
-      </button>
+      <button id="send-button" aria-label="发送消息">发送</button>
+      <button id="more_function_button" aria-label="开启更多功能"></button>
     </div>
     <div id="more_function_board" role="region" aria-labelledby="more_function_label">
       <div id="album_photo" aria-label="添加图片"><i class="fa-solid fa-image"></i></div>
