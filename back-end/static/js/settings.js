@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', (event) => {
     const complexity = localStorage.getItem('complexity');
-    const speed = localStorage.getItem('speed');
+    const speed = localStorage.getItem('speed') || 8;
     if (complexity) {
         const selectElement = document.getElementById('complexity');
         for (let i = 0; i < selectElement.options.length; i++) {
