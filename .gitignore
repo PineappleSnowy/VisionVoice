@@ -56,3 +56,6 @@ api.json
 # 服务器脚本
 run_forever.sh
 gunicorn_config.py
+
+# 签名文件
+*.pem
