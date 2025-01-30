@@ -9,6 +9,7 @@ import time
 import os
 from flask import (
     Flask,
+    send_file,
     send_from_directory,
     stream_with_context,
     render_template,
@@ -86,6 +87,8 @@ def before_request():
         or request.path == "/save_item_image"
         or request.path == "/delete_image"
         or request.path == "/images"
+        or request.path == "/save_item_images"
+        or request.path == "/get_audio"
     ):
         try:
             verify_jwt_in_request()
@@ -180,10 +183,10 @@ def phone():
     return render_template("phone.html")
 
 
-@app.route("/create", methods=["GET"])
-def create():
-    """创作路由"""
-    return render_template("create.html")
+@app.route("/album", methods=["GET"])
+def album():
+    """相册路由"""
+    return render_template("album.html")
 
 
 @app.route("/skills", methods=["GET"])
@@ -218,7 +221,7 @@ def photo_manage():
 
 @app.route("/contact", methods=["GET"])
 def contact():
-    """用户须知路由"""
+    """联系我们路由"""
     return render_template("contact.html")
 
 
@@ -250,19 +253,37 @@ def get_images():
     images = []
     curr_user = get_jwt_identity()
     user_image_folder = os.path.join(USER_IMAGE_FOLDER, curr_user)
+    user_album_folder = os.path.join(USER_IMAGE_FOLDER, curr_user, 'album')
+    
     if not os.path.exists(user_image_folder):
         os.mkdir(user_image_folder)
-    for filename in os.listdir(user_image_folder):
+    if not os.path.exists(user_album_folder):
+        os.mkdir(user_album_folder)
+    
+    mode = request.args.get("mode", "default")
+    
+    if mode == 'album':
+        target_folder = user_album_folder
+    else:
+        target_folder = user_image_folder
+    
+    for filename in os.listdir(target_folder):
         if filename.endswith((".jpg")):
             name, ext = os.path.splitext(filename)
             images.append(
-                {"name": name, "url": f"/image/{curr_user}/{filename}"})
+                {"name": name, "url": f"/image/{curr_user}/{filename}?mode={mode}"}
+            )
+    
     return jsonify(images)
 
 
 @app.route("/image/<user>/<filename>", methods=["GET"])
 def get_image(user, filename):
-    user_image_folder = os.path.join(USER_IMAGE_FOLDER, user)
+    mode = request.args.get("mode", "default")
+    if mode == 'album':
+        user_image_folder = os.path.join(USER_IMAGE_FOLDER, user, 'album')
+    else:
+        user_image_folder = os.path.join(USER_IMAGE_FOLDER, user)
     return send_from_directory(user_image_folder, filename)
 
 
@@ -297,6 +318,12 @@ def rename_image():
         return jsonify({"success": False, "error": str(e)}), 400
 
 
+def gen_time_random_name():
+    timestamp = time.strftime("%Y%m%d%H%M%S", time.localtime())
+    random_number = random.randint(100000, 999999)
+    return f"{timestamp}{random_number}"
+
+
 @app.route("/save_item_image", methods=["POST"])
 def save_item_image():
     curr_user = get_jwt_identity()
@@ -329,6 +356,85 @@ def save_item_image():
         )
     return jsonify({"success": False, "error": "File upload failed"}), 400
 
+def get_image_des(client, img_path):
+    with open(img_path, 'rb') as img_file:
+        img_base = base64.b64encode(img_file.read()).decode('utf-8')
+    response = client.chat.completions.create(
+        model="glm-4v",  # 填写需要调用的模型名称
+        messages=[
+        {
+            "role": "user",
+            "content": [
+            {
+                "type": "text",
+                "text": "图里有什么"
+            },
+            {
+                "type": "image_url",
+                "image_url": {
+                    "url" : img_base
+                }
+            }
+            ]
+        }
+        ]
+    )
+    return response.choices[0].message.content
+
+@app.route("/save_item_images", methods=["POST"])
+def save_item_images():
+    curr_user = get_jwt_identity()
+    user_image_folder = os.path.join(USER_IMAGE_FOLDER, curr_user)
+
+    if "files" not in request.files:
+        return jsonify({"success": False, "error": "No file part"}), 400
+    files = request.files.getlist("files")
+    if not files:
+        return jsonify({"success": False, "error": "No selected files"}), 400
+
+    saved_images = []
+
+    for file in files:
+        filename = file.filename
+        if filename:
+            try:
+                image_filename = filename + '.jpg'
+                image_save_path = os.path.join(user_image_folder, 'album', image_filename)
+                file.save(image_save_path)
+                saved_images.append({
+                    "name": filename,
+                    "url": f"/image/{curr_user}/{image_filename}?mode=album"
+                })
+                # 添加测试
+                image_des = get_image_des(client, image_save_path)
+                des_audio = agent_audio_generate(image_des)
+
+                audio_file_name = filename + '.mp3'
+                audio_folder = os.path.join(user_image_folder, 'album', 'audios')
+                audio_file_path = os.path.join(audio_folder, audio_file_name)
+
+                with open(audio_file_path, 'wb') as f:
+                    f.write(des_audio)
+
+                socketio.emit('image_talk_finished', {'image_name': filename})
+            except Exception as e:
+                return jsonify({"success": False, "error": "图片解析失败！"}), 400
+
+    if saved_images:
+        return jsonify({"success": True, "images": saved_images}), 200
+    else:
+        return jsonify({"success": False, "error": "No images saved"}), 400
+
+@app.route('/get_audio', methods=['GET'])
+def get_audio():
+    curr_user = get_jwt_identity()
+    # 有声相册音频路由
+    audio_file = request.args.get('audio_name') + '.mp3'
+    audio_path = os.path.join(USER_IMAGE_FOLDER, curr_user, 'album', 'audios', audio_file)
+    if not os.path.exists(audio_path):
+        return jsonify({'error': 'Audio file not found'}), 404
+
+    return send_file(audio_path, mimetype='audio/mp3')
 
 @app.route("/delete_image", methods=["POST"])
 def delete_image():
@@ -799,7 +905,8 @@ def build_response(current_user, agent_name, user_talk, video_open, multi_image_
                 {"type": "image_url", "image_url": {"url": img_base}})
         delete_file_from_dir(multi_image_dir)  # 及时清空图片缓存
 
-        content.append({"type": "text", "text": f"{user_talk}（请完全用文本格式回答，直接给我相应描述）"})
+        content.append(
+            {"type": "text", "text": f"{user_talk}（请完全用文本格式回答，直接给我相应描述）"})
 
         dst_messages.append({"role": "user", "content": content})
 

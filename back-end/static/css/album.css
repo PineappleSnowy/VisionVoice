@@ -1,0 +1,236 @@
+body {
+    background-color: #121212;
+    color: #e0e0e0;
+    margin: 0;
+    padding: 0;
+}
+
+p {
+    color: #ffffff;
+}
+
+.header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: #1e1e1e;
+    color: #e0e0e0;
+    text-align: center;
+    padding: 10px 0;
+    z-index: 1000;
+    font-size: 20px;
+}
+
+.back-button {
+    display: flex;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    background: none;
+    border: none;
+    color: #e0e0e0;
+    font-size: 26px;
+    cursor: pointer;
+    width: 100px;
+    height: 46px;
+    justify-content: left;
+    align-items: center;
+    padding: 5px 14px;
+}
+
+.gallery {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 48px;
+    /* 确保画廊不会被顶栏遮挡 */
+}
+
+.gallery-item {
+    position: relative;
+    width: 48vw;
+    margin: calc(1vw - 1px);
+    text-align: center;
+    height: 30vh;
+    border: 1px solid #333;
+}
+
+
+.gallery-item img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+}
+
+.image-talk {
+    width: 100%;
+    height: 100%;
+    border: none;
+    background: none;
+    padding: 0;
+    z-index: 0;
+}
+
+.audio-control {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 50%;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1;
+    background-image: url('../images/audio.png');
+    background-size: 30%;
+    background-repeat: no-repeat;
+    background-position: center;
+    display: none;
+}
+
+.full-screen {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 50%;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1;
+    background-image: url('../images/fullscreen.png');
+    background-size: 30%;
+    background-repeat: no-repeat;
+    background-position: center;
+    display: none;
+}
+
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1;
+    display: flex;
+}
+
+.overlay .text {
+    font-size: 20px;
+}
+
+.footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: #1e1e1e;
+    text-align: center;
+    transition: height 0.2s;
+    height: 60px;
+    color: #e0e0e0;
+    z-index: 2;
+}
+
+.footer.expanded {
+    height: 150px;
+}
+
+.footer button {
+    margin: 5px auto;
+    width: calc(50% - 20px);
+    display: block;
+    height: calc(50% - 10px);
+    background-color: #333;
+    color: #e0e0e0;
+    border: none;
+    border-radius: 5px;
+}
+
+.footer button:hover {
+    background-color: #444;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #e0e0e0;
+    padding-top: 60px;
+}
+
+.modal-content {
+    background-color: #333;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+}
+
+.modal img {
+    width: 100%;
+    height: auto;
+}
+
+.modal input {
+    width: calc(100% - 100px);
+    margin-right: 5px;
+    margin-bottom: 10px;
+    padding-left: 8px;
+}
+
+.modal button {
+    width: 80px;
+}
+
+.modal-content input,
+.modal-content button {
+    background-color: #444;
+    color: #e0e0e0;
+    border: none;
+    height: 40px;
+    border-radius: 3px;
+}
+
+.modal-content button:hover {
+    background-color: #555;
+}
+
+.modal-content button#deleteButton {
+    background-color: #d9534f;
+    color: #ffffff;
+}
+
+.modal-content button#deleteButton:hover {
+    background-color: #c9302c;
+}
+
+.error-message {
+    position: fixed;
+    bottom: 70px;
+    /* 确保在footer上方 */
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: transparent;
+    color: red;
+    padding: 10px;
+    border: none;
+    z-index: 0;
+    text-align: center;
+}

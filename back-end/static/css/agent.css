@@ -485,7 +485,7 @@ p {
     right: 0px;
     width: 80px;
     height: 45px;
-    background-image: url(../images/audio.png);
+    background-image: url('../images/audio.png');
     background-size: 40%;
     background-repeat: no-repeat;
     background-position: calc(100% - 10px) center;

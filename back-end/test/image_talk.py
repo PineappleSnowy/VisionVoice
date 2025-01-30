@@ -1,36 +1,23 @@
-import base64
 from zhipuai import ZhipuAI
-import json
-img_path = ".cache/uploaded_image.jpg"
-with open(img_path, 'rb') as img_file:
-    img_base = base64.b64encode(img_file.read()).decode('utf-8')
-
-with open("./static/api.json", "r", encoding="utf-8") as f:
-    data = json.load(f)
-    api_key_zhipu = data["zhipu"]["api_key"]
-    client = ZhipuAI(api_key=api_key_zhipu)
-responses = client.chat.completions.create(
+client = ZhipuAI(api_key="c0f4c4e1ba81db454375418d085e29aa.8H9MDrsb1wS4NxXw") # 填写您自己的APIKey
+response = client.chat.completions.create(
     model="glm-4v",  # 填写需要调用的模型名称
     messages=[
-      {
+       {
         "role": "user",
         "content": [
           {
-            "type": "image_url",
-            "image_url": {
-                "url": img_base
-            }
+            "type": "text",
+            "text": "图里有什么"
           },
           {
-            "type": "text",
-            "text": "请描述这个图片"
+            "type": "image_url",
+            "image_url": {
+                "url" : "https://img1.baidu.com/it/u=1369931113,3388870256&fm=253&app=138&size=w931&n=0&f=JPEG&fmt=auto?sec=1703696400&t=f3028c7a1dca43a080aeb8239f09cc2f"
+            }
           }
         ]
       }
-    ],
-    stream=True
+    ]
 )
-
-for response in responses:
-    # print(response)
-    print(response.choices[0].delta.content, end="")
+print(response.choices[0].message.content)
