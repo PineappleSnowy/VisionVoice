@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const imageName = data.image_name;
         const images = document.querySelectorAll(`img[alt="${imageName}"]`);
         images.forEach(img => {
-            const overlay = img.parentElement.querySelector('.overlay');
+            const overlay = img.parentElement.parentElement.querySelector('.overlay');
             overlay.style.display = 'none';
         });
     });
@@ -33,12 +33,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 const item = document.createElement('div');
                 item.className = 'gallery-item';
                 item.innerHTML = `
-                            <button class="image-talk" onclick="playAudio('${image.name}', event)">
-                                <img src="${image.url}" alt="${image.name}">
-                                <button class="audio-control" onclick="controlAuido(event)"></button>
-                                <button class="full-screen" onclick="fullScreen(event)"></button>
-                            </button>
-                        `;
+                    <button class="image-talk" onclick="playAudio('${image.name}', event)">
+                        <img src="${image.url}" alt="${image.name}">
+                    </button>
+                    <button class="audio-control" onclick="controlAudio(event)"></button>
+                    <button class="full-screen" onclick="fullScreen(event)"></button>
+                `;
                 gallery.appendChild(item);
             });
         })
@@ -79,7 +79,6 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     fileInput.addEventListener('change', function () {
-        disableButtons(true);
         const files = fileInput.files;
         if (files.length > 0) {
             const gallery = document.getElementById('gallery');
@@ -95,14 +94,14 @@ document.addEventListener('DOMContentLoaded', function () {
                     const item = document.createElement('div');
                     item.className = 'gallery-item';
                     item.innerHTML = `
-                        <button class="image-talk" onclick="playAudio('${newFileName}')">
+                        <button class="image-talk" onclick="playAudio('${newFileName}', event)">
                             <img src="${e.target.result}" alt="${newFileName}">
-                            <button class="audio-control" onclick="controlAuido(event)"></button>
-                                <button class="full-screen" onclick="fullScreen(event)"></button>
-                            <div class="overlay">
-                                <div class="text">正在解析</div>
-                            </div>
                         </button>
+                        <button class="audio-control" onclick="controlAudio(event)"></button>
+                        <button class="full-screen" onclick="fullScreen(event)"></button>
+                        <div class="overlay">
+                            <div class="text">正在解析</div>
+                        </div>
                     `;
                     gallery.appendChild(item);
                 };
@@ -124,7 +123,6 @@ document.addEventListener('DOMContentLoaded', function () {
                         console.error('Error uploading images:', data.error);
                         showError(data.error);
                     }
-                    disableButtons(false);
                 })
                 .catch(error => {
                     console.error('Error:', error);
@@ -132,7 +130,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     showError('上传图片时发生错误！');
                 });
         } else {
-            disableButtons(false);
             console.log("Inputed files are empty");
         }
         footer.classList.remove('expanded');
@@ -192,9 +189,21 @@ function disableButtons(disable) {
 
 const audioPlayer = document.getElementById('audioPlayer');
 
-function playAudio(audioName) {
-    const token = localStorage.getItem('token');
+function playAudio(audioName, event) {
+    audioPlayer.pause();  // 先暂停当前正在播放的音频
+    // 隐藏所有的 audio-control 和 full-screen 按钮
+    document.querySelectorAll('.audio-control').forEach(button => button.style.display = 'none');
+    document.querySelectorAll('.full-screen').forEach(button => button.style.display = 'none');
+
+    // 获取点击的画廊元素
+    const curr_gallery_item = event.currentTarget.parentElement;
+    // 显示 audio-control 和 full-screen 按钮
+    const audioControlButton = curr_gallery_item.querySelector('.audio-control');
+    const fullScreenButton = curr_gallery_item.querySelector('.full-screen');
+    audioControlButton.style.display = 'flex';
+    fullScreenButton.style.display = 'flex';
     
+    const token = localStorage.getItem('token');
     fetch(`/get_audio?audio_name=${audioName}`, {
         method: 'GET',
         headers: {
@@ -206,15 +215,17 @@ function playAudio(audioName) {
         const url = URL.createObjectURL(blob);
         audioPlayer.src = url;
         audioPlayer.play();
+
     })
     .catch(error => {
         console.error('Error fetching audio:', error);
     });
 }
 
-function controlAudio(event) {
+function controlAudio (event) {
     event.stopPropagation();
     // 控制音频的逻辑
+    audioPlayer.paused ? audioPlayer.play() : audioPlayer.pause();
 }
 
 function fullScreen(event) {
