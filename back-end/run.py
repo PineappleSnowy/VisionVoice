@@ -87,8 +87,9 @@ def before_request():
         or request.path == "/save_item_image"
         or request.path == "/delete_image"
         or request.path == "/images"
-        or request.path == "/save_item_images"
+        or request.path == "/save_album_images"
         or request.path == "/get_audio"
+        or request.path == "/get_image_des"
     ):
         try:
             verify_jwt_in_request()
@@ -356,7 +357,7 @@ def save_item_image():
         )
     return jsonify({"success": False, "error": "File upload failed"}), 400
 
-def get_image_des(client, img_path):
+def describe_image(client, img_path):
     with open(img_path, 'rb') as img_file:
         img_base = base64.b64encode(img_file.read()).decode('utf-8')
     response = client.chat.completions.create(
@@ -381,8 +382,8 @@ def get_image_des(client, img_path):
     )
     return response.choices[0].message.content
 
-@app.route("/save_item_images", methods=["POST"])
-def save_item_images():
+@app.route("/save_album_images", methods=["POST"])
+def save_album_images():
     curr_user = get_jwt_identity()
     user_image_folder = os.path.join(USER_IMAGE_FOLDER, curr_user)
 
@@ -406,15 +407,24 @@ def save_item_images():
                     "url": f"/image/{curr_user}/{image_filename}?mode=album"
                 })
                 # 添加测试
-                image_des = get_image_des(client, image_save_path)
+                image_des = describe_image(client, image_save_path)
                 des_audio = agent_audio_generate(image_des)
 
                 audio_file_name = filename + '.mp3'
                 audio_folder = os.path.join(user_image_folder, 'album', 'audios')
                 audio_file_path = os.path.join(audio_folder, audio_file_name)
-
+                if not os.path.exists(audio_folder):
+                    os.makedirs(audio_folder)
                 with open(audio_file_path, 'wb') as f:
                     f.write(des_audio)
+                
+                text_file_name = filename + '.txt'
+                text_folder = os.path.join(user_image_folder, 'album', 'texts')
+                text_file_path = os.path.join(text_folder, text_file_name)
+                if not os.path.exists(text_folder):
+                    os.makedirs(text_folder)
+                with open(text_file_path, 'w', encoding='utf-8') as f:
+                    f.write(image_des)
 
                 socketio.emit('image_talk_finished', {'image_name': filename})
             except Exception as e:
@@ -424,6 +434,20 @@ def save_item_images():
         return jsonify({"success": True, "images": saved_images}), 200
     else:
         return jsonify({"success": False, "error": "No images saved"}), 400
+
+@app.route("/get_image_des", methods=["POST"])
+def get_image_des():
+    curr_user = get_jwt_identity()
+    user_image_folder = os.path.join(USER_IMAGE_FOLDER, curr_user)
+
+    data = request.get_json()
+    image_name = data["image_name"]
+    image_des_path = os.path.join(user_image_folder, 'album', 'texts', image_name + '.txt')
+    if not os.path.exists(image_des_path):
+        return jsonify({"success": False, "error": "Image description not found"}), 400
+    with open(image_des_path, 'r', encoding='utf-8') as f:
+        image_des = f.read()
+    return jsonify({"success": True, "image_des": image_des}), 200
 
 @app.route('/get_audio', methods=['GET'])
 def get_audio():
@@ -435,6 +459,10 @@ def get_audio():
         return jsonify({'error': 'Audio file not found'}), 404
 
     return send_file(audio_path, mimetype='audio/mp3')
+
+@app.route("/album_talk", methods=["POST"])
+def album_talk():
+    pass
 
 @app.route("/delete_image", methods=["POST"])
 def delete_image():

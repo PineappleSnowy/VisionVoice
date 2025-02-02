@@ -48,15 +48,16 @@ document.addEventListener('DOMContentLoaded', function () {
     const addButton = document.getElementById('addButton');
     const cameraButton = document.getElementById('cameraButton');
     const albumButton = document.getElementById('albumButton');
-    const cancelButton = document.getElementById('cancelButton');
     const fileInput = document.getElementById('fileInput');
 
     addButton.addEventListener('click', function () {
-        footer.classList.add('expanded');
-        addButton.style.display = 'none';
-        cameraButton.style.display = 'inline-block';
-        albumButton.style.display = 'inline-block';
-        cancelButton.style.display = 'block';
+        if (footer.classList.contains('expanded')) {
+            footer.classList.remove('expanded');
+        } else {
+            footer.classList.add('expanded');
+        }
+        cameraButton.style.display = cameraButton.style.display == 'none' ? 'inline-block' : 'none';
+        albumButton.style.display = albumButton.style.display == 'none' ? 'inline-block' : 'none';
     });
 
     cameraButton.addEventListener('click', function () {
@@ -68,14 +69,6 @@ document.addEventListener('DOMContentLoaded', function () {
         fileInput.removeAttribute('capture');
         fileInput.setAttribute('multiple', 'multiple');
         fileInput.click();
-    });
-
-    cancelButton.addEventListener('click', function () {
-        footer.classList.remove('expanded');
-        addButton.style.display = 'block';
-        cameraButton.style.display = 'none';
-        albumButton.style.display = 'none';
-        cancelButton.style.display = 'none';
     });
 
     fileInput.addEventListener('change', function () {
@@ -110,7 +103,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             const token = localStorage.getItem('token');
-            fetch('/save_item_images', {
+            fetch('/save_album_images', {
                 method: 'POST',
                 body: formData,
                 headers: {
@@ -133,10 +126,8 @@ document.addEventListener('DOMContentLoaded', function () {
             console.log("Inputed files are empty");
         }
         footer.classList.remove('expanded');
-        addButton.style.display = 'block';
         cameraButton.style.display = 'none';
         albumButton.style.display = 'none';
-        cancelButton.style.display = 'none';
     });
 
     document.getElementById('deleteButton').addEventListener('click', function () {
@@ -172,12 +163,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 statusMessage.style.color = 'red';
             });
     });
-
-    document.getElementById('backButton').addEventListener('click', function () {
-        const modal = document.getElementById('myModal');
-        modal.style.display = 'none';
-        statusMessage.textContent = '';
-    });
 });
 
 function disableButtons(disable) {
@@ -202,7 +187,7 @@ function playAudio(audioName, event) {
     const fullScreenButton = curr_gallery_item.querySelector('.full-screen');
     audioControlButton.style.display = 'flex';
     fullScreenButton.style.display = 'flex';
-    
+
     const token = localStorage.getItem('token');
     fetch(`/get_audio?audio_name=${audioName}`, {
         method: 'GET',
@@ -210,19 +195,19 @@ function playAudio(audioName, event) {
             "Authorization": `Bearer ${token}`
         }
     })
-    .then(response => response.blob())
-    .then(blob => {
-        const url = URL.createObjectURL(blob);
-        audioPlayer.src = url;
-        audioPlayer.play();
+        .then(response => response.blob())
+        .then(blob => {
+            const url = URL.createObjectURL(blob);
+            audioPlayer.src = url;
+            audioPlayer.play();
 
-    })
-    .catch(error => {
-        console.error('Error fetching audio:', error);
-    });
+        })
+        .catch(error => {
+            console.error('Error fetching audio:', error);
+        });
 }
 
-function controlAudio (event) {
+function controlAudio(event) {
     event.stopPropagation();
     // 控制音频的逻辑
     audioPlayer.paused ? audioPlayer.play() : audioPlayer.pause();
@@ -231,6 +216,126 @@ function controlAudio (event) {
 function fullScreen(event) {
     event.stopPropagation();
     // 全屏显示的逻辑
+    audioPlayer.pause();
+    const imageDetail = document.getElementById('imageDetail');
+    imageDetail.style.display = 'block';
+    const image = event.currentTarget.parentElement.querySelector('img');
+    imageDetail.innerHTML = `
+        <div class="image-detail-header">
+            <button class="back-button" aria-label="返回我的页面">&#8592;</button>
+            照片详情
+        </div>
+        <div class="image-container">
+            <img src="${image.src}" alt="${image.alt}">
+        </div>
+        <div id="chat-container" aria-live="polite" aria-atomic="true"></div>
+        <div id="chat-input-container" role="form">
+            <textarea id="agent-chat-textarea" placeholder="输入消息..." aria-label="输入消息"></textarea>
+            <button id="send-button" aria-label="发送消息">发送</button>
+        </div>`;
+    fetch(`/get_image_des`, {
+        method: 'POST',
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({ image_name: image.alt })
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const chatMessageBot = document.createElement('div');
+                chatMessageBot.className = 'chat-messages-bot';
+                const chatBubbleBot = document.createElement('div');
+                chatBubbleBot.className = 'chat-bubble-bot';
+                chatBubbleBot.textContent = data.image_des;
+                chatMessageBot.appendChild(chatBubbleBot);
+                document.getElementById('chat-container').appendChild(chatMessageBot);
+                document.getElementById('chat-container').scrollTo(0, document.getElementById('chat-container').scrollHeight);
+            } else {
+                console.error('Error fetching chat messages:', data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching chat messages:', error);
+        });
+
+    document.querySelector('.back-button').addEventListener('click', function () {
+        imageDetail.style.display = 'none';
+    });
+    imageDetail.style.display = 'block';
+    document.getElementById('send-button').addEventListener('click', function () {
+        const input = document.getElementById('agent-chat-textarea');
+        let message = input.value.trim();
+        message = message.replace(/(\r\n|\n|\r)/gm, '');
+        if (message > 0) {
+            addMessage(message);
+            sendMessageToAgent(message, image.alt);
+            message = ''
+            input.value = ''; // 清空输入框
+        }
+    });
+}
+
+let curr_talk_index = 0;  // 标识当前对话
+
+function sendMessageToAgent(message, image_name) {
+    if (curr_talk_index >= Number.MAX_SAFE_INTEGER) {
+        curr_talk_index = 0;
+    }
+    curr_talk_index += 1;
+    const talk_index = curr_talk_index;
+    const chatMessageBot = document.createElement('div');
+    chatMessageBot.className = 'chat-messages-bot';
+    const chatBubbleBot = document.createElement('div');
+    chatBubbleBot.className = 'chat-bubble-bot';
+
+    const token = localStorage.getItem('token');
+    fetch(`/album_talk?query=${message}&image_name=${image_name}`, {
+        headers: {
+            "Authorization": `Bearer ${token}`
+        }
+    })
+        .then(response => {
+            let reader = response.body.getReader();
+
+            // 逐块读取并处理数据
+            return reader.read().then(function processText({ done, value }) {
+                if (done) {
+                    return;
+                }
+                // 如果对话序号对不上，则停止响应
+                if (talk_index !== curr_talk_index) {
+                    return;
+                }
+
+                let jsonString = new TextDecoder().decode(value); // 将字节流转换为字符串
+
+                chatBubbleBot.textContent += jsonString;
+
+                // 继续读取下一个数据
+                return reader.read().then(processText);
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching stream:', error);
+        });
+
+    chatMessageBot.appendChild(chatBubbleBot);
+    document.getElementById('chat-container').appendChild(chatMessageBot);
+    document.getElementById('chat-container').scrollTo(0, document.getElementById('chat-container').scrollHeight);
+}
+
+function addMessage(message) {
+    const chatMessageUser = document.createElement('div');
+    chatMessageUser.className = 'chat-messages-user';
+    const chatBubbleUser = document.createElement('div');
+    chatBubbleUser.className = 'chat-bubble-user';
+    chatBubbleUser.textContent = message;
+
+    chatMessageUser.appendChild(chatBubbleUser);
+    document.getElementById('chat-container').appendChild(chatMessageUser);
+    document.getElementById('chat-container').scrollTo(0, document.getElementById('chat-container').scrollHeight);
 }
 
 function openModal(url, name, button) {

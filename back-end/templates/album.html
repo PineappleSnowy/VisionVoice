@@ -6,6 +6,7 @@
     <meta name="viewport"
         content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0">
     <title>有声相册</title>
+    <link rel="stylesheet" href="../static/css/base.css" />
     <link rel="stylesheet" href="../static/css/album.css" />
     <link rel="icon" href="../static/favicon.ico" />
     <script src="https://kit.fontawesome.com/11023f265d.js" crossorigin="anonymous"></script>
@@ -14,21 +15,20 @@
 
 <body>
     <div class="header" role="banner" aria-label="页眉">
-        <button class="back-button" onclick="window.location.href='/mine'" aria-label="返回我的页面">&#8592;</button>
         有声相册
+        <div id="footer" class="footer" role="contentinfo" aria-label="添加照片">
+            <button id="addButton" aria-label="添加照片">&#10010;</button>
+            <button id="cameraButton" aria-label="从摄像头获取照片" style="display: none;">从摄像头获取</button>
+            <button id="albumButton" aria-label="从相册获取照片" style="display: none;">从相册获取</button>
+            <input type="file" id="fileInput" accept="image/*" capture="camera" aria-label="选择图片文件" style="display: none;">
+        </div>
     </div>
+    <div id="imageDetail"></div>
     <audio id="audioPlayer" controls style="display: none;"></audio>
     <div class="gallery" id="gallery" role="region" aria-label="照片画廊"></div>
 
     <div id="errorMessage" class="error-message" role="alert" aria-live="assertive" style="display: none;"></div>
 
-    <div id="footer" class="footer" role="contentinfo" aria-label="页脚">
-        <button id="addButton" aria-label="添加照片" style="height: 85%; width: 80%;">&#10010;</button>
-        <button id="cameraButton" aria-label="从摄像头获取照片" style="display: none;">从摄像头获取</button>
-        <button id="albumButton" aria-label="从相册获取照片" style="display: none;">从相册获取</button>
-        <button id="cancelButton" aria-label="取消" style="display: none; width: 80%;">取消</button>
-        <input type="file" id="fileInput" accept="image/*" capture="camera" aria-label="选择图片文件" style="display: none;">
-    </div>
 
     <div id="myModal" class="modal" role="dialog" aria-labelledby="modalTitle" aria-modal="true">
         <div class="modal-content">
@@ -43,6 +43,23 @@
         </div>
     </div>
 
+    <div id="navbar" role="navigation">
+        <a href="/agent" aria-label="首页">
+          <span>首页</span>
+        </a>
+        <a href="/chat" aria-label="消息">
+          <span>消息</span>
+        </a>
+        <a href="/album" aria-label="有声相册">
+          <img src="../static/images/star.png" id="star" alt="有声相册" />
+        </a>
+        <a href="/skills" aria-label="能力">
+          <span>能力</span>
+        </a>
+        <a href="/mine" aria-label="我的">
+          <span>我的</span>
+        </a>
+    </div>
     <script src="../static/js/album.js"></script>
 </body>
 
