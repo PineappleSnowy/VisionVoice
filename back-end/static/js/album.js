@@ -291,10 +291,11 @@ function sendMessageToAgent(message, image_name) {
     chatBubbleBot.className = 'chat-bubble-bot';
 
     const token = localStorage.getItem('token');
-    fetch(`/album_talk?query=${message}&image_name=${image_name}`, {
+    fetch('/album_talk', {
         headers: {
             "Authorization": `Bearer ${token}`
-        }
+        },
+        body: JSON.stringify({ user_talk: message, image_name: image_name })
     })
         .then(response => {
             let reader = response.body.getReader();

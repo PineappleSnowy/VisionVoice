@@ -462,7 +462,17 @@ def get_audio():
 
 @app.route("/album_talk", methods=["POST"])
 def album_talk():
-    pass
+    curr_user = get_jwt_identity()
+    data = request.get_json()
+    image_name = data["image_name"]
+    user_talk = data["user_talk"]
+    user_album_img_path = os.path.join(USER_IMAGE_FOLDER, curr_user, 'album', 'images', image_name + '.jpg')
+
+    if user_talk == "":
+        user_talk = "请描述图片内容"
+    model_name = "glm-4v-plus"
+
+
 
 @app.route("/delete_image", methods=["POST"])
 def delete_image():
