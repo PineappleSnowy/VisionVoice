@@ -223,6 +223,11 @@ function sendMessageToAgent(message, multi_image_talk) {
     const bubble_2 = document.createElement('div');
     bubble_2.className = 'chat-bubble-bot';
 
+    messagesContainer_bot.appendChild(image_bot);
+    messagesContainer_bot.appendChild(bubble_2);
+    messagebackground.appendChild(messagesContainer_bot);
+    messagebackground.scrollTop = messagebackground.scrollHeight;  // 滚动到底部
+
     const token = localStorage.getItem('token');
     fetch(`/agent/chat_stream?query=${message}&agent=${selectedAgent}&multi_image_talk=${multi_image_talk}`, {
         headers: {
@@ -259,11 +264,6 @@ function sendMessageToAgent(message, multi_image_talk) {
         .catch(error => {
             console.error('Error fetching stream:', error);
         });
-
-    messagesContainer_bot.appendChild(image_bot);
-    messagesContainer_bot.appendChild(bubble_2);
-    messagebackground.appendChild(messagesContainer_bot);
-    messagebackground.scrollTop = messagebackground.scrollHeight;
 }
 
 // 删除图片

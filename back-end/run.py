@@ -90,6 +90,7 @@ def before_request():
         or request.path == "/save_album_images"
         or request.path == "/get_audio"
         or request.path == "/get_image_des"
+        or request.path == "/album_talk"
     ):
         try:
             verify_jwt_in_request()
@@ -254,7 +255,7 @@ def get_images():
     images = []
     curr_user = get_jwt_identity()
     user_image_folder = os.path.join(USER_IMAGE_FOLDER, curr_user)
-    user_album_folder = os.path.join(USER_IMAGE_FOLDER, curr_user, 'album')
+    user_album_folder = os.path.join(USER_IMAGE_FOLDER, curr_user, 'album', 'images')
     
     if not os.path.exists(user_image_folder):
         os.mkdir(user_image_folder)
@@ -282,7 +283,7 @@ def get_images():
 def get_image(user, filename):
     mode = request.args.get("mode", "default")
     if mode == 'album':
-        user_image_folder = os.path.join(USER_IMAGE_FOLDER, user, 'album')
+        user_image_folder = os.path.join(USER_IMAGE_FOLDER, user, 'album', 'images')
     else:
         user_image_folder = os.path.join(USER_IMAGE_FOLDER, user)
     return send_from_directory(user_image_folder, filename)
@@ -400,7 +401,8 @@ def save_album_images():
         if filename:
             try:
                 image_filename = filename + '.jpg'
-                image_save_path = os.path.join(user_image_folder, 'album', image_filename)
+                image_folder = os.path.join(user_image_folder, 'album', 'images')
+                image_save_path = os.path.join(image_folder, image_filename)
                 file.save(image_save_path)
                 saved_images.append({
                     "name": filename,
@@ -464,14 +466,38 @@ def get_audio():
 def album_talk():
     curr_user = get_jwt_identity()
     data = request.get_json()
+    album_chat_history = data["album_chat_history"]
     image_name = data["image_name"]
-    user_talk = data["user_talk"]
     user_album_img_path = os.path.join(USER_IMAGE_FOLDER, curr_user, 'album', 'images', image_name + '.jpg')
+    with open(user_album_img_path, 'rb') as img_file:
+        img_base = base64.b64encode(img_file.read()).decode('utf-8')
+    messages = []
+    for chat in album_chat_history:
+        if chat["role"] == "assistant":
+            message = {"role": "assistant", "content": [{"type": "text", "text": chat["text"]}]}
+            messages.append(message)
+        elif chat["role"] == "user":
+            message = {"role": "user", "content": [{"type": "text", "text": chat["text"]}]}
+            messages.append(message)
 
-    if user_talk == "":
-        user_talk = "请描述图片内容"
     model_name = "glm-4v-plus"
-
+    responses = client.chat.completions.create(
+        model=model_name,
+        messages=messages,
+        stream=True,
+    )
+    def generate_response():
+        for response in responses:
+            finish_reason = response.choices[0].finish_reason
+            text = response.choices[0].delta.content
+            # 当用户输入的内容违规时输出“我听不懂你在说什么”
+            if finish_reason == "sensitive":
+                text = "我听不懂你在说什么\n"
+            yield text
+    generate = generate_response()
+    return app.response_class(
+            stream_with_context(generate), mimetype="text/event-stream"
+        )
 
 
 @app.route("/delete_image", methods=["POST"])

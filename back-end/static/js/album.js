@@ -213,6 +213,8 @@ function controlAudio(event) {
     audioPlayer.paused ? audioPlayer.play() : audioPlayer.pause();
 }
 
+let album_chat_history = [];
+
 function fullScreen(event) {
     event.stopPropagation();
     // 全屏显示的逻辑
@@ -244,6 +246,8 @@ function fullScreen(event) {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
+                album_chat_history.push({"role": "assistant", "text": data.image_des})  // 将照片描述加入对话历史
+
                 const chatMessageBot = document.createElement('div');
                 chatMessageBot.className = 'chat-messages-bot';
                 const chatBubbleBot = document.createElement('div');
@@ -262,6 +266,7 @@ function fullScreen(event) {
 
     document.querySelector('.back-button').addEventListener('click', function () {
         imageDetail.style.display = 'none';
+        album_chat_history = [];  // 清空对话历史
     });
     imageDetail.style.display = 'block';
     document.getElementById('send-button').addEventListener('click', function () {
@@ -280,6 +285,8 @@ function fullScreen(event) {
 let curr_talk_index = 0;  // 标识当前对话
 
 function sendMessageToAgent(message, image_name) {
+    album_chat_history.push({"role": "user", "text": message})  // 将用户消息加入对话历史
+
     if (curr_talk_index >= Number.MAX_SAFE_INTEGER) {
         curr_talk_index = 0;
     }
@@ -290,12 +297,18 @@ function sendMessageToAgent(message, image_name) {
     const chatBubbleBot = document.createElement('div');
     chatBubbleBot.className = 'chat-bubble-bot';
 
+    chatMessageBot.appendChild(chatBubbleBot);
+    document.getElementById('chat-container').appendChild(chatMessageBot);
+    document.getElementById('chat-container').scrollTo(0, document.getElementById('chat-container').scrollHeight);  // 滚动到底部
+
     const token = localStorage.getItem('token');
     fetch('/album_talk', {
+        method: 'POST',
         headers: {
-            "Authorization": `Bearer ${token}`
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json"
         },
-        body: JSON.stringify({ user_talk: message, image_name: image_name })
+        body: JSON.stringify({ album_chat_history: album_chat_history, image_name: image_name })
     })
         .then(response => {
             let reader = response.body.getReader();
@@ -303,10 +316,12 @@ function sendMessageToAgent(message, image_name) {
             // 逐块读取并处理数据
             return reader.read().then(function processText({ done, value }) {
                 if (done) {
+                    album_chat_history.push({"role": "assistant", "text": chatBubbleBot.textContent})
                     return;
                 }
                 // 如果对话序号对不上，则停止响应
                 if (talk_index !== curr_talk_index) {
+                    album_chat_history.push({"role": "assistant", "text": chatBubbleBot.textContent})
                     return;
                 }
 
@@ -321,10 +336,6 @@ function sendMessageToAgent(message, image_name) {
         .catch(error => {
             console.error('Error fetching stream:', error);
         });
-
-    chatMessageBot.appendChild(chatBubbleBot);
-    document.getElementById('chat-container').appendChild(chatMessageBot);
-    document.getElementById('chat-container').scrollTo(0, document.getElementById('chat-container').scrollHeight);
 }
 
 function addMessage(message) {
