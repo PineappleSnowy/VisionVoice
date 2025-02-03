@@ -83,7 +83,7 @@ p {
     align-items: center;
     z-index: 1;
     background-image: url('../images/audio.png');
-    background-size: 25%;
+    background-size: 20%;
     background-repeat: no-repeat;
     background-position: center;
     display: none;
@@ -102,7 +102,7 @@ p {
     align-items: center;
     z-index: 1;
     background-image: url('../images/fullscreen.png');
-    background-size: 25%;
+    background-size: 20%;
     background-repeat: no-repeat;
     background-position: center;
     display: none;
@@ -127,23 +127,22 @@ p {
     font-size: 20px;
 }
 
-.footer {
+#album-add {
     position: absolute;
     top: 0;
     right: 3px;
     width: 30%;
     height: 100%;
     text-align: center;
-    transition: height 0.2s;
     color: #e0e0e0;
     z-index: 3;
 }
 
-.footer .expand {
+#album-add .expand {
     height: 300%;
 }
 
-.footer button {
+#album-add button {
     margin: 1px auto;
     width: 100%;
     display: block;
@@ -153,84 +152,25 @@ p {
     border: none;
     border-radius: 5px;
     padding: 0;
+    font-size: large;
 }
 
-.footer button:hover {
+#album-add button:hover {
     background-color: #444;
 }
 
-.modal {
-    display: none;
+#statusMessage {
     position: fixed;
-    z-index: 1;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(0, 0, 0, 0.8);
-    color: #e0e0e0;
-    padding-top: 60px;
-}
-
-.modal-content {
-    background-color: #333;
-    margin: 15% auto;
-    padding: 20px;
-    border: 1px solid #888;
-    width: 80%;
-}
-
-.modal img {
-    width: 100%;
-    height: auto;
-}
-
-.modal input {
-    width: calc(100% - 100px);
-    margin-right: 5px;
-    margin-bottom: 10px;
-    padding-left: 8px;
-}
-
-.modal button {
-    width: 80px;
-}
-
-.modal-content input,
-.modal-content button {
-    background-color: #444;
-    color: #e0e0e0;
-    border: none;
-    height: 40px;
-    border-radius: 3px;
-}
-
-.modal-content button:hover {
-    background-color: #555;
-}
-
-.modal-content button#deleteButton {
-    background-color: #d9534f;
-    color: #ffffff;
-}
-
-.modal-content button#deleteButton:hover {
-    background-color: #c9302c;
-}
-
-.error-message {
-    position: fixed;
-    bottom: 70px;
-    /* 确保在footer上方 */
+    bottom: 105px;
     left: 50%;
     transform: translateX(-50%);
     background-color: transparent;
     color: red;
-    padding: 10px;
+    padding: 20px;
     border: none;
-    z-index: 0;
+    z-index: 4;
     text-align: center;
+    font-size: larger;
 }
 
 #imageDetail {
@@ -243,6 +183,23 @@ p {
     background-color: rgba(0, 0, 0, 0.8);
     color: #e0e0e0;
     z-index: 4;
+}
+
+.back-button {
+    display: flex;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    background: none;
+    border: none;
+    color: #e0e0e0;
+    font-size: 26px;
+    cursor: pointer;
+    width: 30%;
+    height: 100%;
+    justify-content: left;
+    align-items: center;
+    padding: 5px 14px;
 }
 
 .image-detail-header {
@@ -258,21 +215,30 @@ p {
     font-size: 20px;
 }
 
-.back-button {
+.delete-button {
     display: flex;
     position: absolute;
-    left: 0px;
-    top: 0px;
-    background: none;
+    right: 3px;
+    top: 1px;
     border: none;
+    border-radius: 5px;
     color: #e0e0e0;
     font-size: 26px;
     cursor: pointer;
-    width: 100px;
-    height: 46px;
+    width: 30%;
+    height: calc(100% - 1.33px);
     justify-content: left;
     align-items: center;
-    padding: 5px 14px;
+    padding: 0;
+    background-color: red;
+    background-image: url('../images/trash-outline.png');
+    background-size: 20%;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.delete-button button:hover {
+    background-color: #5a1717;
 }
 
 #imageDetail .image-container {

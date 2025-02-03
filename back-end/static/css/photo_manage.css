@@ -146,12 +146,12 @@ p {
 }
 
 .modal-content button#deleteButton {
-    background-color: #d9534f;
+    background-color: red;
     color: #ffffff;
 }
 
 .modal-content button#deleteButton:hover {
-    background-color: #c9302c;
+    background-color: #5a1717;
 }
 
 .error-message {

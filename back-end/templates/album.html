@@ -9,14 +9,13 @@
     <link rel="stylesheet" href="../static/css/base.css" />
     <link rel="stylesheet" href="../static/css/album.css" />
     <link rel="icon" href="../static/favicon.ico" />
-    <script src="https://kit.fontawesome.com/11023f265d.js" crossorigin="anonymous"></script>
     <script src="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/socket.io/4.4.1/socket.io.min.js"></script>
 </head>
 
 <body>
     <div class="header" role="banner" aria-label="页眉">
         有声相册
-        <div id="footer" class="footer" role="contentinfo" aria-label="添加照片">
+        <div id="album-add" role="contentinfo" aria-label="添加照片">
             <button id="addButton" aria-label="添加照片">&#10010;</button>
             <button id="cameraButton" aria-label="从摄像头获取照片" style="display: none;">从摄像头获取</button>
             <button id="albumButton" aria-label="从相册获取照片" style="display: none;">从相册获取</button>
@@ -27,21 +26,7 @@
     <audio id="audioPlayer" controls style="display: none;"></audio>
     <div class="gallery" id="gallery" role="region" aria-label="照片画廊"></div>
 
-    <div id="errorMessage" class="error-message" role="alert" aria-live="assertive" style="display: none;"></div>
-
-
-    <div id="myModal" class="modal" role="dialog" aria-labelledby="modalTitle" aria-modal="true">
-        <div class="modal-content">
-            <h2 id="modalTitle" style="display: none;">照片详情</h2>
-            <img id="modalImage" src="" alt="照片预览" aria-labelledby="modalImageDescription">
-            <p id="modalImageDescription" style="display: none;">照片预览</p>
-            <input type="text" id="imageName" value="" aria-label="照片名称">
-            <button id="saveButton" aria-label="保存更改">修改</button>
-            <button id="deleteButton" aria-label="删除照片">删除</button>
-            <span id="statusMessage" aria-live="polite" style="margin-left: 50px;"></span>
-            <button id="backButton" aria-label="返回" style="display: block; margin-top: 10px;">返回</button>
-        </div>
-    </div>
+    <div id="statusMessage" role="alert" aria-live="assertive"></div>
 
     <div id="navbar" role="navigation">
         <a href="/agent" aria-label="首页">

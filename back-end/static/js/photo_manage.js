@@ -123,7 +123,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 'Content-Type': 'application/json',
                 "Authorization": `Bearer ${token}`
             },
-            body: JSON.stringify({ name: imageName })
+            body: JSON.stringify({ image_name: imageName })
         })
             .then(response => response.json())
             .then(data => {
@@ -150,7 +150,7 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('backButton').addEventListener('click', function () {
         const modal = document.getElementById('myModal');
         modal.style.display = 'none';
-        statusMessage.textContent = '';
+        document.getElementById('statusMessage').textContent = '';
     });
 });
 
