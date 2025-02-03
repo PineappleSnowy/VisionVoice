@@ -255,27 +255,28 @@ def get_images():
     images = []
     curr_user = get_jwt_identity()
     user_image_folder = os.path.join(USER_IMAGE_FOLDER, curr_user)
-    user_album_folder = os.path.join(USER_IMAGE_FOLDER, curr_user, 'album', 'images')
-    
+    user_album_folder = os.path.join(
+        USER_IMAGE_FOLDER, curr_user, 'album', 'images')
+
     if not os.path.exists(user_image_folder):
         os.mkdir(user_image_folder)
     if not os.path.exists(user_album_folder):
         os.mkdir(user_album_folder)
-    
+
     mode = request.args.get("mode", "default")
-    
+
     if mode == 'album':
         target_folder = user_album_folder
     else:
         target_folder = user_image_folder
-    
+
     for filename in os.listdir(target_folder):
         if filename.endswith((".jpg")):
             name, ext = os.path.splitext(filename)
             images.append(
                 {"name": name, "url": f"/image/{curr_user}/{filename}?mode={mode}"}
             )
-    
+
     return jsonify(images)
 
 
@@ -283,7 +284,8 @@ def get_images():
 def get_image(user, filename):
     mode = request.args.get("mode", "default")
     if mode == 'album':
-        user_image_folder = os.path.join(USER_IMAGE_FOLDER, user, 'album', 'images')
+        user_image_folder = os.path.join(
+            USER_IMAGE_FOLDER, user, 'album', 'images')
     else:
         user_image_folder = os.path.join(USER_IMAGE_FOLDER, user)
     return send_from_directory(user_image_folder, filename)
@@ -358,30 +360,32 @@ def save_item_image():
         )
     return jsonify({"success": False, "error": "File upload failed"}), 400
 
+
 def describe_image(client, img_path):
     with open(img_path, 'rb') as img_file:
         img_base = base64.b64encode(img_file.read()).decode('utf-8')
     response = client.chat.completions.create(
         model="glm-4v",  # 填写需要调用的模型名称
         messages=[
-        {
-            "role": "user",
-            "content": [
             {
-                "type": "text",
-                "text": "图里有什么"
-            },
-            {
-                "type": "image_url",
-                "image_url": {
-                    "url" : img_base
-                }
+                "role": "user",
+                "content": [
+                    {
+                        "type": "text",
+                        "text": "图里有什么"
+                    },
+                    {
+                        "type": "image_url",
+                        "image_url": {
+                            "url": img_base
+                        }
+                    }
+                ]
             }
-            ]
-        }
         ]
     )
     return response.choices[0].message.content
+
 
 @app.route("/save_album_images", methods=["POST"])
 def save_album_images():
@@ -401,7 +405,8 @@ def save_album_images():
         if filename:
             try:
                 image_filename = filename + '.jpg'
-                image_folder = os.path.join(user_image_folder, 'album', 'images')
+                image_folder = os.path.join(
+                    user_image_folder, 'album', 'images')
                 image_save_path = os.path.join(image_folder, image_filename)
                 file.save(image_save_path)
                 saved_images.append({
@@ -413,13 +418,14 @@ def save_album_images():
                 des_audio = agent_audio_generate(image_des)
 
                 audio_file_name = filename + '.mp3'
-                audio_folder = os.path.join(user_image_folder, 'album', 'audios')
+                audio_folder = os.path.join(
+                    user_image_folder, 'album', 'audios')
                 audio_file_path = os.path.join(audio_folder, audio_file_name)
                 if not os.path.exists(audio_folder):
                     os.makedirs(audio_folder)
                 with open(audio_file_path, 'wb') as f:
                     f.write(des_audio)
-                
+
                 text_file_name = filename + '.txt'
                 text_folder = os.path.join(user_image_folder, 'album', 'texts')
                 text_file_path = os.path.join(text_folder, text_file_name)
@@ -437,6 +443,7 @@ def save_album_images():
     else:
         return jsonify({"success": False, "error": "No images saved"}), 400
 
+
 @app.route("/get_image_des", methods=["POST"])
 def get_image_des():
     curr_user = get_jwt_identity()
@@ -444,23 +451,27 @@ def get_image_des():
 
     data = request.get_json()
     image_name = data["image_name"]
-    image_des_path = os.path.join(user_image_folder, 'album', 'texts', image_name + '.txt')
+    image_des_path = os.path.join(
+        user_image_folder, 'album', 'texts', image_name + '.txt')
     if not os.path.exists(image_des_path):
         return jsonify({"success": False, "error": "Image description not found"}), 400
     with open(image_des_path, 'r', encoding='utf-8') as f:
         image_des = f.read()
     return jsonify({"success": True, "image_des": image_des}), 200
 
+
 @app.route('/get_audio', methods=['GET'])
 def get_audio():
     curr_user = get_jwt_identity()
     # 有声相册音频路由
     audio_file = request.args.get('audio_name') + '.mp3'
-    audio_path = os.path.join(USER_IMAGE_FOLDER, curr_user, 'album', 'audios', audio_file)
+    audio_path = os.path.join(
+        USER_IMAGE_FOLDER, curr_user, 'album', 'audios', audio_file)
     if not os.path.exists(audio_path):
         return jsonify({'error': 'Audio file not found'}), 404
 
     return send_file(audio_path, mimetype='audio/mp3')
+
 
 @app.route("/album_talk", methods=["POST"])
 def album_talk():
@@ -468,16 +479,22 @@ def album_talk():
     data = request.get_json()
     album_chat_history = data["album_chat_history"]
     image_name = data["image_name"]
-    user_album_img_path = os.path.join(USER_IMAGE_FOLDER, curr_user, 'album', 'images', image_name + '.jpg')
+    user_album_img_path = os.path.join(
+        USER_IMAGE_FOLDER, curr_user, 'album', 'images', image_name + '.jpg')
     with open(user_album_img_path, 'rb') as img_file:
         img_base = base64.b64encode(img_file.read()).decode('utf-8')
-    messages = []
+
+    prompt = "图里有什么"
+    messages = [{"role": "user", "content": [{"type": "text", "text": prompt},
+                                             {"type": "image_url", "image_url": {"url": img_base}}]}]
     for chat in album_chat_history:
         if chat["role"] == "assistant":
-            message = {"role": "assistant", "content": [{"type": "text", "text": chat["text"]}]}
+            message = {"role": "assistant", "content": [
+                {"type": "text", "text": chat["text"]}]}
             messages.append(message)
         elif chat["role"] == "user":
-            message = {"role": "user", "content": [{"type": "text", "text": chat["text"]}]}
+            message = {"role": "user", "content": [
+                {"type": "text", "text": chat["text"]}]}
             messages.append(message)
 
     model_name = "glm-4v-plus"
@@ -486,6 +503,7 @@ def album_talk():
         messages=messages,
         stream=True,
     )
+
     def generate_response():
         for response in responses:
             finish_reason = response.choices[0].finish_reason
@@ -496,8 +514,8 @@ def album_talk():
             yield text
     generate = generate_response()
     return app.response_class(
-            stream_with_context(generate), mimetype="text/event-stream"
-        )
+        stream_with_context(generate), mimetype="text/event-stream"
+    )
 
 
 @app.route("/delete_image", methods=["POST"])

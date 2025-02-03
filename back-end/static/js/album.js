@@ -273,7 +273,7 @@ function fullScreen(event) {
         const input = document.getElementById('agent-chat-textarea');
         let message = input.value.trim();
         message = message.replace(/(\r\n|\n|\r)/gm, '');
-        if (message > 0) {
+        if (message) {
             addMessage(message);
             sendMessageToAgent(message, image.alt);
             message = ''
