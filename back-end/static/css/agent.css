@@ -137,7 +137,7 @@ p {
     background-color: rgba(0, 0, 0, 0);
     overflow: auto;
     scrollbar-width: none;
-    transition: bottom 0.2s ease;
+    transition: bottom 0.1s ease;
     box-sizing: border-box;
 }
 
@@ -310,11 +310,11 @@ p {
 }
 
 .slide-up {
-    animation: slideup 0.2s ease-in-out forwards;
+    animation: slideup 0.1s ease-in-out forwards;
 }
 
 .slide-down {
-    animation: slidedown 0.2s ease-in-out forwards;
+    animation: slidedown 0.1s ease-in-out forwards;
 }
 
 #phone-button {

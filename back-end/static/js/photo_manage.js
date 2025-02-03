@@ -127,23 +127,28 @@ document.addEventListener('DOMContentLoaded', function () {
         })
             .then(response => response.json())
             .then(data => {
-                disableButtons(false);
                 const statusMessage = document.getElementById('statusMessage');
                 if (data.success) {
                     statusMessage.textContent = '删除成功';
                     statusMessage.style.color = 'green';
                     const galleryItem = document.querySelector(`button[onclick="openModal('${data.url}', '${imageName}', this)"]`).parentElement;
                     galleryItem.remove();
+                    setTimeout(() => {
+                        disableButtons(false);
+                        document.getElementById('backButton').click();
+                    }, 500);
                 } else {
                     statusMessage.textContent = '删除失败';
                     statusMessage.style.color = 'red';
+                    disableButtons(false);
                 }
             })
             .catch(error => {
-                disableButtons(false);
+                console.error('Error:', error);
                 const statusMessage = document.getElementById('statusMessage');
                 statusMessage.textContent = '删除失败';
                 statusMessage.style.color = 'red';
+                disableButtons(false);
             });
     });
 

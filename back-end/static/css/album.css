@@ -165,7 +165,6 @@ p {
     left: 50%;
     transform: translateX(-50%);
     background-color: transparent;
-    color: red;
     padding: 20px;
     border: none;
     z-index: 4;
@@ -238,7 +237,7 @@ p {
 }
 
 .delete-button button:hover {
-    background-color: #5a1717;
+    background-color: #a71c1c;
 }
 
 #imageDetail .image-container {

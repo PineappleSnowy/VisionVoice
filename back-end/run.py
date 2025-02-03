@@ -254,7 +254,8 @@ def settings():
 def get_images():
     images = []
     curr_user = get_jwt_identity()
-    user_image_folder = os.path.join(USER_IMAGE_FOLDER, curr_user, 'item_images')
+    user_image_folder = os.path.join(
+        USER_IMAGE_FOLDER, curr_user, 'item_images')
     user_album_folder = os.path.join(
         USER_IMAGE_FOLDER, curr_user, 'album', 'images')
 
@@ -287,14 +288,16 @@ def get_image(user, filename):
         user_image_folder = os.path.join(
             USER_IMAGE_FOLDER, user, 'album', 'images')
     else:
-        user_image_folder = os.path.join(USER_IMAGE_FOLDER, user, 'item_images')
+        user_image_folder = os.path.join(
+            USER_IMAGE_FOLDER, user, 'item_images')
     return send_from_directory(user_image_folder, filename)
 
 
 @app.route("/rename_image", methods=["POST"])
 def rename_image():
     curr_user = get_jwt_identity()
-    user_image_folder = os.path.join(USER_IMAGE_FOLDER, curr_user)
+    user_image_folder = os.path.join(
+        USER_IMAGE_FOLDER, curr_user, 'item_images')
 
     data = request.get_json()
     old_name = data["oldName"]
@@ -331,7 +334,8 @@ def gen_time_random_name():
 @app.route("/save_item_image", methods=["POST"])
 def save_item_image():
     curr_user = get_jwt_identity()
-    user_image_folder = os.path.join(USER_IMAGE_FOLDER, curr_user, 'item_images')
+    user_image_folder = os.path.join(
+        USER_IMAGE_FOLDER, curr_user, 'item_images')
 
     if "file" not in request.files:
         return jsonify({"success": False, "error": "No file part"}), 400
@@ -545,7 +549,11 @@ def delete_image():
                     return jsonify({"success": False, "error": str(e)}), 400
     if file_to_delete is None:
         return jsonify({"success": False, "error": "File not found"}), 400
-    return jsonify({"success": True}), 200
+    return (
+        jsonify(
+            {"success": True, "url": f"/image/{curr_user}/{file_to_delete}"}),
+        200,
+    )
 
 
 # ----- 加载全局变量 -----
