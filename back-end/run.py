@@ -271,7 +271,10 @@ def get_images():
     else:
         target_folder = user_image_folder
 
-    for filename in os.listdir(target_folder):
+    # 获取文件列表并按文件名逆序排序
+    file_list = sorted(os.listdir(target_folder), reverse=True)
+
+    for filename in file_list:
         if filename.endswith((".jpg")):
             name, ext = os.path.splitext(filename)
             images.append(
@@ -369,7 +372,7 @@ def save_item_image():
 def describe_image(client, img_path):
     with open(img_path, 'rb') as img_file:
         img_base = base64.b64encode(img_file.read()).decode('utf-8')
-    prompt = "请用富有关怀的语言向你的盲人朋友描述这张照片。"
+    prompt = "请你充分捕捉照片信息，用生动的语言向你的盲人朋友描述这张照片。"
     response = client.chat.completions.create(
         model="glm-4v",  # 填写需要调用的模型名称
         messages=[

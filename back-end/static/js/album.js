@@ -105,7 +105,11 @@ document.addEventListener('DOMContentLoaded', function () {
                             <div class="text">正在解析</div>
                         </div>
                     `;
-                    gallery.appendChild(item);
+                    if (gallery.firstChild) {
+                        gallery.insertBefore(item, gallery.firstChild);
+                    } else {
+                        gallery.appendChild(item);
+                    }
                 };
                 reader.readAsDataURL(file);
                 formData.append('files', file, newFileName);

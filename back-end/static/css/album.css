@@ -230,7 +230,7 @@ p {
     align-items: center;
     padding: 0;
     background-color: red;
-    background-image: url('../images/trash-outline.png');
+    background-image: url('../images/delete.png');
     background-size: 20%;
     background-repeat: no-repeat;
     background-position: center;
@@ -378,6 +378,11 @@ p {
 #navbar {
     background-color: #1e1e1e;
     z-index: 5;
+}
+
+#navbar a[href="/album"] {
+    font-weight: bold;
+    /* 加粗字体 */
 }
 
 #navbar a:hover {

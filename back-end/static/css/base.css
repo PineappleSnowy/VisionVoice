@@ -59,6 +59,10 @@
         background-image: url('../images/chat.png');
     }
 
+    #navbar a[href="/album"]::before {
+        background-image: url('../images/album.png');
+    }
+
     #navbar a[href="/skills"]::before {
         background-image: url('../images/skills.png');
     }
