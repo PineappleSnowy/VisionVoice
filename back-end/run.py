@@ -260,9 +260,9 @@ def get_images():
         USER_IMAGE_FOLDER, curr_user, 'album', 'images')
 
     if not os.path.exists(user_image_folder):
-        os.mkdir(user_image_folder)
+        os.makedirs(user_image_folder)
     if not os.path.exists(user_album_folder):
-        os.mkdir(user_album_folder)
+        os.makedirs(user_album_folder)
 
     mode = request.args.get("mode", "default")
 
@@ -275,7 +275,8 @@ def get_images():
         if filename.endswith((".jpg")):
             name, ext = os.path.splitext(filename)
             images.append(
-                {"name": name, "url": f"/image/{curr_user}/{filename}?mode={mode}"}
+                {"name": name, "url": f"/image/{curr_user}/{filename}?mode={mode}", 
+                 "finish_des": os.path.exists(os.path.join(USER_IMAGE_FOLDER, curr_user, 'album', 'audios', name + '.mp3'))}
             )
 
     return jsonify(images)
@@ -368,6 +369,7 @@ def save_item_image():
 def describe_image(client, img_path):
     with open(img_path, 'rb') as img_file:
         img_base = base64.b64encode(img_file.read()).decode('utf-8')
+    prompt = "请用富有关怀的语言向你的盲人朋友描述这张照片。"
     response = client.chat.completions.create(
         model="glm-4v",  # 填写需要调用的模型名称
         messages=[
@@ -376,7 +378,7 @@ def describe_image(client, img_path):
                 "content": [
                     {
                         "type": "text",
-                        "text": "图里有什么"
+                        "text": prompt
                     },
                     {
                         "type": "image_url",
@@ -488,7 +490,7 @@ def album_talk():
     with open(user_album_img_path, 'rb') as img_file:
         img_base = base64.b64encode(img_file.read()).decode('utf-8')
 
-    prompt = "图里有什么"
+    prompt = "请用富有关怀的语言向你的盲人朋友描述这张照片。"
     messages = [{"role": "user", "content": [{"type": "text", "text": prompt},
                                              {"type": "image_url", "image_url": {"url": img_base}}]}]
     for chat in album_chat_history:
@@ -1408,10 +1410,10 @@ def run_server():
     else:
         socketio.run(
             app,
-            # port=443,
-            # host="0.0.0.0",
+            port=443,
+            host="0.0.0.0",
             allow_unsafe_werkzeug=True,
-            # ssl_context=("/ssl/cert.pem", "/ssl/cert.key")
+            ssl_context=("/ssl/cert.pem", "/ssl/cert.key")
         )
 
 

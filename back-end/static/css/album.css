@@ -152,7 +152,7 @@ p {
     border: none;
     border-radius: 5px;
     padding: 0;
-    font-size: large;
+    font-size: medium;
 }
 
 #album-add button:hover {
@@ -161,11 +161,11 @@ p {
 
 #statusMessage {
     position: fixed;
-    bottom: 105px;
+    bottom: 7%;
     left: 50%;
     transform: translateX(-50%);
     background-color: transparent;
-    padding: 20px;
+    padding: 5px 25px;
     border: none;
     z-index: 4;
     text-align: center;

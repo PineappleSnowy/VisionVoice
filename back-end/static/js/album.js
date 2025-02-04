@@ -39,6 +39,15 @@ document.addEventListener('DOMContentLoaded', function () {
                     <button class="audio-control" onclick="controlAudio(event)"></button>
                     <button class="full-screen" onclick="fullScreen(event)"></button>
                 `;
+                if (!image.finish_des) {
+                    console.log('Image not finished:', image.name);
+                    const overlay = document.createElement('div');
+                    overlay.className = 'overlay';
+                    overlay.innerHTML = `
+                        <div class="text">正在解析</div>
+                        `;
+                    item.appendChild(overlay);
+                }
                 gallery.appendChild(item);
             });
         })
@@ -213,7 +222,7 @@ function fullScreen(event) {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                album_chat_history.push({"role": "assistant", "text": data.image_des})  // 将照片描述加入对话历史
+                album_chat_history.push({ "role": "assistant", "text": data.image_des })  // 将照片描述加入对话历史
 
                 const chatMessageBot = document.createElement('div');
                 chatMessageBot.className = 'chat-messages-bot';
@@ -282,7 +291,7 @@ function fullScreen(event) {
 let curr_talk_index = 0;  // 标识当前对话
 
 function sendMessageToAgent(message, image_name) {
-    album_chat_history.push({"role": "user", "text": message})  // 将用户消息加入对话历史
+    album_chat_history.push({ "role": "user", "text": message })  // 将用户消息加入对话历史
 
     if (curr_talk_index >= Number.MAX_SAFE_INTEGER) {
         curr_talk_index = 0;
@@ -313,12 +322,12 @@ function sendMessageToAgent(message, image_name) {
             // 逐块读取并处理数据
             return reader.read().then(function processText({ done, value }) {
                 if (done) {
-                    album_chat_history.push({"role": "assistant", "text": chatBubbleBot.textContent})
+                    album_chat_history.push({ "role": "assistant", "text": chatBubbleBot.textContent })
                     return;
                 }
                 // 如果对话序号对不上，则停止响应
                 if (talk_index !== curr_talk_index) {
-                    album_chat_history.push({"role": "assistant", "text": chatBubbleBot.textContent})
+                    album_chat_history.push({ "role": "assistant", "text": chatBubbleBot.textContent })
                     return;
                 }
 

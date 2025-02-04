@@ -125,8 +125,8 @@ p {
 
 .modal-content {
     background-color: #333;
-    margin: 48px auto;
-    padding: 20px;
+    margin: 10% auto;
+    padding: 5%;
     border: 1px solid #888;
     width: 80%;
     height: 80%;
@@ -164,7 +164,7 @@ p {
     background-color: #444;
     color: #e0e0e0;
     border: none;
-    height: 70px;
+    height: 9%;
     border-radius: 3px;
     font-size: large;
 }
@@ -189,12 +189,12 @@ p {
 
 #statusMessage {
     position: fixed;
-    bottom: 35px;
+    bottom: 5%;
     left: 50%;
     transform: translateX(-50%);
     background-color: transparent;
     color: red;
-    padding: 20px;
+    padding: 5px 25px;
     border: none;
     z-index: 4;
     text-align: center;
