@@ -13,7 +13,7 @@
 <body>
     <div class="header" role="banner">消息</div>
     <div class="message-list" role="list">
-        <div class="message-item" data-agent="defaultAgent" onclick="selectChatAgent('defaultAgent'); window.location.href='/agent'" role="listitem">
+        <div class="message-item" data-agent="defaultAgent" onclick="selectChatAgent('defaultAgent'); window.location.href='/agent'" role="listitem" aria-label="生活助手">
             <img src="../static/images/defaultAgent.jpg" alt="生活助手头像" class="avatar">
             <div class="content">
                 <div class="name" aria-label="生活助手">生活助手</div>
@@ -24,7 +24,7 @@
                 <button class="button video" onclick="event.stopPropagation(); selectChatAgent('defaultAgent'); window.location.href='/phone?camera=on'" aria-label="视频联系生活助手"></button>
             </div>
         </div>
-        <div class="message-item" data-agent="psychologicalAgent" onclick="selectChatAgent('psychologicalAgent'); window.location.href='/agent'" role="listitem">
+        <div class="message-item" data-agent="psychologicalAgent" onclick="selectChatAgent('psychologicalAgent'); window.location.href='/agent'" role="listitem" aria-label="心灵树洞">
             <img src="../static/images/psychologicalAgent.jpg" alt="心灵树洞头像" class="avatar">
             <div class="content">
                 <div class="name" aria-label="心灵树洞">心灵树洞</div>

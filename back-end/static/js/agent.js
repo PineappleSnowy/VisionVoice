@@ -567,6 +567,7 @@ function updateAgentName(agent) {
     else
         agent_name = '智能体名称';
     document.getElementById('agent-name').textContent = agent_name;
+    document.getElementById('topbar').ariaLabel = agent_name;
 }
 
 /* 语音输入 start

@@ -36,8 +36,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     <button class="image-talk" onclick="playAudio('${image.name}', event)">
                         <img src="${image.url}" alt="${image.name}">
                     </button>
-                    <button class="audio-control" onclick="controlAudio(event)"></button>
-                    <button class="full-screen" onclick="fullScreen(event)"></button>
+                    <button class="audio-control" onclick="controlAudio(event)" aria-label="开关声音"></button>
+                    <button class="full-screen" onclick="fullScreen(event)" aria-label="查看照片详情"></button>
                 `;
                 if (!image.finish_des) {
                     console.log('Image not finished:', image.name);
@@ -99,8 +99,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         <button class="image-talk" onclick="playAudio('${newFileName}', event)">
                             <img src="${e.target.result}" alt="${newFileName}">
                         </button>
-                        <button class="audio-control" onclick="controlAudio(event)"></button>
-                        <button class="full-screen" onclick="fullScreen(event)"></button>
+                        <button class="audio-control" onclick="controlAudio(event)" aria-label="开关声音"></button>
+                        <button class="full-screen" onclick="fullScreen(event)" aria-label="查看照片详情"></button>
                         <div class="overlay">
                             <div class="text">正在解析</div>
                         </div>
