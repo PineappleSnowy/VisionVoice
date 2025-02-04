@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', function () {
     socket.on('image_talk_finished', function (data) {
         console.log("图片解析完成")
         const imageName = data.image_name;
-        const images = document.querySelectorAll(`img[label="${imageName}"]`);
+        const images = document.querySelectorAll(`img[alt="${imageName}"]`);
         images.forEach(img => {
             const overlay = img.parentElement.parentElement.querySelector('.overlay');
             overlay.style.display = 'none';
@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 item.className = 'gallery-item';
                 item.innerHTML = `
                     <button class="image-talk" onclick="playAudio('${image.name}', event)">
-                        <img src="${image.url}" label="${image.name}" aria-label="照片${photo_id}，点击朗读" alt="照片${photo_id}，点击朗读">
+                        <img src="${image.url}" alt="${image.name}" aria-label="照片${photo_id}，点击朗读">
                     </button>
                     <button class="audio-control" onclick="controlAudio(event)" aria-label="开关声音"></button>
                     <button class="full-screen" onclick="fullScreen(event)" aria-label="照片问答"></button>
@@ -99,7 +99,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     item.className = 'gallery-item';
                     item.innerHTML = `
                         <button class="image-talk" onclick="playAudio('${newFileName}', event)">
-                            <img src="${e.target.result}" label="${newFileName}" aria-label="点击朗读照片" alt="点击朗读照片">
+                            <img src="${e.target.result}" alt="${newFileName}" aria-label="点击朗读照片">
                         </button>
                         <button class="audio-control" onclick="controlAudio(event)" aria-label="开关声音"></button>
                         <button class="full-screen" onclick="fullScreen(event)" aria-label="照片问答"></button>
@@ -195,7 +195,7 @@ function controlAudio(event) {
     event.stopPropagation();
     cameraButton.style.display = 'none';
     albumButton.style.display = 'none';
-    
+
     // 控制音频的逻辑
     audioPlayer.paused ? audioPlayer.play() : audioPlayer.pause();
 }
@@ -219,7 +219,7 @@ function fullScreen(event) {
             <button class="delete-button" aria-label="删除该照片"></button>
         </div>
         <div class="image-container">
-            <img src="${image.src}" label="${image.label}">
+            <img src="${image.src}" alt=""照片"" aria-label="照片">
         </div>
         <div id="chat-container" aria-live="polite" aria-atomic="true"></div>
         <div id="chat-input-container" role="form">
@@ -232,7 +232,7 @@ function fullScreen(event) {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${localStorage.getItem('token')}`
         },
-        body: JSON.stringify({ image_name: image.label })
+        body: JSON.stringify({ image_name: image.alt })
     })
         .then(response => response.json())
         .then(data => {
@@ -266,7 +266,7 @@ function fullScreen(event) {
         message = message.replace(/(\r\n|\n|\r)/gm, '');
         if (message) {
             addMessage(message);
-            sendMessageToAgent(message, image.label);
+            sendMessageToAgent(message, image.alt);
             message = ''
             input.value = ''; // 清空输入框
         }
@@ -280,7 +280,7 @@ function fullScreen(event) {
                 'Content-Type': 'application/json',
                 "Authorization": `Bearer ${token}`
             },
-            body: JSON.stringify({ image_name: image.label })
+            body: JSON.stringify({ image_name: image.alt })
         })
             .then(response => response.json())
             .then(data => {
