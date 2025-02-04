@@ -14,13 +14,14 @@ document.addEventListener('DOMContentLoaded', function () {
     socket.on('image_talk_finished', function (data) {
         console.log("图片解析完成")
         const imageName = data.image_name;
-        const images = document.querySelectorAll(`img[alt="${imageName}"]`);
+        const images = document.querySelectorAll(`img[label="${imageName}"]`);
         images.forEach(img => {
             const overlay = img.parentElement.parentElement.querySelector('.overlay');
             overlay.style.display = 'none';
         });
     });
 
+    let photo_id = 0;  // 当前照片序号
     fetch('/images?mode=album', {
         headers: {
             "Authorization": `Bearer ${token}`
@@ -30,14 +31,15 @@ document.addEventListener('DOMContentLoaded', function () {
         .then(data => {
             const gallery = document.getElementById('gallery');
             data.forEach(image => {
+                photo_id += 1;
                 const item = document.createElement('div');
                 item.className = 'gallery-item';
                 item.innerHTML = `
                     <button class="image-talk" onclick="playAudio('${image.name}', event)">
-                        <img src="${image.url}" alt="${image.name}">
+                        <img src="${image.url}" label="${image.name}" aria-label="照片${photo_id}，点击朗读" alt="照片${photo_id}，点击朗读">
                     </button>
                     <button class="audio-control" onclick="controlAudio(event)" aria-label="开关声音"></button>
-                    <button class="full-screen" onclick="fullScreen(event)" aria-label="查看照片详情"></button>
+                    <button class="full-screen" onclick="fullScreen(event)" aria-label="照片问答"></button>
                 `;
                 if (!image.finish_des) {
                     console.log('Image not finished:', image.name);
@@ -97,10 +99,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     item.className = 'gallery-item';
                     item.innerHTML = `
                         <button class="image-talk" onclick="playAudio('${newFileName}', event)">
-                            <img src="${e.target.result}" alt="${newFileName}">
+                            <img src="${e.target.result}" label="${newFileName}" aria-label="点击朗读照片" alt="点击朗读照片">
                         </button>
                         <button class="audio-control" onclick="controlAudio(event)" aria-label="开关声音"></button>
-                        <button class="full-screen" onclick="fullScreen(event)" aria-label="查看照片详情"></button>
+                        <button class="full-screen" onclick="fullScreen(event)" aria-label="照片问答"></button>
                         <div class="overlay">
                             <div class="text">正在解析</div>
                         </div>
@@ -154,6 +156,9 @@ function disableButtons(disable) {
 const audioPlayer = document.getElementById('audioPlayer');
 
 function playAudio(audioName, event) {
+    cameraButton.style.display = 'none';
+    albumButton.style.display = 'none';
+
     audioPlayer.pause();  // 先暂停当前正在播放的音频
     // 隐藏所有的 audio-control 和 full-screen 按钮
     document.querySelectorAll('.audio-control').forEach(button => button.style.display = 'none');
@@ -188,6 +193,9 @@ function playAudio(audioName, event) {
 
 function controlAudio(event) {
     event.stopPropagation();
+    cameraButton.style.display = 'none';
+    albumButton.style.display = 'none';
+    
     // 控制音频的逻辑
     audioPlayer.paused ? audioPlayer.play() : audioPlayer.pause();
 }
@@ -196,6 +204,9 @@ let album_chat_history = [];
 
 function fullScreen(event) {
     event.stopPropagation();
+    cameraButton.style.display = 'none';
+    albumButton.style.display = 'none';
+
     // 全屏显示的逻辑
     audioPlayer.pause();
     const imageDetail = document.getElementById('imageDetail');
@@ -204,11 +215,11 @@ function fullScreen(event) {
     imageDetail.innerHTML = `
         <div class="image-detail-header">
             <button class="back-button" aria-label="返回我的页面">&#8592;</button>
-            照片详情
+            照片问答
             <button class="delete-button" aria-label="删除该照片"></button>
         </div>
         <div class="image-container">
-            <img src="${image.src}" alt="${image.alt}">
+            <img src="${image.src}" label="${image.label}">
         </div>
         <div id="chat-container" aria-live="polite" aria-atomic="true"></div>
         <div id="chat-input-container" role="form">
@@ -221,7 +232,7 @@ function fullScreen(event) {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${localStorage.getItem('token')}`
         },
-        body: JSON.stringify({ image_name: image.alt })
+        body: JSON.stringify({ image_name: image.label })
     })
         .then(response => response.json())
         .then(data => {
@@ -255,7 +266,7 @@ function fullScreen(event) {
         message = message.replace(/(\r\n|\n|\r)/gm, '');
         if (message) {
             addMessage(message);
-            sendMessageToAgent(message, image.alt);
+            sendMessageToAgent(message, image.label);
             message = ''
             input.value = ''; // 清空输入框
         }
@@ -269,7 +280,7 @@ function fullScreen(event) {
                 'Content-Type': 'application/json',
                 "Authorization": `Bearer ${token}`
             },
-            body: JSON.stringify({ image_name: image.alt })
+            body: JSON.stringify({ image_name: image.label })
         })
             .then(response => response.json())
             .then(data => {
