@@ -99,7 +99,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     item.className = 'gallery-item';
                     item.innerHTML = `
                         <button class="image-talk" onclick="playAudio('${newFileName}', event)">
-                            <img src="${e.target.result}" alt="${newFileName}" aria-label="点击朗读照片">
+                            <img src="${e.target.result}" alt="${newFileName}" aria-label="解析完成${i + 1}，点击朗读">
                         </button>
                         <button class="audio-control" onclick="controlAudio(event)" aria-label="开关声音"></button>
                         <button class="full-screen" onclick="fullScreen(event)" aria-label="照片问答"></button>
