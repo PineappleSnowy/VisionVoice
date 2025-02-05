@@ -60,4 +60,3 @@ gunicorn_config.py
 
 # 签名文件
 *.pem
->>>>>>> b17ed49212d5aa64b712e8960ad2f5bece16fa06
