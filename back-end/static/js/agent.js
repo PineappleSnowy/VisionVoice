@@ -228,6 +228,8 @@ function sendMessageToAgent(message, multi_image_talk) {
     messagebackground.appendChild(messagesContainer_bot);
     messagebackground.scrollTop = messagebackground.scrollHeight;  // 滚动到底部
 
+    const talk_speed = localStorage.getItem('speed') || 8;
+
     const token = localStorage.getItem('token');
     fetch(`/agent/chat_stream?query=${message}&agent=${selectedAgent}&multi_image_talk=${multi_image_talk}`, {
         headers: {
@@ -252,7 +254,7 @@ function sendMessageToAgent(message, multi_image_talk) {
                 // 如果当前不是结束标志，则将文本添加到气泡中
                 if (!(jsonString.includes("<END>"))) {
                     if (!isMuted) {
-                        socket.emit("agent_stream_audio", jsonString);
+                        socket.emit("agent_stream_audio", jsonString, talk_speed);
                     }
                     bubble_2.textContent += jsonString;
                 }

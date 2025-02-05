@@ -1244,12 +1244,13 @@ def agent_upload_audio():
 
 
 @socketio.on("agent_stream_audio")
-def agent_stream_audio(current_token: str):
+def agent_stream_audio(current_token: str, talk_speed: int = 8):
     """
     对音频进行断句处理。
 
     Args:
         current_token {str} 从前端发来的当前 token
+        talk_speed {int} 语速，默认 8
     """
     # 检测socket的token，为了可以调用get_jwt_identity()
     token = request.args.get("token")
@@ -1290,7 +1291,7 @@ def agent_stream_audio(current_token: str):
                 )
 
                 audio_chunk = agent_audio_generate(
-                    "开始寻找" + current_token[current_token.find(">") + 1:]
+                    "开始寻找" + current_token[current_token.find(">") + 1:], talk_speed
                 )
                 socketio.emit(
                     "agent_play_audio_chunk",
@@ -1338,7 +1339,7 @@ def agent_stream_audio(current_token: str):
             if USER_VAR[user]["sentence_buffer"]:
                 # 将剩余内容加入任务队列
                 USER_VAR[user]["task_queue"].add_task_sync(
-                    agent_audio_generate, USER_VAR[user]["sentence_buffer"]
+                    agent_audio_generate, USER_VAR[user]["sentence_buffer"], talk_speed
                 )
 
             # 重置状态
@@ -1365,7 +1366,7 @@ def agent_stream_audio(current_token: str):
 
         # 将音频生成任务加入队列
         USER_VAR[user]["task_queue"].add_task_sync(
-            agent_audio_generate, complete_sentence
+            agent_audio_generate, complete_sentence, talk_speed
         )
 
 

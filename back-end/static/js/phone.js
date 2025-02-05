@@ -239,6 +239,7 @@ function formChat(talk_index) {
         if (state == 0) {
             document.getElementById('captionText').textContent = '';
             const token = localStorage.getItem('token');
+            const talk_speed = localStorage.getItem('speed') || 8;
             startAudio()
             fetch(`/agent/chat_stream?query=${rec_result}&agent=${selectedAgent}&videoOpen=${videoChat}`, {
                 headers: {
@@ -258,7 +259,7 @@ function formChat(talk_index) {
                         // 如果当前不是结束标志，则将文本进行语音合成
                         if (!(jsonString.includes("<END>")) && !audio_stop && talk_index == curr_talk_index) {
                             document.getElementById('captionText').textContent += jsonString;
-                            socket.emit("agent_stream_audio", jsonString);
+                            socket.emit("agent_stream_audio", jsonString, talk_speed);
                         }
 
                         // 继续读取下一个数据
@@ -283,6 +284,7 @@ function captureAndSendFrame() {
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
         const imageData = canvas.toDataURL('image/jpeg');
         const token = localStorage.getItem('token');
+        const talk_speed = localStorage.getItem('speed') || 8;
         fetch('/agent/upload_image', {
             method: 'POST',
             headers: {
@@ -307,7 +309,7 @@ function captureAndSendFrame() {
                             const top_loc = data["obstacle_info"][0]["top"]
                             const obstacle_loc_info = `画面${calcLocation(top_loc, left_loc)}${detected_item}距离${distant.toFixed(2)}米。`;
                             document.getElementById('captionText').textContent = obstacle_loc_info;
-                            socket.emit("agent_stream_audio", obstacle_loc_info);
+                            socket.emit("agent_stream_audio", obstacle_loc_info, talk_speed);
                             // 设置等待时间
                             setTimeout(function () {
                                 captureAndSendFrame()
@@ -322,7 +324,7 @@ function captureAndSendFrame() {
                             const top_loc = data["item_info"][0]["top"]
                             const item_loc_info = `${find_item_name}在画面${calcLocation(top_loc, left_loc)}。`;
                             document.getElementById('captionText').textContent = item_loc_info;
-                            socket.emit("agent_stream_audio", item_loc_info);
+                            socket.emit("agent_stream_audio", item_loc_info, talk_speed);
                             setTimeout(function () {
                                 captureAndSendFrame()
                             }, 1);
@@ -483,7 +485,8 @@ function exit_obstacle_void() {
 function exit_find_item() {
     state = 0
     find_item = false;
-    socket.emit("agent_stream_audio", "##<state=2 exit>");
+    const talk_speed = localStorage.getItem('speed') || 8;
+    socket.emit("agent_stream_audio", "##<state=2 exit>", talk_speed);
 }
 
 // 退出功能模式
@@ -521,7 +524,8 @@ function startAvoidObstacle() {
     if (!obstacle_avoid) {
         obstacle_avoid = true;
         document.getElementById('captionText').textContent = '避障模式已开启'
-        socket.emit("agent_stream_audio", "##<state=1>");
+        const talk_speed = localStorage.getItem('speed') || 8;
+        socket.emit("agent_stream_audio", "##<state=1>", talk_speed);
         startAudio()
     }
 }
@@ -537,7 +541,6 @@ window.startFindItem = function (item_name) {
     statusDiv.textContent = "寻物模式";
     if (vudio.dance()) { vudio.pause(); }
 
-    waveShape.style.display = 'none';
     document.querySelector('.endFunc').style.display = 'flex';
 
     closeModalButton.click();
@@ -548,7 +551,8 @@ window.startFindItem = function (item_name) {
         find_item = true;
         find_item_name = item_name;
         document.getElementById('captionText').textContent = `开始寻找${item_name}`
-        socket.emit("agent_stream_audio", `##<state=2>${item_name}`);
+        const talk_speed = localStorage.getItem('speed') || 8;
+        socket.emit("agent_stream_audio", `##<state=2>${item_name}`, talk_speed);
         startAudio();
     }
 }
@@ -1059,7 +1063,8 @@ window.onload = async () => {
         let location_result = await requestLocaion();
         let location_info = location_result['location_info']
         document.getElementById('captionText').textContent = location_info;
-        socket.emit("agent_stream_audio", location_info);
+        const talk_speed = localStorage.getItem('speed') || 8;
+        socket.emit("agent_stream_audio", location_info, talk_speed);
         startAudio();
     });
 
