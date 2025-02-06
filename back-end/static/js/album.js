@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const item = document.createElement('div');
                 item.className = 'gallery-item';
                 item.innerHTML = `
-                    <button class="image-talk" onclick="playAudio('${image.name}', event)">
+                    <button class="image-talk" onclick="playAudio('${image.name}', event, ${talk_speed})">
                         <img src="${image.url}" alt="${image.name}" aria-label="照片${photo_id}，点击朗读">
                     </button>
                     <button class="audio-control" onclick="controlAudio(event)" aria-label="开关声音"></button>
@@ -63,13 +63,9 @@ document.addEventListener('DOMContentLoaded', function () {
     const fileInput = document.getElementById('fileInput');
 
     addButton.addEventListener('click', function () {
-        if (albumAdd.classList.contains('expanded')) {
-            albumAdd.classList.remove('expanded');
-        } else {
-            albumAdd.classList.add('expanded');
-        }
-        cameraButton.style.display = cameraButton.style.display == 'none' ? 'inline-block' : 'none';
-        albumButton.style.display = albumButton.style.display == 'none' ? 'inline-block' : 'none';
+        addButton.ariaLabel = addButton.ariaLabel == '关闭添加照片' ? '添加照片' : '添加照片';
+        cameraButton.style.display = cameraButton.style.display == 'none' ? 'block' : 'none';
+        albumButton.style.display = albumButton.style.display == 'none' ? 'block' : 'none';
     });
 
     cameraButton.addEventListener('click', function () {
@@ -99,7 +95,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     const item = document.createElement('div');
                     item.className = 'gallery-item';
                     item.innerHTML = `
-                        <button class="image-talk" onclick="playAudio('${newFileName}', event)">
+                        <button class="image-talk" onclick="playAudio('${newFileName}', event, ${talk_speed})">
                             <img src="${e.target.result}" alt="${newFileName}" aria-label="解析完成${i + 1}，点击朗读">
                         </button>
                         <button class="audio-control" onclick="controlAudio(event)" aria-label="开关声音"></button>
@@ -156,7 +152,7 @@ function disableButtons(disable) {
 
 const audioPlayer = document.getElementById('audioPlayer');
 
-function playAudio(audioName, event) {
+function playAudio(audioName, event, talk_speed) {
     cameraButton.style.display = 'none';
     albumButton.style.display = 'none';
 
@@ -174,7 +170,7 @@ function playAudio(audioName, event) {
     fullScreenButton.style.display = 'flex';
 
     const token = localStorage.getItem('token');
-    fetch(`/get_audio?audio_name=${audioName}`, {
+    fetch(`/get_audio?audio_name=${audioName}&talk_speed=${talk_speed}`, {
         method: 'GET',
         headers: {
             "Authorization": `Bearer ${token}`

@@ -268,6 +268,17 @@ def get_images():
 
     if mode == 'album':
         target_folder = user_album_folder
+
+        talk_speed_config_path = os.path.join(
+        USER_IMAGE_FOLDER, curr_user, 'album', 'talk_speed_config.json')
+    
+        if not os.path.exists(talk_speed_config_path):  # 初始化语速配置文件
+            with open(talk_speed_config_path, 'w') as f:
+                album_images = os.listdir(os.path.join(
+                    USER_IMAGE_FOLDER, curr_user, 'album', 'images'))
+                album_images_withot_ext = [os.path.splitext(image)[0] for image in album_images]
+                talk_speed_config = {image: 8 for image in album_images_withot_ext}
+                json.dump(talk_speed_config, f)
     else:
         target_folder = user_image_folder
 
@@ -407,7 +418,14 @@ def save_album_images():
     if not files:
         return jsonify({"success": False, "error": "No selected files"}), 400
 
-    saved_images = []
+    talk_speed = request.args.get("talk_speed", 8)
+
+    talk_speed_config_path = os.path.join(
+        user_image_folder, 'album', 'talk_speed_config.json')
+    with open(talk_speed_config_path, 'r') as f:  # 读取语速配置
+        talk_speed_config = json.load(f)
+
+    saved_images = []  # 保存成功的图片
 
     for file in files:
         filename = file.filename
@@ -424,7 +442,7 @@ def save_album_images():
                 })
                 # 添加测试
                 image_des = describe_image(client, image_save_path)
-                des_audio = agent_audio_generate(image_des)
+                des_audio = agent_audio_generate(image_des, talk_speed)
 
                 audio_file_name = filename + '.mp3'
                 audio_folder = os.path.join(
@@ -434,6 +452,11 @@ def save_album_images():
                     os.makedirs(audio_folder)
                 with open(audio_file_path, 'wb') as f:
                     f.write(des_audio)
+                
+                # 保存语速配置
+                talk_speed_config[filename] = talk_speed
+                with open(talk_speed_config_path, 'w') as f:
+                    json.dump(talk_speed_config, f)
 
                 text_file_name = filename + '.txt'
                 text_folder = os.path.join(user_image_folder, 'album', 'texts')
@@ -473,11 +496,31 @@ def get_image_des():
 def get_audio():
     curr_user = get_jwt_identity()
     # 有声相册音频路由
-    audio_file = request.args.get('audio_name') + '.mp3'
+    audio_name = request.args.get('audio_name')
+    audio_file = audio_name + '.mp3'
     audio_path = os.path.join(
         USER_IMAGE_FOLDER, curr_user, 'album', 'audios', audio_file)
     if not os.path.exists(audio_path):
         return jsonify({'error': 'Audio file not found'}), 404
+    
+    talk_speed = request.args.get('talk_speed', 8)
+    talk_speed_config_path = os.path.join(
+        USER_IMAGE_FOLDER, curr_user, 'album', 'talk_speed_config.json')
+
+    with open(talk_speed_config_path, 'r') as f:
+        talk_speed_config = json.load(f)
+        talk_speed_pre = talk_speed_config.get(audio_name, 8)   
+    if talk_speed != talk_speed_pre:  # 当前请求的语速与之前不同，重新生成音频
+        image_des_text_path = os.path.join(
+            USER_IMAGE_FOLDER, curr_user, 'album', 'texts', audio_name + '.txt')
+        with open(image_des_text_path, 'r', encoding='utf-8') as f:
+            image_des = f.read()
+        audio_data = agent_audio_generate(image_des, talk_speed)
+        with open(audio_path, 'wb') as f:
+            f.write(audio_data)
+        talk_speed_config[audio_name] = talk_speed
+        with open(talk_speed_config_path, 'w') as f:
+            json.dump(talk_speed_config, f)
 
     return send_file(audio_path, mimetype='audio/mp3')
 
@@ -536,6 +579,14 @@ def delete_image():
     # 查找文件名对应的文件
     file_to_delete = None
     if mode == 'album':
+        talk_speed_config_path = os.path.join(
+            USER_IMAGE_FOLDER, curr_user, 'album', 'talk_speed_config.json')
+        with open(talk_speed_config_path, 'r') as f:
+            talk_speed_config = json.load(f)
+        if image_name in talk_speed_config:
+            del talk_speed_config[image_name]
+            with open(talk_speed_config_path, 'w') as f:
+                json.dump(talk_speed_config, f)
         delete_folders = ['album/images', 'album/audios', 'album/texts']
     else:
         delete_folders = ['item_images']

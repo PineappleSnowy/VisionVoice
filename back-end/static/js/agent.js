@@ -228,8 +228,9 @@ function sendMessageToAgent(message, multi_image_talk) {
     messagebackground.appendChild(messagesContainer_bot);
     messagebackground.scrollTop = messagebackground.scrollHeight;  // 滚动到底部
 
-    const token = localStorage.getItem('token');
     const talk_speed = localStorage.getItem('speed') || 8;
+
+    const token = localStorage.getItem('token');
     fetch(`/agent/chat_stream?query=${message}&agent=${selectedAgent}&multi_image_talk=${multi_image_talk}`, {
         headers: {
             "Authorization": `Bearer ${token}`
@@ -583,6 +584,7 @@ document.getElementById('microphone-button').addEventListener('click', async fun
 
     try {
         if (!isRecording) {
+            microphoneButton.ariaLabel = "结束语音输入";
             console.log('[agent.js][microphone-button] start recording');
             // 开始录音
             startRecording();
@@ -592,6 +594,7 @@ document.getElementById('microphone-button').addEventListener('click', async fun
             microphoneButton.style.backgroundColor = 'red';
 
         } else {
+            microphoneButton.ariaLabel = "开始语音输入";
             console.log('[agent.js][microphone-button] stop recording');
 
             // 停止录音
