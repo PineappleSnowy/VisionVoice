@@ -1287,6 +1287,7 @@ def agent_stream_audio(current_token: str, talk_speed: int = 8):
                 file_path = os.path.join(
                     USER_IMAGE_FOLDER,
                     user,
+                    'item_images',
                     current_token[current_token.find(">") + 1:] + ".jpg",
                 )
 
