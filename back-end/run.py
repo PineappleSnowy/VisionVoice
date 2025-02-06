@@ -422,12 +422,10 @@ def save_album_images():
 
     talk_speed_config_path = os.path.join(
         user_image_folder, 'album', 'talk_speed_config.json')
-    if not os.path.exists(talk_speed_config_path):  # 初始化语速配置文件
-        with open(talk_speed_config_path, 'w') as f:
-            json.dump({}, f)
-    with open(talk_speed_config_path, 'r') as f:
+    with open(talk_speed_config_path, 'r') as f:  # 读取语速配置
         talk_speed_config = json.load(f)
-    saved_images = []
+
+    saved_images = []  # 保存成功的图片
 
     for file in files:
         filename = file.filename
