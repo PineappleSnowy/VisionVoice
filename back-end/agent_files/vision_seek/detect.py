@@ -1,5 +1,5 @@
 import os, sys, cv2
-os.environ['CUDA_VISIBLE_DEVICES'] = '-1' # 禁用GPU
+# os.environ['CUDA_VISIBLE_DEVICES'] = '-1' # 禁用GPU
 import numpy as np
 import tensorflow as tf
 # from concurrent.futures import ThreadPoolExecutor
@@ -86,20 +86,28 @@ class ObjectDetector:
         # self.templates_features_6 = []    # 270°
         # self.templates_features_7 = []    # 315°
         self.templates_features = []
+        self.template_class = None
         
     # 提取出目标物品的分割图像和特征向量
     def detect_init(self, *templates):
         # 获取经分割后的目标图像和未分割的目标图像
         def get_target_img(template):
-            template_results_ = model.predict(template, conf=0.3)
+            template_results_ = model.predict(template, conf=0.2)
 
             targets = []
             targets_origin = []
+            classes = []
+            
             for result in template_results_:
                 if result.masks is not None:
                     for mask, box in zip(result.masks.xy, result.boxes):
-                        points = np.int32([mask])
+                        cls = int(box.cls[0])
+                        if classNames[cls] in ['person', 'tv', 'laptop', 'bench', 'chair', 'couch', 'bed', 
+                            'dining table', 'refrigerator', 'toilet', 'book', 'sink', 'microwave', 'oven', 
+                            'potted plant', 'traffic light', 'stop sign', 'parking meter']:
+                            continue
 
+                        points = np.int32([mask])
                         mask_ = np.zeros_like(template, dtype=np.uint8)
                         cv2.fillPoly(mask_, points, 255)
 
@@ -113,8 +121,12 @@ class ObjectDetector:
                         roi_ = template[y1:y2, x1:x2]
                         targets.append(roi)
                         targets_origin.append(roi_)
+                        classes.append(classNames[cls])
                 else:
-                    return None, None
+                    return None, None, None
+
+            if not targets:
+                return None, None, None
 
             areas = []
             for t in targets:
@@ -127,7 +139,9 @@ class ObjectDetector:
             max_index = np.argmax(areas)
             template_r = targets[max_index]
             template_r_origin = targets_origin[max_index]
-            return template_r, template_r_origin
+            template_class = classes[max_index]
+            
+            return template_r, template_r_origin, template_class
 
         self.templates = []
         # self.templates_features_0 = []
@@ -139,8 +153,10 @@ class ObjectDetector:
         # self.templates_features_6 = []
         # self.templates_features_7 = []
         self.templates_features = []
+        self.template_class = None
+        
         for temp in templates:
-            result, result_origin = get_target_img(temp)
+            result, result_origin, cls = get_target_img(temp)
             if result is not None and result_origin is not None:
                 self.templates.append(result)
                 # self.templates_features_0.append(extract_features(result_origin, 0))
@@ -153,6 +169,7 @@ class ObjectDetector:
                 # self.templates_features_7.append(extract_features(result_origin, 315))
                 deep_features = extract_deep_features(result_origin)
                 self.templates_features.append({'deep_features': deep_features})
+                self.template_class = cls
             else:
                 self.templates.append(None)
                 break
@@ -170,6 +187,7 @@ class ObjectDetector:
                 # self.templates_features_6 = []
                 # self.templates_features_7 = []
                 self.templates_features = []
+                self.template_class = None
                 # print(f'未检测到第 {i} 张图片中的目标物品, 请重新上传目标物品图片')
                 return i
             i += 1
@@ -194,9 +212,10 @@ class ObjectDetector:
             if result.masks is not None:
                 boxes_ = []
                 for mask, box in zip(result.masks.xy, result.boxes):
-                    # 排除掉一些不可能的事物
                     cls = int(box.cls[0])
-                    if classNames[cls] in ['person', 'tv', 'laptop', 'bench', 'chair', 'couch', 'bed', 'dining table', 'refrigerator', 'toilet', 'book', 'sink', 'microwave', 'oven', 'potted plant', 'traffic light', 'stop sign', 'parking meter']:
+                    current_class = classNames[cls]
+                    if current_class != self.template_class:
+                        # print(f'跳过不匹配的类别: {current_class}, 期望类别: {self.template_class}')
                         continue
 
                     # 获取识别框的位置信息
@@ -268,7 +287,7 @@ class ObjectDetector:
                         similarity = compute_object_similarity(roi_origin, template_features)
                         max_similarity = max(max_similarity, similarity)
                     # print(f'相似度: {max_similarity}')
-                    if max_similarity < 0.09:
+                    if max_similarity < 0.18:
                         continue
 
                     # # 放大图像, 去噪处理, 增强对比度
@@ -366,6 +385,7 @@ class ObjectDetector:
         # self.templates_features_6 = []
         # self.templates_features_7 = []
         self.templates_features = []
+        self.template_class = None
         print("[detect.py][detector.release]寻物检测器资源释放完毕")
 
 
