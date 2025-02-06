@@ -2,6 +2,7 @@
 
 document.addEventListener('DOMContentLoaded', function () {
     const token = localStorage.getItem('token');
+    const talk_speed = localStorage.getItem('speed') || 8;
 
     const socket = io({
         pingTimeout: 60000,  // 设置较大的 pingTimeout
@@ -35,7 +36,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const item = document.createElement('div');
                 item.className = 'gallery-item';
                 item.innerHTML = `
-                    <button class="image-talk" onclick="playAudio('${image.name}', event)">
+                    <button class="image-talk" onclick="playAudio('${image.name}', event, ${talk_speed})">
                         <img src="${image.url}" alt="${image.name}" aria-label="照片${photo_id}，点击朗读">
                     </button>
                     <button class="audio-control" onclick="controlAudio(event)" aria-label="开关声音"></button>
@@ -98,7 +99,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     const item = document.createElement('div');
                     item.className = 'gallery-item';
                     item.innerHTML = `
-                        <button class="image-talk" onclick="playAudio('${newFileName}', event)">
+                        <button class="image-talk" onclick="playAudio('${newFileName}', event, ${talk_speed})">
                             <img src="${e.target.result}" alt="${newFileName}" aria-label="解析完成${i + 1}，点击朗读">
                         </button>
                         <button class="audio-control" onclick="controlAudio(event)" aria-label="开关声音"></button>
@@ -118,7 +119,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             const token = localStorage.getItem('token');
-            fetch('/save_album_images', {
+            fetch(`/save_album_images?talk_speed=${talk_speed}`, {
                 method: 'POST',
                 body: formData,
                 headers: {
@@ -155,7 +156,7 @@ function disableButtons(disable) {
 
 const audioPlayer = document.getElementById('audioPlayer');
 
-function playAudio(audioName, event) {
+function playAudio(audioName, event, talk_speed) {
     cameraButton.style.display = 'none';
     albumButton.style.display = 'none';
 
@@ -173,7 +174,7 @@ function playAudio(audioName, event) {
     fullScreenButton.style.display = 'flex';
 
     const token = localStorage.getItem('token');
-    fetch(`/get_audio?audio_name=${audioName}`, {
+    fetch(`/get_audio?audio_name=${audioName}&talk_speed=${talk_speed}`, {
         method: 'GET',
         headers: {
             "Authorization": `Bearer ${token}`
