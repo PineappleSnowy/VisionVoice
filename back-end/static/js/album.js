@@ -2,6 +2,7 @@
 
 document.addEventListener('DOMContentLoaded', function () {
     const token = localStorage.getItem('token');
+    const talk_speed = localStorage.getItem('speed') || 8;
 
     const socket = io({
         pingTimeout: 60000,  // 设置较大的 pingTimeout
@@ -118,7 +119,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             const token = localStorage.getItem('token');
-            fetch('/save_album_images', {
+            fetch(`/save_album_images?talk_speed=${talk_speed}`, {
                 method: 'POST',
                 body: formData,
                 headers: {

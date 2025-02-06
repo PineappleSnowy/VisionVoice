@@ -540,7 +540,8 @@ window.startFindItem = function (item_name) {
     finishShutUpStatus();
     statusDiv.textContent = "寻物模式";
     if (vudio.dance()) { vudio.pause(); }
-
+    
+    waveShape.style.display = 'none';
     document.querySelector('.endFunc').style.display = 'flex';
 
     closeModalButton.click();

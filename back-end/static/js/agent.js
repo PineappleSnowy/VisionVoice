@@ -228,9 +228,8 @@ function sendMessageToAgent(message, multi_image_talk) {
     messagebackground.appendChild(messagesContainer_bot);
     messagebackground.scrollTop = messagebackground.scrollHeight;  // 滚动到底部
 
-    const talk_speed = localStorage.getItem('speed') || 8;
-
     const token = localStorage.getItem('token');
+    const talk_speed = localStorage.getItem('speed') || 8;
     fetch(`/agent/chat_stream?query=${message}&agent=${selectedAgent}&multi_image_talk=${multi_image_talk}`, {
         headers: {
             "Authorization": `Bearer ${token}`
