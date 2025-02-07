@@ -856,6 +856,9 @@ def login():
     """登录路由"""
     # 获取前端传来的用户名和密码
     data = request.get_json()
+    login_type = data.get("login_type")
+    phone = data.get("phone")
+    code = data.get("code")
     username = data.get("username")
     password = data.get("password")
 
@@ -867,7 +870,7 @@ def login():
         # 检查用户是否存在
         user_exists = False
         for user in users:
-            if user["username"] == username:
+            if user["username"] == username and login_type == "password":
                 user_exists = True
                 # 检查密码是否正确
                 if user["password"] == password:
@@ -885,6 +888,7 @@ def login():
                                 "user_info": {
                                     "username": username,
                                     "nickname": user.get("nickname"),
+                                    "phone": user.get("phone"),
                                 },
                             }
                         ),
@@ -892,6 +896,46 @@ def login():
                     )
                 else:
                     return jsonify({"message": "密码错误", "code": 400}), 400
+
+            if user["phone"] == phone and login_type == "phone":
+                with open("./configs/verification_code_dict.json", "r") as f:
+                    verification_code_dict = json.load(f)
+                if (
+                    verification_code_dict.get(phone)
+                    and verification_code_dict.get(phone).get("code") == code
+                ):
+                    # 获取验证码生成时的时间戳
+                    time_stamp = verification_code_dict.get(phone, {}).get("timestamp")
+                    # 检查time_stamp是否存在
+                    if not time_stamp:
+                        return jsonify({"message": "验证码无效,请重新获取", "code": 400}), 400
+                    # 验证码5分钟内有效,超过则过期 
+                    if int(time_stamp) + 5 * 60 < int(time.time()):
+                        return jsonify({"message": "验证码已过期,请重新获取", "code": 400}), 400
+
+
+                    print("登录成功")
+                    # 设置 local token
+                    access_token = create_access_token(
+                        identity=user.get("username"), expires_delta=False
+                    )
+                    return (
+                        jsonify(
+                            {
+                                "message": "登录成功",
+                                "code": 200,
+                                "access_token": access_token,
+                                "user_info": {
+                                    "username": user.get("username"),
+                                    "nickname": user.get("nickname"),
+                                    "phone": phone,
+                                },
+                            }
+                        ),
+                        200,
+                    )
+                else:
+                    return jsonify({"message": "验证码错误", "code": 400}), 400
 
         if not user_exists:
             return jsonify({"message": "用户不存在", "code": 400}), 400

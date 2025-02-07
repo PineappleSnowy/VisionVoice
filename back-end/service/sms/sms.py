@@ -67,14 +67,23 @@ def send_verification_code(phone_number: str) -> str:
 
 def store_verification_code(phone_number: str, code: str, verification_code_dict: dict):
     """存储验证码和时间戳"""
+    try:
+        with open("./configs/verification_code_dict.json", "r") as f:
+            verification_code_dict = json.load(f)
+    except Exception as e:
+        verification_code_dict = {}
+
     verification_code_dict[phone_number] = {
         "code": code,
         "timestamp": time.time(),  # 当前时间戳
     }
 
+    with open("./configs/verification_code_dict.json", "w") as f:
+        json.dump(verification_code_dict, f)
 
 
 def verify_code(phone_number: str, code: str, verification_code_dict: dict) -> bool:
+
     """
     验证手机验证码
     返回: (bool) 验证是否通过

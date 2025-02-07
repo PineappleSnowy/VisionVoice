@@ -22,8 +22,8 @@
         </div>
         <div class="login-type-password"  style="display: none;">
             <div class="input-group">
-                <label for="username" aria-label="用户名或手机号">用户名或手机号:</label>
-                <input type="text" placeholder="请输入用户名或手机号" id="username" aria-label="请输入用户名或手机号">
+                <label for="username" aria-label="用户名">用户名:</label>
+                <input type="text" placeholder="请输入用户名" id="username" aria-label="请输入用户名">
             </div>
 
             <div class="input-group password">
@@ -34,15 +34,15 @@
 
         <div class="login-type-phone">
             <div class="input-group">
-                <label for="phone" aria-label="手机号">手机号:</label>
-                <input type="text" placeholder="请输入手机号" id="phone" aria-label="请输入手机号">
+                <label for="login_phone" aria-label="手机号">手机号:</label>
+                <input type="text" placeholder="请输入手机号" id="login_phone" aria-label="请输入手机号">
             </div>
             <div class="input-group" style="display: flex; gap: 10px; position: relative;">
                 <div style="flex: 1;">
                     <label for="phone_code" aria-label="手机验证码">验证码:</label>
                     <input type="text" placeholder="请输入手机验证码" id="phone_code" aria-label="请输入手机验证码">
                 </div>
-                <button id="get_code_btn" style="position: absolute; right: 0; bottom: 0; width: 120px; height: 40px; background: #3eb575; color: white; border: none; border-radius: 5px; cursor: pointer;">获取验证码</button>
+                <button id="get_code_btn_login" style="position: absolute; right: 0; bottom: 0; width: 120px; height: 40px; background: #3eb575; color: white; border: none; border-radius: 5px; cursor: pointer;">获取验证码</button>
             </div>
         </div>
 
@@ -63,8 +63,13 @@
         </div>
 
         <div class="input-group">
-            <label for="register_nickname" aria-label="昵称">手机号:</label>
-            <input type="text" placeholder="请输入手机号" id="register_nickname" aria-label="请输入手机号">
+            <label for="register_nickname" aria-label="昵称">昵称:</label>
+            <input type="text" placeholder="请输入昵称" id="register_nickname" aria-label="请输入昵称">
+        </div>
+
+        <div class="input-group">
+            <label for="register_phone" aria-label="手机号">手机号:</label>
+            <input type="text" placeholder="请输入手机号" id="register_phone" aria-label="请输入手机号">
         </div>
 
 
@@ -84,7 +89,7 @@
                 <label for="register_code" aria-label="验证码">验证码:</label>
                 <input type="text" placeholder="请输入验证码" id="register_code" aria-label="请输入验证码">
             </div>
-            <button id="get_code_btn" style="position: absolute; right: 0; bottom: 0; width: 120px; height: 40px; background: #3eb575; color: white; border: none; border-radius: 5px; cursor: pointer;">获取验证码</button>
+            <button id="get_code_btn_register" style="position: absolute; right: 0; bottom: 0; width: 120px; height: 40px; background: #3eb575; color: white; border: none; border-radius: 5px; cursor: pointer;">获取验证码</button>
         </div>
 
 
