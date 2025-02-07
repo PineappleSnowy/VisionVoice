@@ -291,17 +291,25 @@ register_button.addEventListener("click", () => {
         })
             .then(response => response.json())
             .then(data => {
-                registerMessage.textContent = data.message;
-                registerMessage.className = 'message success';
-                registerMessage.style.display = 'block';
+                if (data.code === 200) {
+                    registerMessage.textContent = data.message;
+                    registerMessage.className = 'message success';
+                    registerMessage.style.display = 'block';
+                    // 尝试过使用前端 Cookie 存储信息，但有些用户可能禁用 Cookie
+                    // 后端 Cookie 存储信息增加服务器负担，故改用 localStorage 存储信息
+                    localStorage.setItem('token', data.access_token);
+                    localStorage.setItem('username', username);
+                    localStorage.setItem('nickname', nickname);
 
-                // 尝试过使用前端 Cookie 存储信息，但有些用户可能禁用 Cookie
-                // 后端 Cookie 存储信息增加服务器负担，故改用 localStorage 存储信息
-                localStorage.setItem('token', data.access_token);
-                localStorage.setItem('username', username);
-                localStorage.setItem('nickname', nickname);
-
-                window.location.href = '/agent';
+                    // 延迟1秒后跳转，让用户看到成功消息
+                    setTimeout(() => {
+                        window.location.href = '/agent';
+                    }, 200);
+                } else {
+                    registerMessage.textContent = data.message;
+                    registerMessage.className = 'message error';
+                    registerMessage.style.display = 'block';
+                }
             }).catch(error => {
                 console.error('Error:', error);
                 registerMessage.textContent = '注册失败，请重试';
