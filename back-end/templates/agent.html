@@ -17,7 +17,7 @@
 
 <body>
   <!-- 顶栏 -->
-  <div id="topbar" role="banner">
+  <div id="topbar" role="banner" aria-label="智能体名称">
     <span id="agent-name">智能体名称</span>
     <button id="audio-control" aria-label="静音开关"></button>
   </div>
@@ -29,7 +29,7 @@
     <div id="chat-input-container" role="form">
 
       <!-- 语音输入按钮 -->
-      <button id="microphone-button" aria-label="语音输入"></button>
+      <button id="microphone-button" aria-label="开始语音输入"></button>
 
       <div id="imageUploadPanel" style="display: none;">
         <div class="content" aria-label="图片列表">
@@ -63,8 +63,8 @@
       <a href="/chat" aria-label="消息">
         <span>消息</span>
       </a>
-      <a aria-label="创建">
-        <img src="../static/images/star.png" id="star" alt="创建" />
+      <a href="/album" aria-label="有声相册">
+        <span>相册</span>
       </a>
       <a href="/skills" aria-label="能力">
         <span>能力</span>

@@ -85,9 +85,11 @@ setInterval(() => {
     if (document.getElementById('agent-chat-textarea').value.trim() || uploadedImages.length > 0) {
         document.querySelector('#send-button').style.display = 'inline-block';
         document.querySelector('#more_function_button').style.display = 'none';
+        document.getElementById('agent-chat-textarea').style.right = '5.5rem';
     } else {
         document.querySelector('#send-button').style.display = 'none';
         document.querySelector('#more_function_button').style.display = 'flex';
+        document.getElementById('agent-chat-textarea').style.right = '2.9rem';
     }
 }, 100);
 
@@ -221,8 +223,14 @@ function sendMessageToAgent(message, multi_image_talk) {
     const bubble_2 = document.createElement('div');
     bubble_2.className = 'chat-bubble-bot';
 
-    const token = localStorage.getItem('token');
+    messagesContainer_bot.appendChild(image_bot);
+    messagesContainer_bot.appendChild(bubble_2);
+    messagebackground.appendChild(messagesContainer_bot);
+    messagebackground.scrollTop = messagebackground.scrollHeight;  // 滚动到底部
+
     const talk_speed = localStorage.getItem('speed') || 8;
+
+    const token = localStorage.getItem('token');
     fetch(`/agent/chat_stream?query=${message}&agent=${selectedAgent}&multi_image_talk=${multi_image_talk}`, {
         headers: {
             "Authorization": `Bearer ${token}`
@@ -258,11 +266,6 @@ function sendMessageToAgent(message, multi_image_talk) {
         .catch(error => {
             console.error('Error fetching stream:', error);
         });
-
-    messagesContainer_bot.appendChild(image_bot);
-    messagesContainer_bot.appendChild(bubble_2);
-    messagebackground.appendChild(messagesContainer_bot);
-    messagebackground.scrollTop = messagebackground.scrollHeight;
 }
 
 // 删除图片
@@ -453,7 +456,7 @@ window.addEventListener('DOMContentLoaded', function () {
         console.log('[agent.js][DOMContentLoaded] localStorage 中用户已经设置过静音，展示静音图标...');
         document.getElementById('audio-control').classList.add('muted');
     }
-    else{
+    else {
         document.getElementById('audio-control').setAttribute('aria-label', '开启静音');
     }
 });
@@ -475,7 +478,7 @@ document.getElementById('audio-control').addEventListener('click', function () {
         audioPlayer.pause();
         isPlaying = false;
     }
-    else{
+    else {
         document.getElementById('audio-control').setAttribute('aria-label', '开启静音');
     }
 })
@@ -566,6 +569,7 @@ function updateAgentName(agent) {
     else
         agent_name = '智能体名称';
     document.getElementById('agent-name').textContent = agent_name;
+    document.getElementById('topbar').ariaLabel = agent_name;
 }
 
 /* 语音输入 start
@@ -580,6 +584,7 @@ document.getElementById('microphone-button').addEventListener('click', async fun
 
     try {
         if (!isRecording) {
+            microphoneButton.ariaLabel = "结束语音输入";
             console.log('[agent.js][microphone-button] start recording');
             // 开始录音
             startRecording();
@@ -589,6 +594,7 @@ document.getElementById('microphone-button').addEventListener('click', async fun
             microphoneButton.style.backgroundColor = 'red';
 
         } else {
+            microphoneButton.ariaLabel = "开始语音输入";
             console.log('[agent.js][microphone-button] stop recording');
 
             // 停止录音

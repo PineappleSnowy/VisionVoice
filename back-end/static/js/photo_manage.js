@@ -123,34 +123,39 @@ document.addEventListener('DOMContentLoaded', function () {
                 'Content-Type': 'application/json',
                 "Authorization": `Bearer ${token}`
             },
-            body: JSON.stringify({ name: imageName })
+            body: JSON.stringify({ image_name: imageName })
         })
             .then(response => response.json())
             .then(data => {
-                disableButtons(false);
                 const statusMessage = document.getElementById('statusMessage');
                 if (data.success) {
                     statusMessage.textContent = '删除成功';
                     statusMessage.style.color = 'green';
                     const galleryItem = document.querySelector(`button[onclick="openModal('${data.url}', '${imageName}', this)"]`).parentElement;
                     galleryItem.remove();
+                    setTimeout(() => {
+                        disableButtons(false);
+                        document.getElementById('backButton').click();
+                    }, 500);
                 } else {
                     statusMessage.textContent = '删除失败';
                     statusMessage.style.color = 'red';
+                    disableButtons(false);
                 }
             })
             .catch(error => {
-                disableButtons(false);
+                console.error('Error:', error);
                 const statusMessage = document.getElementById('statusMessage');
                 statusMessage.textContent = '删除失败';
                 statusMessage.style.color = 'red';
+                disableButtons(false);
             });
     });
 
     document.getElementById('backButton').addEventListener('click', function () {
         const modal = document.getElementById('myModal');
         modal.style.display = 'none';
-        statusMessage.textContent = '';
+        document.getElementById('statusMessage').textContent = '';
     });
 });
 

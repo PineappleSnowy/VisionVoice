@@ -9,6 +9,7 @@ import time
 import os
 from flask import (
     Flask,
+    send_file,
     send_from_directory,
     stream_with_context,
     render_template,
@@ -86,6 +87,10 @@ def before_request():
         or request.path == "/save_item_image"
         or request.path == "/delete_image"
         or request.path == "/images"
+        or request.path == "/save_album_images"
+        or request.path == "/get_audio"
+        or request.path == "/get_image_des"
+        or request.path == "/album_talk"
     ):
         try:
             verify_jwt_in_request()
@@ -180,10 +185,10 @@ def phone():
     return render_template("phone.html")
 
 
-@app.route("/create", methods=["GET"])
-def create():
-    """创作路由"""
-    return render_template("create.html")
+@app.route("/album", methods=["GET"])
+def album():
+    """相册路由"""
+    return render_template("album.html")
 
 
 @app.route("/skills", methods=["GET"])
@@ -218,7 +223,7 @@ def photo_manage():
 
 @app.route("/contact", methods=["GET"])
 def contact():
-    """用户须知路由"""
+    """联系我们路由"""
     return render_template("contact.html")
 
 
@@ -249,27 +254,65 @@ def settings():
 def get_images():
     images = []
     curr_user = get_jwt_identity()
-    user_image_folder = os.path.join(USER_IMAGE_FOLDER, curr_user)
+    user_image_folder = os.path.join(
+        USER_IMAGE_FOLDER, curr_user, 'item_images')
+    user_album_folder = os.path.join(
+        USER_IMAGE_FOLDER, curr_user, 'album', 'images')
+
     if not os.path.exists(user_image_folder):
-        os.mkdir(user_image_folder)
-    for filename in os.listdir(user_image_folder):
+        os.makedirs(user_image_folder)
+    if not os.path.exists(user_album_folder):
+        os.makedirs(user_album_folder)
+
+    mode = request.args.get("mode", "default")
+
+    if mode == 'album':
+        target_folder = user_album_folder
+
+        talk_speed_config_path = os.path.join(
+        USER_IMAGE_FOLDER, curr_user, 'album', 'talk_speed_config.json')
+    
+        if not os.path.exists(talk_speed_config_path):  # 初始化语速配置文件
+            with open(talk_speed_config_path, 'w') as f:
+                album_images = os.listdir(os.path.join(
+                    USER_IMAGE_FOLDER, curr_user, 'album', 'images'))
+                album_images_withot_ext = [os.path.splitext(image)[0] for image in album_images]
+                talk_speed_config = {image: 8 for image in album_images_withot_ext}
+                json.dump(talk_speed_config, f)
+    else:
+        target_folder = user_image_folder
+
+    # 获取文件列表并按文件名逆序排序
+    file_list = sorted(os.listdir(target_folder), reverse=True)
+
+    for filename in file_list:
         if filename.endswith((".jpg")):
             name, ext = os.path.splitext(filename)
             images.append(
-                {"name": name, "url": f"/image/{curr_user}/{filename}"})
+                {"name": name, "url": f"/image/{curr_user}/{filename}?mode={mode}", 
+                 "finish_des": os.path.exists(os.path.join(USER_IMAGE_FOLDER, curr_user, 'album', 'audios', name + '.mp3'))}
+            )
+
     return jsonify(images)
 
 
 @app.route("/image/<user>/<filename>", methods=["GET"])
 def get_image(user, filename):
-    user_image_folder = os.path.join(USER_IMAGE_FOLDER, user)
+    mode = request.args.get("mode", "default")
+    if mode == 'album':
+        user_image_folder = os.path.join(
+            USER_IMAGE_FOLDER, user, 'album', 'images')
+    else:
+        user_image_folder = os.path.join(
+            USER_IMAGE_FOLDER, user, 'item_images')
     return send_from_directory(user_image_folder, filename)
 
 
 @app.route("/rename_image", methods=["POST"])
 def rename_image():
     curr_user = get_jwt_identity()
-    user_image_folder = os.path.join(USER_IMAGE_FOLDER, curr_user)
+    user_image_folder = os.path.join(
+        USER_IMAGE_FOLDER, curr_user, 'item_images')
 
     data = request.get_json()
     old_name = data["oldName"]
@@ -297,10 +340,17 @@ def rename_image():
         return jsonify({"success": False, "error": str(e)}), 400
 
 
+def gen_time_random_name():
+    timestamp = time.strftime("%Y%m%d%H%M%S", time.localtime())
+    random_number = random.randint(100000, 999999)
+    return f"{timestamp}{random_number}"
+
+
 @app.route("/save_item_image", methods=["POST"])
 def save_item_image():
     curr_user = get_jwt_identity()
-    user_image_folder = os.path.join(USER_IMAGE_FOLDER, curr_user)
+    user_image_folder = os.path.join(
+        USER_IMAGE_FOLDER, curr_user, 'item_images')
 
     if "file" not in request.files:
         return jsonify({"success": False, "error": "No file part"}), 400
@@ -330,36 +380,236 @@ def save_item_image():
     return jsonify({"success": False, "error": "File upload failed"}), 400
 
 
-@app.route("/delete_image", methods=["POST"])
-def delete_image():
+def describe_image(client, img_path):
+    with open(img_path, 'rb') as img_file:
+        img_base = base64.b64encode(img_file.read()).decode('utf-8')
+    prompt = "请你充分捕捉照片信息，用生动的语言向你的盲人朋友描述这张照片。"
+    response = client.chat.completions.create(
+        model="glm-4v",  # 填写需要调用的模型名称
+        messages=[
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "text",
+                        "text": prompt
+                    },
+                    {
+                        "type": "image_url",
+                        "image_url": {
+                            "url": img_base
+                        }
+                    }
+                ]
+            }
+        ]
+    )
+    return response.choices[0].message.content
+
+
+@app.route("/save_album_images", methods=["POST"])
+def save_album_images():
+    curr_user = get_jwt_identity()
+    user_image_folder = os.path.join(USER_IMAGE_FOLDER, curr_user)
+
+    if "files" not in request.files:
+        return jsonify({"success": False, "error": "No file part"}), 400
+    files = request.files.getlist("files")
+    if not files:
+        return jsonify({"success": False, "error": "No selected files"}), 400
+
+    talk_speed = request.args.get("talk_speed", 8)
+
+    talk_speed_config_path = os.path.join(
+        user_image_folder, 'album', 'talk_speed_config.json')
+    with open(talk_speed_config_path, 'r') as f:  # 读取语速配置
+        talk_speed_config = json.load(f)
+
+    saved_images = []  # 保存成功的图片
+
+    for file in files:
+        filename = file.filename
+        if filename:
+            try:
+                image_filename = filename + '.jpg'
+                image_folder = os.path.join(
+                    user_image_folder, 'album', 'images')
+                image_save_path = os.path.join(image_folder, image_filename)
+                file.save(image_save_path)
+                saved_images.append({
+                    "name": filename,
+                    "url": f"/image/{curr_user}/{image_filename}?mode=album"
+                })
+                # 添加测试
+                image_des = describe_image(client, image_save_path)
+                des_audio = agent_audio_generate(image_des, talk_speed)
+
+                audio_file_name = filename + '.mp3'
+                audio_folder = os.path.join(
+                    user_image_folder, 'album', 'audios')
+                audio_file_path = os.path.join(audio_folder, audio_file_name)
+                if not os.path.exists(audio_folder):
+                    os.makedirs(audio_folder)
+                with open(audio_file_path, 'wb') as f:
+                    f.write(des_audio)
+                
+                # 保存语速配置
+                talk_speed_config[filename] = talk_speed
+                with open(talk_speed_config_path, 'w') as f:
+                    json.dump(talk_speed_config, f)
+
+                text_file_name = filename + '.txt'
+                text_folder = os.path.join(user_image_folder, 'album', 'texts')
+                text_file_path = os.path.join(text_folder, text_file_name)
+                if not os.path.exists(text_folder):
+                    os.makedirs(text_folder)
+                with open(text_file_path, 'w', encoding='utf-8') as f:
+                    f.write(image_des)
+
+                socketio.emit('image_talk_finished', {'image_name': filename})
+            except Exception as e:
+                return jsonify({"success": False, "error": "图片解析失败！"}), 400
+
+    if saved_images:
+        return jsonify({"success": True, "images": saved_images}), 200
+    else:
+        return jsonify({"success": False, "error": "No images saved"}), 400
+
+
+@app.route("/get_image_des", methods=["POST"])
+def get_image_des():
     curr_user = get_jwt_identity()
     user_image_folder = os.path.join(USER_IMAGE_FOLDER, curr_user)
 
     data = request.get_json()
-    name = data["name"]
+    image_name = data["image_name"]
+    image_des_path = os.path.join(
+        user_image_folder, 'album', 'texts', image_name + '.txt')
+    if not os.path.exists(image_des_path):
+        return jsonify({"success": False, "error": "Image description not found"}), 400
+    with open(image_des_path, 'r', encoding='utf-8') as f:
+        image_des = f.read()
+    return jsonify({"success": True, "image_des": image_des}), 200
 
+
+@app.route('/get_audio', methods=['GET'])
+def get_audio():
+    curr_user = get_jwt_identity()
+    # 有声相册音频路由
+    audio_name = request.args.get('audio_name')
+    audio_file = audio_name + '.mp3'
+    audio_path = os.path.join(
+        USER_IMAGE_FOLDER, curr_user, 'album', 'audios', audio_file)
+    if not os.path.exists(audio_path):
+        return jsonify({'error': 'Audio file not found'}), 404
+    
+    talk_speed = request.args.get('talk_speed', 8)
+    talk_speed_config_path = os.path.join(
+        USER_IMAGE_FOLDER, curr_user, 'album', 'talk_speed_config.json')
+
+    with open(talk_speed_config_path, 'r') as f:
+        talk_speed_config = json.load(f)
+        talk_speed_pre = talk_speed_config.get(audio_name, 8)   
+    if talk_speed != talk_speed_pre:  # 当前请求的语速与之前不同，重新生成音频
+        image_des_text_path = os.path.join(
+            USER_IMAGE_FOLDER, curr_user, 'album', 'texts', audio_name + '.txt')
+        with open(image_des_text_path, 'r', encoding='utf-8') as f:
+            image_des = f.read()
+        audio_data = agent_audio_generate(image_des, talk_speed)
+        with open(audio_path, 'wb') as f:
+            f.write(audio_data)
+        talk_speed_config[audio_name] = talk_speed
+        with open(talk_speed_config_path, 'w') as f:
+            json.dump(talk_speed_config, f)
+
+    return send_file(audio_path, mimetype='audio/mp3')
+
+
+@app.route("/album_talk", methods=["POST"])
+def album_talk():
+    curr_user = get_jwt_identity()
+    data = request.get_json()
+    album_chat_history = data["album_chat_history"]
+    image_name = data["image_name"]
+    user_album_img_path = os.path.join(
+        USER_IMAGE_FOLDER, curr_user, 'album', 'images', image_name + '.jpg')
+    with open(user_album_img_path, 'rb') as img_file:
+        img_base = base64.b64encode(img_file.read()).decode('utf-8')
+
+    prompt = "请用富有关怀的语言向你的盲人朋友描述这张照片。"
+    messages = [{"role": "user", "content": [{"type": "text", "text": prompt},
+                                             {"type": "image_url", "image_url": {"url": img_base}}]}]
+    for chat in album_chat_history:
+        if chat["role"] == "assistant":
+            message = {"role": "assistant", "content": [
+                {"type": "text", "text": chat["text"]}]}
+            messages.append(message)
+        elif chat["role"] == "user":
+            message = {"role": "user", "content": [
+                {"type": "text", "text": chat["text"]}]}
+            messages.append(message)
+
+    model_name = "glm-4v-plus"
+    responses = client.chat.completions.create(
+        model=model_name,
+        messages=messages,
+        stream=True,
+    )
+
+    def generate_response():
+        for response in responses:
+            finish_reason = response.choices[0].finish_reason
+            text = response.choices[0].delta.content
+            # 当用户输入的内容违规时输出“我听不懂你在说什么”
+            if finish_reason == "sensitive":
+                text = "我听不懂你在说什么\n"
+            yield text
+    generate = generate_response()
+    return app.response_class(
+        stream_with_context(generate), mimetype="text/event-stream"
+    )
+
+
+@app.route("/delete_image", methods=["POST"])
+def delete_image():
+    curr_user = get_jwt_identity()
+    mode = request.args.get("mode", "default")
+    data = request.get_json()
+    image_name = data["image_name"]
     # 查找文件名对应的文件
     file_to_delete = None
-    for filename in os.listdir(user_image_folder):
-        name_without_ext, ext = os.path.splitext(filename)
-        if name_without_ext == name:
-            file_to_delete = filename
-            break
-
+    if mode == 'album':
+        talk_speed_config_path = os.path.join(
+            USER_IMAGE_FOLDER, curr_user, 'album', 'talk_speed_config.json')
+        with open(talk_speed_config_path, 'r') as f:
+            talk_speed_config = json.load(f)
+        if image_name in talk_speed_config:
+            del talk_speed_config[image_name]
+            with open(talk_speed_config_path, 'w') as f:
+                json.dump(talk_speed_config, f)
+        delete_folders = ['album/images', 'album/audios', 'album/texts']
+    else:
+        delete_folders = ['item_images']
+    for folder in delete_folders:
+        user_image_folder = os.path.join(
+            USER_IMAGE_FOLDER, curr_user, folder)
+        for filename in os.listdir(user_image_folder):
+            name_without_ext, ext = os.path.splitext(filename)
+            if name_without_ext == image_name:
+                file_to_delete = filename
+                file_path = os.path.join(user_image_folder, file_to_delete)
+                try:
+                    os.remove(file_path)
+                    break
+                except Exception as e:
+                    return jsonify({"success": False, "error": str(e)}), 400
     if file_to_delete is None:
         return jsonify({"success": False, "error": "File not found"}), 400
-
-    file_path = os.path.join(user_image_folder, file_to_delete)
-
-    try:
-        os.remove(file_path)
-        return (
-            jsonify(
-                {"success": True, "url": f"/image/{curr_user}/{file_to_delete}"}),
-            200,
-        )
-    except Exception as e:
-        return jsonify({"success": False, "error": str(e)}), 400
+    return (
+        jsonify(
+            {"success": True, "url": f"/image/{curr_user}/{file_to_delete}"}),
+        200,
+    )
 
 
 # ----- 加载全局变量 -----
@@ -799,7 +1049,8 @@ def build_response(current_user, agent_name, user_talk, video_open, multi_image_
                 {"type": "image_url", "image_url": {"url": img_base}})
         delete_file_from_dir(multi_image_dir)  # 及时清空图片缓存
 
-        content.append({"type": "text", "text": f"{user_talk}（请完全用文本格式回答，直接给我相应描述）"})
+        content.append(
+            {"type": "text", "text": f"{user_talk}（请完全用文本格式回答，直接给我相应描述）"})
 
         dst_messages.append({"role": "user", "content": content})
 
@@ -1087,6 +1338,7 @@ def agent_stream_audio(current_token: str, talk_speed: int = 8):
                 file_path = os.path.join(
                     USER_IMAGE_FOLDER,
                     user,
+                    'item_images',
                     current_token[current_token.find(">") + 1:] + ".jpg",
                 )
 
@@ -1214,10 +1466,10 @@ def run_server():
     else:
         socketio.run(
             app,
-            # port=443,
-            # host="0.0.0.0",
+            port=443,
+            host="0.0.0.0",
             allow_unsafe_werkzeug=True,
-            # ssl_context=("/ssl/cert.pem", "/ssl/cert.key")
+            ssl_context=("/ssl/cert.pem", "/ssl/cert.key")
         )
 
 

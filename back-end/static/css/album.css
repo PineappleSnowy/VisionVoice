@@ -1,0 +1,399 @@
+body {
+    background-color: #121212;
+    color: #e0e0e0;
+    margin: 0;
+    padding: 0;
+}
+
+p {
+    color: #ffffff;
+}
+
+.header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: #1e1e1e;
+    color: #e0e0e0;
+    text-align: center;
+    padding: 10px 0;
+    z-index: 3;
+    font-size: 20px;
+}
+
+.back-button {
+    display: flex;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    background: none;
+    border: none;
+    color: #e0e0e0;
+    font-size: 26px;
+    cursor: pointer;
+    width: 100px;
+    height: 46px;
+    justify-content: left;
+    align-items: center;
+    padding: 5px 14px;
+}
+
+.gallery {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 48px;
+    /* 确保画廊不会被顶栏遮挡 */
+}
+
+.gallery-item {
+    position: relative;
+    width: 48vw;
+    margin: calc(1vw - 1px);
+    text-align: center;
+    height: 30vh;
+    border: 1px solid #333;
+}
+
+
+.gallery-item img {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.image-talk {
+    width: 100%;
+    height: 100%;
+    border: none;
+    background: none;
+    padding: 0;
+    z-index: 0;
+}
+
+.audio-control {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 50%;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1;
+    background-image: url('../images/audio.png');
+    background-size: 20%;
+    background-repeat: no-repeat;
+    background-position: center;
+    display: none;
+}
+
+.full-screen {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 50%;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1;
+    background-image: url('../images/fullscreen.png');
+    background-size: 20%;
+    background-repeat: no-repeat;
+    background-position: center;
+    display: none;
+}
+
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1;
+    display: flex;
+}
+
+.overlay .text {
+    font-size: 20px;
+}
+
+#album-add {
+    position: absolute;
+    top: 0;
+    right: 3px;
+    width: 30%;
+    height: 100%;
+    text-align: center;
+    color: #e0e0e0;
+    z-index: 3;
+}
+
+#album-add .expand {
+    height: 300%;
+}
+
+#album-add button {
+    margin: 1px auto;
+    width: 100%;
+    display: block;
+    height: calc(100% - 1.33px);
+    background-color: #333;
+    color: #e0e0e0;
+    border: none;
+    border-radius: 5px;
+    padding: 0;
+    font-size: medium;
+}
+
+#album-add button:hover {
+    background-color: #444;
+}
+
+#statusMessage {
+    position: fixed;
+    bottom: 7%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: transparent;
+    padding: 5px 25px;
+    border: none;
+    z-index: 4;
+    text-align: center;
+    font-size: larger;
+}
+
+#imageDetail {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #e0e0e0;
+    z-index: 4;
+}
+
+.back-button {
+    display: flex;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    background: none;
+    border: none;
+    color: #e0e0e0;
+    font-size: 26px;
+    cursor: pointer;
+    width: 30%;
+    height: 100%;
+    justify-content: left;
+    align-items: center;
+    padding: 5px 14px;
+}
+
+.image-detail-header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: #1e1e1e;
+    color: #e0e0e0;
+    text-align: center;
+    padding: 10px 0;
+    z-index: 4;
+    font-size: 20px;
+}
+
+.delete-button {
+    display: flex;
+    position: absolute;
+    right: 3px;
+    top: 1px;
+    border: none;
+    border-radius: 5px;
+    color: #e0e0e0;
+    font-size: 26px;
+    cursor: pointer;
+    width: 30%;
+    height: calc(100% - 1.33px);
+    justify-content: left;
+    align-items: center;
+    padding: 0;
+    background-color: red;
+    background-image: url('../images/delete.png');
+    background-size: 20%;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.delete-button button:hover {
+    background-color: #a71c1c;
+}
+
+#imageDetail .image-container {
+    position: absolute;
+    margin-top: 55px;
+    left: 0;
+    width: 100%;
+    height: 25%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#imageDetail .image-container img {
+    max-height: 100%;
+    max-width: 100%;
+}
+
+#chat-input-container {
+    position: absolute;
+    bottom: 50px;
+    width: 100%;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    border: 0;
+    padding: 1px 0px;
+    background-color: #2c2c2c;
+    border-top: 1px solid #555;
+    border-bottom: 1px solid #333;
+}
+
+#send-button {
+    position: absolute;
+    right: 0.3rem;
+    width: 5rem;
+    height: 2.4rem;
+    border-radius: 5px;
+    border: none;
+    font-size: large;
+    background-color: #3eb575;
+    color: white;
+    cursor: pointer;
+    text-align: center;
+    display: block;
+}
+
+#agent-chat-textarea {
+    display: flex;
+    min-height: 20px;
+    max-height: 50px;
+    overflow-y: auto;
+    resize: none;
+    width: auto;
+    height: auto;
+    position: absolute;
+    right: 5.6rem;
+    left: 0.3rem;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #ffffff;
+    border-radius: 10px;
+    padding: 10px 0.5rem 10px 0.5rem;
+    font-size: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.1s ease;
+    line-height: 1.5;
+    box-sizing: border-box;
+    align-items: center;
+}
+
+#agent-chat-textarea:focus {
+    outline: none;
+    border-color: rgba(255, 255, 255, 0.5);
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.2);
+}
+
+#chat-container {
+    position: absolute;
+    top: 32%;
+    bottom: 104px;
+    width: 100%;
+    padding: 10px;
+    flex-direction: column;
+    background-color: rgba(0, 0, 0, 0);
+    overflow: auto;
+    scrollbar-width: none;
+    box-sizing: border-box;
+    padding: 0;
+}
+
+
+.chat-messages-user {
+    display: flex;
+    flex-direction: row;
+    position: relative;
+    top: 5px;
+    width: 100%;
+    height: fit-content;
+    justify-content: right;
+}
+
+.chat-messages-bot {
+    display: flex;
+    flex-direction: row;
+    position: relative;
+    top: 5px;
+    width: 100%;
+    height: fit-content;
+    justify-content: left;
+}
+
+.chat-bubble-user {
+    padding: 10px;
+    margin: 10px 8px;
+    margin-top: 0px;
+    border-radius: 4px;
+    max-width: calc(100% - 36px);
+    word-wrap: break-word;
+    font-size: 1.1rem;
+    background-color: #3eb575;
+    color: #fff;
+    align-self: flex-end;
+}
+
+.chat-bubble-bot {
+    padding: 10px;
+    margin: 10px 8px;
+    margin-top: 0px;
+    border-radius: 4px;
+    max-width: calc(100% - 36px);
+    word-wrap: break-word;
+    font-size: 1.1rem;
+    background-color: #2c2c2c;
+    color: #fff;
+    align-self: flex-end;
+}
+
+#navbar {
+    background-color: #1e1e1e;
+    z-index: 5;
+}
+
+#navbar a[href="/album"] {
+    font-weight: bold;
+    /* 加粗字体 */
+}
+
+#navbar a:hover {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+#navbar img {
+    width: 35px;
+    /* 增加图片的宽度 */
+    height: 35px;
+    /* 增加图片的高度 */
+    margin-right: 0;
+    /* 移除图片与文字之间的间距 */
+}

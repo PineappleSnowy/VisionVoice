@@ -160,6 +160,7 @@ openCamera.addEventListener('click', async () => {
     try {
         videoChat = !videoChat;
         if (videoChat) {
+            openCamera.ariaLabel = '关闭摄像头';
             try {
                 stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio: false });
                 video.srcObject = stream;
@@ -180,6 +181,7 @@ openCamera.addEventListener('click', async () => {
             goBack.style.color = 'white';
             toggleCamera.style.color = 'white';
         } else {
+            openCamera.ariaLabel = '打开摄像头';
             // 关闭摄像头时退出部分功能模式
             document.querySelector('.endFunc').click();
 
@@ -540,7 +542,8 @@ window.startFindItem = function (item_name) {
     finishShutUpStatus();
     statusDiv.textContent = "寻物模式";
     if (vudio.dance()) { vudio.pause(); }
-
+    
+    waveShape.style.display = 'none';
     document.querySelector('.endFunc').style.display = 'flex';
 
     closeModalButton.click();

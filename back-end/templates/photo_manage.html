@@ -30,13 +30,13 @@
 
     <div id="myModal" class="modal" role="dialog" aria-labelledby="modalTitle" aria-modal="true">
         <div class="modal-content">
-            <h2 id="modalTitle" style="display: none;">照片详情</h2>
-            <img id="modalImage" src="" alt="照片预览" aria-labelledby="modalImageDescription">
-            <p id="modalImageDescription" style="display: none;">照片预览</p>
+            <div class="image-container">
+                <img id="modalImage" src="" alt="照片预览" aria-labelledby="modalImageDescription">
+            </div>
             <input type="text" id="imageName" value="" aria-label="照片名称">
             <button id="saveButton" aria-label="保存更改">修改</button>
             <button id="deleteButton" aria-label="删除照片">删除</button>
-            <span id="statusMessage" aria-live="polite" style="margin-left: 50px;"></span>
+            <span id="statusMessage" aria-live="polite"></span>
             <button id="backButton" aria-label="返回" style="display: block; margin-top: 10px;">返回</button>
         </div>
     </div>

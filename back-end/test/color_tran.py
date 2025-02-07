@@ -19,4 +19,4 @@ def change_visible_to_white(image_path, output_path):
     img.save(output_path)
 
 # 使用示例
-change_visible_to_white("./static/images/phone.png", "./test/output.png")
+change_visible_to_white("./static/images/album.png", "./static/images/album.png")
