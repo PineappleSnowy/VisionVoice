@@ -43,7 +43,7 @@ p {
     display: flex;
     flex-wrap: wrap;
     margin-top: 48px;
-    /* 确保画廊不会被顶栏遮挡 */
+    margin-bottom: 50px;
 }
 
 .gallery-item {
@@ -136,10 +136,6 @@ p {
     text-align: center;
     color: #e0e0e0;
     z-index: 3;
-}
-
-#album-add .expand {
-    height: 300%;
 }
 
 #album-add button {

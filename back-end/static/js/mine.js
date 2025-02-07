@@ -33,6 +33,10 @@ function getUserInfo() {
 
     document.querySelector('.username').textContent = nickname;
     document.querySelector('.user-account').textContent = `账号: ${username}`;
+
+    if (username == 'CaraLin'){
+        document.querySelector('.avatar').src = '../static/images/CaraLin.jpg';
+    }
 }
 
 getUserInfo();

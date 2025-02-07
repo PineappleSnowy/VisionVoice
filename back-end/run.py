@@ -380,10 +380,18 @@ def save_item_image():
     return jsonify({"success": False, "error": "File upload failed"}), 400
 
 
-def describe_image(client, img_path):
+def describe_image(client, img_path, curr_user):
     with open(img_path, 'rb') as img_file:
         img_base = base64.b64encode(img_file.read()).decode('utf-8')
-    prompt = "请你充分捕捉照片信息，用生动的语言向你的盲人朋友描述这张照片。"
+
+    prompt = "你是一名乐于助人的盲人助手，请你充分捕捉照片信息，用生动的语言向你的盲人朋友描述这张照片。"
+    
+    if curr_user == "CaraLin":
+        prompt_path = os.path.join(USER_IMAGE_FOLDER, curr_user, 'album', 'caralin_prompt.txt')
+        if os.path.exists(prompt_path):
+            with open(prompt_path, 'r', encoding='utf-8') as f:
+                prompt = f.read()
+
     response = client.chat.completions.create(
         model="glm-4v",  # 填写需要调用的模型名称
         messages=[
@@ -440,8 +448,8 @@ def save_album_images():
                     "name": filename,
                     "url": f"/image/{curr_user}/{image_filename}?mode=album"
                 })
-                # 添加测试
-                image_des = describe_image(client, image_save_path)
+
+                image_des = describe_image(client, image_save_path, curr_user)
                 des_audio = agent_audio_generate(image_des, talk_speed)
 
                 audio_file_name = filename + '.mp3'
@@ -536,7 +544,14 @@ def album_talk():
     with open(user_album_img_path, 'rb') as img_file:
         img_base = base64.b64encode(img_file.read()).decode('utf-8')
 
-    prompt = "请用富有关怀的语言向你的盲人朋友描述这张照片。"
+    prompt = "你是一名乐于助人的助手，请你充分捕捉照片信息，用生动的语言向你的盲人朋友描述这张照片。"
+
+    if curr_user == "CaraLin":
+        prompt_path = os.path.join(USER_IMAGE_FOLDER, curr_user, 'album', 'caralin_prompt.txt')
+        if os.path.exists(prompt_path):
+            with open(prompt_path, 'r', encoding='utf-8') as f:
+                prompt = f.read()
+
     messages = [{"role": "user", "content": [{"type": "text", "text": prompt},
                                              {"type": "image_url", "image_url": {"url": img_base}}]}]
     for chat in album_chat_history:

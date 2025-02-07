@@ -63,13 +63,9 @@ document.addEventListener('DOMContentLoaded', function () {
     const fileInput = document.getElementById('fileInput');
 
     addButton.addEventListener('click', function () {
-        if (albumAdd.classList.contains('expanded')) {
-            albumAdd.classList.remove('expanded');
-        } else {
-            albumAdd.classList.add('expanded');
-        }
-        cameraButton.style.display = cameraButton.style.display == 'none' ? 'inline-block' : 'none';
-        albumButton.style.display = albumButton.style.display == 'none' ? 'inline-block' : 'none';
+        addButton.ariaLabel = addButton.ariaLabel == '关闭添加照片' ? '添加照片' : '添加照片';
+        cameraButton.style.display = cameraButton.style.display == 'none' ? 'block' : 'none';
+        albumButton.style.display = albumButton.style.display == 'none' ? 'block' : 'none';
     });
 
     cameraButton.addEventListener('click', function () {

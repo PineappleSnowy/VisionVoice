@@ -584,6 +584,7 @@ document.getElementById('microphone-button').addEventListener('click', async fun
 
     try {
         if (!isRecording) {
+            microphoneButton.ariaLabel = "结束语音输入";
             console.log('[agent.js][microphone-button] start recording');
             // 开始录音
             startRecording();
@@ -593,6 +594,7 @@ document.getElementById('microphone-button').addEventListener('click', async fun
             microphoneButton.style.backgroundColor = 'red';
 
         } else {
+            microphoneButton.ariaLabel = "开始语音输入";
             console.log('[agent.js][microphone-button] stop recording');
 
             // 停止录音
