@@ -166,8 +166,35 @@ document.getElementById('go_to_register').addEventListener('click', function (e)
     document.querySelector('.login-container').style.display = 'none';
     document.querySelector('.register-container').style.display = 'block';
 });
+
+// 点击切换登录方式
+document.addEventListener('DOMContentLoaded', function() {
+    const passwordLogin = document.getElementById('password_login');
+    const phoneLogin = document.getElementById('phone_login');
+    const slider = document.querySelector('.slider');
+    const phoneLoginContainer = document.querySelector('.login-type-phone');
+    const passwordLoginContainer = document.querySelector('.login-type-password');
+    
+    passwordLogin.addEventListener('click', function() {
+        passwordLogin.classList.add('active');
+        phoneLogin.classList.remove('active');
+        slider.classList.add('pwd-login');
+        phoneLoginContainer.style.display = 'none';
+        passwordLoginContainer.style.display = 'block';
+    });
+    
+
+    phoneLogin.addEventListener('click', function() {
+        phoneLogin.classList.add('active');
+        passwordLogin.classList.remove('active');
+        slider.classList.remove('pwd-login');
+        phoneLoginContainer.style.display = 'block';
+        passwordLoginContainer.style.display = 'none';
+    });
+});
 /* 登录板块 end
 ----------------------------------------------------------*/
+
 
 
 /* 注册板块 start
