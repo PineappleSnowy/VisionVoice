@@ -62,3 +62,6 @@ gunicorn_config.py
 *.pem
 
 test/
+
+# 环境变量
+.env
