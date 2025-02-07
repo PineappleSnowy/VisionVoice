@@ -122,7 +122,8 @@ const handleLogin = () => {
             body: JSON.stringify({
                 phone: phone,
                 code: code,
-                login_type: 'phone'  // 手机号登录
+                login_type: 'phone',  // 手机号登录
+                usage: 'login'
             })
         })
             .then(response => response.json())
@@ -175,7 +176,8 @@ const handleLogin = () => {
                 body: JSON.stringify({
                     username: username,
                     password: encryptedPassword,
-                    login_type: 'password'  // 密码登录
+                    login_type: 'password',  // 密码登录
+                    usage: 'login'
                 })
             })
                 .then(response => response.json())
@@ -261,6 +263,8 @@ register_button.addEventListener("click", () => {
     const username = document.getElementById("register_username").value;
     const password = document.getElementById("register_password").value;
     const confirmPassword = document.getElementById("register_confirm_password").value;
+    const phone = document.getElementById("register_phone").value;
+    const code = document.getElementById("register_code").value;
     const registerMessage = document.getElementById("register_message");
 
     if (!nickname || !username || !password || !confirmPassword) {
@@ -286,7 +290,10 @@ register_button.addEventListener("click", () => {
             body: JSON.stringify({
                 username: username,
                 password: encryptedPassword,
-                nickname: nickname
+                nickname: nickname,
+                phone: phone,
+                code: code,
+                usage: 'register'
             })
         })
             .then(response => response.json())

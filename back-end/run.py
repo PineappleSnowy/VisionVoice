@@ -164,7 +164,7 @@ def index():
         # logging.success("index", "index", f"[run.py][index] username: {username[:5]}...{username[-5:]}")
         # logging.success("index", "index", f"[run.py][index] nickname: {nickname[:5]}...{nickname[-5:]}")
     else:
-        logging.error("index", "index", "[run.py][index] cookie_value is None")
+        logging.error("run.py", "index", "cookie_value is None")
     return render_template("index.html")
 
 
@@ -780,10 +780,14 @@ def register():
     username = data.get("username")
     password = data.get("password")
     nickname = data.get("nickname")
+    phone = data.get("phone")
+    code = data.get("code")
+    usage = data.get("usage")
+
 
     print(
-        "注册信息：\n用户名：{}\n密码：{}\n昵称：{}".format(
-            username, password, nickname
+        "注册信息：\n用户名：{}\n密码：{}\n昵称：{}\n手机号：{}".format(
+            username, password, nickname, phone
         )
     )
 
@@ -793,49 +797,88 @@ def register():
             400,
         )
 
+    if len(phone) != 11:
+        return (
+            jsonify({"message": "手机号长度为11位", "code": 400}),
+            400,
+        )
+
     try:
         # 读取现有用户
+        try:
+            with open("./static/user.json", "r+", encoding="utf-8") as f:
+                users = json.load(f)
+        except Exception as e:
+            logging.error("run.py", "register", f"用户文件读取失败: {str(e)}")
+            users = []
 
-        with open("./static/user.json", "r+", encoding="utf-8") as f:
-            users = json.load(f)
+        # 检查用户名是否存在
+        if any(user.get("username") == username for user in users):
+            return jsonify({"message": "用户名已存在", "code": 400}), 400
 
-            # 检查用户名是否存在
-            if any(user["username"] == username for user in users):
-                return jsonify({"message": "用户名已存在", "code": 400}), 400
+        # 检查手机号是否存在
+        if any(user.get("phone") == phone for user in users):
+            return jsonify({"message": "手机号已存在", "code": 400}), 400
 
-            # 注册完后向用户信息中添加预设智能体，此处可以后续智能体定制兼容
-            sys_prompt = "你是视界之声，一位乐于助人的对话助手。为了能让用户能尽快解决问题，你的话语总是十分简洁而概要。"
-            background_info = "嗨，亲爱的朋友，我是小天，很高兴能和你在这心灵的角落相遇。不管你眼前的世界是怎样的，我都在这儿陪着你，准备好和你一起聊聊内心的喜怒哀乐啦。"
-            users.append(
-                {
-                    "username": username,
-                    "password": password,
-                    "nickname": nickname,
-                    "agents": {
-                        "defaultAgent": {
-                            "chat_history": [
-                                {"role": "system", "content": sys_prompt},
-                                {
-                                    "role": "assistant",
-                                    "content": "我是视界之声，你的生活助手，有什么我可以帮你的么？",
-                                },
-                            ]
-                        },
-                        "psychologicalAgent": {
-                            "chat_history": [
-                                {"role": "assistant", "content": background_info}
-                            ]
-                        },
+
+        # 检查验证码是否正确
+        try:
+            with open("./configs/verification_code_dict.json", "r") as f:
+                verification_code_dict = json.load(f)
+        except Exception as e:
+            logging.error("run.py", "register", f"验证码文件读取失败: {str(e)}")
+            verification_code_dict = {}
+        if (
+            verification_code_dict.get(phone)
+            and verification_code_dict.get(phone).get("code") != code and usage == "register"
+        ):
+            logging.error("run.py", "register", f"验证码错误: {phone} {code}")
+
+            return jsonify({"message": "验证码错误", "code": 400}), 400
+        else:
+            # 验证码5分钟内有效,超过则过期
+            if int(
+                verification_code_dict.get(phone, {}).get("timestamp")
+            ) + 5 * 60 < int(time.time()):
+                return (
+                    jsonify({"message": "验证码已过期,请重新获取", "code": 400}),
+                    400,
+                )
+
+        # 注册完后向用户信息中添加预设智能体，此处可以后续智能体定制兼容
+        sys_prompt = "你是视界之声，一位乐于助人的对话助手。为了能让用户能尽快解决问题，你的话语总是十分简洁而概要。"
+
+        background_info = "嗨，亲爱的朋友，我是小天，很高兴能和你在这心灵的角落相遇。不管你眼前的世界是怎样的，我都在这儿陪着你，准备好和你一起聊聊内心的喜怒哀乐啦。"
+        users.append(
+            {
+                "username": username,
+                "password": password,
+                "nickname": nickname,
+                "phone": phone,
+                "agents": {
+                    "defaultAgent": {
+                        "chat_history": [
+                            {"role": "system", "content": sys_prompt},
+                            {
+                                "role": "assistant",
+                                "content": "我是视界之声，你的生活助手，有什么我可以帮你的么？",
+                            },
+                        ]
                     },
-                }
-            )
+                    "psychologicalAgent": {
+                        "chat_history": [
+                            {"role": "assistant", "content": background_info}
+                        ]
+                    },
+                },
+            }
+        )
 
-            print("用户注册成功：\n用户名：{}\n密码：{}".format(username, password))
+        print("用户注册成功：\n用户名：{}\n密码：{}".format(username, password))
 
-            # 写回文件
-            f.seek(0)
+        # 写回文件
+        with open("./static/user.json", "w", encoding="utf-8") as f:
             json.dump(users, f, indent=4, ensure_ascii=False)
-            f.truncate()
 
         # 注册成功后直接生成 token
         access_token = create_access_token(identity=username, expires_delta=False)
@@ -861,6 +904,8 @@ def login():
     code = data.get("code")
     username = data.get("username")
     password = data.get("password")
+    usage = data.get("usage")
+
 
     try:
         # 读取用户信息
@@ -870,10 +915,12 @@ def login():
         # 检查用户是否存在
         user_exists = False
         for user in users:
-            if user["username"] == username and login_type == "password":
+            if user.get("username") == username and login_type == "password":
                 user_exists = True
                 # 检查密码是否正确
-                if user["password"] == password:
+                if user.get("password") == password:
+
+
                     print("登录成功")
                     # 设置 local token
                     access_token = create_access_token(
@@ -897,9 +944,15 @@ def login():
                 else:
                     return jsonify({"message": "密码错误", "code": 400}), 400
 
-            if user["phone"] == phone and login_type == "phone":
-                with open("./configs/verification_code_dict.json", "r") as f:
-                    verification_code_dict = json.load(f)
+            if user.get("phone") == phone and login_type == "phone":
+                try:
+                    with open("./configs/verification_code_dict.json", "r") as f:
+                        verification_code_dict = json.load(f)
+                except Exception as e:
+                    logging.error("run.py", "login", f"验证码文件读取失败: {str(e)}")
+                    verification_code_dict = {}
+
+
                 if (
                     verification_code_dict.get(phone)
                     and verification_code_dict.get(phone).get("code") == code
@@ -907,12 +960,19 @@ def login():
                     # 获取验证码生成时的时间戳
                     time_stamp = verification_code_dict.get(phone, {}).get("timestamp")
                     # 检查time_stamp是否存在
-                    if not time_stamp:
-                        return jsonify({"message": "验证码无效,请重新获取", "code": 400}), 400
-                    # 验证码5分钟内有效,超过则过期 
+                    if not time_stamp and not usage == "login":
+                        return (
+                            jsonify({"message": "验证码无效,请重新获取", "code": 400}),
+                            400,
+                        )
+                    # 验证码5分钟内有效,超过则过期
                     if int(time_stamp) + 5 * 60 < int(time.time()):
-                        return jsonify({"message": "验证码已过期,请重新获取", "code": 400}), 400
-
+                        return (
+                            jsonify(
+                                {"message": "验证码已过期,请重新获取", "code": 400}
+                            ),
+                            400,
+                        )
 
                     print("登录成功")
                     # 设置 local token
