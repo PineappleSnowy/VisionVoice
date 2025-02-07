@@ -7,7 +7,7 @@ cap = cv2.VideoCapture(0)
 
 # 获取初始目标物品图
 module_dir = os.path.dirname(__file__)
-pic_path_1 = os.path.join(module_dir, 'templates/template6.jpg')
+pic_path_1 = os.path.join(module_dir, 'templates/template7.jpg')
 # pic_path_2 = os.path.join(module_dir, 'templates/template2.jpg')
 # pic_path_3 = os.path.join(module_dir, 'templates/template3.jpg')
 # pic_path_4 = os.path.join(module_dir, 'templates/template4.jpg')

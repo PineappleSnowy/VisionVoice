@@ -60,3 +60,8 @@ gunicorn_config.py
 
 # 签名文件
 *.pem
+
+test/
+
+# 环境变量
+.env

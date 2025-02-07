@@ -89,6 +89,46 @@ input:focus {
     text-decoration: underline;
 }
 
+.login-type-switch {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    background: #f5f5f5;
+    padding: 3px;
+}
+
+.login-type-switch span {
+    flex: 1;
+    text-align: center;
+    padding: 8px 0;
+    cursor: pointer;
+    z-index: 1;
+    transition: color 0.3s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.login-type-switch span.active {
+    color: #fff;
+}
+
+.slider {
+    position: absolute;
+    left: 3px;
+    top: 3px;
+    width: calc(50% - 3px);
+    height: calc(100% - 6px);
+    background: #4CAF50;
+    border-radius: 3px;
+    transition: transform 0.3s ease;
+}
+
+.slider.pwd-login {
+    transform: translateX(100%);
+}
+
 /* ----- 注册容器样式 ----- */
 .register-container {
     margin: 0 1rem;

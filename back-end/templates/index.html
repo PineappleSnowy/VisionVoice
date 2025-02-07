@@ -15,15 +15,39 @@
     <!-- 登录容器 -->
     <div class="login-container" role="form" aria-label="登录表单">
         <h2>欢迎登录</h2>
-        <div class="input-group">
-            <label for="username" aria-label="用户名">用户名:</label>
-            <input type="text" placeholder="请输入用户名" id="username" aria-label="请输入用户名">
+        <div class="login-type-switch">
+            <span id="phone_login" class="active">手机验证码登录</span>
+            <span id="password_login">账号密码登录</span>
+            <div class="slider"></div>
+        </div>
+        <div class="login-type-password"  style="display: none;">
+            <div class="input-group">
+                <label for="username" aria-label="用户名">用户名:</label>
+                <input type="text" placeholder="请输入用户名" id="username" aria-label="请输入用户名">
+            </div>
+
+            <div class="input-group password">
+                <label for="password" aria-label="密码">密码:</label>
+                <input type="password" placeholder="请输入密码" id="password" aria-label="请输入密码">
+            </div>
         </div>
 
-        <div class="input-group password">
-            <label for="password" aria-label="密码">密码:</label>
-            <input type="password" placeholder="请输入密码" id="password" aria-label="请输入密码">
+        <div class="login-type-phone">
+            <div class="input-group">
+                <label for="login_phone" aria-label="手机号">手机号:</label>
+                <input type="text" placeholder="请输入手机号" id="login_phone" aria-label="请输入手机号">
+            </div>
+            <div class="input-group" style="display: flex; gap: 10px; position: relative;">
+                <div style="flex: 1;">
+                    <label for="phone_code" aria-label="手机验证码">验证码:</label>
+                    <input type="text" placeholder="请输入手机验证码" id="phone_code" aria-label="请输入手机验证码">
+                </div>
+                <button id="get_code_btn_login" style="position: absolute; right: 0; bottom: 0; width: 120px; height: 40px; background: #3eb575; color: white; border: none; border-radius: 5px; cursor: pointer;">获取验证码</button>
+            </div>
         </div>
+
+
+
 
         <div class="message" id="login_message" style="display: none;"></div>
         <button id="login_button" aria-label="登录">登录</button>
@@ -40,8 +64,15 @@
 
         <div class="input-group">
             <label for="register_nickname" aria-label="昵称">昵称:</label>
-            <input type="text" placeholder="请输入用于显示的昵称" id="register_nickname" aria-label="请输入用于显示的昵称">
+            <input type="text" placeholder="请输入昵称" id="register_nickname" aria-label="请输入昵称">
         </div>
+
+        <div class="input-group">
+            <label for="register_phone" aria-label="手机号">手机号:</label>
+            <input type="text" placeholder="请输入手机号" id="register_phone" aria-label="请输入手机号">
+        </div>
+
+
 
         <div class="input-group">
             <label for="register_password" aria-label="密码">密码:</label>
@@ -52,6 +83,15 @@
             <label for="register_confirm_password" aria-label="确认密码">确认密码:</label>
             <input type="password" placeholder="请再次输入密码" id="register_confirm_password" aria-label="请再次输入密码">
         </div>
+
+        <div class="input-group" style="display: flex; gap: 10px; position: relative;">
+            <div style="flex: 1;">
+                <label for="register_code" aria-label="验证码">验证码:</label>
+                <input type="text" placeholder="请输入验证码" id="register_code" aria-label="请输入验证码">
+            </div>
+            <button id="get_code_btn_register" style="position: absolute; right: 0; bottom: 0; width: 120px; height: 40px; background: #3eb575; color: white; border: none; border-radius: 5px; cursor: pointer;">获取验证码</button>
+        </div>
+
 
         <div class="message" id="register_message" style="display: none;"></div>
         <button id="register_button" aria-label="注册">注册</button>
