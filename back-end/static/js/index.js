@@ -369,6 +369,21 @@ getCodeBtnLogin.addEventListener('click', async () => {
         loginMessage.className = 'message error';
         loginMessage.style.display = 'block';
     }
+
+    // 开始60秒倒计时
+    let countdown = 60;
+    getCodeBtnLogin.disabled = true;
+    getCodeBtnLogin.style.backgroundColor = '#ccc';
+    const timer = setInterval(() => {
+        getCodeBtnLogin.textContent = `${countdown}秒后重新获取`;
+        countdown--;
+        if (countdown < 0) {
+            clearInterval(timer);
+            getCodeBtnLogin.disabled = false;
+            getCodeBtnLogin.textContent = '获取验证码';
+            getCodeBtnLogin.style.backgroundColor = '#3eb575';
+        }
+    }, 1000);
 });
 
 getCodeBtnRegister.addEventListener('click', async () => {
@@ -399,6 +414,21 @@ getCodeBtnRegister.addEventListener('click', async () => {
         loginMessage.className = 'message error';
         loginMessage.style.display = 'block';
     }
+
+    // 开始60秒倒计时
+    let countdown = 60;
+    getCodeBtnRegister.disabled = true;
+    getCodeBtnRegister.style.backgroundColor = '#ccc';
+    const timer = setInterval(() => {
+        getCodeBtnRegister.textContent = `${countdown}秒后重新获取`;
+        countdown--;
+        if (countdown < 0) {
+            clearInterval(timer);
+            getCodeBtnRegister.disabled = false;
+            getCodeBtnRegister.textContent = '获取验证码';
+            getCodeBtnRegister.style.backgroundColor = '#3eb575';
+        }
+    }, 1000);
 });
 
 
