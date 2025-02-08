@@ -297,6 +297,13 @@ imageList.addEventListener('click', function (event) {
             }
         }, 100);
     }
+    setTimeout(()=>{
+        if(uploadedImages){
+            document.querySelector('#imageUploadPanel .content .add').focus();
+        }else{
+            document.getElementById('agent-chat-textarea').focus();
+        }
+    },200);
 
 });
 
@@ -328,15 +335,22 @@ document.querySelector('#imageUploadPanel .content .add input').addEventListener
     const imageList = document.querySelector('#imageUploadPanel .content .imageList');
     const imageDiv = document.createElement('div');
     imageDiv.className = 'image';
+
+    // 获取图片的索引
+    const imageIndex = uploadedImages.length;
+
+    // 创建图片元素并设置 aria-label
     const userImg = document.createElement('img');
     userImg.src = imageUrl; // 使用临时 URL
     userImg.style.height = '100%';
     userImg.style.width = 'auto';
+    userImg.setAttribute('aria-label', `这是您上船的第${imageIndex}张照片，单击即可删除该照片`);
 
     const removeImg = document.createElement('img');
     removeImg.className = 'remove';
     removeImg.src = '../static/images/more_function_end.png';
     removeImg.alt = '删除照片';
+    removeImg.ariaHidden = 'true';
 
     imageDiv.appendChild(userImg);
     imageDiv.appendChild(removeImg);
@@ -352,6 +366,11 @@ document.querySelector('#imageUploadPanel .content .add input').addEventListener
     } else {
         document.querySelector('#imageUploadPanel .content .add').style.display = 'none';
     }
+
+    const addDiv = document.querySelector('#imageUploadPanel .content .add');
+    setTimeout(()=>{
+        addDiv.focus();
+    },200);
 });
 
 document.getElementById('album_photo').addEventListener('click', function () {
