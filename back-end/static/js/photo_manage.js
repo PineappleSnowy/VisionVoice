@@ -81,13 +81,13 @@ document.addEventListener('DOMContentLoaded', function () {
                         item.className = 'gallery-item';
                         item.innerHTML = `
                         <button onclick="openModal('${data.image_url}', '${data.image_name}', this)">
-                        <img src="${data.image_url}" alt="${data.image_name}">
-                        <p>${data.image_name}</p>
+                            <img src="${data.image_url}" alt="${data.image_name}">
+                            <p>${data.image_name}</p>
                         </button>
                         `;
                         gallery.appendChild(item);
                         // 显示myModal窗口
-                        openModal(data.image_url, data.image_name, item.querySelector('button'));
+                        item.querySelector('button').click();
                     } else {
                         console.error('Error uploading image:', data.error);
                         showError(data.error);
@@ -113,43 +113,60 @@ document.addEventListener('DOMContentLoaded', function () {
         cancelButton.style.display = 'none';
     });
 
+    function findGalleryItemByAlt(altText) {
+        const galleryItems = document.querySelectorAll('.gallery-item');
+        for (let item of galleryItems) {
+            const img = item.querySelector('img');
+            if (img && img.alt === altText) {
+                return item;
+            }
+        }
+        return null;
+    }
+
     document.getElementById('deleteButton').addEventListener('click', function () {
-        disableButtons(true);
-        const imageName = document.getElementById('modalImage').alt;
-        const token = localStorage.getItem('token');
-        fetch('/delete_image', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                "Authorization": `Bearer ${token}`
-            },
-            body: JSON.stringify({ image_name: imageName })
-        })
-            .then(response => response.json())
-            .then(data => {
-                const statusMessage = document.getElementById('statusMessage');
-                if (data.success) {
-                    statusMessage.textContent = '删除成功';
-                    statusMessage.style.color = 'green';
-                    const galleryItem = document.querySelector(`button[onclick="openModal('${data.url}', '${imageName}', this)"]`).parentElement;
-                    galleryItem.remove();
-                    setTimeout(() => {
+        if (!deleteButton_clicked) {
+            deleteButton_clicked = true;
+            disableButtons(true);
+            const imageName = document.getElementById('modalImage').alt;
+            const token = localStorage.getItem('token');
+            fetch('/delete_image', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify({ image_name: imageName })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    const statusMessage = document.getElementById('statusMessage');
+                    if (data.success) {
+                        statusMessage.textContent = '删除成功';
+                        statusMessage.style.color = 'green';
+                        const galleryItem = findGalleryItemByAlt(imageName);
+                        galleryItem.remove();
+                        setTimeout(() => {
+                            deleteButton_clicked = false;
+                            disableButtons(false);
+                            document.getElementById('backButton').click();
+                        }, 500);
+                    } else {
+                        statusMessage.textContent = '删除失败';
+                        statusMessage.style.color = 'red';
+                        deleteButton_clicked = false;
                         disableButtons(false);
-                        document.getElementById('backButton').click();
-                    }, 500);
-                } else {
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    const statusMessage = document.getElementById('statusMessage');
                     statusMessage.textContent = '删除失败';
                     statusMessage.style.color = 'red';
+                    deleteButton_clicked = false;
                     disableButtons(false);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                const statusMessage = document.getElementById('statusMessage');
-                statusMessage.textContent = '删除失败';
-                statusMessage.style.color = 'red';
-                disableButtons(false);
-            });
+                });
+        }
     });
 
     document.getElementById('backButton').addEventListener('click', function () {
@@ -166,6 +183,9 @@ function disableButtons(disable) {
     });
 }
 
+let renameButton_clicked = false;
+let deleteButton_clicked = false;
+
 function openModal(url, name, button) {
     const modal = document.getElementById('myModal');
     const modalImage = document.getElementById('modalImage');
@@ -177,47 +197,57 @@ function openModal(url, name, button) {
     modalImage.alt = name;
     imageName.value = name;
 
-    document.getElementById('saveButton').addEventListener('click', function () {
-        disableButtons(true)
-        const newName = document.getElementById('imageName').value;
-        const oldName = button.querySelector('p').innerText;
+    // 直接赋值新的点击事件，覆盖之前的事件
+    document.getElementById('renameButton').onclick = function () {
+        if (!renameButton_clicked) {
+            renameButton_clicked = true;
+            document.getElementById('renameButton').disabled = true;
+            disableButtons(true);
+            const newName = document.getElementById('imageName').value;
+            console.log(button);
+            const oldName = button.querySelector('p').innerText;
+            console.log('oldName:', oldName);
 
-        const token = localStorage.getItem('token');
-        // 发送请求到后端修改图片名称
-        fetch('/rename_image', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                "Authorization": `Bearer ${token}`
-            },
-            body: JSON.stringify({ oldName: oldName, newName: newName })
-        })
-            .then(response => response.json())
-            .then(data => {
-                disableButtons(false)
-                if (data.success) {
-                    console.log('Image name updated successfully');
+            const token = localStorage.getItem('token');
+            // 发送请求到后端修改图片名称
+            fetch('/rename_image', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify({ oldName: oldName, newName: newName })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    renameButton_clicked = false;
+                    disableButtons(false)
+                    if (data.success) {
+                        console.log('Image name updated successfully');
+                        modalImage.alt = newName;
+                        // 更新前端显示的图片名称
+                        button.querySelector('p').innerText = newName;
+                        button.querySelector('img').alt = newName;
+                        console.log('button:', button);
+                        button.setAttribute('onclick', `openModal('${data.url}', '${newName}', this)`);
 
-                    // 更新前端显示的图片名称
-                    button.querySelector('p').innerText = newName;
-                    button.querySelector('img').alt = newName;
-                    button.setAttribute('onclick', `openModal('${url}', '${newName}', this)`);
-
-                    statusMessage.textContent = '修改成功';
-                    statusMessage.style.color = 'green';
-                } else {
-                    console.error('Error updating image name');
+                        statusMessage.textContent = '修改成功';
+                        statusMessage.style.color = 'green';
+                    } else {
+                        console.error('Error updating image name');
+                        statusMessage.textContent = '修改失败';
+                        statusMessage.style.color = 'red';
+                    }
+                })
+                .catch(error => {
+                    renameButton_clicked = false;
+                    disableButtons(false);
+                    console.error('Error:', error);
                     statusMessage.textContent = '修改失败';
                     statusMessage.style.color = 'red';
-                }
-            })
-            .catch(error => {
-                disableButtons(false);
-                console.error('Error:', error);
-                statusMessage.textContent = '修改失败';
-                statusMessage.style.color = 'red';
-            });
-    });
+                });
+        }
+    };
 }
 
 // 获取底栏和画廊的元素

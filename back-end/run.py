@@ -263,7 +263,7 @@ def get_images():
     if not os.path.exists(user_album_folder):
         os.makedirs(user_album_folder)
 
-    mode = request.args.get("mode", "default")
+    mode = request.args.get("mode", "find_item")
 
     if mode == "album":
         target_folder = user_album_folder
@@ -308,7 +308,7 @@ def get_images():
 
 @app.route("/image/<user>/<filename>", methods=["GET"])
 def get_image(user, filename):
-    mode = request.args.get("mode", "default")
+    mode = request.args.get("mode", "find_item")
     if mode == "album":
         user_image_folder = os.path.join(USER_IMAGE_FOLDER, user, "album", "images")
     else:
@@ -334,15 +334,18 @@ def rename_image():
             break
 
     if old_file is None:
+        print(f"Old file not found: {old_name}")
         return jsonify({"success": False, "error": "Old file not found"}), 400
 
     old_path = os.path.join(user_image_folder, old_file)
-    new_path = os.path.join(user_image_folder, new_name + os.path.splitext(old_file)[1])
+    new_file = new_name + os.path.splitext(old_file)[1]
+    new_path = os.path.join(user_image_folder, new_file)
 
     try:
         os.rename(old_path, new_path)
-        return jsonify({"success": True}), 200
+        return jsonify({"success": True, "url":f"/image/{curr_user}/{new_file}"}), 200
     except Exception as e:
+        print(f"Rename failed: {str(e)}")
         return jsonify({"success": False, "error": str(e)}), 400
 
 
@@ -377,7 +380,7 @@ def save_item_image():
                 {
                     "success": True,
                     "image_name": name,
-                    "image_url": f"/image/{curr_user}/{new_filename}",
+                    "image_url": f"/image/{curr_user}/{new_filename}?mode=find_item",
                 }
             ),
             200,
@@ -617,7 +620,7 @@ def album_talk():
 @app.route("/delete_image", methods=["POST"])
 def delete_image():
     curr_user = get_jwt_identity()
-    mode = request.args.get("mode", "default")
+    mode = request.args.get("mode", "find_item")
     data = request.get_json()
     image_name = data["image_name"]
     # 查找文件名对应的文件
@@ -649,7 +652,7 @@ def delete_image():
     if file_to_delete is None:
         return jsonify({"success": False, "error": "File not found"}), 400
     return (
-        jsonify({"success": True, "url": f"/image/{curr_user}/{file_to_delete}"}),
+        jsonify({"success": True, "url": f"/image/{curr_user}/{file_to_delete}?mode={mode}"}),
         200,
     )
 
