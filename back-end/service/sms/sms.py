@@ -1,20 +1,23 @@
 import os
-from typing import List
 
 from alibabacloud_dysmsapi20170525.client import Client as Dysmsapi20170525Client
 from alibabacloud_tea_openapi import models as open_api_models
 from alibabacloud_dysmsapi20170525 import models as dysmsapi_20170525_models
 from alibabacloud_tea_util import models as util_models
-from alibabacloud_tea_util.client import Client as UtilClient
 
 import random
 import json
-import dotenv
 import time
+
 try:
-    dotenv.load_dotenv()
+    module_dir = os.path.dirname(__file__)
+    json_path = os.path.join(module_dir, '..', '..', 'static', 'api.json')
+    with open(json_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+        ALIBABA_CLOUD_ACCESS_KEY_ID = data["alibaba"]["access_key_id"]
+        ALIBABA_CLOUD_ACCESS_KEY_SECRET = data["alibaba"]["access_key_secret"]
 except Exception as e:
-    print(f"加载环境变量失败: {e}")
+    print(f"加载sms配置失败: {e}")
 
 
 def create_client() -> Dysmsapi20170525Client:
@@ -22,15 +25,10 @@ def create_client() -> Dysmsapi20170525Client:
     使用AK&SK初始化账号Client
     @return: Client
     """
-    # 工程代码泄露可能会导致 AccessKey 泄露，并威胁账号下所有资源的安全性。以下代码示例仅供参考。
-    # 建议使用更安全的 STS 方式，更多鉴权访问方式请参见：https://help.aliyun.com/document_detail/378659.html。
     config = open_api_models.Config(
-        # 必填，请确保代码运行环境设置了环境变量 ALIBABA_CLOUD_ACCESS_KEY_ID
-        access_key_id=os.environ["ALIBABA_CLOUD_ACCESS_KEY_ID"],
-        # 必填，请确保代码运行环境设置了环境变量 ALIBABA_CLOUD_ACCESS_KEY_SECRET
-        access_key_secret=os.environ["ALIBABA_CLOUD_ACCESS_KEY_SECRET"],
+        access_key_id=ALIBABA_CLOUD_ACCESS_KEY_ID,
+        access_key_secret=ALIBABA_CLOUD_ACCESS_KEY_SECRET,
     )
-    # Endpoint 请参考 https://api.aliyun.com/product/Dysmsapi
     config.endpoint = "dysmsapi.aliyuncs.com"
     return Dysmsapi20170525Client(config)
 
