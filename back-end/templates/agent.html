@@ -36,13 +36,13 @@
           <div class="imageList">
             <!-- 图片列表在这里 -->
           </div>
-          <div class="add" aria-label="添加图片" style="display: none;">
-            <img src="../static/images/more_function_start.png" alt="添加图片">
+          <div class="add" aria-label="添加图片" style="display: none;" tabindex="0">
+            <img src="../static/images/more_function_start.png" alt="添加图片" aria-hidden="true">
             <input id="photo" type="file" accept="image/*" capture="camera" style="display: none;"/>
           </div>
         </div>
       </div>
-      <button id="camera-button" aria-label="使用相机上传图片">
+      <button id="camera-button" aria-label="使用相机上传图片" tabindex="0">
         <img src="../static/images/camera.png" id="camera_icon" alt="使用相机上传图片" />
       </button>
       <button id="phone-button" aria-label="语音聊天">
@@ -53,8 +53,8 @@
       <button id="more_function_button" aria-label="开启更多功能"></button>
     </div>
     <div id="more_function_board" role="region" aria-labelledby="more_function_label">
-      <div id="album_photo" aria-label="添加图片"><i class="fa-solid fa-image"></i></div>
-      <div id="camera_photo" aria-label="使用相机上传图片"><i class="fa-solid fa-camera"></i></div>
+      <div id="album_photo" aria-label="添加图片" tabindex="0"><i class="fa-solid fa-image"></i></div>
+      <div id="camera_photo" aria-label="使用相机上传图片" tabindex="0"><i class="fa-solid fa-camera"></i></div>
     </div>
     <div id="navbar" role="navigation">
       <a href="/agent" aria-label="首页">

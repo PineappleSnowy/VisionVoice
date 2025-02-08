@@ -1666,7 +1666,9 @@ def run_server():
     current_os = platform.system()
     if current_os == "Windows":
         socketio.run(
-            app, port=80, allow_unsafe_werkzeug=True, debug=True  # 调试模式（开发环境）
+            app, 
+            host = '0.0.0.0',
+            port=80, allow_unsafe_werkzeug=True, debug=True  # 调试模式（开发环境）
         )
     else:
         socketio.run(
