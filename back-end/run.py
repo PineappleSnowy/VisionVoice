@@ -269,13 +269,17 @@ def get_images():
         target_folder = user_album_folder
 
         talk_speed_config_path = os.path.join(
-        USER_IMAGE_FOLDER, curr_user, 'album', 'talk_speed_config.json')
-    
+            USER_IMAGE_FOLDER, curr_user, "album", "talk_speed_config.json"
+        )
+
         if not os.path.exists(talk_speed_config_path):  # 初始化语速配置文件
-            with open(talk_speed_config_path, 'w') as f:
-                album_images = os.listdir(os.path.join(
-                    USER_IMAGE_FOLDER, curr_user, 'album', 'images'))
-                album_images_withot_ext = [os.path.splitext(image)[0] for image in album_images]
+            with open(talk_speed_config_path, "w") as f:
+                album_images = os.listdir(
+                    os.path.join(USER_IMAGE_FOLDER, curr_user, "album", "images")
+                )
+                album_images_withot_ext = [
+                    os.path.splitext(image)[0] for image in album_images
+                ]
                 talk_speed_config = {image: 8 for image in album_images_withot_ext}
                 json.dump(talk_speed_config, f)
     else:
@@ -343,7 +347,7 @@ def rename_image():
 
     try:
         os.rename(old_path, new_path)
-        return jsonify({"success": True, "url":f"/image/{curr_user}/{new_file}"}), 200
+        return jsonify({"success": True, "url": f"/image/{curr_user}/{new_file}"}), 200
     except Exception as e:
         print(f"Rename failed: {str(e)}")
         return jsonify({"success": False, "error": str(e)}), 400
@@ -389,15 +393,17 @@ def save_item_image():
 
 
 def describe_image(client, img_path, curr_user):
-    with open(img_path, 'rb') as img_file:
-        img_base = base64.b64encode(img_file.read()).decode('utf-8')
+    with open(img_path, "rb") as img_file:
+        img_base = base64.b64encode(img_file.read()).decode("utf-8")
 
     prompt = "你是一名乐于助人的盲人助手，请你充分捕捉照片信息，用生动的语言向你的盲人朋友描述这张照片。"
-    
+
     if curr_user == "CaraLin":
-        prompt_path = os.path.join(USER_IMAGE_FOLDER, curr_user, 'album', 'caralin_prompt.txt')
+        prompt_path = os.path.join(
+            USER_IMAGE_FOLDER, curr_user, "album", "caralin_prompt.txt"
+        )
         if os.path.exists(prompt_path):
-            with open(prompt_path, 'r', encoding='utf-8') as f:
+            with open(prompt_path, "r", encoding="utf-8") as f:
                 prompt = f.read()
 
     response = client.chat.completions.create(
@@ -429,8 +435,9 @@ def save_album_images():
     talk_speed = request.args.get("talk_speed", 8)
 
     talk_speed_config_path = os.path.join(
-        user_image_folder, 'album', 'talk_speed_config.json')
-    with open(talk_speed_config_path, 'r') as f:  # 读取语速配置
+        user_image_folder, "album", "talk_speed_config.json"
+    )
+    with open(talk_speed_config_path, "r") as f:  # 读取语速配置
         talk_speed_config = json.load(f)
 
     saved_images = []  # 保存成功的图片
@@ -443,10 +450,12 @@ def save_album_images():
                 image_folder = os.path.join(user_image_folder, "album", "images")
                 image_save_path = os.path.join(image_folder, image_filename)
                 file.save(image_save_path)
-                saved_images.append({
-                    "name": filename,
-                    "url": f"/image/{curr_user}/{image_filename}?mode=album"
-                })
+                saved_images.append(
+                    {
+                        "name": filename,
+                        "url": f"/image/{curr_user}/{image_filename}?mode=album",
+                    }
+                )
 
                 image_des = describe_image(client, image_save_path, curr_user)
                 des_audio = agent_audio_generate(image_des, talk_speed)
@@ -458,10 +467,10 @@ def save_album_images():
                     os.makedirs(audio_folder)
                 with open(audio_file_path, "wb") as f:
                     f.write(des_audio)
-                
+
                 # 保存语速配置
                 talk_speed_config[filename] = talk_speed
-                with open(talk_speed_config_path, 'w') as f:
+                with open(talk_speed_config_path, "w") as f:
                     json.dump(talk_speed_config, f)
 
                 # 保存语速配置
@@ -508,31 +517,33 @@ def get_image_des():
 def get_audio():
     curr_user = get_jwt_identity()
     # 有声相册音频路由
-    audio_name = request.args.get('audio_name')
-    audio_file = audio_name + '.mp3'
+    audio_name = request.args.get("audio_name")
+    audio_file = audio_name + ".mp3"
     audio_path = os.path.join(
         USER_IMAGE_FOLDER, curr_user, "album", "audios", audio_file
     )
     if not os.path.exists(audio_path):
-        return jsonify({'error': 'Audio file not found'}), 404
-    
-    talk_speed = request.args.get('talk_speed', 8)
-    talk_speed_config_path = os.path.join(
-        USER_IMAGE_FOLDER, curr_user, 'album', 'talk_speed_config.json')
+        return jsonify({"error": "Audio file not found"}), 404
 
-    with open(talk_speed_config_path, 'r') as f:
+    talk_speed = request.args.get("talk_speed", 8)
+    talk_speed_config_path = os.path.join(
+        USER_IMAGE_FOLDER, curr_user, "album", "talk_speed_config.json"
+    )
+
+    with open(talk_speed_config_path, "r") as f:
         talk_speed_config = json.load(f)
-        talk_speed_pre = talk_speed_config.get(audio_name, 8)   
+        talk_speed_pre = talk_speed_config.get(audio_name, 8)
     if talk_speed != talk_speed_pre:  # 当前请求的语速与之前不同，重新生成音频
         image_des_text_path = os.path.join(
-            USER_IMAGE_FOLDER, curr_user, 'album', 'texts', audio_name + '.txt')
-        with open(image_des_text_path, 'r', encoding='utf-8') as f:
+            USER_IMAGE_FOLDER, curr_user, "album", "texts", audio_name + ".txt"
+        )
+        with open(image_des_text_path, "r", encoding="utf-8") as f:
             image_des = f.read()
         audio_data = agent_audio_generate(image_des, talk_speed)
-        with open(audio_path, 'wb') as f:
+        with open(audio_path, "wb") as f:
             f.write(audio_data)
         talk_speed_config[audio_name] = talk_speed
-        with open(talk_speed_config_path, 'w') as f:
+        with open(talk_speed_config_path, "w") as f:
             json.dump(talk_speed_config, f)
 
     talk_speed = request.args.get("talk_speed", 8)
@@ -574,13 +585,22 @@ def album_talk():
     prompt = "你是一名乐于助人的助手，请你充分捕捉照片信息，用生动的语言向你的盲人朋友描述这张照片。"
 
     if curr_user == "CaraLin":
-        prompt_path = os.path.join(USER_IMAGE_FOLDER, curr_user, 'album', 'caralin_prompt.txt')
+        prompt_path = os.path.join(
+            USER_IMAGE_FOLDER, curr_user, "album", "caralin_prompt.txt"
+        )
         if os.path.exists(prompt_path):
-            with open(prompt_path, 'r', encoding='utf-8') as f:
+            with open(prompt_path, "r", encoding="utf-8") as f:
                 prompt = f.read()
 
-    messages = [{"role": "user", "content": [{"type": "text", "text": prompt},
-                                             {"type": "image_url", "image_url": {"url": img_base}}]}]
+    messages = [
+        {
+            "role": "user",
+            "content": [
+                {"type": "text", "text": prompt},
+                {"type": "image_url", "image_url": {"url": img_base}},
+            ],
+        }
+    ]
     for chat in album_chat_history:
         if chat["role"] == "assistant":
             message = {
@@ -625,16 +645,17 @@ def delete_image():
     image_name = data["image_name"]
     # 查找文件名对应的文件
     file_to_delete = None
-    if mode == 'album':
+    if mode == "album":
         talk_speed_config_path = os.path.join(
-            USER_IMAGE_FOLDER, curr_user, 'album', 'talk_speed_config.json')
-        with open(talk_speed_config_path, 'r') as f:
+            USER_IMAGE_FOLDER, curr_user, "album", "talk_speed_config.json"
+        )
+        with open(talk_speed_config_path, "r") as f:
             talk_speed_config = json.load(f)
         if image_name in talk_speed_config:
             del talk_speed_config[image_name]
-            with open(talk_speed_config_path, 'w') as f:
+            with open(talk_speed_config_path, "w") as f:
                 json.dump(talk_speed_config, f)
-        delete_folders = ['album/images', 'album/audios', 'album/texts']
+        delete_folders = ["album/images", "album/audios", "album/texts"]
     else:
         delete_folders = ["item_images"]
     for folder in delete_folders:
@@ -652,7 +673,9 @@ def delete_image():
     if file_to_delete is None:
         return jsonify({"success": False, "error": "File not found"}), 400
     return (
-        jsonify({"success": True, "url": f"/image/{curr_user}/{file_to_delete}?mode={mode}"}),
+        jsonify(
+            {"success": True, "url": f"/image/{curr_user}/{file_to_delete}?mode={mode}"}
+        ),
         200,
     )
 
@@ -811,7 +834,6 @@ def register():
     code = data.get("code")
     usage = data.get("usage")
 
-
     print(
         "注册信息：\n用户名：{}\n密码：{}\n昵称：{}\n手机号：{}".format(
             username, password, nickname, phone
@@ -847,7 +869,6 @@ def register():
         if any(user.get("phone") == phone for user in users):
             return jsonify({"message": "手机号已存在", "code": 400}), 400
 
-
         # 检查验证码是否正确
         try:
             with open("./configs/verification_code_dict.json", "r") as f:
@@ -855,22 +876,22 @@ def register():
         except Exception as e:
             logging.error("run.py", "register", f"验证码文件读取失败: {str(e)}")
             verification_code_dict = {}
-        if (
-            verification_code_dict.get(phone)
-            and verification_code_dict.get(phone).get("code") != code and usage == "register"
-        ):
-            logging.error("run.py", "register", f"验证码错误: {phone} {code}")
 
+        # 级联判断验证码是否匹配
+        phone_number = verification_code_dict.get(phone)
+        if not phone_number:
+            return jsonify({"message": "发送验证码失败", "code": 400}), 400
+        
+        timestamp = phone_number.get("timestamp")
+        if not timestamp:
+            return jsonify({"message": "发送验证码失败", "code": 400}), 400
+        
+        if int(timestamp) + 5 * 60 < int(time.time()):
+            return jsonify({"message": "验证码已过期", "code": 400}), 400
+        
+        verify_code = phone_number.get("code")
+        if verify_code != code:
             return jsonify({"message": "验证码错误", "code": 400}), 400
-        else:
-            # 验证码5分钟内有效,超过则过期
-            if int(
-                verification_code_dict.get(phone, {}).get("timestamp")
-            ) + 5 * 60 < int(time.time()):
-                return (
-                    jsonify({"message": "验证码已过期,请重新获取", "code": 400}),
-                    400,
-                )
 
         # 注册完后向用户信息中添加预设智能体，此处可以后续智能体定制兼容
         sys_prompt = "你是视界之声，一位乐于助人的对话助手。为了能让用户能尽快解决问题，你的话语总是十分简洁而概要。"
@@ -933,7 +954,6 @@ def login():
     password = data.get("password")
     usage = data.get("usage")
 
-
     try:
         # 读取用户信息
         try:
@@ -950,7 +970,6 @@ def login():
                 user_exists = True
                 # 检查密码是否正确
                 if user.get("password") == password:
-
 
                     print("登录成功")
                     # 设置 local token
@@ -983,29 +1002,24 @@ def login():
                     logging.error("run.py", "login", f"验证码文件读取失败: {str(e)}")
                     verification_code_dict = {}
 
-
-                if (
-                    verification_code_dict.get(phone)
-                    and verification_code_dict.get(phone).get("code") == code
-                ):
-                    # 获取验证码生成时的时间戳
-                    time_stamp = verification_code_dict.get(phone, {}).get("timestamp")
-                    # 检查time_stamp是否存在
-                    if not time_stamp and not usage == "login":
-                        return (
-                            jsonify({"message": "验证码无效,请重新获取", "code": 400}),
-                            400,
-                        )
-                    # 验证码5分钟内有效,超过则过期
-                    if int(time_stamp) + 5 * 60 < int(time.time()):
-                        return (
-                            jsonify(
-                                {"message": "验证码已过期,请重新获取", "code": 400}
-                            ),
-                            400,
-                        )
+                    # 级联判断验证码是否匹配
+                    phone_number = verification_code_dict.get(phone)
+                    if not phone_number:
+                        return jsonify({"message": "发送验证码失败", "code": 400}), 400
+                    
+                    timestamp = phone_number.get("timestamp")
+                    if not timestamp:
+                        return jsonify({"message": "发送验证码失败", "code": 400}), 400
+                    
+                    if int(timestamp) + 5 * 60 < int(time.time()):
+                        return jsonify({"message": "验证码已过期", "code": 400}), 400
+                    
+                    verify_code = phone_number.get("code")
+                    if verify_code != code:
+                        return jsonify({"message": "验证码错误", "code": 400}), 400
 
                     print("登录成功")
+                    
                     # 设置 local token
                     access_token = create_access_token(
                         identity=user.get("username"), expires_delta=False
@@ -1533,8 +1547,8 @@ def agent_stream_audio(current_token: str, talk_speed: int = 8):
                 file_path = os.path.join(
                     USER_IMAGE_FOLDER,
                     user,
-                    'item_images',
-                    current_token[current_token.find(">") + 1:] + ".jpg",
+                    "item_images",
+                    current_token[current_token.find(">") + 1 :] + ".jpg",
                 )
 
                 audio_chunk = agent_audio_generate(
