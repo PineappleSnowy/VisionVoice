@@ -933,8 +933,12 @@ def login():
 
     try:
         # 读取用户信息
-        with open("./static/user.json", "r", encoding="utf-8") as f:
-            users = json.load(f)
+        try:
+            with open("./static/user.json", "r", encoding="utf-8") as f:
+                users = json.load(f)
+        except Exception as e:
+            logging.error("run.py", "login", f"用户文件读取失败: {str(e)}")
+            users = []
 
         # 检查用户是否存在
         user_exists = False
