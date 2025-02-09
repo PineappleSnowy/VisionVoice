@@ -15,6 +15,90 @@ const labels = [
     "toothbrush"
 ];
 
+
+const labelen_ch = {
+    "person": "人",
+    "bicycle": "自行车",
+    "car": "汽车",
+    "motorcycle": "摩托车",
+    "airplane": "飞机",
+    "bus": "公交车",
+    "train": "火车",
+    "truck": "卡车",
+    "boat": "船",
+    "traffic light": "交通信号灯",
+    "fire hydrant": "消防栓",
+    "stop sign": "停车标志",
+    "parking meter": "停车计费器",
+    "bench": "长椅",
+    "bird": "鸟",
+    "cat": "猫",
+    "dog": "狗",
+    "horse": "马",
+    "sheep": "羊",
+    "cow": "牛",
+    "elephant": "大象",
+    "bear": "熊",
+    "zebra": "斑马",
+    "giraffe": "长颈鹿",
+    "backpack": "背包",
+    "umbrella": "雨伞",
+    "handbag": "手提包",
+    "tie": "领带",
+    "suitcase": "行李箱",
+    "frisbee": "飞盘",
+    "skis": "滑雪板",
+    "snowboard": "单板滑雪板",
+    "sports ball": "运动球",
+    "kite": "风筝",
+    "baseball bat": "棒球棒",
+    "baseball glove": "棒球手套",
+    "skateboard": "滑板",
+    "surfboard": "冲浪板",
+    "tennis racket": "网球拍",
+    "bottle": "瓶子",
+    "wine glass": "酒杯",
+    "cup": "杯子",
+    "fork": "叉子",
+    "knife": "刀",
+    "spoon": "勺子",
+    "bowl": "碗",
+    "banana": "香蕉",
+    "apple": "苹果",
+    "sandwich": "三明治",
+    "orange": "橙子",
+    "broccoli": "西兰花",
+    "carrot": "胡萝卜",
+    "hot dog": "热狗",
+    "pizza": "披萨",
+    "donut": "甜甜圈",
+    "cake": "蛋糕",
+    "chair": "椅子",
+    "couch": "沙发",
+    "potted plant": "盆栽植物",
+    "bed": "床",
+    "dining table": "餐桌",
+    "toilet": "马桶",
+    "tv": "电视",
+    "laptop": "笔记本电脑",
+    "mouse": "鼠标",
+    "remote": "遥控器",
+    "keyboard": "键盘",
+    "cell phone": "手机",
+    "microwave": "微波炉",
+    "oven": "烤箱",
+    "toaster": "烤面包机",
+    "sink": "水槽",
+    "refrigerator": "冰箱",
+    "book": "书",
+    "clock": "时钟",
+    "vase": "花瓶",
+    "scissors": "剪刀",
+    "teddy bear": "泰迪熊",
+    "hair drier": "吹风机",
+    "toothbrush": "牙刷"
+};
+
 let yoloModel = null;
 let featureModel = null;
 
@@ -379,6 +463,74 @@ class YoloDetector {
             }];
 
         } catch (error) {
+            console.error('检测过程发生错误:', error);
+            return [];
+        }
+    }
+
+    async detect_obs(image, options = {}) {
+        if (!this.initialized) {
+            console.error('模型未初始化');
+            yoloModel = await loadModel();
+            console.log("模型加载成功");
+        }
+
+        let distanceDic = {}; // 用于比较，获取最近障碍物标签以及距离
+        let distanceDicAll = {}; // 存储所有障碍物位置信息
+        try {
+            const detections = await this.generalDetect(image, options);
+            if (detections.length == 0) {
+                console.log('未检测到目标');
+                return [];
+            }
+            let i = 0;
+            for (let detection of detections) {
+                i = i + 1;
+                const { x, y, width, height } = detection.bbox;
+                const label_0 = detection.class
+                const roiCanvas = document.createElement('canvas');
+                const roiCtx = roiCanvas.getContext('2d');
+                roiCanvas.width = width;
+                roiCanvas.height = height;
+                roiCtx.drawImage(image, x, y, width, height, 0, 0, width, height);
+                roiCanvas.width = 1;
+                roiCanvas.height = 1;
+
+                const label_1 = label_0 + i;
+                const y2 = y + height;
+                const distanceReal = 6.88448838e-13 * Math.pow(y2, 4) - 2.27144172e-09 * Math.pow(y2, 3) + 3.19109921e-06 * Math.pow(y2, 2) - 3.16104347e-03 * y2 + 2.06059217e+00;
+                const x_centor = x + width / 2;
+                const y_centor = y + height / 2;
+                // const left = x_centor / image.width;
+                // const top = y_centor / image.height;
+                const left = x_centor / 480.0;
+                const top = y_centor / 480.0;
+                distanceDic[label_1] = distanceReal;
+                distanceDicAll[label_1] = [labelen_ch[label_0], distanceReal, left, top, y2]
+            }
+            let labelMin, distanceMin;
+            for (const [key, value] of Object.entries(distanceDic)) {
+              if (distanceMin === undefined || value < distanceMin) {
+                labelMin = key;
+                distanceMin = value;
+              }
+            }
+
+            console.log('检测结果:', {
+                class: distanceDicAll[labelMin][0],
+                distance: distanceDicAll[labelMin][1],
+                left: distanceDicAll[labelMin][2],
+                top: distanceDicAll[labelMin][3],
+                y2: distanceDicAll[labelMin][4],
+            });
+
+            return [{
+                class: distanceDicAll[labelMin][0],
+                distance: distanceDicAll[labelMin][1],
+                left: distanceDicAll[labelMin][2],
+                top: distanceDicAll[labelMin][3]
+            }]
+        } catch (error){
             console.error('检测过程发生错误:', error);
             return [];
         }
