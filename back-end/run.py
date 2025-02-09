@@ -407,7 +407,7 @@ def describe_image(client, img_path, curr_user):
                 prompt = f.read()
 
     response = client.chat.completions.create(
-        model="glm-4v",  # 填写需要调用的模型名称
+        model="glm-4v-plus-0111",  # 填写需要调用的模型名称
         messages=[
             {
                 "role": "user",
@@ -569,7 +569,7 @@ def get_audio():
 
     return send_file(audio_path, mimetype="audio/mp3")
 
-
+# 构建上下文信息进行照片对话
 @app.route("/album_talk", methods=["POST"])
 def album_talk():
     curr_user = get_jwt_identity()
@@ -615,7 +615,7 @@ def album_talk():
             }
             messages.append(message)
 
-    model_name = "glm-4v-plus"
+    model_name = "glm-4v-plus-0111"
     responses = client.chat.completions.create(
         model=model_name,
         messages=messages,
@@ -1156,7 +1156,7 @@ def build_response(current_user, agent_name, user_talk, video_open, multi_image_
     user_image_path = os.path.join(user_cache_dir, IMAGE_SAVE_NAME)
 
     if video_open:
-        model_name = "glm-4v-flash"
+        model_name = "glm-4v-plus-0111"
         messages = init_chat_history(current_user, agent_name, messages)
 
         dst_messages = message_format_tran(messages[-MAX_HISTORY:])
@@ -1203,7 +1203,7 @@ def build_response(current_user, agent_name, user_talk, video_open, multi_image_
         else:
             image_path_list = []
         model_name = (
-            "glm-4v-plus" if len(image_path_list) == 1 else "glm-4v-plus"
+            "glm-4v-plus-0111" if len(image_path_list) == 1 else "glm-4v-plus-0111"
         )  # 选择模型类别
 
         messages = init_chat_history(current_user, agent_name, messages)
@@ -1258,7 +1258,7 @@ def build_response(current_user, agent_name, user_talk, video_open, multi_image_
 
         else:
             # 根据选择的模型调用大模型
-            model_name = "glm-4-flash"
+            model_name = "glm-4-plus-0111"
             messages = init_chat_history(current_user, agent_name, messages)
             # 添加用户消息
             messages.append({"role": "user", "content": user_talk})
@@ -1284,7 +1284,7 @@ def agent_chat_stream():
     """
     user_talk = request.args.get("query", "（消息为空，发生了错误，请你给出错误警告）")
     agent_name = request.args.get("agent", "defaultAgent")  # 获取选择的智能体
-    video_open = request.args.get("videoOpen", "false") == "true"  # 获取选择的智能体
+    video_open = request.args.get("videoOpen", "false") == "true"  # 是否进行图片对话
     multi_image_talk = (
         request.args.get("multi_image_talk", "false") == "true"
     )  # 是否开启多轮对话

@@ -344,7 +344,7 @@ document.querySelector('#imageUploadPanel .content .add input').addEventListener
     userImg.src = imageUrl; // 使用临时 URL
     userImg.style.height = '100%';
     userImg.style.width = 'auto';
-    userImg.setAttribute('aria-label', `这是您上船的第${imageIndex}张照片，单击即可删除该照片`);
+    userImg.setAttribute('aria-label', `这是您上传的第${imageIndex}张照片，单击即可删除该照片`);
 
     const removeImg = document.createElement('img');
     removeImg.className = 'remove';

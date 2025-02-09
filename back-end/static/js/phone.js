@@ -164,6 +164,7 @@ openCamera.addEventListener('click', async () => {
             try {
                 stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio: false });
                 video.srcObject = stream;
+                video.style.transform = 'none';
             } catch (err) {
                 if (err.name === 'NotAllowedError') {
                     alert('请允许访问您的摄像头！');
@@ -1093,7 +1094,7 @@ window.onload = async () => {
         else if (complexity == "简洁") {
             prompt_des = "简洁地";
         }
-        rec_result = `请${prompt_des}描述环境。`;
+        rec_result = `你是一名热心的助手，请你${prompt_des}描述环境。`;
         speech_rec_ready = true;
         captureAndSendFrame();
     });
