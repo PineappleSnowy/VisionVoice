@@ -280,12 +280,17 @@ function formChat(talk_index) {
 // 将视频帧发往后端的函数
 function captureAndSendFrame() {
     if (videoChat) {
+        // 创建 canvas 元素，用于绘制视频帧
         const canvas = document.createElement('canvas');
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
+
         const context = canvas.getContext('2d');
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
         const imageData = canvas.toDataURL('image/jpeg');
+        // 销毁 canvas 元素，避免持续内存占用
+        canvas.remove();
+
         const token = localStorage.getItem('token');
         const talk_speed = localStorage.getItem('speed') || 8;
         fetch('/agent/upload_image', {
@@ -488,8 +493,6 @@ function exit_obstacle_void() {
 function exit_find_item() {
     state = 0
     find_item = false;
-    const talk_speed = localStorage.getItem('speed') || 8;
-    socket.emit("agent_stream_audio", "##<state=2 exit>", talk_speed);
 }
 
 // 退出功能模式
@@ -535,8 +538,9 @@ function startAvoidObstacle() {
 
 // 寻物启动函数
 let find_item_name = '';
+let yoloDetectorInstance = new YoloDetector();  // 创建 YoloDetector 实例
 
-window.startFindItem = function (item_name) {
+window.startFindItem = async function (item_name) {
     state = 2;
     stopCheckSilenceTimer();
     stopAudio();
@@ -547,17 +551,46 @@ window.startFindItem = function (item_name) {
     waveShape.style.display = 'none';
     document.querySelector('.endFunc').style.display = 'flex';
 
+    const template_image = document.getElementById('gallery').querySelector(`img[alt="${item_name}"]`).cloneNode();
     closeModalButton.click();
     if (!videoChat) {
-        openCamera.click();
+        await openCamera.click();
     }
     if (!find_item) {
         find_item = true;
         find_item_name = item_name;
         document.getElementById('captionText').textContent = `开始寻找${item_name}`
         const talk_speed = localStorage.getItem('speed') || 8;
-        socket.emit("agent_stream_audio", `##<state=2>${item_name}`, talk_speed);
+        socket.emit("agent_stream_audio", `开始寻找${item_name}`, talk_speed);
         startAudio();
+        await yoloDetectorInstance.getTemplate(template_image);
+        yoloDetectRealize(item_name, talk_speed);
+    }
+}
+
+async function yoloDetectRealize(item_name, talk_speed) {
+    while(find_item) {
+        // 创建 canvas 元素，用于绘制视频帧
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const context = canvas.getContext('2d');
+        
+        // 将视频帧绘制到 canvas 上
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        const detect_result = yoloDetectorInstance.detect(canvas);
+        canvas.remove(); // 从 DOM 中移除 canvas 元素
+        if (detect_result.length > 0) {
+        const left_loc = detect_result[0]["x"]
+        const top_loc = detect_result[0]["y"]
+        const item_loc_info = `${item_name}在画面${calcLocation(top_loc, left_loc)}。`;
+        document.getElementById('captionText').textContent = item_loc_info;
+        socket.emit("agent_stream_audio", item_loc_info, talk_speed);
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+
+        await new Promise(resolve => setTimeout(resolve, 1000));
     }
 }
 
@@ -885,16 +918,6 @@ window.onload = async () => {
 
     // 避障socket
     socket.on('obstacle_avoid', function (data) {
-        const user = localStorage.getItem('user');
-        if (data.user !== user) return;
-        const flag = data["flag"];
-        if (flag == "begin") {
-            captureAndSendFrame();
-        }
-    })
-
-    // 寻物socket
-    socket.on('find_item', function (data) {
         const user = localStorage.getItem('user');
         if (data.user !== user) return;
         const flag = data["flag"];

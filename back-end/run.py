@@ -112,6 +112,7 @@ def before_request():
         "/image",
         "/static/favicon.ico",
         "/static/manifest.json",
+        "/static/models",
     ]
 
     # 获取所有已注册的路由
