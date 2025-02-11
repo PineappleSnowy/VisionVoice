@@ -23,6 +23,10 @@ export default {
   async verifyToken(params) {
     console.log("[visionvoice][verifyToken] params:", params);
     return $ajax.post(`${baseUrl}/verify-token`, params)
+  },
+  async verifyCode(params) {
+    console.log("[visionvoice][verifyCode] params:", params);
+    return $ajax.post(`${baseUrl}/send-code`, params)
   }
 }
 
