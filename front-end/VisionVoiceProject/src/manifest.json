@@ -1,7 +1,7 @@
 {
   "package": "com.visionvoice.quick.app",
   "name": "visionvoice",
-  "versionName": "1.0.0.1",
+  "versionName": "1.0.0.2",
   "versionCode": 1,
   "minPlatformVersion": 1070,
   "icon": "/assets/images/logo.png",
@@ -52,7 +52,7 @@
     "widgets": {
       "IntroCard": {
         "name": "IntroCard",
-        "description": "VisionVoice 快应用卡片展示",
+        "description": "视界之声快应用卡片展示",
         "component": "index",
         "path": "/IntroCard",
         "minPlatformVersion": 1032,
@@ -72,10 +72,10 @@
     "titleBarTextColor": "#414141",
     "pages": {
       "pages/Content": {
-        "titleBarText": "VisionVoice 快应用"
+        "titleBarText": "视界之声快应用"
       },
       "pages/Login": {
-        "titleBarText": "VisionVoice 登录页"
+        "titleBarText": "视界之声登录页"
       }
     }
   },

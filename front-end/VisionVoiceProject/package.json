@@ -1,6 +1,6 @@
 {
   "name": "visionvoice",
-  "version": "1.0.0.1",
+  "version": "1.0.0.2",
   "description": "VisionVoice Quickapp",
   "scripts": {
     "start": "hap server --watch",

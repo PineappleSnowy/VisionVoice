@@ -840,9 +840,9 @@ def register():
         )
     )
 
-    if len(username) < 3 or len(password) < 6:
+    if len(username) < 3:
         return (
-            jsonify({"message": "用户名长度至少3位，密码长度至少6位", "code": 400}),
+            jsonify({"message": "用户名长度至少3位", "code": 400}),
             400,
         )
 
@@ -1015,7 +1015,7 @@ def login():
                         return jsonify({"message": "验证码已过期", "code": 400}), 400
                     
                     verify_code = phone_number.get("code")
-                    if verify_code != code:
+                    if int(verify_code) != int(code):
                         return jsonify({"message": "验证码错误", "code": 400}), 400
 
                     print("登录成功")
@@ -1343,6 +1343,7 @@ verification_code_dict = {}
 def send_code():
     data = request.get_json()
     phone = data.get("phone")
+    usage = data.get("usage")
 
     if not phone:
         return jsonify({"message": "手机号不能为空", "code": 400}), 400
@@ -1367,7 +1368,7 @@ def send_code():
     try:
         code = send_verification_code(phone)
         # 存储验证码
-        store_verification_code(phone, code, verification_code_dict)
+        store_verification_code(phone, code, usage, verification_code_dict)
         return jsonify({"message": "验证码发送成功", "code": 200}), 200
 
     except Exception as e:

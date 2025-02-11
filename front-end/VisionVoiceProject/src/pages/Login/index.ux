@@ -8,28 +8,70 @@
       if="isLoginVisible"
     >
       <text class="title">欢迎登录</text>
-      <div class="input-group">
-        <label target="username" aria-label="用户名">用户名:</label>
-        <input
-          type="text"
-          placeholder="请输入用户名"
-          id="username"
-          model:value="{{loginUsername}}"
-          aria-label="请输入用户名"
-        />
+      <div class="login-type-switch" if="isPhoneLogin">
+        <text id="phone-login" class="active" @click="handlePhoneLogin"
+          >手机验证码登录</text
+        >
+        <text id="password-login" @click="handlePasswordLogin"
+          >账号密码登录</text
+        >
+      </div>
+      <div class="login-type-switch" else>
+        <text id="phone-login" @click="handlePhoneLogin">手机验证码登录</text>
+        <text id="password-login" class="active" @click="handlePasswordLogin"
+          >账号密码登录</text
+        >
+      </div>
+      <div class="login-type-phone" id="login-type-phone" if="isPhoneLogin">
+        <div class="input-group">
+          <label target="phone_number" aria-label="手机号">手机号:</label>
+          <input
+            type="text"
+            placeholder="请输入手机号"
+            id="phone_number"
+            model:value="{{loginPhoneNumber}}"
+            aria-label="请输入手机号"
+          />
+        </div>
+
+        <div class="input-group">
+          <label target="login-verify-code" aria-label="验证码">验证码:</label>
+          <input
+            type="login-verify-code"
+            placeholder="请输入验证码"
+            id="login-verify-code"
+            model:value="{{loginVerifyCode}}"
+            aria-label="请输入验证码"
+          />
+          <text class="get-code-btn-login" @click="handleGetVerifyCode"
+            >获取验证码</text
+          >
+        </div>
       </div>
 
-      <div class="input-group password">
-        <label target="password" aria-label="密码">密码:</label>
-        <input
-          type="password"
-          placeholder="请输入密码"
-          id="password"
-          model:value="{{loginPassword}}"
-          aria-label="请输入密码"
-        />
-      </div>
+      <div class="login-type-password" id="login-type-password" else>
+        <div class="input-group">
+          <label target="username" aria-label="用户名">用户名:</label>
+          <input
+            type="text"
+            placeholder="请输入用户名"
+            id="username"
+            model:value="{{loginUsername}}"
+            aria-label="请输入用户名"
+          />
+        </div>
 
+        <div class="input-group password">
+          <label target="password" aria-label="密码">密码:</label>
+          <input
+            type="password"
+            placeholder="请输入密码"
+            id="password"
+            model:value="{{loginPassword}}"
+            aria-label="请输入密码"
+          />
+        </div>
+      </div>
       <div class="message" id="login_message" style="display: none"></div>
       <text id="login_button" aria-label="登录" @click="handleLogin">登录</text>
       <text class="register-link">
@@ -63,6 +105,16 @@
           aria-label="请输入用于显示的昵称"
         />
       </div>
+      <div class="input-group">
+        <label target="register_phone_number" aria-label="昵称">手机号:</label>
+        <input
+          type="text"
+          placeholder="请输入手机号"
+          id="register_phone_number"
+          model:value="{{registerPhoneNumber}}"
+          aria-label="请输入手机号"
+        />
+      </div>
 
       <div class="input-group">
         <label target="register_password" aria-label="密码">密码:</label>
@@ -88,6 +140,20 @@
         />
       </div>
 
+      <div class="input-group">
+        <label target="register_verify_code" aria-label="昵称">验证码:</label>
+        <input
+          type="text"
+          placeholder="请输入验证码"
+          id="register_verify_code"
+          model:value="{{registerVerifyCode}}"
+          aria-label="请在右边按钮获取验证码"
+        />
+        <text class="get-code-btn-register" @click="handleGetVerifyCode"
+          >获取验证码</text
+        >
+      </div>
+
       <div class="message" id="register_message" style="display: none"></div>
       <text id="register_button" aria-label="注册" @click="handleRegister"
         >注册</text
@@ -108,23 +174,24 @@ import webviewUtils from '../../helper/webviewUtils'
 
 export default {
   data: {
+    loginPhoneNumber: "",
+    loginVerifyCode: "",
     loginUsername: "",
     loginPassword: "",
     registerUsername: "",
     registerNickname: "",
     registerPassword: "",
     registerConfirmPassword: "",
+    registerPhoneNumber: "",
+    registerVerifyCode: "",
     isLoginVisible: true,
+    isPhoneLogin: true,
   },
 
-  // onInit() {
-    // storageUtils.clearAll();
-  //   webviewUtils.deleteCookie("token");
-  //   webviewUtils.deleteCookie("username");
-  //   webviewUtils.deleteCookie("nickname");
-  // },
-
   async onShow() {
+    storageUtils.deleteData('username');
+    storageUtils.deleteData('password');
+    storageUtils.deleteData('token');
     await this.checkAuthAndRedirect();
   },
 
@@ -132,61 +199,105 @@ export default {
     this.isLoginVisible = !this.isLoginVisible;
   },
 
-  async handleLogin() {
-    storageUtils.saveData("loginUsername", this.loginUsername)
-    storageUtils.saveData("loginPassword", this.loginPassword)
-
-    if (!this.loginUsername || !this.loginPassword) {
-      console.log("用户名和密码不能为空")
-      utils.showToast("用户名和密码不能为空")
-      return;
+  handlePhoneLogin() {
+    const phoneLogin = this.$element('phone-login');
+    if (phoneLogin.attr.class != 'active') {
+      this.isPhoneLogin = !this.isPhoneLogin;
     }
+  },
 
-    try {
-      const encryptedPassword = SHA256(this.loginPassword);
+  handlePasswordLogin() {
+    const passwordLogin = this.$element('password-login');
+    if (passwordLogin.attr.class != 'active') {
+      this.isPhoneLogin = !this.isPhoneLogin;
+    }
+  },
 
-      const response = await $apis.visionvoice.login({
-        data: {
-          username: this.loginUsername,
-          password: encryptedPassword
-        },
-        header: {
-          "Content-Type": "application/json"
-        }
-      });
+  async handleLogin() {
+    if (this.isPhoneLogin) {
+      storageUtils.saveData("loginUsername", this.loginPhoneNumber)
+      storageUtils.saveData("loginUsername", this.loginVerifyCode)
 
-      console.log("[login][handleLogin] response:", response);
-      const data = JSON.parse(response.data.data);
-      console.log("[login][handleLogin] data:", data);
-      utils.showToast(data.message);
-
-      if (response.data.code === 200) {
-        storageUtils.saveData("token", data.access_token);
-        storageUtils.saveData("username", this.loginUsername);
-        storageUtils.saveData("nickname", data.user_info.nickname);
-        this.gotoVisionVoice(data.access_token, this.loginUsername, data.user_info.nickname);
-
-        // router.replace({
-        //   uri: "/pages/Content",
-        //   // uri: "https://pineapplesnowy.cn/",
-        //   params: {
-        //     ___PARAM_PAGE_ANIMATION___: {
-        //       openEnter: 'none',
-        //       closeEnter: 'slide',
-        //       openExit: 'slide',
-        //       closeExit: 'slide'
-        //     }
-        //   }
-        // });
+      if (!this.loginPhoneNumber || !this.loginVerifyCode) {
+        console.log("手机号和验证码不能为空")
+        utils.showToast("手机号和验证码不能为空")
+        return;
       }
-    } catch (error) {
-      console.error('Error:', error);
+
+      try {
+        const response = await $apis.visionvoice.login({
+          data: {
+            login_type: 'phone',
+            phone: this.loginPhoneNumber,
+            code: this.loginVerifyCode,
+            usage: 'login',
+          },
+          header: {
+            "Content-Type": "application/json"
+          }
+        });
+
+        console.log("[login][handleLogin] response:", response);
+        const data = JSON.parse(response.data.data);
+        console.log("[login][handleLogin] data:", data);
+        utils.showToast(data.message);
+
+        if (response.data.code === 200) {
+          storageUtils.saveData("token", data.access_token);
+          storageUtils.saveData("username", this.loginUsername);
+          storageUtils.saveData("nickname", data.user_info.nickname);
+          this.gotoVisionVoice(data.access_token, this.loginUsername, data.user_info.nickname);
+        }
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    } else {
+      storageUtils.saveData("loginUsername", this.loginUsername)
+      storageUtils.saveData("loginPassword", this.loginPassword)
+
+      if (!this.loginUsername || !this.loginPassword) {
+        console.log("用户名和密码不能为空")
+        utils.showToast("用户名和密码不能为空")
+        return;
+      }
+
+      try {
+        const encryptedPassword = SHA256(this.loginPassword);
+
+        const response = await $apis.visionvoice.login({
+          data: {
+            login_type: 'password',
+            username: this.loginUsername,
+            password: encryptedPassword,
+            usage: 'login'
+          },
+          header: {
+            "Content-Type": "application/json"
+          }
+        });
+
+        console.log("[login][handleLogin] response:", response);
+        const data = JSON.parse(response.data.data);
+        console.log("[login][handleLogin] data:", data);
+        utils.showToast(data.message);
+
+        if (response.data.code === 200) {
+          storageUtils.saveData("token", data.access_token);
+          storageUtils.saveData("username", this.loginUsername);
+          storageUtils.saveData("nickname", data.user_info.nickname);
+          this.gotoVisionVoice(data.access_token, this.loginUsername, data.user_info.nickname);
+        }
+      } catch (error) {
+        console.error('Error:', error);
+      }
     }
   },
 
   async handleRegister() {
 
-    if (!this.registerNickname || !this.registerUsername || !this.registerPassword || !this.registerConfirmPassword) {
+    if (!this.registerNickname || !this.registerUsername ||
+      !this.registerPassword || !this.registerConfirmPassword ||
+      !this.registerPhoneNumber || !this.registerVerifyCode) {
       utils.showToast("请填写完整信息");
       return;
     }
@@ -203,7 +314,9 @@ export default {
         data: {
           username: this.registerUsername,
           password: encryptedPassword,
-          nickname: this.registerNickname
+          nickname: this.registerNickname,
+          phone: this.registerPhoneNumber,
+          code: this.registerVerifyCode,
         },
         header: {
           'Content-Type': 'application/json'
@@ -217,21 +330,10 @@ export default {
       if (response.data.code === 200) {
         storageUtils.saveData("token", data.access_token);
         storageUtils.saveData("username", this.registerUsername);
-        storageUtils.saveData("nickname", data.user_info.nickname);
+        storageUtils.saveData("nickname", this.registerNickname);
         this.gotoVisionVoice(data.access_token, this.registerUsername, this.registerNickname);
-
-        // router.replace({
-        //   // uri: "https://pineapplesnowy.cn/",
-        //   uri: "/pages/Content",
-        //   params: {
-        //     ___PARAM_PAGE_ANIMATION___: {
-        //       openEnter: 'none',
-        //       closeEnter: 'slide',
-        //       openExit: 'slide',
-        //       closeExit: 'slide'
-        //     }
-        //   }
-        // });
+      } else {
+        utils.showToast("注册失败，请重试");
       }
     } catch (error) {
       console.error('Error:', error);
@@ -239,10 +341,65 @@ export default {
     }
   },
 
+  async handleGetVerifyCode() {
+    if (this.isLoginVisible) {
+      if (this.loginPhoneNumber) {
+        try {
+          const response = await $apis.visionvoice.verifyCode({
+            data: {
+              phone: this.loginPhoneNumber,
+              usage: 'login'
+            },
+            header: {
+              "Content-Type": "application/json"
+            }
+          });
+
+          console.log("[login][handleLogin] response:", response);
+          const data = JSON.parse(response.data.data);
+
+          if (response.data.code === 200) {
+            utils.showToast("验证码发送成功");
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          utils.showToast("出错啦，请检查网络")
+        }
+      } else {
+        utils.showToast("请输入手机号");
+      }
+
+    } else {
+      
+      if (this.registerPhoneNumber) {
+        try {
+          const response = await $apis.visionvoice.verifyCode({
+            data: {
+              phone: this.registerPhoneNumber,
+              usage: 'register'
+            },
+            header: {
+              "Content-Type": "application/json"
+            }
+          });
+
+          console.log("[login][handleLogin] response:", response);
+          const data = JSON.parse(response.data.data);
+
+          if (response.data.code === 200) {
+            utils.showToast("验证码发送成功");
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          utils.showToast("出错啦，请检查网络")
+        }
+      } else {
+        utils.showToast("请输入手机号");
+      }
+    }
+  },
+
   async gotoVisionVoice(token, username, nickname) {
-    // const token = await storageUtils.getData("token");
-    // const username = await storageUtils.getData("username");
-    // const nickname = await storageUtils.getData("nickname");
     if (token && username && nickname) {
       webviewUtils.setCookie("token", token);
       webviewUtils.setCookie("username", username);
@@ -255,7 +412,7 @@ export default {
     const token = await storageUtils.getData("token");
     const username = await storageUtils.getData("username");
     const nickname = await storageUtils.getData("nickname");
-    console.log("[login][checkAuth] token:", token);
+    // console.log("[login][checkAuth] token:", token);
     if (!token) {
       utils.showToast("请先登录");
       return;
@@ -282,13 +439,13 @@ export default {
   justify-content: center;
   align-items: center;
   box-sizing: border-box;
-  background-image: url('./../../assets/images/background.jpg');
-  background-size: cover;
+  background-color: #121212;
 }
 
 /* ----- 登录容器样式 ----- */
 
 .input-group {
+  display: flex;
   flex-direction: column;
   margin-bottom: 1.5 * @size-factor;
 }
@@ -311,8 +468,43 @@ input {
 
 input:focus {
   outline: none;
-  border-color: #5b61b9;
+  border-color: #3eb575;
 }
+
+.login-type-password,
+.login-type-phone {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.login-type-switch {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 20px;
+  border-radius: 5px;
+  background-color: #f5f5f5;
+  padding: 3px;
+}
+
+.login-type-switch text {
+  flex: 1;
+  text-align: center;
+  padding: 8px 0;
+  color: #000;
+  cursor: pointer;
+  z-index: 1;
+  transition: color 0.3s ease;
+}
+
+.login-type-switch .active {
+  background-color: #3eb575;
+  color: #fff;
+}
+
+/* ----- 注册容器样式 -----  */
 
 /* 登录和注册共有的样式 start
 ----------------------------------- */
@@ -337,7 +529,7 @@ input:focus {
   #register_button {
     width: 100%;
     padding: 12px;
-    background-color: #5b61b9;
+    background-color: #3eb575;
     color: white;
     border: none;
     border-radius: 5px;
@@ -363,13 +555,27 @@ input:focus {
 
   .login-link a,
   .register-link a {
-    color: #5b61b9;
+    color: #3eb575;
     text-decoration: none;
   }
 
   .login-link a:hover,
   .register-link a:hover {
     text-decoration: underline;
+  }
+
+  .get-code-btn-register,
+  .get-code-btn-login {
+    position: absolute;
+    padding: 0.66 * @size-factor;
+    right: 0;
+    bottom: 0;
+    width: max-content;
+    background-color: #3eb575;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
   }
 }
 

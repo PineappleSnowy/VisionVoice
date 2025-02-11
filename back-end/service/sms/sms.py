@@ -63,7 +63,7 @@ def send_verification_code(phone_number: str) -> str:
         raise Exception(f"验证码发送失败: {str(error)}")
 
 
-def store_verification_code(phone_number: str, code: str, verification_code_dict: dict):
+def store_verification_code(phone_number: str, code: str, usage: str, verification_code_dict: dict):
     """存储验证码和时间戳"""
     try:
         with open("./configs/verification_code_dict.json", "r") as f:
@@ -74,6 +74,7 @@ def store_verification_code(phone_number: str, code: str, verification_code_dict
     verification_code_dict[phone_number] = {
         "code": code,
         "timestamp": time.time(),  # 当前时间戳
+        "usage": usage,
     }
 
     with open("./configs/verification_code_dict.json", "w") as f:
