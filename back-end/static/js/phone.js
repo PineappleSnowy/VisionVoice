@@ -310,7 +310,7 @@ function captureAndSendFrame() {
                             const distant = data["obstacle_info"][0]["distant"]
                             const left_loc = data["obstacle_info"][0]["left"]
                             const top_loc = data["obstacle_info"][0]["top"]
-                            const obstacle_loc_info = `画面${calcLocation(top_loc, left_loc)}${detected_item}距离${distant.toFixed(2)}米。`;
+                            const obstacle_loc_info = `画面 ${calcLocation(top_loc, left_loc)} ${detected_item}距离${distant.toFixed(2)}米。`;
                             document.getElementById('captionText').textContent = obstacle_loc_info;
                             socket.emit("agent_stream_audio", obstacle_loc_info, talk_speed);
                             // 设置等待时间
@@ -500,12 +500,14 @@ function exitFuncModel() {
         startCheckSilenceTimer()
         finishShutUpStatus()
         exit_obstacle_void()
+        document.getElementById('captionText').textContent = '避障模式已退出'
     }
     else if (find_item) {
         stopAudio()
         startCheckSilenceTimer()
         finishShutUpStatus()
         exit_find_item()
+        document.getElementById('captionText').textContent = '寻物模式已退出'
     }
 }
 
