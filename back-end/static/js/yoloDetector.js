@@ -277,7 +277,7 @@ class YoloDetector {
         this.inputShape = null;
         this.templateFeature = [];
         this.templateClass = null;
-        this.init();
+        // this.init();
         this.minSimilarityThreshold = 0.3;
         this.maxSimilarityThreshold = 0.7;
     }
@@ -527,8 +527,8 @@ class YoloDetector {
             return [{
                 class: distanceDicAll[labelMin][0],
                 distance: distanceDicAll[labelMin][1],
-                left: distanceDicAll[labelMin][2],
-                top: distanceDicAll[labelMin][3]
+                x: distanceDicAll[labelMin][2],
+                y: distanceDicAll[labelMin][3]
             }]
         } catch (error){
             console.error('检测过程发生错误:', error);

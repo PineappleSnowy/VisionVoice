@@ -309,38 +309,7 @@ function captureAndSendFrame() {
                 }
                 else {
                     console.log('Frame uploaded successfully:', data);
-                    if (state == 1 && "obstacle_info" in data) {
-                        if (data["obstacle_info"].length != 0) {
-                            const detected_item = data["obstacle_info"][0]["label"];
-                            const distant = data["obstacle_info"][0]["distant"]
-                            const left_loc = data["obstacle_info"][0]["left"]
-                            const top_loc = data["obstacle_info"][0]["top"]
-                            const obstacle_loc_info = `画面${calcLocation(top_loc, left_loc)}${detected_item}距离${distant.toFixed(2)}米。`;
-                            document.getElementById('captionText').textContent = obstacle_loc_info;
-                            socket.emit("agent_stream_audio", obstacle_loc_info, talk_speed);
-                            // 设置等待时间
-                            setTimeout(function () {
-                                captureAndSendFrame()
-                            }, 1);
-                        }
-                        else { captureAndSendFrame() }
-                    }
-
-                    else if (state == 2 && "item_info" in data) {
-                        if (data['item_info'].length != 0) {
-                            const left_loc = data["item_info"][0]["left"]
-                            const top_loc = data["item_info"][0]["top"]
-                            const item_loc_info = `${find_item_name}在画面${calcLocation(top_loc, left_loc)}。`;
-                            document.getElementById('captionText').textContent = item_loc_info;
-                            socket.emit("agent_stream_audio", item_loc_info, talk_speed);
-                            setTimeout(function () {
-                                captureAndSendFrame()
-                            }, 1);
-                        }
-                        else { captureAndSendFrame() }
-                    }
-
-                    else if (state == 0) {
+                    if (state == 0) {
                         image_upload_ready = true;
                         formChat(curr_talk_index)
                     }
@@ -351,40 +320,6 @@ function captureAndSendFrame() {
             });
     }
 }
-
-// 前端避障，尚在开发
-// async function loadModel() {
-//     const model = await cocoSsd.load();
-//     return model;
-// }
-
-// async function detectFrame(model) {
-//     const canvas = document.querySelector('.frame-window');
-//     canvas.width = video.videoWidth;
-//     canvas.height = video.videoHeight;
-//     const context = canvas.getContext('2d');
-//     const predictions = await model.detect(video);
-//     context.clearRect(0, 0, canvas.width, canvas.height);
-//     context.drawImage(video, 0, 0, canvas.width, canvas.height);
-//     predictions.forEach(prediction => {
-//         context.beginPath();
-//         context.rect(...prediction.bbox);
-//         context.lineWidth = 2;
-//         context.strokeStyle = 'red';
-//         context.fillStyle = 'red';
-//         context.font = '0.2rem Arial';
-//         context.stroke();
-//         context.fillText(prediction.class, prediction.bbox[0], prediction.bbox[1] > 10 ? prediction.bbox[1] - 5 : 10);
-//     });
-//     canvas.style.display = 'block';
-//     video.style.display = 'none';
-//     requestAnimationFrame(() => detectFrame(model));
-// }
-
-// async function main() {
-//     const model = await loadModel();
-//     detectFrame(model);
-// }
 
 function calcLocation(top, left) {
     let x_describe = '';
@@ -486,13 +421,16 @@ function startCheckSilenceTimer() {
 function exit_obstacle_void() {
     state = 0
     obstacle_avoid = false;
-    // socket.emit("agent_stream_audio", "##<state=1 exit>");
 }
 
 // 退出寻物
 function exit_find_item() {
     state = 0
     find_item = false;
+    if (yoloDetectorInstance)
+    {
+        yoloDetectorInstance.release();  // 释放物品模板资源
+    }
 }
 
 // 退出功能模式
@@ -512,8 +450,10 @@ function exitFuncModel() {
     }
 }
 
+let yoloDetectorInstance = null;  // YoloDetector 实例
+
 // 避障启动函数
-function startAvoidObstacle() {
+async function startAvoidObstacle() {
     state = 1;
     stopCheckSilenceTimer()
     stopAudio()
@@ -529,17 +469,21 @@ function startAvoidObstacle() {
     }
     if (!obstacle_avoid) {
         obstacle_avoid = true;
-        document.getElementById('captionText').textContent = '避障模式已开启'
+        document.getElementById('captionText').innerHTML = '避障模式已开启'
         const talk_speed = localStorage.getItem('speed') || 8;
         socket.emit("agent_stream_audio", "##<state=1>", talk_speed);
         startAudio()
+        if (!yoloDetectorInstance) {
+            document.getElementById('captionText').innerHTML += '<br>模型正在初始化...';
+            yoloDetectorInstance = new YoloDetector();  // 创建 YoloDetector 实例
+            await yoloDetectorInstance.init();  // 等待模型初始化完成
+            document.getElementById('captionText').innerHTML += '<br>模型初始化完成';
+        }
+        yoloDetectRealize('', talk_speed, 'obstacle_avoid');
     }
 }
 
 // 寻物启动函数
-let find_item_name = '';
-let yoloDetectorInstance = new YoloDetector();  // 创建 YoloDetector 实例
-
 window.startFindItem = async function (item_name) {
     state = 2;
     stopCheckSilenceTimer();
@@ -547,7 +491,7 @@ window.startFindItem = async function (item_name) {
     finishShutUpStatus();
     statusDiv.textContent = "寻物模式";
     if (vudio.dance()) { vudio.pause(); }
-    
+
     waveShape.style.display = 'none';
     document.querySelector('.endFunc').style.display = 'flex';
 
@@ -558,39 +502,62 @@ window.startFindItem = async function (item_name) {
     }
     if (!find_item) {
         find_item = true;
-        find_item_name = item_name;
-        document.getElementById('captionText').textContent = `开始寻找${item_name}`
+        const start_text = `开始寻找${item_name}`;
+        document.getElementById('captionText').innerHTML = start_text;
         const talk_speed = localStorage.getItem('speed') || 8;
-        socket.emit("agent_stream_audio", `开始寻找${item_name}`, talk_speed);
+        socket.emit("agent_stream_audio", `##<state=2>${item_name}`, talk_speed);
         startAudio();
+        if (!yoloDetectorInstance) {
+            document.getElementById('captionText').innerHTML += '<br>模型正在初始化...';
+            yoloDetectorInstance = new YoloDetector();  // 创建 YoloDetector 实例
+            await yoloDetectorInstance.init();  // 等待模型初始化完成
+            document.getElementById('captionText').innerHTML += '<br>模型初始化完成';
+        }
+        document.getElementById('captionText').innerHTML += '<br>正在加载物品模板...';
         await yoloDetectorInstance.getTemplate(template_image);
-        yoloDetectRealize(item_name, talk_speed);
+        document.getElementById('captionText').innerHTML += '<br>物品模板加载完毕';
+        yoloDetectRealize(item_name, talk_speed, 'find_item');
     }
 }
 
-async function yoloDetectRealize(item_name, talk_speed) {
-    while(find_item) {
+async function yoloDetectRealize(item_name, talk_speed, mode) {
+    // 模式不同，退出条件不同
+    while (find_item && mode == 'find_item' || obstacle_avoid && mode == 'obstacle_avoid') {
         // 创建 canvas 元素，用于绘制视频帧
         const canvas = document.createElement('canvas');
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
         const context = canvas.getContext('2d');
-        
+
         // 将视频帧绘制到 canvas 上
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-        const detect_result = yoloDetectorInstance.detect(canvas);
+        let detect_result = [];
+        if (mode == 'find_item') {
+            detect_result = await yoloDetectorInstance.detect(canvas);
+        }
+        else {
+            detect_result = await yoloDetectorInstance.detect_obs(canvas);
+        }
         canvas.remove(); // 从 DOM 中移除 canvas 元素
+
+        let item_loc_info = '';
         if (detect_result.length > 0) {
-        const left_loc = detect_result[0]["x"]
-        const top_loc = detect_result[0]["y"]
-        const item_loc_info = `${item_name}在画面${calcLocation(top_loc, left_loc)}。`;
-        document.getElementById('captionText').textContent = item_loc_info;
-        socket.emit("agent_stream_audio", item_loc_info, talk_speed);
-        await new Promise(resolve => setTimeout(resolve, 1000));
+            const left_loc = detect_result[0]["x"]
+            const top_loc = detect_result[0]["y"]
+            if (mode == 'find_item') {
+                item_loc_info = `${item_name}在画面${calcLocation(top_loc, left_loc)}。`;
+            }
+            else {
+                const obs_dis = detect_result[0]["distance"];
+                const detected_item = detect_result[0]["class"];
+                item_loc_info = `画面${calcLocation(top_loc, left_loc)}${detected_item}距离${obs_dis.toFixed(2)}米。`;
+            }
+            document.getElementById('captionText').innerHTML = item_loc_info;
+            socket.emit("agent_stream_audio", item_loc_info, talk_speed);
+            await new Promise(resolve => setTimeout(resolve, 1000));
         }
 
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise(resolve => setTimeout(resolve, 10));  // 防止处理超速
     }
 }
 
@@ -915,17 +882,6 @@ window.onload = async () => {
             formChat(curr_talk_index);
         }
     })
-
-    // 避障socket
-    socket.on('obstacle_avoid', function (data) {
-        const user = localStorage.getItem('user');
-        if (data.user !== user) return;
-        const flag = data["flag"];
-        if (flag == "begin") {
-            captureAndSendFrame();
-        }
-    })
-
     /* 处理音频识别 end 
     ------------------------------------------------------------*/
 
