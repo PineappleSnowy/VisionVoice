@@ -292,7 +292,6 @@ function captureAndSendFrame() {
         canvas.remove();
 
         const token = localStorage.getItem('token');
-        const talk_speed = localStorage.getItem('speed') || 8;
         fetch('/agent/upload_image', {
             method: 'POST',
             headers: {
