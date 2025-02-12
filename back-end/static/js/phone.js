@@ -240,7 +240,7 @@ function formChat(talk_index) {
         speech_rec_ready = false;
         image_upload_ready = false;
         if (state == 0) {
-            document.getElementById('captionText').textContent = '';
+            document.getElementById('captionText').innerHTML = '';
             const token = localStorage.getItem('token');
             const talk_speed = localStorage.getItem('speed') || 8;
             startAudio()
@@ -440,12 +440,14 @@ function exitFuncModel() {
         startCheckSilenceTimer()
         finishShutUpStatus()
         exit_obstacle_void()
+        document.getElementById('captionText').innerHTML = '避障模式已退出';
     }
     else if (find_item) {
         stopAudio()
         startCheckSilenceTimer()
         finishShutUpStatus()
         exit_find_item()
+        document.getElementById('captionText').innerHTML = '寻物模式已退出';
     }
 }
 
@@ -513,7 +515,13 @@ window.startFindItem = async function (item_name) {
             document.getElementById('captionText').innerHTML += '<br>模型初始化完成';
         }
         document.getElementById('captionText').innerHTML += '<br>正在加载物品模板...';
-        await yoloDetectorInstance.getTemplate(template_image);
+        const template_state = await yoloDetectorInstance.getTemplate(template_image);
+        if (template_state == -1)
+        {
+            document.querySelector('.endFunc').click();
+            document.getElementById('captionText').innerHTML = '物品模板加载失败<br>寻物模式已退出<br><em>建议使用更清晰的物品模板，并不以人为主体</em>';
+            return;
+        }
         document.getElementById('captionText').innerHTML += '<br>物品模板加载完毕';
         yoloDetectRealize(item_name, talk_speed, 'find_item');
     }
@@ -549,7 +557,7 @@ async function yoloDetectRealize(item_name, talk_speed, mode) {
             else {
                 const obs_dis = detect_result[0]["distance"];
                 const detected_item = detect_result[0]["class"];
-                item_loc_info = `画面${calcLocation(top_loc, left_loc)}${detected_item}距离${obs_dis.toFixed(2)}米。`;
+                item_loc_info = `画面${calcLocation(top_loc, left_loc)} ${detected_item}距离${obs_dis.toFixed(2)}米。`;
             }
             document.getElementById('captionText').innerHTML = item_loc_info;
             socket.emit("agent_stream_audio", item_loc_info, talk_speed);
@@ -1044,7 +1052,7 @@ window.onload = async () => {
         if (vudio.dance()) { vudio.pause() }
         let location_result = await requestLocaion();
         let location_info = location_result['location_info']
-        document.getElementById('captionText').textContent = location_info;
+        document.getElementById('captionText').innerHTML = location_info;
         const talk_speed = localStorage.getItem('speed') || 8;
         socket.emit("agent_stream_audio", location_info, talk_speed);
         startAudio();
