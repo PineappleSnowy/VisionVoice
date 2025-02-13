@@ -9,5 +9,9 @@
     },
     "zhipu": {
         "api_key": ""
+    },
+    "alibaba": {
+        "access_key_id": "",
+        "access_key_secret": ""
     }
 }

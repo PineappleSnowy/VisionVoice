@@ -475,7 +475,7 @@ async function startAvoidObstacle() {
         socket.emit("agent_stream_audio", "##<state=1>", talk_speed);
         startAudio()
         if (!yoloDetectorInstance) {
-            document.getElementById('captionText').innerHTML += '<br>模型正在初始化...';
+            document.getElementById('captionText').innerHTML += '<br>模型正在初始化...<em>（第一次较慢）</em>';
             yoloDetectorInstance = new YoloDetector();  // 创建 YoloDetector 实例
             await yoloDetectorInstance.init();  // 等待模型初始化完成
             document.getElementById('captionText').innerHTML += '<br>模型初始化完成';
@@ -509,7 +509,7 @@ window.startFindItem = async function (item_name) {
         socket.emit("agent_stream_audio", `##<state=2>${item_name}`, talk_speed);
         startAudio();
         if (!yoloDetectorInstance) {
-            document.getElementById('captionText').innerHTML += '<br>模型正在初始化...';
+            document.getElementById('captionText').innerHTML += '<br>模型正在初始化...<em>（第一次较慢）</em>';
             yoloDetectorInstance = new YoloDetector();  // 创建 YoloDetector 实例
             await yoloDetectorInstance.init();  // 等待模型初始化完成
             document.getElementById('captionText').innerHTML += '<br>模型初始化完成';
