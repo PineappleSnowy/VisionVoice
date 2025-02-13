@@ -12,6 +12,9 @@
     <!-- 引入fa字体图标和音频可视化库 -->
     <script src="https://kit.fontawesome.com/11023f265d.js" crossorigin="anonymous"></script>
     <script src="../static/js/vudio.js"></script>
+    <!-- 引入tensorflow.js和mobilenet模型 -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.15.0/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet"></script>
 </head>
 
 <body>
@@ -67,8 +70,7 @@
     <script src="../static/js/lib/recorder.js"></script>
     <script type="module" src="../static/js/lib/audioUtils.js"></script>
     <script type="module" src="../static/js/phone.js"></script>
-    <!-- <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"></script> -->
+    <script src="../static/js/yoloDetector.js"></script>
     <script>
         function startFindItem(item_name) {
             // 这里可以是一个空函数，具体实现已经在phone.js中

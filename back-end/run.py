@@ -112,6 +112,7 @@ def before_request():
         "/image",
         "/static/favicon.ico",
         "/static/manifest.json",
+        "/static/models",
     ]
 
     # 获取所有已注册的路由
@@ -1540,45 +1541,16 @@ def agent_stream_audio(current_token: str, talk_speed: int = 8):
                 "agent_play_audio_chunk",
                 {"user": user, "index": 0, "audio_chunk": audio_chunk},
             )
-            socketio.emit("obstacle_avoid", {"user": user, "flag": "begin"})
         # 状态2处理
-        elif "##<state=2" in current_token:
-            if "##<state=2>" in current_token:
-                # 使用用户物品模板初始化寻物检测器
-                file_path = os.path.join(
-                    USER_IMAGE_FOLDER,
-                    user,
-                    "item_images",
-                    current_token[current_token.find(">") + 1 :] + ".jpg",
-                )
-
-                audio_chunk = agent_audio_generate(
-                    "开始寻找" + current_token[current_token.find(">") + 1 :],
-                    talk_speed,
-                )
-                socketio.emit(
-                    "agent_play_audio_chunk",
-                    {"user": user, "index": 0, "audio_chunk": audio_chunk},
-                )
-                init_state = detector.detect_init(cv2.imread(file_path, 1))
-                if init_state != 0:
-                    audio_file_path = "./agent_files/find_item_fail.wav"
-                    with open(audio_file_path, "rb") as audio_file:
-                        audio_chunk = audio_file.read()
-                    socketio.emit(
-                        "agent_play_audio_chunk",
-                        {"user": user, "index": 0, "audio_chunk": audio_chunk},
-                    )
-                    return (
-                        jsonify({"message": "未识别到模板图中的目标", "item_info": []}),
-                        400,
-                    )
-                socketio.emit("find_item", {"user": user, "flag": "begin"})
-            elif current_token == "##<state=2 exit>":
-                detector.release()
-                return
-        else:
-            return
+        elif "##<state=2>" in current_token:
+            audio_chunk = agent_audio_generate(
+                "开始寻找" + current_token[current_token.find(">") + 1 :],
+                talk_speed,
+            )
+            socketio.emit(
+                "agent_play_audio_chunk",
+                {"user": user, "index": 0, "audio_chunk": audio_chunk},
+            )
 
     else:
         if not USER_VAR[user]["is_streaming"]:

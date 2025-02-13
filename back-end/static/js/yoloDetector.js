@@ -1,5 +1,5 @@
-const resnetModelPath = '/static/models/resnet-v2-tfjs-50-feature-vector-v2/model.json';
-const yoloModelPath = '/static/models/yolo11x-seg_web_model/model.json';
+// const resnetModelPath = '/static/models/resnet-v2-tfjs-50-feature-vector-v2/model.json';
+const yoloModelPath = '/static/models/yolo11s_web_model/model.json';
 
 const labels = [
     "person", "bicycle", "car", "motorcycle", "airplane", "bus", "train", "truck", "boat",
@@ -14,7 +14,6 @@ const labels = [
     "refrigerator", "book", "clock", "vase", "scissors", "teddy bear", "hair drier",
     "toothbrush"
 ];
-
 
 const labelen_ch = {
     "person": "人",
@@ -107,8 +106,8 @@ async function loadModel() {
     console.log('当前缓存的模型:', models);
 
     try {
-        if (models['indexeddb://yolo11x-seg_web_model']) {
-            yoloModel = await tf.loadGraphModel('indexeddb://yolo11x-seg_web_model');
+        if (models['indexeddb://yolo11s_web_model']) {
+            yoloModel = await tf.loadGraphModel('indexeddb://yolo11s_web_model');
             console.log("成功从缓存中加载yolo模型");
         } else {
             throw new Error('yolo模型在缓存中未找到');
@@ -118,7 +117,7 @@ async function loadModel() {
         yoloModel = await tf.loadGraphModel(yoloModelPath);
         console.log("成功从本地加载yolo模型");
         try {
-            await yoloModel.save('indexeddb://yolo11x-seg_web_model');
+            await yoloModel.save('indexeddb://yolo11s_web_model');
             console.log("成功将yolo模型保存到缓存");
         } catch (saveError) {
             console.error('保存yolo模型到缓存失败:', saveError);
@@ -126,21 +125,26 @@ async function loadModel() {
     }
 
     try {
-        if (models['indexeddb://resnet-50-model']) {
-            featureModel = await tf.loadGraphModel('indexeddb://resnet-50-model');
-            console.log("成功从缓存中加载resnet-50模型");
+        if (models['indexeddb://mobilenet-model']) {
+            featureModel = await tf.loadGraphModel('indexeddb://mobilenet-model');
+            console.log("成功从缓存中加载mobilenet模型");
         } else {
-            throw new Error('resnet-50模型在缓存中未找到');
+            throw new Error('mobilenet模型在缓存中未找到');
         }
     } catch (error) {
-        console.error('从缓存加载resnet-50模型失败:', error);
-        featureModel = await tf.loadGraphModel(resnetModelPath);
-        console.log("成功从本地加载resnet-50模型");
+        console.error('从缓存加载mobilenet模型失败:', error);
+        // featureModel = await tf.loadGraphModel(resnetModelPath);
+        const mobileNetModel = await mobilenet.load({
+            version: 2,
+            alpha: 1.0
+        });
+        featureModel = mobileNetModel.model;    // 获取内部的 tf.GraphModel
+        console.log("成功从CDN加载mobilenet模型");
         try {
-            await featureModel.save('indexeddb://resnet-50-model');
-            console.log("成功将resnet-50模型保存到缓存");
+            await featureModel.save('indexeddb://mobilenet-model');
+            console.log("成功将mobilenet模型保存到缓存");
         } catch (saveError) {
-            console.error('保存resnet-50模型到缓存失败:', saveError);
+            console.error('保存mobilenet模型到缓存失败:', saveError);
         }
     }
 
@@ -148,12 +152,12 @@ async function loadModel() {
 }
 
 async function preprocessImage(img) {
-    return tf.tidy(() => {
-        let tensor = tf.browser.fromPixels(img);
-        tensor = tf.image.resizeBilinear(tensor, [224, 224]);
-        tensor = tensor.toFloat().div(tf.scalar(127.5)).sub(tf.scalar(1));
-        return tensor.expandDims(0);
-    });
+    return tf.tidy(() =>
+        tf.browser.fromPixels(img)
+            .resizeBilinear([224, 224])
+            .div(255.0)
+            .expandDims()
+    );
 }
 
 async function extractDeepFeatures(image) {
@@ -176,8 +180,8 @@ async function extractDeepFeatures(image) {
 }
 
 async function extractMultiScaleFeatures(image) {
-    const angles = [0];
-    const scales = [1];
+    const angles = [0, 90, 180, 270];
+    const scales = [2];
     let allFeatures = [];
 
     try {
@@ -201,15 +205,20 @@ async function extractMultiScaleFeatures(image) {
                 );
 
                 // 缩放处理
-                const scaledCanvas = document.createElement('canvas');
-                const scaledCtx = scaledCanvas.getContext('2d');
-                scaledCanvas.width = Math.round(rotatedCanvas.width * scale);
-                scaledCanvas.height = Math.round(rotatedCanvas.height * scale);
-                scaledCtx.drawImage(
-                    rotatedCanvas,
-                    0, 0,
-                    scaledCanvas.width, scaledCanvas.height
-                );
+                let scaledCanvas;
+                if (rotatedCanvas.width * rotatedCanvas.height < 30000) {
+                    scaledCanvas = document.createElement('canvas');
+                    const scaledCtx = scaledCanvas.getContext('2d');
+                    scaledCanvas.width = Math.round(rotatedCanvas.width * scale);
+                    scaledCanvas.height = Math.round(rotatedCanvas.height * scale);
+                    scaledCtx.drawImage(
+                        rotatedCanvas,
+                        0, 0,
+                        scaledCanvas.width, scaledCanvas.height
+                    );
+                } else {
+                    scaledCanvas = rotatedCanvas;
+                }
 
                 const features = await extractDeepFeatures(scaledCanvas);
                 if (features) {
@@ -231,7 +240,6 @@ async function extractMultiScaleFeatures(image) {
         // 融合所有特征
         const combinedFeatures = new Array(allFeatures[0].length).fill(0);
         for (let i = 0; i < combinedFeatures.length; i++) {
-            // 使用最大值融合
             combinedFeatures[i] = Math.max(...allFeatures.map(f => f[i]));
         }
 
@@ -248,6 +256,22 @@ function computeSimilarity(feature1, feature2) {
             return 0;
         }
 
+        // 曼哈顿距离
+        let manhattanDistance = 0;
+        for (let i = 0; i < feature1.length; i++) {
+            manhattanDistance += Math.abs(feature1[i] - feature2[i]);
+        }
+        const manhattanSimilarity = 1 / (1 + manhattanDistance);
+
+        // 欧氏距离
+        let euclideanDistance = 0;
+        for (let i = 0; i < feature1.length; i++) {
+            euclideanDistance += Math.pow(feature1[i] - feature2[i], 2);
+        }
+        euclideanDistance = Math.sqrt(euclideanDistance);
+        const euclideanSimilarity = 1 / (1 + euclideanDistance);
+
+        // 余弦相似度
         let dotProduct = 0;
         let magnitudeA = 0;
         let magnitudeB = 0;
@@ -261,10 +285,12 @@ function computeSimilarity(feature1, feature2) {
         const cosineSimilarity = dotProduct / (magnitudeA * magnitudeB);
 
         console.log('相似度详情:', {
+            曼哈顿相似度: manhattanSimilarity.toFixed(4),
+            欧氏相似度: euclideanSimilarity.toFixed(4),
             余弦相似度: cosineSimilarity.toFixed(4)
         });
 
-        return cosineSimilarity;
+        return manhattanSimilarity + euclideanSimilarity + cosineSimilarity;
     } catch (error) {
         console.error('计算相似度时出错:', error);
         return 0;
@@ -277,9 +303,19 @@ class YoloDetector {
         this.inputShape = null;
         this.templateFeature = [];
         this.templateClass = null;
-        this.init();
-        this.minSimilarityThreshold = 0.3;
-        this.maxSimilarityThreshold = 0.7;
+        // this.init();  // 在类外部再显示初始化，便于进程统一
+        this.minSimilarityThreshold = 0.37;
+        this.maxSimilarityThreshold = 0.47;
+        this.categoryGroups = {
+            '餐具': ['fork', 'knife', 'spoon', 'bowl', 'cup', 'wine glass', 'bottle'],
+            '电子设备': ['tv', 'laptop', 'mouse', 'remote', 'keyboard', 'cell phone'],
+            '家具': ['chair', 'couch', 'bed', 'dining table', 'bench'],
+            '厨房电器': ['microwave', 'oven', 'toaster', 'refrigerator', 'sink'],
+            '食物': ['banana', 'apple', 'sandwich', 'orange', 'broccoli', 'carrot', 'hot dog', 'pizza', 'donut', 'cake'],
+            '交通工具': ['bicycle', 'car', 'motorcycle', 'airplane', 'bus', 'train', 'truck', 'boat'],
+            '动物': ['bird', 'cat', 'dog', 'horse', 'sheep', 'cow', 'elephant', 'bear', 'zebra', 'giraffe'],
+            '运动器材': ['frisbee', 'skis', 'snowboard', 'sports ball', 'kite', 'baseball bat', 'baseball glove', 'skateboard', 'surfboard', 'tennis racket']
+        };
     }
 
     async init() {
@@ -373,6 +409,15 @@ class YoloDetector {
         return threshold;
     }
 
+    getCategory(className) {
+        for (const [category, items] of Object.entries(this.categoryGroups)) {
+            if (items.includes(className)) {
+                return category;
+            }
+        }
+        return className; // 如果没有找到对应的类别组，返回原始类别
+    }
+
     async detect(image, options = {}) {
         if (!this.initialized) {
             console.error('模型未初始化');
@@ -390,9 +435,12 @@ class YoloDetector {
             }
 
             let results = [];
+            const templateCategory = this.getCategory(this.templateClass);
+
             for (let detection of detections) {
-                if (detection.class !== this.templateClass) {
-                    console.log(`跳过不匹配的类别: ${detection.class}, 期望类别: ${this.templateClass}`);
+                const detectionCategory = this.getCategory(detection.class);
+                if (detectionCategory !== templateCategory) {
+                    console.log(`跳过不匹配的类别组: ${detectionCategory}, 期望类别组: ${templateCategory}`);
                     continue;
                 }
 
@@ -436,8 +484,10 @@ class YoloDetector {
 
             // 选择最佳匹配结果
             const bestResult = results.reduce((best, current) => {
-                const bestScore = best.similarity / best.threshold;
-                const currentScore = current.similarity / current.threshold;
+                const bestScore = best.similarity;
+                const currentScore = current.similarity;
+                // const bestScore = best.similarity / best.threshold;
+                // const currentScore = current.similarity / current.threshold;                
                 return currentScore > bestScore ? current : best;
             }, results[0]);
 
@@ -471,8 +521,10 @@ class YoloDetector {
     async detect_obs(image, options = {}) {
         if (!this.initialized) {
             console.error('模型未初始化');
-            yoloModel = await loadModel();
+            [yoloModel, featureModel] = await loadModel();
             console.log("模型加载成功");
+            this.inputShape = yoloModel.inputs[0].shape;
+            this.initialized = this.inputShape != null;
         }
 
         let distanceDic = {}; // 用于比较，获取最近障碍物标签以及距离
@@ -527,8 +579,8 @@ class YoloDetector {
             return [{
                 class: distanceDicAll[labelMin][0],
                 distance: distanceDicAll[labelMin][1],
-                left: distanceDicAll[labelMin][2],
-                top: distanceDicAll[labelMin][3]
+                x: distanceDicAll[labelMin][2],
+                y: distanceDicAll[labelMin][3]
             }]
         } catch (error){
             console.error('检测过程发生错误:', error);
@@ -567,8 +619,8 @@ class YoloDetector {
         if (!this.initialized) { throw new Error("请先调用initialize()初始化模型"); }
 
         const defaults = {
-            scoreThreshold: 0.45,
-            iouThreshold: 0.35,
+            scoreThreshold: 0.35,
+            iouThreshold: 0.45,
             maxDetections: 20
         };
         const config = { ...defaults, ...options };
