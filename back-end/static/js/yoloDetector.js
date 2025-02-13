@@ -1,4 +1,4 @@
-const resnetModelPath = '/static/models/resnet-v2-tfjs-50-feature-vector-v2/model.json';
+// const resnetModelPath = '/static/models/resnet-v2-tfjs-50-feature-vector-v2/model.json';
 const yoloModelPath = '/static/models/yolo11s_web_model/model.json';
 
 const labels = [
@@ -125,21 +125,26 @@ async function loadModel() {
     }
 
     try {
-        if (models['indexeddb://resnet-50-model']) {
-            featureModel = await tf.loadGraphModel('indexeddb://resnet-50-model');
-            console.log("成功从缓存中加载resnet-50模型");
+        if (models['indexeddb://mobilenet-model']) {
+            featureModel = await tf.loadGraphModel('indexeddb://mobilenet-model');
+            console.log("成功从缓存中加载mobilenet模型");
         } else {
-            throw new Error('resnet-50模型在缓存中未找到');
+            throw new Error('mobilenet模型在缓存中未找到');
         }
     } catch (error) {
-        console.error('从缓存加载resnet-50模型失败:', error);
-        featureModel = await tf.loadGraphModel(resnetModelPath);
-        console.log("成功从本地加载resnet-50模型");
+        console.error('从缓存加载mobilenet模型失败:', error);
+        // featureModel = await tf.loadGraphModel(resnetModelPath);
+        const mobileNetModel = await mobilenet.load({
+            version: 2,
+            alpha: 1.0
+        });
+        featureModel = mobileNetModel.model;    // 获取内部的 tf.GraphModel
+        console.log("成功从CDN加载mobilenet模型");
         try {
-            await featureModel.save('indexeddb://resnet-50-model');
-            console.log("成功将resnet-50模型保存到缓存");
+            await featureModel.save('indexeddb://mobilenet-model');
+            console.log("成功将mobilenet模型保存到缓存");
         } catch (saveError) {
-            console.error('保存resnet-50模型到缓存失败:', saveError);
+            console.error('保存mobilenet模型到缓存失败:', saveError);
         }
     }
 
