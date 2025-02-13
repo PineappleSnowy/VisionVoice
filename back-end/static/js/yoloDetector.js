@@ -1,5 +1,5 @@
 const resnetModelPath = '/static/models/resnet-v2-tfjs-50-feature-vector-v2/model.json';
-const yoloModelPath = '/static/models/yolo11x-seg_web_model/model.json';
+const yoloModelPath = '/static/models/yolo11s_web_model/model.json';
 
 const labels = [
     "person", "bicycle", "car", "motorcycle", "airplane", "bus", "train", "truck", "boat",
@@ -106,8 +106,8 @@ async function loadModel() {
     console.log('当前缓存的模型:', models);
 
     try {
-        if (models['indexeddb://yolo11x-seg_web_model']) {
-            yoloModel = await tf.loadGraphModel('indexeddb://yolo11x-seg_web_model');
+        if (models['indexeddb://yolo11s_web_model']) {
+            yoloModel = await tf.loadGraphModel('indexeddb://yolo11s_web_model');
             console.log("成功从缓存中加载yolo模型");
         } else {
             throw new Error('yolo模型在缓存中未找到');
@@ -117,7 +117,7 @@ async function loadModel() {
         yoloModel = await tf.loadGraphModel(yoloModelPath);
         console.log("成功从本地加载yolo模型");
         try {
-            await yoloModel.save('indexeddb://yolo11x-seg_web_model');
+            await yoloModel.save('indexeddb://yolo11s_web_model');
             console.log("成功将yolo模型保存到缓存");
         } catch (saveError) {
             console.error('保存yolo模型到缓存失败:', saveError);
