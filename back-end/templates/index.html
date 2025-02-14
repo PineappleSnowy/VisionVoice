@@ -13,14 +13,14 @@
 
 <body>
     <!-- 登录容器 -->
-    <div class="login-container" role="form" aria-label="登录表单">
+    <div class="login-container" id="login-container" role="form" aria-label="登录表单">
         <h2>欢迎登录</h2>
         <div class="login-type-switch">
             <span id="phone_login" class="active">手机验证码登录</span>
             <span id="password_login">账号密码登录</span>
-            <div class="slider"></div>
+            <div class="slider" id="slider"></div>
         </div>
-        <div class="login-type-password" style="display: none;">
+        <div class="login-type-password" id="login-type-password" style="display: none;">
             <div class="input-group">
                 <label for="username" aria-label="用户名">用户名:</label>
                 <input type="text" placeholder="请输入用户名" id="username" aria-label="请输入用户名">
@@ -32,7 +32,7 @@
             </div>
         </div>
 
-        <div class="login-type-phone">
+        <div class="login-type-phone" id="login-type-phone">
             <div class="input-group">
                 <label for="login_phone" aria-label="手机号">手机号:</label>
                 <input type="text" placeholder="请输入手机号" id="login_phone" aria-label="请输入手机号">
@@ -56,7 +56,7 @@
     </div>
 
     <!-- 注册容器 -->
-    <div class="register-container" role="form" aria-label="注册表单" style="display: none;">
+    <div class="register-container" id="register-container" role="form" aria-label="注册表单" style="display: none;">
         <h2>用户注册</h2>
         <div class="input-group">
             <label for="register_username" aria-label="用户名">用户名:</label>
