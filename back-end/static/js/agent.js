@@ -848,3 +848,25 @@ window.onload = async () => {
 
 /* 处理环境噪音获取 end
 ----------------------------------------------------------*/
+
+// 删除聊天记录按钮
+document.getElementById('delete-chat-history').addEventListener('click', function () {
+    const token = localStorage.getItem('token');
+    fetch('/delete-chat-history', {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ agent_name: selectedAgent })
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message === 'success') {
+                messagebackground.innerHTML = '';
+            }
+        })
+        .catch(error => {
+            console.error('Error deleting chat history:', error);
+        });
+});

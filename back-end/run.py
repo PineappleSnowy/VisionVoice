@@ -93,13 +93,15 @@ def before_request():
         or request.path == "/get_audio"
         or request.path == "/get_image_des"
         or request.path == "/album_talk"
+        or request.path == "/delete-chat-history"
     ):
         try:
             verify_jwt_in_request()
         except Exception as e:
             return (
                 jsonify(
-                    {"message": "Token has expired!", "code": 401, "error": str(e)}
+                    {"message": "Token has expired!",
+                        "code": 401, "error": str(e)}
                 ),
                 401,
             )
@@ -257,8 +259,10 @@ def settings():
 def get_images():
     images = []
     curr_user = get_jwt_identity()
-    user_image_folder = os.path.join(USER_IMAGE_FOLDER, curr_user, "item_images")
-    user_album_folder = os.path.join(USER_IMAGE_FOLDER, curr_user, "album", "images")
+    user_image_folder = os.path.join(
+        USER_IMAGE_FOLDER, curr_user, "item_images")
+    user_album_folder = os.path.join(
+        USER_IMAGE_FOLDER, curr_user, "album", "images")
 
     if not os.path.exists(user_image_folder):
         os.makedirs(user_image_folder)
@@ -277,12 +281,14 @@ def get_images():
         if not os.path.exists(talk_speed_config_path):  # 初始化语速配置文件
             with open(talk_speed_config_path, "w") as f:
                 album_images = os.listdir(
-                    os.path.join(USER_IMAGE_FOLDER, curr_user, "album", "images")
+                    os.path.join(USER_IMAGE_FOLDER,
+                                 curr_user, "album", "images")
                 )
                 album_images_withot_ext = [
                     os.path.splitext(image)[0] for image in album_images
                 ]
-                talk_speed_config = {image: 8 for image in album_images_withot_ext}
+                talk_speed_config = {
+                    image: 8 for image in album_images_withot_ext}
                 json.dump(talk_speed_config, f)
     else:
         target_folder = user_image_folder
@@ -316,16 +322,19 @@ def get_images():
 def get_image(user, filename):
     mode = request.args.get("mode", "find_item")
     if mode == "album":
-        user_image_folder = os.path.join(USER_IMAGE_FOLDER, user, "album", "images")
+        user_image_folder = os.path.join(
+            USER_IMAGE_FOLDER, user, "album", "images")
     else:
-        user_image_folder = os.path.join(USER_IMAGE_FOLDER, user, "item_images")
+        user_image_folder = os.path.join(
+            USER_IMAGE_FOLDER, user, "item_images")
     return send_from_directory(user_image_folder, filename)
 
 
 @app.route("/rename_image", methods=["POST"])
 def rename_image():
     curr_user = get_jwt_identity()
-    user_image_folder = os.path.join(USER_IMAGE_FOLDER, curr_user, "item_images")
+    user_image_folder = os.path.join(
+        USER_IMAGE_FOLDER, curr_user, "item_images")
 
     data = request.get_json()
     old_name = data["oldName"]
@@ -364,7 +373,8 @@ def gen_time_random_name():
 @app.route("/save_item_image", methods=["POST"])
 def save_item_image():
     curr_user = get_jwt_identity()
-    user_image_folder = os.path.join(USER_IMAGE_FOLDER, curr_user, "item_images")
+    user_image_folder = os.path.join(
+        USER_IMAGE_FOLDER, curr_user, "item_images")
 
     if "file" not in request.files:
         return jsonify({"success": False, "error": "No file part"}), 400
@@ -449,7 +459,8 @@ def save_album_images():
         if filename:
             try:
                 image_filename = filename + ".jpg"
-                image_folder = os.path.join(user_image_folder, "album", "images")
+                image_folder = os.path.join(
+                    user_image_folder, "album", "images")
                 image_save_path = os.path.join(image_folder, image_filename)
                 file.save(image_save_path)
                 saved_images.append(
@@ -463,7 +474,8 @@ def save_album_images():
                 des_audio = agent_audio_generate(image_des, talk_speed)
 
                 audio_file_name = filename + ".mp3"
-                audio_folder = os.path.join(user_image_folder, "album", "audios")
+                audio_folder = os.path.join(
+                    user_image_folder, "album", "audios")
                 audio_file_path = os.path.join(audio_folder, audio_file_name)
                 if not os.path.exists(audio_folder):
                     os.makedirs(audio_folder)
@@ -808,7 +820,8 @@ def encode_message_content(message):
     """对消息内容进行 Base64 编码"""
     if isinstance(message, dict) and "content" in message:
         content = message["content"]
-        encoded_content = base64.b64encode(content.encode("utf-8")).decode("utf-8")
+        encoded_content = base64.b64encode(
+            content.encode("utf-8")).decode("utf-8")
         message["content"] = encoded_content
     return message
 
@@ -932,12 +945,14 @@ def register():
             json.dump(users, f, indent=4, ensure_ascii=False)
 
         # 注册成功后直接生成 token
-        access_token = create_access_token(identity=username, expires_delta=False)
+        access_token = create_access_token(
+            identity=username, expires_delta=False)
         session["username"] = username
         session["nickname"] = nickname
 
         return (
-            jsonify({"message": "注册成功", "code": 200, "access_token": access_token}),
+            jsonify({"message": "注册成功", "code": 200,
+                    "access_token": access_token}),
             200,
         )
 
@@ -1122,7 +1137,8 @@ def get_chat_history():
         return jsonify({"error": str(e)}), 401
 
     # 对聊天记录进行解码
-    chat_history = [decode_message_content(msg.copy()) for msg in encoded_chat_history]
+    chat_history = [decode_message_content(
+        msg.copy()) for msg in encoded_chat_history]
 
     return jsonify(chat_history)
 
@@ -1141,7 +1157,8 @@ def init_chat_history(current_user, agent_name, messages):
                 encoded_chat_history = user["agents"][agent_name]["chat_history"]
                 break
     # 对聊天记录进行解码
-    messages = [decode_message_content(msg.copy()) for msg in encoded_chat_history]
+    messages = [decode_message_content(msg.copy())
+                for msg in encoded_chat_history]
 
     return messages
 
@@ -1226,7 +1243,8 @@ def build_response(current_user, agent_name, user_talk, video_open, multi_image_
             img_path = os.path.join(multi_image_dir, image_file)
             with open(img_path, "rb") as f:
                 img_base = base64.b64encode(f.read()).decode("utf-8")
-            content.append({"type": "image_url", "image_url": {"url": img_base}})
+            content.append(
+                {"type": "image_url", "image_url": {"url": img_base}})
         delete_file_from_dir(multi_image_dir)  # 及时清空图片缓存
 
         content.append(
@@ -1408,7 +1426,8 @@ def upload_image():
 
         # 获取当前是否是多图片对话
         if "multi_image_index" in data:
-            multi_image_dir = os.path.join(user_cache_dir, MULTI_IMAGE_DIRECTORY)
+            multi_image_dir = os.path.join(
+                user_cache_dir, MULTI_IMAGE_DIRECTORY)
             if not os.path.exists(multi_image_dir):
                 os.makedirs(multi_image_dir)
             print(data["multi_image_index"])
@@ -1446,7 +1465,8 @@ def upload_image():
                 obstacle_info = obstacle_avoid_realize(mat_image)
                 print("[run.py][upload_image] obstacle_info:", obstacle_info)
                 return (
-                    jsonify({"message": "Success", "obstacle_info": obstacle_info}),
+                    jsonify({"message": "Success",
+                            "obstacle_info": obstacle_info}),
                     200,
                 )
             except Exception as e:
@@ -1502,7 +1522,8 @@ def agent_upload_audio():
     file.save(audio_file_path)
 
     # 修改采样率
-    resampled_audio_data = change_sample_rate(audio_file_path, 16000, ori_sample_rate)
+    resampled_audio_data = change_sample_rate(
+        audio_file_path, 16000, ori_sample_rate)
 
     # 语音识别
     rec_result = speech_rec(resampled_audio_data)
@@ -1510,7 +1531,8 @@ def agent_upload_audio():
 
     # 音频识别结果发送到前端
     socketio.emit(
-        "agent_speech_recognition_finished", {"user": user, "rec_result": rec_result}
+        "agent_speech_recognition_finished", {
+            "user": user, "rec_result": rec_result}
     )
 
     return jsonify({"message": "File uploaded successfully and processed"}), 200
@@ -1555,7 +1577,7 @@ def agent_stream_audio(current_token: str, talk_speed: int = 8):
         # 状态2处理
         elif "##<state=2>" in current_token:
             audio_chunk = agent_audio_generate(
-                "开始寻找" + current_token[current_token.find(">") + 1 :],
+                "开始寻找" + current_token[current_token.find(">") + 1:],
                 talk_speed,
             )
             socketio.emit(
@@ -1578,7 +1600,8 @@ def agent_stream_audio(current_token: str, talk_speed: int = 8):
 
         # 如果收到结束标记
         if "<END>" in current_token:
-            logging.info("run.py", "agent_stream_audio", "大模型响应结束", color="red")
+            logging.info("run.py", "agent_stream_audio",
+                         "大模型响应结束", color="red")
 
             # 处理缓冲区中剩余的内容
             if USER_VAR[user]["sentence_buffer"]:
@@ -1602,11 +1625,12 @@ def agent_stream_audio(current_token: str, talk_speed: int = 8):
 
         # 如果找到断句符号，则生成完整句子
         complete_sentence = (
-            USER_VAR[user]["sentence_buffer"] + current_token[: pause_index + 1]
+            USER_VAR[user]["sentence_buffer"] +
+            current_token[: pause_index + 1]
         )
 
         # 更新缓冲区
-        USER_VAR[user]["sentence_buffer"] = current_token[pause_index + 1 :]
+        USER_VAR[user]["sentence_buffer"] = current_token[pause_index + 1:]
 
         # 将音频生成任务加入队列
         USER_VAR[user]["task_queue"].add_task_sync(
@@ -1643,6 +1667,30 @@ def process_audio_stream(user):
         except Exception as e:
             logging.error("run.py", "process_audio_stream", f"处理音频流错误: {e}")
             break
+
+# 删除聊天记录
+
+
+@app.route("/delete-chat-history", methods=["POST"])
+def delete_chat_history():
+    data = request.get_json()
+    curr_user = get_jwt_identity()
+    agent_name = data.get("agent_name")
+
+    with open("./static/user.json", "r", encoding="utf-8") as f:
+        users = json.load(f)
+        for user in users:
+            if user["username"] == curr_user:
+                if agent_name == 'defaultAgent':
+                    user["agents"][agent_name]["chat_history"] = [
+                        {"role": "system", "content": "你是视界之声，一位乐于助人的对话助手。为了能让用户能尽快解决问题，你的话语总是十分简洁而概要。"}]
+                else:
+                    user["agents"][agent_name]["chat_history"] = []
+                break
+    with open("./static/user.json", "w", encoding="utf-8") as f:
+        json.dump(users, f, indent=4, ensure_ascii=False)
+
+    return jsonify({"message": "success"}), 200
 
 
 def run_server():

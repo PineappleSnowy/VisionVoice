@@ -472,6 +472,21 @@ p {
     z-index: 1;
 }
 
+#delete-chat-history {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 80px;
+    height: 45px;
+    background-image: url('../images/delete.png');
+    background-size: 40%;
+    background-repeat: no-repeat;
+    background-position: 10px center;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+}
+
 /* 音频控制按钮样式 */
 #audio-control {
     position: absolute;

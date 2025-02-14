@@ -560,8 +560,8 @@ class YoloDetector {
                 const y_centor = y + height / 2;
                 // const left = x_centor / image.width;
                 // const top = y_centor / image.height;
-                const left = x_centor / 480.0;
-                const top = y_centor / 480.0;
+                const left = x_centor / 640.0;
+                const top = y_centor / 640.0;
                 distanceDic[label_1] = distanceReal;
                 distanceDicAll[label_1] = [labelen_ch[label_0], distanceReal, left, top, y2]
             }
