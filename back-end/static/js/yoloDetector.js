@@ -135,6 +135,16 @@ async function loadModel() {
     } catch (error) {
         console.error('从缓存加载mobilenet模型失败:', error);
         // featureModel = await tf.loadGraphModel(resnetModelPath);
+        // 加载 MobileNet 模型
+        if (typeof mobilenet === 'undefined') {
+            console.log('正在加载 MobileNet 模型...');
+            await new Promise(resolve => {
+                const script2 = document.createElement('script');
+                script2.src = 'https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet';
+                script2.onload = resolve;
+                document.head.appendChild(script2);
+            });
+        }
         const mobileNetModel = await mobilenet.load({
             version: 2,
             alpha: 1.0
@@ -542,7 +552,7 @@ class YoloDetector {
                 const { x, y, width, height } = detection.bbox;
                 let label_0 = detection.class
                 const score = detection.score;
-                if(score <= 0.8){
+                if (score <= 0.8) {
                     label_0 = "unknown";
                 }
                 const roiCanvas = document.createElement('canvas');
@@ -567,10 +577,10 @@ class YoloDetector {
             }
             let labelMin, distanceMin;
             for (const [key, value] of Object.entries(distanceDic)) {
-              if (distanceMin === undefined || value < distanceMin) {
-                labelMin = key;
-                distanceMin = value;
-              }
+                if (distanceMin === undefined || value < distanceMin) {
+                    labelMin = key;
+                    distanceMin = value;
+                }
             }
 
             console.log('检测结果:', {
@@ -587,7 +597,7 @@ class YoloDetector {
                 left: distanceDicAll[labelMin][2],
                 top: distanceDicAll[labelMin][3]
             }]
-        } catch (error){
+        } catch (error) {
             console.error('检测过程发生错误:', error);
             return [];
         }

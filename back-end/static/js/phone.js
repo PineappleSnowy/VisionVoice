@@ -475,6 +475,7 @@ async function startAvoidObstacle() {
         startAudio()
         if (!yoloDetectorInstance) {
             document.getElementById('captionText').innerHTML += '<br>模型正在初始化...<em>（第一次较慢）</em>';
+            // 加载 Yolo 模型
             if (typeof tf === 'undefined') {
                 console.log('正在加载 Yolo 模型...');
                 await new Promise(resolve => {
@@ -533,16 +534,6 @@ window.startFindItem = async function (item_name) {
             document.getElementById('captionText').innerHTML += '<br>模型初始化完成';
         }
         document.getElementById('captionText').innerHTML += '<br>正在加载物品模板...';
-        // 加载 MobileNet 模型
-        if (typeof mobilenet === 'undefined') {
-            console.log('正在加载 MobileNet 模型...');
-            await new Promise(resolve => {
-                const script2 = document.createElement('script');
-                script2.src = 'https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet';
-                script2.onload = resolve;
-                document.head.appendChild(script2);
-            });
-        }
         const template_state = await yoloDetectorInstance.getTemplate(template_image);
         if (template_state == -1) {
             document.querySelector('.endFunc').click();
