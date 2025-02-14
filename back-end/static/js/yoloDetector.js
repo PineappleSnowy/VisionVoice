@@ -95,7 +95,8 @@ const labelen_ch = {
     "scissors": "剪刀",
     "teddy bear": "泰迪熊",
     "hair drier": "吹风机",
-    "toothbrush": "牙刷"
+    "toothbrush": "牙刷",
+    "unknown": "未知障碍物"
 };
 
 let yoloModel = null;
@@ -539,7 +540,11 @@ class YoloDetector {
             for (let detection of detections) {
                 i = i + 1;
                 const { x, y, width, height } = detection.bbox;
-                const label_0 = detection.class
+                let label_0 = detection.class
+                const score = detection.score;
+                if(score <= 0.8){
+                    label_0 = "unknown";
+                }
                 const roiCanvas = document.createElement('canvas');
                 const roiCtx = roiCanvas.getContext('2d');
                 roiCanvas.width = width;
