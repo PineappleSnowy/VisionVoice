@@ -222,17 +222,17 @@ login_button.addEventListener("click", (e) => {
 // 点击跳转至注册页面
 document.getElementById('go_to_register').addEventListener('click', function (e) {
     e.preventDefault();
-    document.querySelector('.login-container').style.display = 'none';
-    document.querySelector('.register-container').style.display = 'block';
+    document.getElementById('login-container').style.display = 'none';
+    document.getElementById('register-container').style.display = 'block';
 });
 
 // 点击切换登录方式
 document.addEventListener('DOMContentLoaded', function () {
     const passwordLogin = document.getElementById('password_login');
     const phoneLogin = document.getElementById('phone_login');
-    const slider = document.querySelector('.slider');
-    const phoneLoginContainer = document.querySelector('.login-type-phone');
-    const passwordLoginContainer = document.querySelector('.login-type-password');
+    const slider = document.getElementById('slider');
+    const phoneLoginContainer = document.getElementById('login-type-phone');
+    const passwordLoginContainer = document.getElementById('login-type-password');
 
     passwordLogin.addEventListener('click', function () {
         passwordLogin.classList.add('active');

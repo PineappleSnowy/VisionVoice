@@ -31,11 +31,11 @@ function getUserInfo() {
     const username = localStorage.getItem('username');
     const nickname = localStorage.getItem('nickname');
 
-    document.querySelector('.username').textContent = nickname;
-    document.querySelector('.user-account').textContent = `账号: ${username}`;
+    document.getElementById('username').textContent = nickname;
+    document.getElementById('user-account').textContent = `账号: ${username}`;
 
     if (username == 'CaraLin'){
-        document.querySelector('.avatar').src = '../static/images/CaraLin.jpg';
+        document.getElementById('avatar').src = '../static/images/CaraLin.jpg';
     }
 }
 

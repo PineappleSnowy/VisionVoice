@@ -83,12 +83,12 @@ document.getElementById('phone-button').addEventListener('click', function () {
 
 setInterval(() => {
     if (document.getElementById('agent-chat-textarea').value.trim() || uploadedImages.length > 0) {
-        document.querySelector('#send-button').style.display = 'inline-block';
-        document.querySelector('#more_function_button').style.display = 'none';
+        document.getElementById('send-button').style.display = 'inline-block';
+        document.getElementById('more_function_button').style.display = 'none';
         document.getElementById('agent-chat-textarea').style.right = '5.5rem';
     } else {
-        document.querySelector('#send-button').style.display = 'none';
-        document.querySelector('#more_function_button').style.display = 'flex';
+        document.getElementById('send-button').style.display = 'none';
+        document.getElementById('more_function_button').style.display = 'flex';
         document.getElementById('agent-chat-textarea').style.right = '2.9rem';
     }
 }, 100);
@@ -270,7 +270,7 @@ function sendMessageToAgent(message, multi_image_talk) {
 
 // 删除图片
 // 为 #imageUploadPanel 添加事件委托
-const imageList = document.querySelector('#imageUploadPanel .content .imageList');
+const imageList = document.getElementById('imageList');
 imageList.addEventListener('click', function (event) {
 
     // 找到当前按钮的父元素 .image
@@ -289,17 +289,17 @@ imageList.addEventListener('click', function (event) {
             // 从 DOM 中移除 .image 元素及其所有子元素
             imageContainer.remove();
             if (uploadedImages.length > 0) {
-                document.querySelector('#imageUploadPanel .content .add').style.display = 'flex';
-                document.querySelector('#imageUploadPanel').style.display = 'flex';
+                document.getElementById('addImg').style.display = 'flex';
+                document.getElementById('imageUploadPanel').style.display = 'flex';
             } else {
-                document.querySelector('#imageUploadPanel .content .add').style.display = 'none';
-                document.querySelector('#imageUploadPanel').style.display = 'none';
+                document.getElementById('addImg').style.display = 'none';
+                document.getElementById('imageUploadPanel').style.display = 'none';
             }
         }, 100);
     }
     setTimeout(()=>{
         if(uploadedImages){
-            document.querySelector('#imageUploadPanel .content .add').focus();
+            document.getElementById('addImg').focus();
         }else{
             document.getElementById('agent-chat-textarea').focus();
         }
@@ -312,13 +312,13 @@ document.getElementById('photo').addEventListener('click', function (e) {
 });
 
 // 添加图片
-document.querySelector('#imageUploadPanel .content .add').addEventListener('click', function () {
-    const input = document.querySelector('#imageUploadPanel .content .add input');
+document.getElementById('addImg').addEventListener('click', function () {
+    const input = document.getElementById('photo');
     input.removeAttribute('capture'); // 确保不包含 capture 属性
     input.click();
 });
 
-document.querySelector('#imageUploadPanel .content .add input').addEventListener('change', function (e) {
+document.getElementById('photo').addEventListener('change', function (e) {
     const file = e.target.files[0];
 
     if (!file) return; // 检查文件是否存在
@@ -332,7 +332,7 @@ document.querySelector('#imageUploadPanel .content .add input').addEventListener
     uploadedImages.push(file);
 
     // 在 .content 最前面插入包含上传图片的 <div> 结构
-    const imageList = document.querySelector('#imageUploadPanel .content .imageList');
+    const imageList = document.getElementById('imageList');
     const imageDiv = document.createElement('div');
     imageDiv.className = 'image';
 
@@ -362,12 +362,12 @@ document.querySelector('#imageUploadPanel .content .add input').addEventListener
     e.target.value = '';
 
     if (uploadedImages.length > 0) {
-        document.querySelector('#imageUploadPanel .content .add').style.display = 'flex';
+        document.getElementById('addImg').style.display = 'flex';
     } else {
-        document.querySelector('#imageUploadPanel .content .add').style.display = 'none';
+        document.getElementById('addImg').style.display = 'none';
     }
 
-    const addDiv = document.querySelector('#imageUploadPanel .content .add');
+    const addDiv = document.getElementById('addImg');
     setTimeout(()=>{
         addDiv.focus();
     },200);
@@ -375,7 +375,7 @@ document.querySelector('#imageUploadPanel .content .add input').addEventListener
 
 document.getElementById('album_photo').addEventListener('click', function () {
     const imageUploadPanel = document.getElementById('imageUploadPanel');
-    const input = document.querySelector('#imageUploadPanel .content .add input');
+    const input = document.getElementById('photo');
     input.removeAttribute('capture'); // 确保不包含 capture 属性
     imageUploadPanel.style.display = 'flex';
     input.click();
@@ -383,7 +383,7 @@ document.getElementById('album_photo').addEventListener('click', function () {
 
 document.getElementById('camera_photo').addEventListener('click', function () {
     const imageUploadPanel = document.getElementById('imageUploadPanel');
-    const input = document.querySelector('#imageUploadPanel .content .add input');
+    const input = document.getElementById('photo');
     input.setAttribute('capture', 'camera'); // 从相机上传
     imageUploadPanel.style.display = 'flex';
     input.click();
@@ -395,7 +395,7 @@ document.getElementById('camera_icon').addEventListener('click', function () {
 
 // 清空图片div
 function clearImageDiv() {
-    const imageList = document.querySelector('#imageUploadPanel .content .imageList');
+    const imageList = document.getElementById('imageList');
     imageList.innerHTML = ''; // 清空内容
     // 清空 uploadedImages 数组
     uploadedImages = [];
@@ -405,8 +405,8 @@ function clearImageDiv() {
 document.getElementById('more_function_button').addEventListener('click', function () {
     if (flag_board === 0) {
         flag_board = 1;
-        document.querySelector('#more_function_button').style.backgroundImage = "url('../static/images/more_function_end.png')";
-        document.querySelector('#more_function_button').ariaLabel = '关闭更多功能面板';
+        document.getElementById('more_function_button').style.backgroundImage = "url('../static/images/more_function_end.png')";
+        document.getElementById('more_function_button').ariaLabel = '关闭更多功能面板';
         if (!document.getElementById('chat-input-container').classList.contains('slide-up')) {
             document.getElementById('chat-input-container').classList.remove('slide-down');
             document.getElementById('chat-input-container').classList.add('slide-up');
@@ -420,8 +420,8 @@ document.getElementById('more_function_button').addEventListener('click', functi
 
     else {
         flag_board = 0;
-        document.querySelector('#more_function_button').style.backgroundImage = "url('../static/images/more_function_start.png')";
-        document.querySelector('#more_function_button').ariaLabel = '打开更多功能面板';
+        document.getElementById('more_function_button').style.backgroundImage = "url('../static/images/more_function_start.png')";
+        document.getElementById('more_function_button').ariaLabel = '打开更多功能面板';
         if (!document.getElementById('chat-input-container').classList.contains('slide-down')) {
             document.getElementById('chat-input-container').classList.remove('slide-up');
             document.getElementById('chat-input-container').classList.add('slide-down');
