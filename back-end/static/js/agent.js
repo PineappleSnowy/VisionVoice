@@ -864,6 +864,7 @@ document.getElementById('delete-chat-history').addEventListener('click', functio
         .then(data => {
             if (data.message === 'success') {
                 messagebackground.innerHTML = '';
+                console.log('Chat history deleted successfully.');
             }
         })
         .catch(error => {

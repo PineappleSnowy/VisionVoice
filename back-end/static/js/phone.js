@@ -426,8 +426,7 @@ function exit_obstacle_void() {
 function exit_find_item() {
     state = 0
     find_item = false;
-    if (yoloDetectorInstance)
-    {
+    if (yoloDetectorInstance) {
         yoloDetectorInstance.release();  // 释放物品模板资源
     }
 }
@@ -476,6 +475,15 @@ async function startAvoidObstacle() {
         startAudio()
         if (!yoloDetectorInstance) {
             document.getElementById('captionText').innerHTML += '<br>模型正在初始化...<em>（第一次较慢）</em>';
+            if (typeof tf === 'undefined') {
+                console.log('正在加载 Yolo 模型...');
+                await new Promise(resolve => {
+                    const script1 = document.createElement('script');
+                    script1.src = 'https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.15.0/dist/tf.min.js';
+                    script1.onload = resolve;
+                    document.head.appendChild(script1);
+                });
+            }
             yoloDetectorInstance = new YoloDetector();  // 创建 YoloDetector 实例
             await yoloDetectorInstance.init();  // 等待模型初始化完成
             document.getElementById('captionText').innerHTML += '<br>模型初始化完成';
@@ -510,14 +518,33 @@ window.startFindItem = async function (item_name) {
         startAudio();
         if (!yoloDetectorInstance) {
             document.getElementById('captionText').innerHTML += '<br>模型正在初始化...<em>（第一次较慢）</em>';
+            // 加载 Yolo 模型
+            if (typeof tf === 'undefined') {
+                console.log('正在加载 Yolo 模型...');
+                await new Promise(resolve => {
+                    const script1 = document.createElement('script');
+                    script1.src = 'https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.15.0/dist/tf.min.js';
+                    script1.onload = resolve;
+                    document.head.appendChild(script1);
+                });
+            }
             yoloDetectorInstance = new YoloDetector();  // 创建 YoloDetector 实例
             await yoloDetectorInstance.init();  // 等待模型初始化完成
             document.getElementById('captionText').innerHTML += '<br>模型初始化完成';
         }
         document.getElementById('captionText').innerHTML += '<br>正在加载物品模板...';
+        // 加载 MobileNet 模型
+        if (typeof mobilenet === 'undefined') {
+            console.log('正在加载 MobileNet 模型...');
+            await new Promise(resolve => {
+                const script2 = document.createElement('script');
+                script2.src = 'https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet';
+                script2.onload = resolve;
+                document.head.appendChild(script2);
+            });
+        }
         const template_state = await yoloDetectorInstance.getTemplate(template_image);
-        if (template_state == -1)
-        {
+        if (template_state == -1) {
             document.querySelector('.endFunc').click();
             document.getElementById('captionText').innerHTML = '物品模板加载失败<br>寻物模式已退出<br><em>建议使用更清晰的物品模板，并不以人为主体</em>';
             return;
@@ -903,8 +930,6 @@ window.onload = async () => {
     obstacleAvoidButton.addEventListener('click', () => {
         exitFuncModel();
         startAvoidObstacle();
-        // 前端避障，处开发阶段，尚未启用
-        // main()
     });
 
     // 寻物逻辑
