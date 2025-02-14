@@ -549,8 +549,8 @@ async function yoloDetectRealize(item_name, talk_speed, mode) {
 
         let item_loc_info = '';
         if (detect_result.length > 0) {
-            const left_loc = detect_result[0]["x"]
-            const top_loc = detect_result[0]["y"]
+            const left_loc = detect_result[0]["left"]
+            const top_loc = detect_result[0]["top"]
             if (mode == 'find_item') {
                 item_loc_info = `${item_name}在画面${calcLocation(top_loc, left_loc)}。`;
             }

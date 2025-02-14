@@ -496,8 +496,8 @@ class YoloDetector {
             const y_center = (bestResult.y + bestResult.height / 2) / image.height;
 
             console.log('检测结果:', {
-                x: x_center,
-                y: y_center,
+                left: x_center,
+                top: y_center,
                 width: bestResult.width / image.width,
                 height: bestResult.height / image.height,
                 similarity: bestResult.similarity,
@@ -506,8 +506,8 @@ class YoloDetector {
             });
 
             return [{
-                x: x_center,
-                y: y_center,
+                left: x_center,
+                top: y_center,
                 width: bestResult.width / image.width,
                 height: bestResult.height / image.height,
                 class: bestResult.class
@@ -584,8 +584,8 @@ class YoloDetector {
             return [{
                 class: distanceDicAll[labelMin][0],
                 distance: distanceDicAll[labelMin][1],
-                x: distanceDicAll[labelMin][2],
-                y: distanceDicAll[labelMin][3]
+                left: distanceDicAll[labelMin][2],
+                top: distanceDicAll[labelMin][3]
             }]
         } catch (error){
             console.error('检测过程发生错误:', error);
