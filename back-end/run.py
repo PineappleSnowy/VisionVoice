@@ -113,6 +113,7 @@ def before_request():
         "/static/favicon.ico",
         "/static/manifest.json",
         "/static/models",
+        "/static/service-worker.js",
     ]
 
     # 获取所有已注册的路由
