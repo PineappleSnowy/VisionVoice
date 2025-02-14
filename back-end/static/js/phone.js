@@ -14,10 +14,10 @@ const socket = io({
 let stream;
 const toggleCamera = document.querySelector('.toggleCamera');  // 切换摄像头
 const openCamera = document.querySelector('.openCamera');  // 打开摄像头
-const container = document.querySelector('.container');
+const container = document.getElementById('container');
 const video = document.querySelector('video');
-const img = document.querySelector('img');
-const waveShape = document.getElementById('#waveShape');
+const botImage = document.querySelector('#container img');
+const waveShape = document.getElementById('waveShape');
 let videoChat = false;
 let isFrontCamera = false;
 let state = 0;  // 状态标识，0：普通对话 1：避障 2：寻物
@@ -102,22 +102,22 @@ if (micClose === null) {
 }
 
 if (micClose) {
-    document.querySelector('.micButton').setAttribute('aria-label', '打开麦克风');
+    document.getElementById('micButton').setAttribute('aria-label', '打开麦克风');
     stopCheckSilenceTimer();
-    document.querySelector('.micButton').classList.add('mic-off');
+    document.getElementById('micButton').classList.add('mic-off');
 }
 else {
-    document.querySelector('.micButton').setAttribute('aria-label', '关闭麦克风');
+    document.getElementById('micButton').setAttribute('aria-label', '关闭麦克风');
 }
 
-document.querySelector('.micButton').addEventListener('click', function () {
-    if (document.querySelector('.micButton').classList.toggle('mic-off')) {
-        document.querySelector('.micButton').setAttribute('aria-label', '打开麦克风');
+document.getElementById('micButton').addEventListener('click', function () {
+    if (document.getElementById('micButton').classList.toggle('mic-off')) {
+        document.getElementById('micButton').setAttribute('aria-label', '打开麦克风');
         micClose = true;
         localStorage.setItem('micClose', micClose);
         stopCheckSilenceTimer();
     } else {
-        document.querySelector('.micButton').setAttribute('aria-label', '关闭麦克风');
+        document.getElementById('micButton').setAttribute('aria-label', '关闭麦克风');
         micClose = false;
         localStorage.setItem('micClose', micClose);
         startCheckSilenceTimer();
@@ -133,22 +133,22 @@ if (captionClose === null) {
 }
 
 if (captionClose) {
-    document.querySelector('.captionButton').setAttribute('aria-label', '打开字幕');
-    document.querySelector('.captionButton').classList.add('caption-off');
+    document.getElementById('captionButton').setAttribute('aria-label', '打开字幕');
+    document.getElementById('captionButton').classList.add('caption-off');
 }
 else {
-    document.querySelector('.captionButton').setAttribute('aria-label', '关闭字幕');
+    document.getElementById('captionButton').setAttribute('aria-label', '关闭字幕');
     document.getElementById('captionModal').style.display = 'block';
 }
 
-document.querySelector('.captionButton').addEventListener('click', function () {
-    if (document.querySelector('.captionButton').classList.toggle('caption-off')) {
-        document.querySelector('.captionButton').setAttribute('aria-label', '打开字幕');
+document.getElementById('captionButton').addEventListener('click', function () {
+    if (document.getElementById('captionButton').classList.toggle('caption-off')) {
+        document.getElementById('captionButton').setAttribute('aria-label', '打开字幕');
         captionClose = true;
         localStorage.setItem('captionClose', captionClose);
         document.getElementById('captionModal').style.display = 'none';
     } else {
-        document.querySelector('.captionButton').setAttribute('aria-label', '关闭字幕');
+        document.getElementById('captionButton').setAttribute('aria-label', '关闭字幕');
         captionClose = false;
         localStorage.setItem('captionClose', captionClose);
         document.getElementById('captionModal').style.display = 'block';
@@ -178,7 +178,7 @@ openCamera.addEventListener('click', async () => {
             video.style.display = 'block';
             container.classList.add('shifted');
             toggleCamera.style.display = 'block';
-            img.style.display = 'none';
+            botImage.style.display = 'none';
             goBack.style.color = 'white';
             toggleCamera.style.color = 'white';
         } else {
@@ -193,7 +193,7 @@ openCamera.addEventListener('click', async () => {
             video.style.display = 'null';
             container.classList.remove('shifted');
             toggleCamera.style.display = 'none';
-            img.style.display = 'block';
+            botImage.style.display = 'block';
             goBack.style.color = 'white';
         }
     } catch (err) {
@@ -570,7 +570,6 @@ async function yoloDetectRealize(item_name, talk_speed, mode) {
 
 window.onload = async () => {
     // 根据当前智能体选择设置智能体头像
-    const botImage = document.querySelector('.container img');
     if (selectedAgent === 'psychologicalAgent') {
         botImage.src = '../static/images/psychologicalAgent.jpg';
     } else {
