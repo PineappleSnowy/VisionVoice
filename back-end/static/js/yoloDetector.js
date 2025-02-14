@@ -96,7 +96,7 @@ const labelen_ch = {
     "teddy bear": "泰迪熊",
     "hair drier": "吹风机",
     "toothbrush": "牙刷",
-    "unknown": "未知障碍物"
+    "unknown": "障碍物"
 };
 
 let yoloModel = null;

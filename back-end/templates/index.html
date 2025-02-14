@@ -20,7 +20,7 @@
             <span id="password_login">账号密码登录</span>
             <div class="slider"></div>
         </div>
-        <div class="login-type-password"  style="display: none;">
+        <div class="login-type-password" style="display: none;">
             <div class="input-group">
                 <label for="username" aria-label="用户名">用户名:</label>
                 <input type="text" placeholder="请输入用户名" id="username" aria-label="请输入用户名">
@@ -42,7 +42,8 @@
                     <label for="phone_code" aria-label="手机验证码">验证码:</label>
                     <input type="text" placeholder="请输入手机验证码" id="phone_code" aria-label="请输入手机验证码">
                 </div>
-                <button id="get_code_btn_login" style="position: absolute; right: 0; bottom: 0; width: 120px; height: 40px; background: #3eb575; color: white; border: none; border-radius: 5px; cursor: pointer;">获取验证码</button>
+                <button id="get_code_btn_login"
+                    style="position: absolute; right: 0; bottom: 0; width: 120px; height: 40px; background: #3eb575; color: white; border: none; border-radius: 5px; cursor: pointer;">获取验证码</button>
             </div>
         </div>
 
@@ -89,7 +90,8 @@
                 <label for="register_code" aria-label="验证码">验证码:</label>
                 <input type="text" placeholder="请输入验证码" id="register_code" aria-label="请输入验证码">
             </div>
-            <button id="get_code_btn_register" style="position: absolute; right: 0; bottom: 0; width: 120px; height: 40px; background: #3eb575; color: white; border: none; border-radius: 5px; cursor: pointer;">获取验证码</button>
+            <button id="get_code_btn_register"
+                style="position: absolute; right: 0; bottom: 0; width: 120px; height: 40px; background: #3eb575; color: white; border: none; border-radius: 5px; cursor: pointer;">获取验证码</button>
         </div>
 
 
@@ -107,6 +109,17 @@
     <script type="module" src="../static/js/lib/secretUtils.js"></script>
     <script type="module" src="../static/js/lib/audioUtils.js"></script>
     <script type="module" src="../static/js/index.js"></script>
+    <script>
+        // 注册service worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/static/js/service-worker.js')
+                .then(function (registration) {
+                    console.log('Service Worker registered with scope:', registration.scope);
+                }).catch(function (error) {
+                    console.log('Service Worker registration failed:', error);
+                });
+        }
+    </script>
 </body>
 
 </html>
