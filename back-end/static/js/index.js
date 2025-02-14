@@ -356,7 +356,7 @@ getCodeBtnLogin.addEventListener('click', async () => {
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ phone: phone })
+        body: JSON.stringify({ phone: phone, usage: 'login' })
     });
 
     const data = await response.json();
@@ -401,7 +401,7 @@ getCodeBtnRegister.addEventListener('click', async () => {
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ phone: phone })
+        body: JSON.stringify({ phone: phone, usage: 'register' })
     });
 
     const data = await response.json();
