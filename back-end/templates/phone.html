@@ -26,13 +26,13 @@
     <div id="captionModal" class="captionModal" aria-label="字幕模态窗口">
         <p id="captionText"></p>
     </div>
-    <div class="container">
+    <div id="container">
         <img src="../static/images/bot.jpg" alt="智能体头像" aria-label="智能体头像">
     </div>
 
     <!-- 控件部分 -->
-    <div class="controller">
-        <div class="status">正在听</div>
+    <div id="controller">
+        <div id="status">正在听</div>
         <canvas id="waveShape" aria-label="音频波形图"></canvas>
         <audio autoplay id="audio" aria-label="通话音频"></audio>
         <div aria-label="打开摄像头"><i class="fa-solid fa-video openCamera"></i></div>
@@ -44,7 +44,7 @@
     </div>
 
     <!-- 选项栏 -->
-    <div class="optionsBar">
+    <div id="optionsBar">
         <button class="optionButton avoidObstacle" aria-label="辅助避障">避障</button>
         <button class="optionButton findItem" aria-label="帮我寻物">寻物</button>
         <button class="optionButton currentLocation" aria-label="当前位置">位置</button>
@@ -52,11 +52,11 @@
     </div>
 
     <!-- 小窗部分 -->
-    <div id="findItemModal" class="modal" aria-label="请选择要寻找的物品模板。来自：我的，寻物画廊">
-        <div class="overflowArea">
-            <div class="gallery" id="gallery"></div>
+    <div id="findItemModal" aria-label="请选择要寻找的物品模板。来自：我的，寻物画廊">
+        <div id="overflowArea">
+            <div id="gallery"></div>
         </div>
-        <button id="closeModalButton" class="closeModalButton">关闭</button>
+        <button id="closeModalButton">关闭</button>
     </div>
 
     <div id="microphone" class="voice"></div>

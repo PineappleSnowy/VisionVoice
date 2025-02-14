@@ -37,7 +37,7 @@ html body .toggleCamera {
   padding: 0 0.2rem;
 }
 
-html body .controller {
+html body #controller {
   position: fixed;
   width: 100vw;
   height: 2.6rem;
@@ -47,7 +47,7 @@ html body .controller {
   z-index: 1;
 }
 
-html body .controller .status {
+html body #controller #status {
   display: block;
   position: absolute;
   left: 1.31rem;
@@ -58,7 +58,7 @@ html body .controller .status {
   text-align: center;
 }
 
-html body .controller canvas {
+html body #controller canvas {
   display: block;
   position: absolute;
   left: 1.31rem;
@@ -67,7 +67,7 @@ html body .controller canvas {
   height: 1rem;
 }
 
-html body .controller .openCamera {
+html body #controller .openCamera {
   display: flex;
   position: absolute;
   left: 0.4rem;
@@ -79,7 +79,7 @@ html body .controller .openCamera {
   align-items: center;
 }
 
-html body .controller .hangUp {
+html body #controller .hangUp {
   display: flex;
   position: absolute;
   right: 0.4rem;
@@ -91,7 +91,7 @@ html body .controller .hangUp {
   align-items: center;
 }
 
-html body .controller .micButton {
+html body #controller .micButton {
   position: absolute;
   right: 0.35rem;
   bottom: 1.7rem;
@@ -106,12 +106,12 @@ html body .controller .micButton {
   color: black;
 }
 
-html body .controller .micButton.mic-off {
+html body #controller .micButton.mic-off {
   background-color: gray;
   color: white;
 }
 
-html body .controller .captionButton {
+html body #controller .captionButton {
   position: absolute;
   left: 0.35rem;
   bottom: 1.7rem;
@@ -126,7 +126,7 @@ html body .controller .captionButton {
   color: black;
 }
 
-html body .controller .captionButton.caption-off {
+html body #controller .captionButton.caption-off {
   background-color: gray;
   color: white;
 }
@@ -168,13 +168,13 @@ html body video {
   z-index: -1;
 }
 
-html body .container {
+html body #container {
   width: 100vw;
   height: 100vh;
   transition: transform 0.2s ease;
 }
 
-html body .container img {
+html body #container img {
   position: absolute;
   width: 1.5rem;
   height: 1.5rem;
@@ -185,13 +185,13 @@ html body .container img {
   left: 1.31rem;
 }
 
-html body .container.shifted {
+html body #container.shifted {
   transform: translateY(6.34rem);
   border-top-left-radius: 0.1rem;
   border-top-right-radius: 0.1rem;
 }
 
-.modal {
+#findItemModal {
   display: none;
   position: fixed;
   left: 50%;
@@ -205,7 +205,7 @@ html body .container.shifted {
   border: 1px solid #333;
 }
 
-.overflowArea {
+#overflowArea {
   position: fixed;
   left: 0%;
   top: 0%;
@@ -214,7 +214,7 @@ html body .container.shifted {
   overflow: auto;
 }
 
-.gallery {
+#gallery {
   display: flex;
   flex-wrap: wrap;
   margin-bottom: 10px;
@@ -243,7 +243,7 @@ p {
   color: #ffffff;
 }
 
-.closeModalButton {
+#closeModalButton {
   position: fixed;
   bottom: 0%;
   left: 0;
@@ -256,7 +256,7 @@ p {
   font-size: large;
 }
 
-.closeModalButton:hover {
+#closeModalButton:hover {
   background-color: #444;
 }
 
@@ -271,7 +271,7 @@ p {
   z-index: 3;
 }
 
-.optionsBar {
+#optionsBar {
   position: fixed;
   bottom: 0;
   left: 50%;

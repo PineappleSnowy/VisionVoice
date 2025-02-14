@@ -62,7 +62,7 @@ function startAudio() {
 }
 
 // 是否允许打断以及当前功能的状态标识
-const statusDiv = document.querySelector('.controller .status');
+const statusDiv = document.getElementById('status');
 
 // 打断说话的按钮
 const shutUpSpeakButton = document.querySelector('.shutUpSpeak');
