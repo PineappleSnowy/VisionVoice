@@ -570,6 +570,7 @@ def get_audio():
 
     return send_file(audio_path, mimetype="audio/mp3")
 
+
 # 构建上下文信息进行照片对话
 @app.route("/album_talk", methods=["POST"])
 def album_talk():
@@ -882,14 +883,14 @@ def register():
         phone_number = verification_code_dict.get(phone)
         if not phone_number:
             return jsonify({"message": "发送验证码失败", "code": 400}), 400
-        
+
         timestamp = phone_number.get("timestamp")
         if not timestamp:
             return jsonify({"message": "发送验证码失败", "code": 400}), 400
-        
+
         if int(timestamp) + 5 * 60 < int(time.time()):
             return jsonify({"message": "验证码已过期", "code": 400}), 400
-        
+
         verify_code = phone_number.get("code")
         if verify_code != code:
             return jsonify({"message": "验证码错误", "code": 400}), 400
@@ -967,7 +968,11 @@ def login():
         # 检查用户是否存在
         user_exists = False
         for user in users:
-            if user.get("username") == username and login_type == "password":
+            if (
+                user.get("username") == username
+                and login_type == "password"
+                and usage == "login"
+            ):
                 user_exists = True
                 # 检查密码是否正确
                 if user.get("password") == password:
@@ -995,7 +1000,12 @@ def login():
                 else:
                     return jsonify({"message": "密码错误", "code": 400}), 400
 
-            if user.get("phone") == phone and login_type == "phone":
+            elif (
+                user.get("phone") == phone
+                and login_type == "phone"
+                and usage == "login"
+            ):
+                user_exists = True
                 try:
                     with open("./configs/verification_code_dict.json", "r") as f:
                         verification_code_dict = json.load(f)
@@ -1003,48 +1013,48 @@ def login():
                     logging.error("run.py", "login", f"验证码文件读取失败: {str(e)}")
                     verification_code_dict = {}
 
-                    # 级联判断验证码是否匹配
-                    phone_number = verification_code_dict.get(phone)
-                    if not phone_number:
-                        return jsonify({"message": "发送验证码失败", "code": 400}), 400
-                    
-                    timestamp = phone_number.get("timestamp")
-                    if not timestamp:
-                        return jsonify({"message": "发送验证码失败", "code": 400}), 400
-                    
-                    if int(timestamp) + 5 * 60 < int(time.time()):
-                        return jsonify({"message": "验证码已过期", "code": 400}), 400
-                    
-                    verify_code = phone_number.get("code")
-                    if int(verify_code) != int(code):
-                        return jsonify({"message": "验证码错误", "code": 400}), 400
+                # 级联判断验证码是否匹配
+                phone_number = verification_code_dict.get(phone)
+                if not phone_number:
+                    return jsonify({"message": "发送验证码失败", "code": 400}), 400
 
-                    print("登录成功")
-                    
-                    # 设置 local token
-                    access_token = create_access_token(
-                        identity=user.get("username"), expires_delta=False
-                    )
-                    return (
-                        jsonify(
-                            {
-                                "message": "登录成功",
-                                "code": 200,
-                                "access_token": access_token,
-                                "user_info": {
-                                    "username": user.get("username"),
-                                    "nickname": user.get("nickname"),
-                                    "phone": phone,
-                                },
-                            }
-                        ),
-                        200,
-                    )
-                else:
+                timestamp = phone_number.get("timestamp")
+                if not timestamp:
+                    return jsonify({"message": "发送验证码失败", "code": 400}), 400
+
+                if int(timestamp) + 5 * 60 < int(time.time()):
+                    return jsonify({"message": "验证码已过期", "code": 400}), 400
+
+                verify_code = phone_number.get("code")
+                if int(verify_code) != int(code):
                     return jsonify({"message": "验证码错误", "code": 400}), 400
+
+                print("登录成功")
+
+                # 设置 local token
+                access_token = create_access_token(
+                    identity=user.get("username"), expires_delta=False
+                )
+                return (
+                    jsonify(
+                        {
+                            "message": "登录成功",
+                            "code": 200,
+                            "access_token": access_token,
+                            "user_info": {
+                                "username": user.get("username"),
+                                "nickname": user.get("nickname"),
+                                "phone": phone,
+                            },
+                        }
+                    ),
+                    200,
+                )
 
         if not user_exists:
             return jsonify({"message": "用户不存在", "code": 400}), 400
+        else:
+            return jsonify({"message": "出错啦，请联系工作人员", "code": 400}), 400
 
     except Exception as e:
         logging.error("run.py", "login", f"登录失败: {str(e)}")
@@ -1639,9 +1649,11 @@ def run_server():
     current_os = platform.system()
     if current_os == "Windows":
         socketio.run(
-            app, 
-            host = '0.0.0.0',
-            port=80, allow_unsafe_werkzeug=True, debug=True  # 调试模式（开发环境）
+            app,
+            host="0.0.0.0",
+            port=80,
+            allow_unsafe_werkzeug=True,
+            debug=True,  # 调试模式（开发环境）
         )
     else:
         socketio.run(
