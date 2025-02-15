@@ -1090,12 +1090,12 @@ window.onload = async () => {
         }
         let prompt_des = "";
         if (complexity == "详细") {
-            prompt_des = "充分捕捉环境信息，客观详细地";
+            prompt_des = "充分捕捉图片信息，客观详细地";
         }
         else if (complexity == "简洁") {
             prompt_des = "简洁地";
         }
-        rec_result = `你是一名热心的助手，请你${prompt_des}描述环境。`;
+        rec_result = `你是一名热心的助手，请你${prompt_des}描述这张图片。`;
         speech_rec_ready = true;
         captureAndSendFrame();
     });
