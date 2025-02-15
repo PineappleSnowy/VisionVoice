@@ -79,9 +79,12 @@ document.addEventListener('DOMContentLoaded', function () {
         fileInput.click();
     });
 
+    let upload_id = 0;  // 当前分析序号
+
     fileInput.addEventListener('change', function () {
         const files = fileInput.files;
         if (files.length > 0) {
+            upload_id += 1; // 上传次数加一
             const gallery = document.getElementById('gallery');
             const timestamp = new Date().toISOString().replace(/[-:.TZ]/g, '').slice(0, 14);
             const formData = new FormData();
@@ -96,7 +99,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     item.className = 'gallery-item';
                     item.innerHTML = `
                         <button class="image-talk" onclick="playAudio('${newFileName}', event, ${talk_speed})">
-                            <img src="${e.target.result}" alt="${newFileName}" aria-label="解析完成${i + 1}，点击朗读">
+                            <img src="${e.target.result}" alt="${newFileName}" aria-label="第${upload_id}次上传的第${i + 1}张照片，点击朗读">
                         </button>
                         <button class="audio-control" onclick="controlAudio(event)" aria-label="开关声音"></button>
                         <button class="full-screen" onclick="fullScreen(event)" aria-label="照片问答"></button>
