@@ -91,7 +91,7 @@ html body #controller .hangUp {
   align-items: center;
 }
 
-html body #controller .micButton {
+#micButton {
   position: absolute;
   right: 0.35rem;
   bottom: 1.7rem;
@@ -106,12 +106,12 @@ html body #controller .micButton {
   color: black;
 }
 
-html body #controller .micButton.mic-off {
+#micButton.mic-off {
   background-color: gray;
   color: white;
 }
 
-html body #controller .captionButton {
+#captionButton {
   position: absolute;
   left: 0.35rem;
   bottom: 1.7rem;
@@ -126,7 +126,7 @@ html body #controller .captionButton {
   color: black;
 }
 
-html body #controller .captionButton.caption-off {
+#captionButton.caption-off {
   background-color: gray;
   color: white;
 }
