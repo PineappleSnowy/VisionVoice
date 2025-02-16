@@ -189,10 +189,10 @@ export default {
   },
 
   async onShow() {
-    storageUtils.deleteData('username');
-    storageUtils.deleteData('password');
-    storageUtils.deleteData('token');
-    storageUtils.deleteData('nickname');
+    // storageUtils.deleteData('username');
+    // storageUtils.deleteData('password');
+    // storageUtils.deleteData('token');
+    // storageUtils.deleteData('nickname');
     await this.checkAuthAndRedirect();
   },
 
