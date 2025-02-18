@@ -205,6 +205,14 @@ html body #container.shifted {
   border: 1px solid #333;
 }
 
+#findItemModal .find-item-tip{
+  position: fixed;
+  text-align: center;
+  font-size: small;
+  width: 100%;
+  top: -4%;
+}
+
 #overflowArea {
   position: fixed;
   left: 0%;
