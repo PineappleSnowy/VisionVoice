@@ -968,6 +968,9 @@ window.onload = async () => {
                         `;
                     gallery.appendChild(item);
                 });
+                if (gallery.children.length === 0) {
+                    document.querySelector('#findItemModal .no-item-tip').style.display = 'block';
+                }
             })
             .catch(error => console.error('Error fetching images:', error));
     }

@@ -199,7 +199,6 @@ html body #container.shifted {
   width: 90%;
   height: 88%;
   background-color: rgba(0, 0, 0, 0.8);
-  padding-top: 5%;
   transform: translate(-50%, -50%);
   z-index: 4;
   border: 1px solid #333;
@@ -210,7 +209,19 @@ html body #container.shifted {
   text-align: center;
   font-size: small;
   width: 100%;
-  top: -4%;
+  top: -6%;
+  padding: 4% 0px;
+}
+
+#findItemModal .no-item-tip {
+  position: fixed;
+  text-align: center;
+  font-size: large;
+  width: 88%;
+  top: 36%;
+  padding: 6%;
+  display: none;
+  color: darkgray;
 }
 
 #overflowArea {
@@ -230,9 +241,10 @@ html body #container.shifted {
 }
 
 .gallery-item {
-  width: 46%;
-  margin: 2%;
+  width: calc(48% - 2px);
+  margin: 1%;
   text-align: center;
+  border: 1px solid #333;
 }
 
 .gallery-item button {
@@ -247,8 +259,9 @@ html body #container.shifted {
   height: auto;
 }
 
-p {
+.gallery-item p {
   color: #ffffff;
+  margin: 5px 0;
 }
 
 #closeModalButton {
