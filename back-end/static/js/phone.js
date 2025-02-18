@@ -590,8 +590,10 @@ window.onload = async () => {
     // 根据当前智能体选择设置智能体头像
     if (selectedAgent === 'psychologicalAgent') {
         botImage.src = '../static/images/psychologicalAgent.jpg';
+        botImage.ariaLabel = '心灵树洞头像';
     } else {
         botImage.src = '../static/images/defaultAgent.jpg';
+        botImage.ariaLabel = '生活助手头像';
     }
 
     // 检查 URL 中的查询参数

@@ -45,6 +45,7 @@ function loadChatHistory(agent) {
                         bubble.className = 'chat-bubble-user';
                         const image_user = document.createElement('div');
                         image_user.className = 'chat-image-user';
+                        image_user.ariaLabel = '用户头像';
                         bubble.textContent = msg.content;
 
                         messagebackground.appendChild(messagesContainer_user);
@@ -54,6 +55,7 @@ function loadChatHistory(agent) {
                         // 创建机器人消息
                         const image_bot = document.createElement('div');
                         image_bot.className = 'chat-image-bot';
+                        image_bot.ariaLabel = '智能体头像';
                         image_bot.style.backgroundImage = `url('${botImageUrl}')`;
                         const messagesContainer_bot = document.createElement('div');
                         messagesContainer_bot.className = 'chat-messages-bot';
@@ -142,6 +144,7 @@ function addMessage(message) {
     bubble.className = 'chat-bubble-user';
     const image_user = document.createElement('div');
     image_user.className = 'chat-image-user';
+    image_user.ariaLabel = '用户头像';
     bubble.textContent = message;
 
     messagebackground.appendChild(messagesContainer_user);
@@ -216,6 +219,7 @@ function sendMessageToAgent(message, multi_image_talk) {
     // 机器人响应
     const image_bot = document.createElement('div');
     image_bot.className = 'chat-image-bot';
+    image_bot.ariaLabel = '智能体头像';
     const botImageUrl = selectedAgent === 'psychologicalAgent' ? '../static/images/psychologicalAgent.jpg' : '../static/images/defaultAgent.jpg';
     image_bot.style.backgroundImage = `url('${botImageUrl}')`;
     const messagesContainer_bot = document.createElement('div');
