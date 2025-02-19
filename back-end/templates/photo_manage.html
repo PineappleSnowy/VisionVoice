@@ -16,14 +16,14 @@
         寻物画廊
     </div>
 
-    <div class="gallery" id="gallery" role="region" aria-label="照片画廊"></div>
+    <div class="gallery" id="gallery" role="region" aria-label="寻物画廊图片列表"></div>
 
     <div id="errorMessage" class="error-message" role="alert" aria-live="assertive" style="display: none;"></div>
 
     <div id="footer" class="footer" role="contentinfo" aria-label="页脚">
-        <button id="addButton" aria-label="添加照片" style="height: 85%; width: 80%;">&#10010;</button>
-        <button id="cameraButton" aria-label="从摄像头获取照片" style="display: none;">从摄像头获取</button>
-        <button id="albumButton" aria-label="从相册获取照片" style="display: none;">从相册获取</button>
+        <button id="addButton" aria-label="添加物品图片" style="height: 85%; width: 80%;">&#10010;</button>
+        <button id="cameraButton" aria-label="从摄像头获取图片" style="display: none;">从摄像头获取</button>
+        <button id="albumButton" aria-label="从相册获取图片" style="display: none;">从相册获取</button>
         <button id="cancelButton" aria-label="取消" style="display: none; width: 80%;">取消</button>
         <input type="file" id="fileInput" accept="image/*" capture="camera" aria-label="选择图片文件" style="display: none;">
     </div>
@@ -31,11 +31,11 @@
     <div id="myModal" class="modal" role="dialog" aria-labelledby="modalTitle" aria-modal="true">
         <div class="modal-content">
             <div class="image-container">
-                <img id="modalImage" src="" alt="照片预览" aria-labelledby="modalImageDescription">
+                <img id="modalImage" src="" alt="图片预览" aria-labelledby="modalImageDescription">
             </div>
-            <input type="text" id="imageName" value="" aria-label="照片名称">
+            <input type="text" id="imageName" value="" aria-label="物品名称，请注意修改">
             <button id="renameButton" aria-label="保存更改">修改</button>
-            <button id="deleteButton" aria-label="删除照片">删除</button>
+            <button id="deleteButton" aria-label="删除图片">删除</button>
             <span id="statusMessage" aria-live="polite"></span>
             <button id="backButton" aria-label="返回" style="display: block; margin-top: 10px;">返回</button>
         </div>

@@ -471,7 +471,7 @@ def save_album_images():
                 )
 
                 image_des = describe_image(client, image_save_path, curr_user)
-                des_audio = agent_audio_generate(image_des, talk_speed)
+                des_audio, = agent_audio_generate(image_des, talk_speed)
 
                 audio_file_name = filename + ".mp3"
                 audio_folder = os.path.join(
@@ -553,28 +553,7 @@ def get_audio():
         )
         with open(image_des_text_path, "r", encoding="utf-8") as f:
             image_des = f.read()
-        audio_data = agent_audio_generate(image_des, talk_speed)
-        with open(audio_path, "wb") as f:
-            f.write(audio_data)
-        talk_speed_config[audio_name] = talk_speed
-        with open(talk_speed_config_path, "w") as f:
-            json.dump(talk_speed_config, f)
-
-    talk_speed = request.args.get("talk_speed", 8)
-    talk_speed_config_path = os.path.join(
-        USER_IMAGE_FOLDER, curr_user, "album", "talk_speed_config.json"
-    )
-
-    with open(talk_speed_config_path, "r") as f:
-        talk_speed_config = json.load(f)
-        talk_speed_pre = talk_speed_config.get(audio_name, 8)
-    if talk_speed != talk_speed_pre:  # 当前请求的语速与之前不同，重新生成音频
-        image_des_text_path = os.path.join(
-            USER_IMAGE_FOLDER, curr_user, "album", "texts", audio_name + ".txt"
-        )
-        with open(image_des_text_path, "r", encoding="utf-8") as f:
-            image_des = f.read()
-        audio_data = agent_audio_generate(image_des, talk_speed)
+        audio_data, = agent_audio_generate(image_des, talk_speed)
         with open(audio_path, "wb") as f:
             f.write(audio_data)
         talk_speed_config[audio_name] = talk_speed
@@ -803,7 +782,7 @@ def find_pause(sentence: str) -> int:
         "？",
         "，",
         "；",  # 全角符号
-        # ".", "!", ":", "?", ",", ";",  # 半角符号
+        ".", "!", ":", "?", ",", ";",  # 半角符号
     ]
 
     # 记录目标符号的位置
@@ -1105,6 +1084,7 @@ def verify_token():
         USER_VAR[current_user]["sentence_buffer"] = ""  # 用于累积 token 的缓冲区
         USER_VAR[current_user]["sentence_index"] = 0  # 用于标记当前是第几句
         USER_VAR[current_user]["task_queue"] = AsyncTaskQueue()  # 任务队列
+        USER_VAR[current_user]["task_id"] = 0  # 任务队列
 
         return jsonify({"valid": True, "user": current_user}), 200
     # 如果token无效，返回错误信息
@@ -1539,7 +1519,7 @@ def agent_upload_audio():
 
 
 @socketio.on("agent_stream_audio")
-def agent_stream_audio(current_token: str, talk_speed: int = 8):
+def agent_stream_audio(current_token: str, talk_speed: int = 8, task_id : int = 0):
     """
     对音频进行断句处理。
 
@@ -1563,6 +1543,14 @@ def agent_stream_audio(current_token: str, talk_speed: int = 8):
     else:
         print("[run.py][agent_stream_audio] Missing token")
         return
+    
+    # task_id处理，如果task_id不同，则重置状态
+    if USER_VAR[user]["task_id"] != task_id:
+        USER_VAR[user]["task_id"] = task_id
+        # 重置状态
+        USER_VAR[user]["is_streaming"] = False
+        USER_VAR[user]["sentence_buffer"] = ""
+
     # 功能性处理
     if "##" in current_token:
         # 状态1处理
@@ -1572,17 +1560,18 @@ def agent_stream_audio(current_token: str, talk_speed: int = 8):
                 audio_chunk = audio_file.read()
             socketio.emit(
                 "agent_play_audio_chunk",
-                {"user": user, "index": 0, "audio_chunk": audio_chunk},
+                {"user": user, "index": 0, "audio_chunk": audio_chunk, "task_id": task_id},
             )
         # 状态2处理
         elif "##<state=2>" in current_token:
-            audio_chunk = agent_audio_generate(
+            audio_chunk, task_id = agent_audio_generate(
                 "开始寻找" + current_token[current_token.find(">") + 1:],
                 talk_speed,
+                task_id,
             )
             socketio.emit(
                 "agent_play_audio_chunk",
-                {"user": user, "index": 0, "audio_chunk": audio_chunk},
+                {"user": user, "index": 0, "audio_chunk": audio_chunk, "task_id": task_id},
             )
 
     else:
@@ -1607,7 +1596,7 @@ def agent_stream_audio(current_token: str, talk_speed: int = 8):
             if USER_VAR[user]["sentence_buffer"]:
                 # 将剩余内容加入任务队列
                 USER_VAR[user]["task_queue"].add_task_sync(
-                    agent_audio_generate, USER_VAR[user]["sentence_buffer"], talk_speed
+                    agent_audio_generate, USER_VAR[user]["sentence_buffer"], talk_speed, task_id
                 )
 
             # 重置状态
@@ -1634,7 +1623,7 @@ def agent_stream_audio(current_token: str, talk_speed: int = 8):
 
         # 将音频生成任务加入队列
         USER_VAR[user]["task_queue"].add_task_sync(
-            agent_audio_generate, complete_sentence, talk_speed
+            agent_audio_generate, complete_sentence, talk_speed, task_id
         )
 
 
@@ -1643,7 +1632,7 @@ def process_audio_stream(user):
     while True:
         try:
             # 获取下一个音频结果
-            audio_chunk = USER_VAR[user]["task_queue"].get_next_result_sync()
+            audio_chunk, task_id = USER_VAR[user]["task_queue"].get_next_result_sync()
 
             if audio_chunk is not None:
                 # 发送到前端
@@ -1653,6 +1642,7 @@ def process_audio_stream(user):
                         "user": user,
                         "index": USER_VAR[user]["sentence_index"],
                         "audio_chunk": audio_chunk,
+                        "task_id": task_id,
                     },
                 )
                 USER_VAR[user]["sentence_index"] += 1
