@@ -415,10 +415,11 @@ document.getElementById('more_function_button').addEventListener('click', functi
             document.getElementById('chat-input-container').classList.remove('slide-down');
             document.getElementById('chat-input-container').classList.add('slide-up');
         }
-        if (!document.getElementById('more_function_board').classList.contains('slide-up')) {
-            document.getElementById('more_function_board').classList.remove('slide-down');
-            document.getElementById('more_function_board').classList.add('slide-up');
-        }
+        setTimeout(()=>{document.getElementById('more_function_board').style.display = 'flex'},100);
+        // if (!document.getElementById('more_function_board').classList.contains('slide-up')) {
+        //     document.getElementById('more_function_board').classList.remove('slide-down');
+        //     document.getElementById('more_function_board').classList.add('slide-up');
+        // }
         document.getElementById('chat-container').style.bottom = '181px';
     }
 
@@ -430,12 +431,14 @@ document.getElementById('more_function_button').addEventListener('click', functi
             document.getElementById('chat-input-container').classList.remove('slide-up');
             document.getElementById('chat-input-container').classList.add('slide-down');
         }
-        if (!document.getElementById('more_function_board').classList.contains('slide-down')) {
-            document.getElementById('more_function_board').classList.remove('slide-up');
-            document.getElementById('more_function_board').classList.add('slide-down');
-        }
+        // if (!document.getElementById('more_function_board').classList.contains('slide-down')) {
+        //     document.getElementById('more_function_board').classList.remove('slide-up');
+        //     document.getElementById('more_function_board').classList.add('slide-down');
+        // }
+        document.getElementById('more_function_board').style.display = 'none';
         document.getElementById('chat-container').style.bottom = '100px';
     }
+    forceReflow();
 });
 
 
