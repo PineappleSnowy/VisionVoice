@@ -26,8 +26,9 @@ let find_item = false;  // 防止多次启动寻物
 let rec_result = "";
 let speech_rec_ready = false;
 let image_upload_ready = false;
-let audio_stop = false;  // 音频阻断标识
 let vudio = null;
+
+let curr_task_id = 0;  // 当前任务唯一 ID
 
 // 标识是否正在播放音频
 let isPlaying = false;
@@ -45,11 +46,10 @@ function checkSilence() { }
 
 // 停止音频播放
 function stopAudio() {
-    curr_talk_index += 1;
-    if (curr_talk_index >= Number.MAX_SAFE_INTEGER) {
-        curr_talk_index = 0;
+    curr_task_id += 1;
+    if (curr_task_id >= Number.MAX_SAFE_INTEGER) {
+        curr_task_id = 0;
     }
-    audio_stop = true;
     audioPlayer.pause()
     audioQueue = [];
     isPlaying = false;
@@ -57,7 +57,6 @@ function stopAudio() {
 
 // 开始音频播放
 function startAudio() {
-    audio_stop = false;
     audioQueue = [];
 }
 
@@ -230,8 +229,6 @@ toggleCamera.addEventListener('click', async () => {
     }
 });
 
-let curr_talk_index = 0;
-
 // 发起大模型请求
 function formChat(talk_index) {
     /*当开启视频聊天时（videoChat==true），要求speech_rec_ready和image_upload_ready都是true；
@@ -254,16 +251,19 @@ function formChat(talk_index) {
 
                     // 逐块读取并处理数据
                     return reader.read().then(function processText({ done, value }) {
-                        if (done) {
+                        // 响应结束或任务id对不上，则停止处理
+                        if (done || talk_index !== curr_task_id) {
                             return;
                         }
+
                         let jsonString = new TextDecoder().decode(value); // 将字节流转换为字符串
 
                         // 如果当前不是结束标志，则将文本进行语音合成
-                        if (!(jsonString.includes("<END>")) && !audio_stop && talk_index == curr_talk_index) {
+                        if (!jsonString.includes("<END>")) {
                             document.getElementById('captionText').textContent += jsonString;
-                            socket.emit("agent_stream_audio", jsonString, talk_speed);
                         }
+                        
+                        socket.emit("agent_stream_audio", jsonString, talk_speed, curr_task_id);
 
                         // 继续读取下一个数据
                         return reader.read().then(processText);
@@ -310,7 +310,7 @@ function captureAndSendFrame() {
                     console.log('Frame uploaded successfully:', data);
                     if (state == 0) {
                         image_upload_ready = true;
-                        formChat(curr_talk_index)
+                        formChat(curr_task_id)
                     }
                 }
             })
@@ -471,7 +471,7 @@ async function startAvoidObstacle() {
         obstacle_avoid = true;
         document.getElementById('captionText').innerHTML = '避障模式已开启'
         const talk_speed = localStorage.getItem('speed') || 8;
-        socket.emit("agent_stream_audio", "##<state=1>", talk_speed);
+        socket.emit("agent_stream_audio", "##<state=1>", talk_speed, curr_task_id);
         startAudio()
         if (!yoloDetectorInstance) {
             document.getElementById('captionText').innerHTML += '<br>模型正在初始化...<em>（第一次较慢）</em>';
@@ -515,7 +515,7 @@ window.startFindItem = async function (item_name) {
         const start_text = `开始寻找${item_name}`;
         document.getElementById('captionText').innerHTML = start_text;
         const talk_speed = localStorage.getItem('speed') || 8;
-        socket.emit("agent_stream_audio", `##<state=2>${item_name}`, talk_speed);
+        socket.emit("agent_stream_audio", `##<state=2>${item_name}`, talk_speed, curr_task_id);
         startAudio();
         if (!yoloDetectorInstance) {
             document.getElementById('captionText').innerHTML += '<br>模型正在初始化...<em>（第一次较慢）</em>';
@@ -578,7 +578,7 @@ async function yoloDetectRealize(item_name, talk_speed, mode) {
                 item_loc_info = `画面${calcLocation(top_loc, left_loc)} ${detected_item}距离${obs_dis.toFixed(2)}米。`;
             }
             document.getElementById('captionText').innerHTML = item_loc_info;
-            socket.emit("agent_stream_audio", item_loc_info, talk_speed);
+            socket.emit("agent_stream_audio", item_loc_info, talk_speed, curr_task_id);
             await new Promise(resolve => setTimeout(resolve, 1000));
         }
 
@@ -784,21 +784,20 @@ window.onload = async () => {
      */
     socket.on('agent_play_audio_chunk', function (data) {
         const user = localStorage.getItem('user');
-        if (data.user !== user) return;
-        if (!audio_stop) {
-            const audioIndex = data['index'];
-            const audioData = data['audio_chunk'];
+        // 如果用户不匹配或任务 ID 不匹配，则停止处理
+        if (data.user !== user || data.task_id !== curr_task_id) return;
+        const audioIndex = data['index'];
+        const audioData = data['audio_chunk'];
 
-            // 将音频数据添加到队列中
-            audioQueue[audioIndex] = audioData;
+        // 将音频数据添加到队列中
+        audioQueue[audioIndex] = audioData;
 
-            // 如果当前没有音频正在播放，开始播放
-            if (!isPlaying) {
-                playNextAudio();
-            }
-
+        // 如果当前没有音频正在播放，开始播放
+        if (!isPlaying) {
+            playNextAudio();
         }
-    });
+    }
+    );
 
     /**
      * @description 播放下一个音频
@@ -905,7 +904,7 @@ window.onload = async () => {
                 let prompt = location_result['prompt'];
                 rec_result = prompt + rec_result;
             }
-            formChat(curr_talk_index);
+            formChat(curr_task_id);
         }
     })
     /* 处理音频识别 end 
@@ -1074,7 +1073,7 @@ window.onload = async () => {
         let location_info = location_result['location_info']
         document.getElementById('captionText').innerHTML = location_info;
         const talk_speed = localStorage.getItem('speed') || 8;
-        socket.emit("agent_stream_audio", location_info, talk_speed);
+        socket.emit("agent_stream_audio", location_info, talk_speed, curr_task_id);
         startAudio();
     });
 

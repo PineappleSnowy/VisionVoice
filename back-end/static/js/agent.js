@@ -245,11 +245,8 @@ function sendMessageToAgent(message, multi_image_talk) {
 
             // 逐块读取并处理数据
             return reader.read().then(function processText({ done, value }) {
-                if (done) {
-                    return;
-                }
-                // 如果对话序号对不上，则停止响应
-                if (talk_index !== curr_talk_index) {
+                // 响应结束或对话序号对不上，则停止处理
+                if (done || talk_index !== curr_talk_index) {
                     return;
                 }
 
@@ -257,10 +254,11 @@ function sendMessageToAgent(message, multi_image_talk) {
 
                 // 如果当前不是结束标志，则将文本添加到气泡中
                 if (!(jsonString.includes("<END>"))) {
-                    if (!isMuted) {
-                        socket.emit("agent_stream_audio", jsonString, talk_speed);
-                    }
                     bubble_2.textContent += jsonString;
+                }
+                
+                if (!isMuted) {
+                    socket.emit("agent_stream_audio", jsonString, talk_speed, talk_index);
                 }
 
                 // 继续读取下一个数据
@@ -514,7 +512,10 @@ document.getElementById('audio-control').addEventListener('click', function () {
 socket.on('agent_play_audio_chunk', function (data) {
     const user = localStorage.getItem('user');
     console.log('curr_user', user)
-    if (data.user !== user) return;
+    console.log('curr_talk_index', curr_talk_index)
+    console.log(data.task_id)
+    // 如果用户不匹配或者对话序号不匹配，则停止处理
+    if (data.user !== user || data.task_id !== curr_talk_index) return;
     if (!isMuted) {
         const audioIndex = data['index'];
         const audioData = data['audio_chunk'];
