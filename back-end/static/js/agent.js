@@ -436,7 +436,6 @@ document.getElementById('more_function_button').addEventListener('click', functi
         document.getElementById('more_function_board').style.display = 'none';
         document.getElementById('chat-container').style.bottom = '100px';
     }
-    forceReflow();
 });
 
 

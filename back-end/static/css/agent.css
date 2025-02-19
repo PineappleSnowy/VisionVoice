@@ -308,12 +308,14 @@ p {
 
 .slide-up {
     /* animation: slideup 0.1s ease-in-out forwards; */
-    transform: translateY(-80px)
+    transform: translateY(-80px);
+    transition: all, 0.1s;
 }
 
 .slide-down {
     /* animation: slidedown 0.1s ease-in-out forwards; */
-    transform: translateY(0px)
+    transform: translateY(0px);
+    transition: all, 0.1s;
 }
 
 #phone-button {
