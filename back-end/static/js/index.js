@@ -74,6 +74,15 @@ const checkLoginStatus = async () => {
                         localStorage.setItem('nickname', '昵称获取失败');
                     }
                 }
+                
+                if (!localStorage.getItem('phone')) {
+                    const cookieNickname = await getCookie('phone');
+                    if (cookieNickname) {
+                        localStorage.setItem('phone', cookieNickname);
+                    } else {
+                        localStorage.setItem('phone', '手机号获取失败');
+                    }
+                }
                 // 跳转到 agent 主页
                 window.location.href = '/agent';
             } else {
