@@ -303,16 +303,16 @@ function fullScreen(event) {
     });
 }
 
-let curr_talk_index = 0;  // 标识当前对话
+let curr_task_id = 0;  // 标识当前对话
 
 function sendMessageToAgent(message, image_name) {
     album_chat_history.push({ "role": "user", "text": message })  // 将用户消息加入对话历史
 
-    if (curr_talk_index >= Number.MAX_SAFE_INTEGER) {
-        curr_talk_index = 0;
+    if (curr_task_id >= Number.MAX_SAFE_INTEGER) {
+        curr_task_id = 0;
     }
-    curr_talk_index += 1;
-    const talk_index = curr_talk_index;
+    curr_task_id += 1;
+    const talk_index = curr_task_id;
     const chatMessageBot = document.createElement('div');
     chatMessageBot.className = 'chat-messages-bot';
     const chatBubbleBot = document.createElement('div');
@@ -341,7 +341,7 @@ function sendMessageToAgent(message, image_name) {
                     return;
                 }
                 // 如果对话序号对不上，则停止响应
-                if (talk_index !== curr_talk_index) {
+                if (talk_index !== curr_task_id) {
                     album_chat_history.push({ "role": "assistant", "text": chatBubbleBot.textContent })
                     return;
                 }

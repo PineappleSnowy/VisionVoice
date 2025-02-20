@@ -32,6 +32,7 @@ function getUserInfo() {
     const nickname = localStorage.getItem('nickname');
 
     document.getElementById('username').textContent = nickname;
+    document.getElementById('username').ariaLabel = `用户名：${nickname}`;
     document.getElementById('user-account').textContent = `账号: ${username}`;
 
     if (username == 'CaraLin'){
