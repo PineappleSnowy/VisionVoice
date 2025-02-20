@@ -88,7 +88,7 @@
 
 也可以在这里查看手机无障碍功能中的[读屏功能演示](videos/视界之声手机盲人模式兼容.mp4)
 
-[盲人模式兼容在线播放链接](https://github.com/user-attachments/assets/05660079-a585-4de7-88f6-f025d562ec6a)
+[盲人模式兼容在线播放链接](https://github.com/user-attachments/assets/5642d769-d0dd-43f6-a5bc-ae96cc3fc756)
 
 ### 软件使用说明书
 
