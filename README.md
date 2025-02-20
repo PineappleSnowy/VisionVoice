@@ -147,12 +147,12 @@
 
 #### 生活助手
 
-|                                                            [避障模式](https://pineapplesnowy.cn/phone)                                                             |                                                           [寻物模式](https://pineapplesnowy.cn/phone)                                                            |
+|                                                            [避障模式](https://pineapplesnowy.cn/phone?avoidObstacle=true)                                                             |                                                           [寻物模式](https://pineapplesnowy.cn/phone?findItem=true)                                                            |
 | :----------------------------------------------------------------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------------------------: |
 |                              <a href="https://pineapplesnowy.cn/phone"> <img src="assets/images/feature_avoid.jpg" width="70%"> </a>                               |                              <a href="https://pineapplesnowy.cn/phone"> <img src="assets/images/feature_seek.jpg" width="70%"> </a>                               |
 | “避障模式”开启时，生活助手将通过手机后置摄像头不断获取周围环境的信息，并实时通过语音向用户提醒其附近的障碍物以及障碍物与用户的间距，依此帮助用户前行时绕开障碍物。 | 当用户找不到自己的个人物品时，用户可以使用“寻物模式”功能，通过手机后置摄像头的实时录像，找到用户事先已经在手机中保存好的照片所对应的物品（照片在“寻物画廊”中）。 |
 
-|                                [环境识别](https://pineapplesnowy.cn/phone)                                 |                               [帮我定位](https://pineapplesnowy.cn/phone)                               |
+|                                [环境识别](https://pineapplesnowy.cn/phone?envDescription=true)                                 |                               [帮我定位](https://pineapplesnowy.cn/phone?currentLocation=true)                               |
 | :--------------------------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------------: |
 | <a href="https://pineapplesnowy.cn/phone"> <img src="assets/images/feature_identify.jpg"  width="70%"> </a> | <a href="https://pineapplesnowy.cn/phone"> <img src="assets/images/feature_locate.jpg" width="70%"> </a> |
 |            “环境识别”将通过用户的手机后置摄像头进行拍照，通过照片中的信息来分析用户周围的环境。            |                      “帮我定位”将通过用户的手机定位帮助用户确定自己当前所在位置。                       |
@@ -166,7 +166,7 @@
 
 #### 有声相册
 
-|                               [有声相册](https://pineapplesnowy.cn/agent)                               |
+|                               [有声相册](https://pineapplesnowy.cn/album)                               |
 | :-----------------------------------------------------------------------------------------------------: |
 | <a href="https://pineapplesnowy.cn/agent"> <img src="assets/images/有声相册批量导入.jpg" width="70%"> </a> |
 |                                “有声相册”可以解析用户存放进来的每一张图片。用户可以通过手机相册和摄像头获取图片。用户可以通过点击图片来听产品对图片的详细解析，并让解析成为用户对图片的回忆的一部分。                                 |
