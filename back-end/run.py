@@ -471,7 +471,7 @@ def save_album_images():
                 )
 
                 image_des = describe_image(client, image_save_path, curr_user)
-                des_audio, = agent_audio_generate(image_des, talk_speed)
+                des_audio, _ = agent_audio_generate(image_des, talk_speed)
 
                 audio_file_name = filename + ".mp3"
                 audio_folder = os.path.join(
@@ -553,7 +553,7 @@ def get_audio():
         )
         with open(image_des_text_path, "r", encoding="utf-8") as f:
             image_des = f.read()
-        audio_data, = agent_audio_generate(image_des, talk_speed)
+        audio_data, _ = agent_audio_generate(image_des, talk_speed)
         with open(audio_path, "wb") as f:
             f.write(audio_data)
         talk_speed_config[audio_name] = talk_speed
