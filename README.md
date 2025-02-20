@@ -63,7 +63,7 @@
 
 #### 软件背景
 
-视障人士群体由于失去了视力，在生活中有诸多不便，有许多视障人士也因自身残疾而自闭自卑。为了帮助视障人士群体提高他们的生活质量， PineappleSnowy 团队 开发了无障碍智能助手“视界之声”（又名 VisionVoice），并希望这款产品能帮助他们寻找照亮他们黑暗生活的一道光。
+视障人士群体由于失去了视力，在生活中有诸多不便，有许多视障人士也因自身残疾而自闭自卑。为了帮助视障人士群体提高他们的生活质量， PineappleSnowy 团队 开发了无障碍“视界之声”VisionVoice智慧盲人助手（又名 VisionVoice，简称为 **视界之声** ），并希望这款产品能帮助他们寻找照亮他们黑暗生活的一道光。
 
 #### 应用领域
 
@@ -84,7 +84,7 @@
 
 可以在这里查看“视界之声”的使用 [演示视频](videos/视界之声主要功能演示.mp4)。
 
-[主要功能演示在线播放链接](https://github.com/user-attachments/assets/46caa625-27ef-4f39-8219-f54f019d5e4e)
+[主要功能演示在线播放链接](https://github.com/user-attachments/assets/f1c0294d-849c-4feb-8125-e2c736099223)
 
 也可以在这里查看手机无障碍功能中的[读屏功能演示](videos/视界之声手机盲人模式兼容.mp4)
 
@@ -100,7 +100,7 @@
 
 ### 核心功能
 
-作为面向视障人士群体的智能助手，“视界之声”由 **生活助手** 和 **心灵树洞** 组成。每个智能助手都可以和用户进行文字、语音、视频交流。并且，用户可以借助手机的无障碍读屏功能通过点击“视界之声”每个功能对应的按钮启动相应功能，或直接和智能助手进行语音或视频交流，直接说出用户当前想要做的事，“视界之声”将自动匹配与用户描述需求最接近的功能，并启动该功能服务用户。
+作为面向视障人士群体的智能助手，“视界之声”由 **生活助手** 、 **心灵树洞** 以及 **有声相册** 组成。生活助手和心灵树洞都是智能助手，每个智能助手都可以和用户进行文字、语音、视频交流。并且，用户可以借助手机的无障碍读屏功能通过点击“视界之声”每个功能对应的按钮启动相应功能，或直接和智能助手进行语音或视频交流，直接说出用户当前想要做的事，“视界之声”将自动匹配与用户描述需求最接近的功能，并启动该功能服务用户。
 
 用户可以在“视界之声”的消息列表中找到所有智能助手：
 
@@ -124,7 +124,7 @@
 
 用户随时可以通过点击界面下方的红色正方形打断智能体助手的输出。
 
-下面将介绍每个智能体助手分别包含的具体功能。每个助手的功能如下：
+下面将介绍“视界之声”的具体功能：
 
 - **生活助手**：
 
@@ -137,6 +137,9 @@
 
   - **情感陪护**：可以和用户进行聊天互动和情感交流
   - **专业问答**：可以和用户进行专业知识问答
+
+- **有声相册**：
+    可以从摄像头和相册获取图片并解析用户存放进来的每一张图片。用户可以通过点击图片来听产品对图片的详细解析，并让解析成为用户对图片的回忆的一部分。
 
 ### 在线演示
 
@@ -161,11 +164,21 @@
 | <a href="https://pineapplesnowy.cn/agent"> <img src="assets/images/agent2_emotion.jpg" width="70%"> </a> | <a href="https://pineapplesnowy.cn/agent"> <img src="assets/images/agent2_profession.jpg" width="70%"> </a> |
 |                                用户可以和智能体进行聊天互动与情感交流。                                 |                                     用户可以和智能体进行专业知识问答。                                     |
 
+#### 有声相册
+
+|                               [有声相册](https://pineapplesnowy.cn/agent)                               |
+| :-----------------------------------------------------------------------------------------------------: |
+| <a href="https://pineapplesnowy.cn/agent"> <img src="assets/images/agent2_emotion.jpg" width="70%"> </a> |
+|                                “有声相册”可以解析用户存放进来的每一张图片。用户可以通过手机相册和摄像头获取图片。用户可以通过点击图片来听产品对图片的详细解析，并让解析成为用户对图片的回忆的一部分。                                 |
+
+
 <br>
 
 ## 🏁 快速开始
 
 以下操作如果对用户来说不太方便，用户可以通过用户的家人、朋友来协助用户进行操作。
+
+**以下内容均为对“视界之声”的简要介绍。如果您希望了解更详细的内容，请通过[软件使用说明书](assets/images/manual.pdf) 查看软件使用说明书。**
 
 ### 1.安装“视界之声”
 
@@ -183,11 +196,11 @@
 
 #### 电脑体验版安装
 
-电脑体验版只有“智慧拍照”和“环境识别”功能可以体验，目前仍处于 0.3.0 版本（其中使用说明书为“用户手册”0.3.0 版本）。电脑体验版无需注册账号。
+电脑体验版只有“智慧拍照”和“环境识别”功能可以体验。电脑体验版无需注册账号。
 
 免费[安装“视界之声”电脑体验版](https://visionvoice.life/%E5%BA%94%E7%94%A8/Camera.exe)
 
-点击以上链接安装电脑体验版“视界之声”之后，用户需要打开 VisionVoice_3.0_Setup.exe 文件并通过提示将“视界之声”电脑体验版下载到用户喜欢的地址中。下载完成后“视界之声”会自动在桌面创建快捷方式，用户可以通过直接打开该快捷方式使用电脑体验版产品，或者找到“VisionVoice”文件夹并通过打开 openCamera.exe（如下图）文件使用电脑体验版产品。
+点击以上链接安装电脑体验版“视界之声”之后，用户需要打开 VisionVoice_1.0.0_Setup.exe 文件并通过提示将“视界之声”电脑体验版下载到用户喜欢的地址中。下载完成后“视界之声”会自动在桌面创建快捷方式，用户可以通过直接打开该快捷方式使用电脑体验版产品，或者找到“VisionVoice”文件夹并通过打开 openCamera.exe（如下图）文件使用电脑体验版产品。
 
 电脑体验版“VisionVoice”文件夹:
 
@@ -221,10 +234,14 @@
 <img src="assets/images/Android_open.jpg" width="35%">
 </div>
 
-启动后，在登录界面输入用户名和密码即可登录：
+启动后，在登录界面通过手机号码和短信验证码即可登录，也可以通过输入用户名和密码登录：
 
 <div align=center>
-<img src="assets/images/Android_login.jpg" width="35%">
+<img src="assets/images/Android_login1.jpg" width="35%">
+</div>
+
+<div align=center>
+<img src="assets/images/Android_login2.jpg" width="35%">
 </div>
 
 如果用户还没有注册账号，可以点击登录界面下方的“点击注册”进入注册界面，在注册界面输入用户名、昵称和密码，点击“注册”即可成功注册：
@@ -251,29 +268,16 @@
 <img src="assets/images/agent_listen.jpg" width="35%">
 </div>
 
-如果用户想要正常使用生活助手中“环境识别”“帮我定位”“寻物模式”“避障模式”等功能，请点击界面左下角的“视频”按钮打开手机摄像头，并把用户的需求通过语音告诉智能助手：
-
-<div align=center>
-<img src="assets/images/Android_listen.jpg" width="35%">
-</div>
+如果用户想要正常使用生活助手中“环境识别”“帮我定位”“寻物模式”“避障模式”等功能，请点击界面左下角的“视频”按钮打开手机摄像头，并把用户的需求通过语音告诉智能助手。
 
 用户可以通过点击界面右上角的转换箭头转换手机前置或后置摄像模式。
 
 <div align=center>
-<img src="assets/images/Android_turn.jpg" width="35%">
+<img src="assets/images/feature_identify.jpg" width="35%">
 </div>
 
-用户还可以通过点击界面下方中央的栏目按钮展开功能栏:
+用户可以在音视频通话界面下方选择对应功能：点击“避障”按钮开启“避障模式”功能，点击“寻物”按钮开启“寻物模式”功能，点击“位置”按钮开启“帮我定位”功能，点击“环境”按钮开启“环境识别”功能。
 
-<div align=center>
-<img src="assets/images/feature_menu2.jpg" width="35%">
-</div>
-
-功能栏中的四个按钮从左至右依次为 **“避障模式”“寻物模式”“环境识别”“帮我定位”** 这四个功能，点击按钮即可快速启动对应功能：
-
-<div align=center>
-<img src="assets/images/feature_menu3.jpg" width="35%">
-</div>
 
 下面将详细讲解“视界之声”的所有功能。
 
@@ -290,12 +294,6 @@
 </div>
 
 用户随时可以通过点击界面下方的红色叉号退出“避障模式”。
-
-用户也可以点击以下红色方框中的按钮快速开启“避障模式”：
-
-<div align=center>
-<img src="assets/images/feature_menu_avoid.jpg" width="35%">
-</div>
 
 ##### 寻物模式
 
@@ -319,30 +317,12 @@
 
 用户随时可以通过点击界面下方的红色叉号退出“寻物模式”。
 
-用户也可以点击以下红色方框中的按钮快速开启“寻物模式”：
-
-<div align=center>
-<img src="assets/images/feature_menu_seek.jpg" width="35%">
-</div>
-
 ##### 环境识别
 
 用户告诉助手“我附近都有什么？”“我周围都是什么？”“请描述四周环境”等需求，智能助手将自动开启“环境识别”功能：
 
 <div align=center>
 <img src="assets/images/feature_identify.jpg" width="35%">
-</div>
-
-下面是识别结果展示（实际使用时，生活助手将通过语音向用户播报识别结果）
-
-<div align=center>
-<img src="assets/images/feature_identify2.jpg" width="35%">
-</div>
-
-用户也可以点击以下红色方框中的按钮快速开启“环境识别”：
-
-<div align=center>
-<img src="assets/images/feature_menu_identify.jpg" width="35%">
 </div>
 
 ##### 帮我定位
@@ -353,26 +333,13 @@
 <img src="assets/images/feature_locate.jpg" width="35%">
 </div>
 
-下面是定位结果展示（实际使用时，生活助手将通过语音向用户播报识别结果）
-
-<div align=center>
-<img src="assets/images/feature_locate2.jpg" width="35%">
-</div>
-
-用户也可以点击以下红色方框中的按钮快速开启“帮我定位”：
-
-<div align=center>
-<img src="assets/images/feature_menu_locate.jpg" width="35%">
-</div>
-
-
 #### 心灵树洞
 
 用户可以点击界面下方的“消息”进入智能体助手菜单，然后选择自己想要的智能助手（“视界之声”现在上架了两个智能助手：**生活助手**和**心灵树洞**），点击对应的智能助手即可和它交流。直接点击智能助手的头像将进入对话界面；点击电话或视频按钮将进入语音和视频通话界面。
 
 
 <div align=center>
-<img src="assets/images/agent_menu.jpg" width="35%">
+<img src="assets/images/all_agents.jpg" width="35%">
 </div>
 
 点击“心灵树洞”进入如下对话界面：
@@ -416,6 +383,56 @@
 </div>
 
 当智能助手输出时，点击该界面右下角的正方形即可打断。
+
+#### 有声相册
+
+用户可以点击界面下方的“相册”按钮进入“有声相册”。初始时，“有声相册”中没有任何图片，如下所示：
+
+<div align=center>
+<img src="assets/images/进入有声相册.jpg" width="35%">
+</div>
+
+点击右上角的“+”号可以添加图片。点击“从摄像头获取”立刻打开摄像头拍摄图片；点击“从相册获取”访问手机相册中的图片。
+
+<div align=center>
+<img src="assets/images/有声相册获取图片.jpg" width="35%">
+</div>
+
+导入图片后，产品会立刻开始解析图片：
+
+<div align=center>
+<img src="assets/images/有声相册解析图片.jpg" width="35%">
+</div>
+
+解析完成后，点击图片立即语音播报产品对该图片的分析，并且在图片上显示两个按钮：
+
+<div align=center>
+<img src="assets/images/有声相册播报图片解析.jpg" width="35%">
+</div>
+
+点击图片上半部分的喇叭按钮即可停止语音播报，再次点击该按钮可以继续听到语音播报；点击图片下半部分的全屏按钮可以全屏文字展示产品对该图片的分析结果：
+
+<div align=center>
+<img src="assets/images/有声相册照片问答.jpg" width="35%">
+</div>
+
+用户可以在界面下方聊天框里和产品互动，以获得产品对该图片更进一步的分析：
+
+<div align=center>
+<img src="assets/images/有声相册照片问答2.jpg" width="35%">
+</div>
+
+用户可以点击右上角的红色按钮删除该图片。产品将返回“有声相册”界面，并提示用户“删除图片成功”。
+
+<div align=center>
+<img src="assets/images/有声相册删除图片.jpg" width="35%">
+</div>
+
+“有声相册”支持用户导入多张图片：
+
+<div align=center>
+<img src="assets/images/有声相册批量导入.jpg" width="35%">
+</div>
 
 ### 4.退出“视界之声”
 
