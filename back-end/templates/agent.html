@@ -29,33 +29,35 @@
     <!-- 下部功能区 -->
     <div id="chat-input-container" role="form">
 
-      <!-- 语音输入按钮 -->
-      <button id="microphone-button" aria-label="开始语音输入"></button>
+      
 
       <div id="imageUploadPanel" style="display: none;">
         <div class="content" aria-label="图片列表">
           <div class="imageList" id="imageList">
             <!-- 图片列表在这里 -->
           </div>
-          <div class="add" aria-label="添加图片" style="display: none;" tabindex="0" id="addImg">
+          <div class="add" aria-label="添加图片" style="display: none;" id="addImg">
             <img src="../static/images/more_function_start.png" alt="添加图片" aria-hidden="true">
             <input id="photo" type="file" accept="image/*" capture="camera" style="display: none;"/>
           </div>
         </div>
       </div>
-      <button id="camera-button" aria-label="使用相机上传图片" tabindex="0">
-        <img src="../static/images/camera.png" id="camera_icon" alt="使用相机上传图片" />
-      </button>
       <button id="phone-button" aria-label="语音聊天">
         <img src="../static/images/phone.png" id="phone_icon" alt="语音聊天" />
       </button>
+      <button id="camera-button" aria-label="使用相机上传图片">
+        <img src="../static/images/camera.png" id="camera_icon" alt="使用相机上传图片" />
+      </button>
+      
+      <!-- 语音输入按钮 -->
+      <button id="microphone-button" aria-label="开始语音输入"></button>
       <textarea id="agent-chat-textarea" placeholder="输入消息..." aria-label="输入消息"></textarea>
       <button id="send-button" aria-label="发送消息">发送</button>
       <button id="more_function_button" aria-label="开启更多功能"></button>
     </div>
-    <div id="more_function_board" role="region" aria-labelledby="more_function_label">
-      <div id="album_photo" aria-label="添加图片" tabindex="0"><i class="fa-solid fa-image"></i></div>
-      <div id="camera_photo" aria-label="使用相机上传图片" tabindex="0"><i class="fa-solid fa-camera"></i></div>
+    <div id="more_function_board" role="region" aria-labelledby="more_function_label" style="display:none">
+      <div id="album_photo" aria-label="添加图片"><i class="fa-solid fa-image"></i></div>
+      <div id="camera_photo" aria-label="使用相机上传图片"><i class="fa-solid fa-camera"></i></div>
     </div>
     <div id="navbar" role="navigation">
       <a href="/agent" aria-label="首页">

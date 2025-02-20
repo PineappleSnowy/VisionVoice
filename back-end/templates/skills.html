@@ -29,10 +29,10 @@
     </div>
     <div class="button-container">
       <button class="func_button" onclick="location.href='/agent'">🤖 智能体交互</button>
-      <button class="func_button" onclick="location.href='/phone?avoidObstacle=true'">🚧 辅助避障</button>
-      <button class="func_button" onclick="location.href='/phone?findItem=true'">🔍 帮我寻物</button>
-      <button class="func_button" onclick="location.href='/phone?envDescription=true'">🌳 环境描述</button>
-      <button class="func_button" onclick="location.href='/phone?currentLocation=true'">📍 获取位置</button>
+      <button class="func_button" onclick="localStorage.setItem('selectedAgent', 'defaultAgent'); location.href='/phone?avoidObstacle=true'">🚧 辅助避障</button>
+      <button class="func_button" onclick="localStorage.setItem('selectedAgent', 'defaultAgent'); location.href='/phone?findItem=true'">🔍 帮我寻物</button>
+      <button class="func_button" onclick="localStorage.setItem('selectedAgent', 'defaultAgent'); location.href='/phone?envDescription=true'">🌳 环境描述</button>
+      <button class="func_button" onclick="localStorage.setItem('selectedAgent', 'defaultAgent'); location.href='/phone?currentLocation=true'">📍 获取位置</button>
       <button class="func_button" onclick="location.href='/album'">🖼️ 有声相册</button>
     </div>
   </body>

@@ -110,7 +110,7 @@ def fetch_token() -> str:
 """  TOKEN end """
 
 
-def agent_audio_generate(text: str, speed: int = 8) -> str:
+def agent_audio_generate(text: str, speed: int = 8, task_id: int = 0) -> str:
     """
     根据文本生成音频
     :param text: 文本
@@ -175,7 +175,7 @@ def agent_audio_generate(text: str, speed: int = 8) -> str:
         "agent_audio_generate",
         "音频 '{}' 生成成功".format(text),
     )
-    return result_str
+    return result_str, task_id
 
 
 if __name__ == "__main__":

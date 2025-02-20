@@ -189,10 +189,10 @@ export default {
   },
 
   async onShow() {
-    storageUtils.deleteData('username');
-    storageUtils.deleteData('password');
-    storageUtils.deleteData('token');
-    storageUtils.deleteData('nickname');
+    // storageUtils.deleteData('username');
+    // storageUtils.deleteData('password');
+    // storageUtils.deleteData('token');
+    // storageUtils.deleteData('nickname');
     await this.checkAuthAndRedirect();
   },
 
@@ -216,9 +216,6 @@ export default {
 
   async handleLogin() {
     if (this.isPhoneLogin) {
-      storageUtils.saveData("loginUsername", this.loginPhoneNumber)
-      storageUtils.saveData("loginUsername", this.loginVerifyCode)
-
       if (!this.loginPhoneNumber || !this.loginVerifyCode) {
         console.log("手机号和验证码不能为空")
         utils.showToast("手机号和验证码不能为空")
@@ -245,17 +242,15 @@ export default {
 
         if (response.data.code === 200) {
           storageUtils.saveData("token", data.access_token);
-          storageUtils.saveData("username", this.loginUsername);
+          storageUtils.saveData("username", data.user_info.username);
           storageUtils.saveData("nickname", data.user_info.nickname);
-          this.gotoVisionVoice(data.access_token, this.loginUsername, data.user_info.nickname);
+          storageUtils.saveData("phone", this.loginPhoneNumber);
+          this.gotoVisionVoice(data.access_token, this.loginUsername, data.user_info.nickname, data.user_info.phone);
         }
       } catch (error) {
         console.error('Error:', error);
       }
     } else {
-      storageUtils.saveData("loginUsername", this.loginUsername)
-      storageUtils.saveData("loginPassword", this.loginPassword)
-
       if (!this.loginUsername || !this.loginPassword) {
         console.log("用户名和密码不能为空")
         utils.showToast("用户名和密码不能为空")
@@ -286,7 +281,8 @@ export default {
           storageUtils.saveData("token", data.access_token);
           storageUtils.saveData("username", this.loginUsername);
           storageUtils.saveData("nickname", data.user_info.nickname);
-          this.gotoVisionVoice(data.access_token, this.loginUsername, data.user_info.nickname);
+          storageUtils.saveData("phonr", data.user_info.phone);
+          this.gotoVisionVoice(data.access_token, this.loginUsername, data.user_info.nickname, data.user_info.phone);
         }
       } catch (error) {
         console.error('Error:', error);
@@ -332,6 +328,7 @@ export default {
         storageUtils.saveData("token", data.access_token);
         storageUtils.saveData("username", this.registerUsername);
         storageUtils.saveData("nickname", this.registerNickname);
+        storageUtils.saveData("phone", this.registerPhoneNumber);
         this.gotoVisionVoice(data.access_token, this.registerUsername, this.registerNickname);
       } else {
         utils.showToast("注册失败，请重试");
@@ -400,11 +397,12 @@ export default {
     }
   },
 
-  async gotoVisionVoice(token, username, nickname) {
+  async gotoVisionVoice(token, username, nickname, phone) {
     if (token && username && nickname) {
       webviewUtils.setCookie("token", token);
       webviewUtils.setCookie("username", username);
       webviewUtils.setCookie("nickname", nickname);
+      webviewUtils.setCookie("phone", phone);
     }
     webviewUtils.loadUrl($server_url)
   },
@@ -413,6 +411,7 @@ export default {
     const token = await storageUtils.getData("token");
     const username = await storageUtils.getData("username");
     const nickname = await storageUtils.getData("nickname");
+    const phone = await storageUtils.getData("phone");
     // console.log("[login][checkAuth] token:", token);
     if (!token) {
       utils.showToast("请先登录");
@@ -426,8 +425,8 @@ export default {
     });
     const data = JSON.parse(response.data.data);
     console.log("[login][checkAuth] data:", data);
-    if (data.valid) {
-      this.gotoVisionVoice(token, username, nickname);
+    if (data.valid) {+
+      this.gotoVisionVoice(token, username, nickname, phone);
     }
   }
 }

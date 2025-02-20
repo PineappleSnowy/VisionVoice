@@ -45,6 +45,7 @@ function loadChatHistory(agent) {
                         bubble.className = 'chat-bubble-user';
                         const image_user = document.createElement('div');
                         image_user.className = 'chat-image-user';
+                        image_user.ariaLabel = '用户头像';
                         bubble.textContent = msg.content;
 
                         messagebackground.appendChild(messagesContainer_user);
@@ -54,6 +55,7 @@ function loadChatHistory(agent) {
                         // 创建机器人消息
                         const image_bot = document.createElement('div');
                         image_bot.className = 'chat-image-bot';
+                        image_bot.ariaLabel = '智能体头像';
                         image_bot.style.backgroundImage = `url('${botImageUrl}')`;
                         const messagesContainer_bot = document.createElement('div');
                         messagesContainer_bot.className = 'chat-messages-bot';
@@ -142,6 +144,7 @@ function addMessage(message) {
     bubble.className = 'chat-bubble-user';
     const image_user = document.createElement('div');
     image_user.className = 'chat-image-user';
+    image_user.ariaLabel = '用户头像';
     bubble.textContent = message;
 
     messagebackground.appendChild(messagesContainer_user);
@@ -216,6 +219,7 @@ function sendMessageToAgent(message, multi_image_talk) {
     // 机器人响应
     const image_bot = document.createElement('div');
     image_bot.className = 'chat-image-bot';
+    image_bot.ariaLabel = '智能体头像';
     const botImageUrl = selectedAgent === 'psychologicalAgent' ? '../static/images/psychologicalAgent.jpg' : '../static/images/defaultAgent.jpg';
     image_bot.style.backgroundImage = `url('${botImageUrl}')`;
     const messagesContainer_bot = document.createElement('div');
@@ -241,11 +245,8 @@ function sendMessageToAgent(message, multi_image_talk) {
 
             // 逐块读取并处理数据
             return reader.read().then(function processText({ done, value }) {
-                if (done) {
-                    return;
-                }
-                // 如果对话序号对不上，则停止响应
-                if (talk_index !== curr_talk_index) {
+                // 响应结束或对话序号对不上，则停止处理
+                if (done || talk_index !== curr_talk_index) {
                     return;
                 }
 
@@ -253,10 +254,11 @@ function sendMessageToAgent(message, multi_image_talk) {
 
                 // 如果当前不是结束标志，则将文本添加到气泡中
                 if (!(jsonString.includes("<END>"))) {
-                    if (!isMuted) {
-                        socket.emit("agent_stream_audio", jsonString, talk_speed);
-                    }
                     bubble_2.textContent += jsonString;
+                }
+                
+                if (!isMuted) {
+                    socket.emit("agent_stream_audio", jsonString, talk_speed, talk_index);
                 }
 
                 // 继续读取下一个数据
@@ -411,10 +413,11 @@ document.getElementById('more_function_button').addEventListener('click', functi
             document.getElementById('chat-input-container').classList.remove('slide-down');
             document.getElementById('chat-input-container').classList.add('slide-up');
         }
-        if (!document.getElementById('more_function_board').classList.contains('slide-up')) {
-            document.getElementById('more_function_board').classList.remove('slide-down');
-            document.getElementById('more_function_board').classList.add('slide-up');
-        }
+        setTimeout(()=>{document.getElementById('more_function_board').style.display = 'flex'},100);
+        // if (!document.getElementById('more_function_board').classList.contains('slide-up')) {
+        //     document.getElementById('more_function_board').classList.remove('slide-down');
+        //     document.getElementById('more_function_board').classList.add('slide-up');
+        // }
         document.getElementById('chat-container').style.bottom = '181px';
     }
 
@@ -426,10 +429,11 @@ document.getElementById('more_function_button').addEventListener('click', functi
             document.getElementById('chat-input-container').classList.remove('slide-up');
             document.getElementById('chat-input-container').classList.add('slide-down');
         }
-        if (!document.getElementById('more_function_board').classList.contains('slide-down')) {
-            document.getElementById('more_function_board').classList.remove('slide-up');
-            document.getElementById('more_function_board').classList.add('slide-down');
-        }
+        // if (!document.getElementById('more_function_board').classList.contains('slide-down')) {
+        //     document.getElementById('more_function_board').classList.remove('slide-up');
+        //     document.getElementById('more_function_board').classList.add('slide-down');
+        // }
+        document.getElementById('more_function_board').style.display = 'none';
         document.getElementById('chat-container').style.bottom = '100px';
     }
 });
@@ -510,7 +514,10 @@ document.getElementById('audio-control').addEventListener('click', function () {
 socket.on('agent_play_audio_chunk', function (data) {
     const user = localStorage.getItem('user');
     console.log('curr_user', user)
-    if (data.user !== user) return;
+    console.log('curr_talk_index', curr_talk_index)
+    console.log(data.task_id)
+    // 如果用户不匹配或者对话序号不匹配，则停止处理
+    if (data.user !== user || data.task_id !== curr_talk_index) return;
     if (!isMuted) {
         const audioIndex = data['index'];
         const audioData = data['audio_chunk'];
