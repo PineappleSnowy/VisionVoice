@@ -68,3 +68,4 @@ gunicorn_config.py
 # 测试文件
 **/test/
 **/YoloJS_
+**/.VSCodeCounter/
