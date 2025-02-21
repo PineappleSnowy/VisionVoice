@@ -565,7 +565,8 @@ class YoloDetector {
 
                 const label_1 = label_0 + i;
                 const y2 = y + height;
-                const distanceReal = 6.88448838e-13 * Math.pow(y2, 4) - 2.27144172e-09 * Math.pow(y2, 3) + 3.19109921e-06 * Math.pow(y2, 2) - 3.16104347e-03 * y2 + 2.06059217e+00;
+                const distanceReal = -8.42969910e-12 * Math.pow(y2, 4) + 2.48549357e-09 * Math.pow(y2, 3) + 1.12279819e-05 * Math.pow(y2, 2) - 1.14428737e-02 * y2 + 3.65615061e+00;
+                // const distanceReal = 6.88448838e-13 * Math.pow(y2, 4) - 2.27144172e-09 * Math.pow(y2, 3) + 3.19109921e-06 * Math.pow(y2, 2) - 3.16104347e-03 * y2 + 2.06059217e+00;
                 // const distanceReal = -1.94372972e-10 * Math.pow(y2, 4) + 3.64277250e-07 * Math.pow(y2, 3) - 2.44495517e-04 * Math.pow(y2, 2) + 6.62975001e-02 * y2 - 4.91398633e+00;
                 const x_centor = x + width / 2;
                 const y_centor = y + height / 2;
