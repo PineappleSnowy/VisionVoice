@@ -375,15 +375,7 @@
 
 用户可以点击右上角的红色按钮删除该图片。产品将返回“有声相册”界面，并提示用户“删除图片成功”。
 
-<div align=center>
-<img src="assets/images/有声相册删除图片.jpg" width="35%">
-</div>
-
-“有声相册”支持用户导入多张图片：
-
-<div align=center>
-<img src="assets/images/有声相册批量导入.jpg" width="35%">
-</div>
+“有声相册”支持用户导入多张图片。
 
 ### 4.退出“视界之声”
 
