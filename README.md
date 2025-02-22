@@ -1,13 +1,6 @@
-[![Overview](assets/images/visionvoice_cover.jpg)](https://visionvoice.life/)
+![Overview](assets/images/visionvoice_cover.jpg)
 
 <div align="center">
-
-<a href="https://visionvoice.life/html.child/%E4%BA%A7%E5%93%81%E6%BC%94%E7%A4%BA.html">🔥视界之声 在线版</a> · <a href="https://visionvoice.life/html.child/user_manual.html">📃 用户文档</a> · <a href="https://github.com/PineappleSnowy/VisionVoice/issues">报告问题</a> · <a href="https://github.com/PineappleSnowy/VisionVoice/issues">建议反馈</a> · <a href="https://visionvoice.life/html.child/%E6%9B%B4%E6%96%B0%E6%97%A5%E5%BF%97.html">更新日志</a> · <a href="https://visionvoice.life">🌐 官方网站</a>
-
-
-<br>
-
-👋 关于我们的[信息](https://visionvoice.life/html.child/%E5%85%B3%E4%BA%8E%E6%88%91%E4%BB%AC.html)
 
 # 视界之声 VisionVoice
 
@@ -19,8 +12,8 @@
 - [📜 开放源码许可证](#-开放源码许可证) 
 - [ℹ️ 软件基本信息](#-软件基本信息)
 - [🚗 作品概述](#-作品概述)
-- [🎥 演示视频与软件使用说明书](#-演示视频与软件使用说明书)
-- [📋 功能描述与在线演示](#-功能描述与在线演示)
+- [🎥 演示视频](#-演示视频)
+- [📋 功能描述](#-功能描述)
 - [🚀 快速开始](#-快速开始)
 - [🛠️ 视界之声开发说明](#-视界之声开发说明)
 - [🌟 产品创新点](#-产品创新点)
@@ -33,7 +26,7 @@
 
 ### 什么是“视界之声”VisionVoice？
 
-“视界之声"(又名 VisionVoice)是一款为视障人士群体（以下简称为“用户”）开发的无障碍智能助手，分为 Windows 端体验版和 Android 端正式版。通过图像识别、单目测距、人脸检测、语音识别和语音播报等高新技术，“视界之声”可以帮助用户进行日常生活中的拍照、出行和寻物，帮助用户出行时绕开障碍物，还可以和用户进行聊天互动、专业知识问答和情感交流。
+“视界之声"(又名 VisionVoice)是一款为视障人士群体（以下简称为“用户”）开发的无障碍智能助手，基于蓝河操作系统实现。通过图像识别、单目测距、特征提取、语音识别和语音播报等高新技术，“视界之声”可以帮助用户进行日常生活中的照片阅读、出行和寻物，帮助用户出行时绕开障碍物，还可以和用户进行聊天互动、专业知识问答和情感交流。
 
 ### VisionVoice README 徽章
 
@@ -54,7 +47,7 @@
 - **作品标题**：视界之声 VisionVoice
 - **版本**：1.0.0
 - **软件分类**：多模态智能交互应用
-- **作者/团队**：西安电子科技大学 PineappleSnowy 团队（又名"寒菠创想"团队）
+- **作者/团队**：西安电子科技大学寒菠创想团队
 - **联系方式**：hdgong2766@qq.com
 
 ## 🚗 作品概述
@@ -63,7 +56,7 @@
 
 #### 软件背景
 
-视障人士群体由于失去了视力，在生活中有诸多不便，有许多视障人士也因自身残疾而自闭自卑。为了帮助视障人士群体提高他们的生活质量， PineappleSnowy 团队 开发了无障碍“视界之声”VisionVoice智慧盲人助手（又名 VisionVoice，简称为 **视界之声** ），并希望这款产品能帮助他们寻找照亮他们黑暗生活的一道光。
+视障人士群体由于失去了视力，在生活中有诸多不便，有许多视障人士也因自身残疾而自闭自卑。为了帮助视障人士群体提高他们的生活质量， 寒菠创想团队 开发了无障碍“视界之声”VisionVoice智慧盲人助手（又名 VisionVoice，简称为 **视界之声** ），并希望这款产品能帮助他们寻找照亮他们黑暗生活的一道光。
 
 #### 应用领域
 
@@ -78,7 +71,7 @@
 
 <br>
 
-## 💻 演示视频与软件使用说明书
+## 💻 演示视频
 
 ### 演示视频
 
@@ -90,13 +83,7 @@
 
 [盲人模式兼容在线播放链接](https://github.com/user-attachments/assets/5642d769-d0dd-43f6-a5bc-ae96cc3fc756)
 
-### 软件使用说明书
-
-我们为用户编写了详细的用户手册和使用说明！前往 <a href="https://visionvoice.life/html.child/user_manual.html">📃 用户文档</a> 和 [软件使用说明书](assets/images/manual.pdf) 查看用户文档和软件使用说明书。
-
-## 📃 功能描述与在线演示
-
-[点此体验“视界之声”](https://pineapplesnowy.cn) 🚀
+## 📃 功能描述
 
 ### 核心功能
 
@@ -147,28 +134,28 @@
 
 #### 生活助手
 
-|                                                            [避障模式](https://pineapplesnowy.cn/phone?avoidObstacle=true)                                                             |                                                           [寻物模式](https://pineapplesnowy.cn/phone?findItem=true)                                                            |
+|                                                            避障模式                                                           |                                                           寻物模式                                                           |
 | :----------------------------------------------------------------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------------------------: |
-|                              <a href="https://pineapplesnowy.cn/phone"> <img src="assets/images/feature_avoid.jpg" width="70%"> </a>                               |                              <a href="https://pineapplesnowy.cn/phone"> <img src="assets/images/feature_seek.jpg" width="70%"> </a>                               |
+|                              <img src="assets/images/feature_avoid.jpg" width="70%">                                |                              <img src="assets/images/feature_seek.jpg" width="70%">                           |
 | “避障模式”开启时，生活助手将通过手机后置摄像头不断获取周围环境的信息，并实时通过语音向用户提醒其附近的障碍物以及障碍物与用户的间距，依此帮助用户前行时绕开障碍物。 | 当用户找不到自己的个人物品时，用户可以使用“寻物模式”功能，通过手机后置摄像头的实时录像，找到用户事先已经在手机中保存好的照片所对应的物品（照片在“寻物画廊”中）。 |
 
-|                                [环境识别](https://pineapplesnowy.cn/phone?envDescription=true)                                 |                               [帮我定位](https://pineapplesnowy.cn/phone?currentLocation=true)                               |
+|                                环境识别                                |                               帮我定位                               |
 | :--------------------------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------------: |
-| <a href="https://pineapplesnowy.cn/phone"> <img src="assets/images/feature_identify.jpg"  width="70%"> </a> | <a href="https://pineapplesnowy.cn/phone"> <img src="assets/images/feature_locate.jpg" width="70%"> </a> |
+| <img src="assets/images/feature_identify.jpg"  width="70%">| <img src="assets/images/feature_locate.jpg" width="70%"> |
 |            “环境识别”将通过用户的手机后置摄像头进行拍照，通过照片中的信息来分析用户周围的环境。            |                      “帮我定位”将通过用户的手机定位帮助用户确定自己当前所在位置。                       |
 
 #### 心灵树洞
 
-|                               [情感陪护](https://pineapplesnowy.cn/agent)                               |                                [专业问答](https://pineapplesnowy.cn/agent)                                 |
+|                               情感陪护                              |                                专业问答                                 |
 | :-----------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------: |
-| <a href="https://pineapplesnowy.cn/agent"> <img src="assets/images/agent2_emotion.jpg" width="70%"> </a> | <a href="https://pineapplesnowy.cn/agent"> <img src="assets/images/agent2_profession.jpg" width="70%"> </a> |
+|  <img src="assets/images/agent2_emotion.jpg" width="70%">  |  <img src="assets/images/agent2_profession.jpg" width="70%">  |
 |                                用户可以和智能体进行聊天互动与情感交流。                                 |                                     用户可以和智能体进行专业知识问答。                                     |
 
 #### 有声相册
 
-|                               [有声相册](https://pineapplesnowy.cn/album)                               |
+|                               有声相册                             |
 | :-----------------------------------------------------------------------------------------------------: |
-| <a href="https://pineapplesnowy.cn/agent"> <img src="assets/images/有声相册批量导入.jpg" width="70%"> </a> |
+|<img src="assets/images/有声相册批量导入.jpg" width="70%"> |
 |                                “有声相册”可以解析用户存放进来的每一张图片。用户可以通过手机相册和摄像头获取图片。用户可以通过点击图片来听产品对图片的详细解析，并让解析成为用户对图片的回忆的一部分。                                 |
 
 
@@ -182,43 +169,7 @@
 
 ### 1.安装“视界之声”
 
-“视界之声”现已推出电脑体验版和手机正式版。
-
-#### 手机正式版安装
-
-手机正式版（即“视界之声”手机版）拥有 [功能描述与在线演示](#-功能描述与在线演示) 中展示的所有功能。使用手机版“视界之声”需要用户免费注册账号并登录。
-
-扫描二维码，免费安装“视界之声”手机版。
-
-<div align=center>
-<img src="assets/images/download_andriod_app.jpg" width="30%">
-</div>
-
-#### 电脑体验版安装
-
-电脑体验版只有“智慧拍照”和“环境识别”功能可以体验。电脑体验版无需注册账号。
-
-免费[安装“视界之声”电脑体验版](https://visionvoice.life/%E5%BA%94%E7%94%A8/Camera.exe)
-
-点击以上链接安装电脑体验版“视界之声”之后，用户需要打开 VisionVoice_1.0.0_Setup.exe 文件并通过提示将“视界之声”电脑体验版下载到用户喜欢的地址中。下载完成后“视界之声”会自动在桌面创建快捷方式，用户可以通过直接打开该快捷方式使用电脑体验版产品，或者找到“VisionVoice”文件夹并通过打开 openCamera.exe（如下图）文件使用电脑体验版产品。
-
-电脑体验版“VisionVoice”文件夹:
-
-<div align=center>
-<img src="assets/images/windows_files.jpg" width="85%">
-</div>
-
-电脑体验版启动界面:
-
-<div align=center>
-<img src="assets/images/windows_open.jpg" width="85%">
-</div>
-
-电脑体验版使用界面：
-
-<div align=center>
-<img src="assets/images/windows_use.jpg" width="85%">
-</div>
+“视界之声”基于蓝河操作系统实现，请使用蓝河快应用调试器安装。
 
 ### 2.免费注册并登录“视界之声”
 
@@ -250,7 +201,7 @@
 <img src="assets/images/Android_register.jpg" width="35%">
 </div>
 
-也可以在这里免费[注册账号](https://pineapplesnowy.cn/)。成功注册账号后，用户将自动登录。
+成功注册账号后，用户将自动登录。
 
 <br>
 
@@ -436,18 +387,13 @@
 
 ### 4.退出“视界之声”
 
-#### 退出Android端正式版
+#### 退出蓝河正式版
 
 当以上功能使用完毕后，用户可以选择继续使用对应功能，或直接在手机后台关闭应用程序即可退出登录并退出程序。用户也可以点击界面右下角的“我的”进入个人信息界面，然后点击“退出登录“即可退出登录并自动返回登录界面。
 
 <div align=center>
 <img src="assets/images/Android_quit.jpg" width="35%">
 </div>
-
-#### 退出Windows端体验版
-
-当以上功能使用完毕后，本产品将提醒用户“您可以说“退出”以退出程序，或继续选择服务：1.智慧拍照；2.环境识别”。用户可以根据提示通过说“智慧拍照”或“环境识别”的方式或通过点击左侧对应按钮继续选择使用对应功能。用户可以通过说“退出”的方式退出本产品，或通过直接关闭程序的方式退出本产品。
-
 
 ## 🛠️ 视界之声开发说明
 
@@ -577,17 +523,13 @@
 #### 运行程序
 
 由于快应用的特殊性，如果您想要在蓝河快应用环境中运行本项目:
-- 快应用只能访问已部署的线上服务器(https://pineapplesnowy.cn)
+- 快应用只能访问已部署的线上服务器
 - 无法直接访问本地开发服务器
 - 请确保使用线上正式环境的API配置
 
-### 更新日志
-
-在这里，您可以查看我们对“视界之声”的开发历史。 [更新日志](https://visionvoice.life/html.child/%E6%9B%B4%E6%96%B0%E6%97%A5%E5%BF%97.child/%E4%BB%8E%E9%9B%B6%E5%88%B0%E4%B8%80.html)
-
 ## 🌟 产品创新点
 
-- **Web开发**
+- **前后端开发**
 
   - 调用视觉能力时动态设置图片上传帧率，加速环境感知并保证响应质量
   - 图片上传与语音识别并行处理、发起大模型响应阻塞处理，实现快速响应并避免网络时延带来的逻
@@ -604,11 +546,11 @@
 - **视觉识别、单目测距与图像处理**
 
   - 使用 YOLO 模型 检测图像中的目标，使用多线程并发机制同时识别多个物体并返回边界框
-  - 图像分割, 排除边界框中背景的影响, 使之后的图像特征提取和特征点匹配更精确
-  - ResNet50 提取图像特征 (预先将传入的图像设为固定尺寸)，去除全连接层, 从多个不同旋转角度获得高维特征向量，用于之后图像内容相似度计算
+  - 目标检测，快速筛选ROI，减小特征匹配搜索空间
+  - MobileNet 提取图像特征 (预先将传入的图像设为固定尺寸)，去除全连接层, 从多个不同旋转角度获得高维特征向量，用于之后图像内容相似度计算
   - 计算两个图像特征向量之间的余弦相似度, 评估目标物品图像和检测物体之间的相似性，过滤掉不相似的物体
   - 对尺寸较小的物体区域，通过双三次插值放大图像，增强细节；去除噪声; 增强图像的对比度，提升细节，尤其是在低光照条件下，改善物体检测效果
-  - ORB 特征点匹配, 结合计算机视觉传统技术，通过检测并匹配关键点来提高检测准确度
+  - 根据物品距离动态调整检测阈值，提高检测精度
 
 ## 🆚 视界之声与其它助盲产品的比较
 
@@ -623,7 +565,7 @@
   Be My Eyes 需要视障人士与能够提供视觉帮助的志愿者进行实时视频通话连接，并请求志愿者的帮助。"视界之声"无需志愿者，一切功能都基于各种人工智能算法。
 
 - **📱 支持 Anroid 使用**：
-  Be My Eyes 仅适用于 iPad 和 iPhone，Android 手机用户无法使用。"视界之声"是一款快应用，可以在 Android 手机上自由使用。
+  Be My Eyes 仅适用于 iPad 和 iPhone，Android 手机用户无法使用。"视界之声"是一款快应用，可以在兼容蓝河操作系统的 Android 手机上自由使用。
 
 - **🌏 支持国内使用**：
   Be My Eyes 是一款国外软件，国内难以使用。"视界之声"是一款自主研发的国产软件，可以在国内自由使用。
@@ -681,9 +623,9 @@
 
 ### 我们的故事
 
-本产品开发团队（简称为“我们”）是来自 西安电子科技大学 的 PineappleSnowy 团队，是一个全部由 00 后大学生组成的充满爱心、活力满满的团队！
+本产品开发团队（简称为“我们”）是来自 西安电子科技大学 的 寒菠创想 团队，是一个全部由 00 后大学生组成的充满爱心、活力满满的团队！
 为了开发出更符合视障人士需求的产品，我们联系了陕西省盲人协会并参与了“黑暗跑团”西安站的志愿活动，成为帮助视障人士跑步运动的盲人助跑员等志愿者，并在帮助盲人跑步时和盲人进行深入交流，实地调研视障人士群体的真实需求，并以此改进我们的产品。
-下列图片为我们 PineappleSnowy 团队参与志愿活动的实地照片：
+下列图片为我们 寒菠创想 团队参与志愿活动的实地照片：
 <div style="display: flex; justify-content:  space-around; align-items: center; gap: 20px;">
   <img src="assets/images/about_us1.jpg" width="40%">
   <img src="assets/images/about_us2.jpg" width="40%">
@@ -716,7 +658,7 @@
 
 #### _希望不再有于黑暗中踽踽独行者，每个人都拥有拥抱光彩世界的自由_
 
-_——这是 PineappleSnowy 团队的初心_
+_——这是 寒菠创想 团队的初心_
 
 如果您愿意和我们合作，请联系：**hdgong2766@qq.com**
 
