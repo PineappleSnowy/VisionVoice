@@ -1,71 +1,70 @@
-# ----------------- front-end -----------------
+# ==================== General Development ====================
 .DS_Store
-node_modules
-**/build
-**/backup-*
-
-# sign
-
-# local env files
-.env.local
-.env.*.local
-
-# Log files
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Editor directories and files
-.idea
-.vscode
+*.log
+*.local
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw*
-.ide
+*.tsbuildinfo
+*.sw?
+
+# ==================== Node.js/JavaScript ====================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+/build
+/dist
+/dist-ssr
+/coverage
+
+# ==================== Python ====================
+*.pyc
+__pycache__/
+.venv/
+.pytest_cache/
+*.py[cod]
+
+# ==================== IDE/Editor ====================
+.idea/
+.vscode/
+!.vscode/extensions.json
+.ide/
 .quickapp.preview.json
 
-# ----------------- back-end -----------------
-# 缓存文件
-*.pyc
-**/__pycache__
-**/api.json
+# ==================== Testing ====================
+/cypress/videos/
+/cypress/screenshots/
+/test/
 
-# 临时文件
-**/.cache/*
-
-# 虚拟环境
-.venv
-
-# ide 默认配置文件
-.idea
-
-# less 文件
-*.less
-
-# yolo大体积模型
-yolo11x-seg.pt
-
-# api文件
+# ==================== Build/Generated Files ====================
 api.json
-
-# 用户文件
-**/user_images/*
 user.json
 verification_code_dict.json
-
-# 服务器脚本
-run_forever.sh
 gunicorn_config.py
-
-# 签名文件
+run_forever.sh
 *.pem
 
-# 环境变量
-.env
+# ==================== Large Files ====================
+yolo11x-seg.pt
 
-# 测试文件
-**/test/
-**/YoloJS_
-**/.VSCodeCounter/
+# ==================== User-generated Content ====================
+/user_images/
+/backup-*
+/.cache/
+
+# ==================== Environment ====================
+.env
+.env.*
+.env.local
+.env.*.local
+
+# ==================== Other ====================
+/.VSCodeCounter/
+/YoloJS_
+*.less
+sign
