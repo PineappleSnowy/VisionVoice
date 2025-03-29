@@ -6,8 +6,9 @@ import UserAgent from '@/views/user/UserAgent.vue'
 import UserAlbum from '@/views/user/UserAlbum.vue'
 import UserSkills from '@/views/user/UserSkills.vue'
 import UserMine from '@/views/user/UserMine.vue'
-import FullScreenLayout from '@/layouts/FullScreenLayout.vue'
 import UserAgreement from '@/views/user/userMine/UserAgreement.vue'
+import UserSettings from '@/views/user/userMine/UserSettings.vue'
+import UserContact from '@/views/user/userMine/UserContact.vue'
 
 const router = createRouter({
   history:createWebHistory(),
@@ -56,23 +57,24 @@ const router = createRouter({
     },
     {
       path:'/mine/agreement',
-      component:FullScreenLayout,
-      children:[
-        {
-          path:'',
-          component:UserAgreement
-        },
-      ],
+      component:UserAgreement,
+          meta:{
+            title:'用户须知'
+          }
     },
     {
       path:'/mine/contact',
-      component:FullScreenLayout,
-      children:[
-        {
-          path:'',
-          component:UserAgreement
-        },
-      ],
+      component:UserContact,
+          meta:{
+            title:'联系我们'
+          },
+    },
+    {
+      path:'/mine/settings',
+      component:UserSettings,
+          meta:{
+            title:'用户设置'
+          },
     },
     {
       path:'/login',
