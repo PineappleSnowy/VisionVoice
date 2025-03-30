@@ -1,18 +1,18 @@
 <template>
   <div id="navbar" role="navigation">
-        <RouterLink :to="{path: '/agent'}" active-class="active" aria-label="首页">
+        <RouterLink :to="{path: '/agent'}" replace active-class="active" aria-label="首页">
             <span>首页</span>
         </RouterLink>
-        <RouterLink :to="{path: '/chat'}" active-class="active" aria-label="消息">
+        <RouterLink :to="{path: '/chat'}" replace active-class="active" aria-label="消息">
             <span>消息</span>
         </RouterLink>
-        <RouterLink :to="{path: '/album'}" active-class="active" aria-label="有声相册">
+        <RouterLink :to="{path: '/album'}" replace active-class="active" aria-label="有声相册">
             <span>相册</span>
         </RouterLink>
-        <RouterLink :to="{path: '/skills'}" active-class="active" aria-label="能力">
+        <RouterLink :to="{path: '/skills'}" replace active-class="active" aria-label="能力">
             <span>能力</span>
         </RouterLink>
-        <RouterLink :to="{path: '/mine'}" active-class="active" aria-label="我的">
+        <RouterLink :to="{path: '/mine'}" replace active-class="active" aria-label="我的">
             <span>我的</span>
         </RouterLink>
     </div>

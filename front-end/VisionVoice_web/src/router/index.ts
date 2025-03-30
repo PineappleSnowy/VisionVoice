@@ -9,6 +9,7 @@ import UserMine from '@/views/user/UserMine.vue'
 import UserAgreement from '@/views/user/userMine/UserAgreement.vue'
 import UserSettings from '@/views/user/userMine/UserSettings.vue'
 import UserContact from '@/views/user/userMine/UserContact.vue'
+import UserPhotoManage from '@/views/user/userMine/UserPhotoManage.vue'
 
 const router = createRouter({
   history:createWebHistory(),
@@ -74,6 +75,13 @@ const router = createRouter({
       component:UserSettings,
           meta:{
             title:'用户设置'
+          },
+    },
+    {
+      path:'/mine/photoManage',
+      component:UserPhotoManage,
+          meta:{
+            title:'寻物画廊'
           },
     },
     {

@@ -64,6 +64,10 @@ app.config["JWT_SECRET_KEY"] = "s96cae35ce8a9b0244178bf28e4966c2ce1b83"
 """
 USER_VAR = dict()
 
+# 设置图片文件夹路径
+USER_IMAGE_FOLDER = "./user_images/"
+
+
 # 处理user.json不存在的情况
 if not os.path.exists("./static/user.json"):
     with open("./static/user.json", "w") as f:
@@ -78,55 +82,55 @@ if not os.path.exists("./user_images"):
 # 使用 verify_jwt_in_request 进行 JWT 验证
 
 
-@app.before_request
-def before_request():
-    # 排除 GET 请求的 JWT 验证
-    if (
-        request.path == "/agent/chat_stream"
-        or request.path == "/agent/upload_audio"
-        or request.path == "/agent/upload_image"
-        or request.path == "/rename_image"
-        or request.path == "/save_item_image"
-        or request.path == "/delete_image"
-        or request.path == "/images"
-        or request.path == "/save_album_images"
-        or request.path == "/get_audio"
-        or request.path == "/get_image_des"
-        or request.path == "/album_talk"
-        or request.path == "/delete-chat-history"
-    ):
-        try:
-            verify_jwt_in_request()
-        except Exception as e:
-            return (
-                jsonify(
-                    {"message": "Token has expired!",
-                        "code": 401, "error": str(e)}
-                ),
-                401,
-            )
+# @app.before_request
+# def before_request():
+    # # 排除 GET 请求的 JWT 验证
+    # if (
+    #     request.path == "/agent/chat_stream"
+    #     or request.path == "/agent/upload_audio"
+    #     or request.path == "/agent/upload_image"
+    #     or request.path == "/rename_image"
+    #     or request.path == "/save_item_image"
+    #     or request.path == "/delete_image"
+    #     or request.path == "/images"
+    #     or request.path == "/save_album_images"
+    #     or request.path == "/get_audio"
+    #     or request.path == "/get_image_des"
+    #     or request.path == "/album_talk"
+    #     or request.path == "/delete-chat-history"
+    # ):
+    #     try:
+    #         verify_jwt_in_request()
+    #     except Exception as e:
+    #         return (
+    #             jsonify(
+    #                 {"message": "Token has expired!",
+    #                     "code": 401, "error": str(e)}
+    #             ),
+    #             401,
+    #         )
 
-    # 允许访问的静态资源路径
-    allowed_paths = [
-        "/static/css",
-        "/static/js",
-        "/static/images",
-        "/image",
-        "/static/favicon.ico",
-        "/static/manifest.json",
-        "/static/models",
-        "/static/service-worker.js",
-    ]
+    # # 允许访问的静态资源路径
+    # allowed_paths = [
+    #     "/static/css",
+    #     "/static/js",
+    #     "/static/images",
+    #     "/image",
+    #     "/static/favicon.ico",
+    #     "/static/manifest.json",
+    #     "/static/models",
+    #     "/static/service-worker.js",
+    # ]
 
-    # 获取所有已注册的路由
-    registered_routes = [rule.rule for rule in app.url_map.iter_rules()]
+    # # 获取所有已注册的路由
+    # registered_routes = [rule.rule for rule in app.url_map.iter_rules()]
 
-    # 检查请求路径是否在允许的静态资源路径或已注册的路由中
-    if (
-        not any(request.path.startswith(path) for path in allowed_paths)
-        and request.path not in registered_routes
-    ):
-        return jsonify({"message": "Forbidden", "code": 403}), 403
+    # # 检查请求路径是否在允许的静态资源路径或已注册的路由中
+    # if (
+    #     not any(request.path.startswith(path) for path in allowed_paths)
+    #     and request.path not in registered_routes
+    # ):
+    #     return jsonify({"message": "Forbidden", "code": 403}), 403
 
 
 # 断开连接时删除用户变量
@@ -152,7 +156,7 @@ def handle_disconnect():
     else:
         print("[run.py][handle_disconnect] Missing token")
 
-
+#region 页面路由
 @app.route("/", methods=["GET"])
 def index():
     cookie_value = request.cookies.get("token")
@@ -214,12 +218,6 @@ def logout():
     return redirect("/login")
 
 
-"""寻物画廊路由"""
-
-# 设置图片文件夹路径
-USER_IMAGE_FOLDER = "./user_images/"
-
-
 @app.route("/photo_manage", methods=["GET"])
 def photo_manage():
     """画廊路由"""
@@ -237,8 +235,14 @@ def user_agreement():
     """用户须知路由"""
     return render_template("user_agreement.html")
 
+@app.route("/settings", methods=["GET"])
+def settings():
+    return render_template("settings.html")
 
-@app.route("/get_user_agreement_text")
+#endregion 页面路由
+
+
+@app.route("/userAgreement", methods=['GET'])
 def get_user_agreement_text():
     file_path = "./configs/user_announcement.txt"
     try:
@@ -249,16 +253,15 @@ def get_user_agreement_text():
         return "File not found", 404
 
 
-@app.route("/settings", methods=["GET"])
-def settings():
     """用户须知路由"""
     return render_template("settings.html")
 
-
-@app.route("/images", methods=["GET"])
+#region 寻物画廊部分
+@app.route("/galleryImages", methods=["GET"])
 def get_images():
     images = []
-    curr_user = get_jwt_identity()
+    # curr_user = get_jwt_identity()
+    curr_user = 'StarsAC'
     user_image_folder = os.path.join(
         USER_IMAGE_FOLDER, curr_user, "item_images")
     user_album_folder = os.path.join(
@@ -302,7 +305,7 @@ def get_images():
             images.append(
                 {
                     "name": name,
-                    "url": f"/image/{curr_user}/{filename}?mode={mode}",
+                    "url": f"http://localhost/image/{curr_user}/{filename}?mode={mode}",
                     "finish_des": os.path.exists(
                         os.path.join(
                             USER_IMAGE_FOLDER,
@@ -317,6 +320,38 @@ def get_images():
 
     return jsonify(images)
 
+@app.route("/galleryImages", methods=["POST"])
+def save_item_image():
+    curr_user = 'StarsAC'
+    user_image_folder = os.path.join(
+        USER_IMAGE_FOLDER, curr_user, "item_images")
+
+    if "file" not in request.files:
+        return jsonify({"success": False, "error": "No file part"}), 400
+    file = request.files["file"]
+    filename = file.filename
+    if filename == "":
+        return jsonify({"success": False, "error": "No selected file"}), 400
+    if file:
+        name, ext = os.path.splitext(filename)
+        new_filename = name + ".jpg"
+        if os.path.exists(os.path.join(user_image_folder, new_filename)):
+            return jsonify({"success": False, "error": "该图片已存在！"}), 400
+        try:
+            file.save(os.path.join(user_image_folder, new_filename))
+        except Exception as e:
+            return jsonify({"success": False, "error": "图片保存失败！"}), 400
+        return (
+            jsonify(
+                {
+                    "success": True,
+                    "image_name": name,
+                    "image_url": f"http://localhost/image/{curr_user}/{new_filename}?mode=find_item",
+                }
+            ),
+            200,
+        )
+    return jsonify({"success": False, "error": "File upload failed"}), 400
 
 @app.route("/image/<user>/<filename>", methods=["GET"])
 def get_image(user, filename):
@@ -329,10 +364,9 @@ def get_image(user, filename):
             USER_IMAGE_FOLDER, user, "item_images")
     return send_from_directory(user_image_folder, filename)
 
-
-@app.route("/rename_image", methods=["POST"])
+@app.route("/galleryImages", methods=["PUT"])
 def rename_image():
-    curr_user = get_jwt_identity()
+    curr_user = 'StarsAC'
     user_image_folder = os.path.join(
         USER_IMAGE_FOLDER, curr_user, "item_images")
 
@@ -358,50 +392,61 @@ def rename_image():
 
     try:
         os.rename(old_path, new_path)
-        return jsonify({"success": True, "url": f"/image/{curr_user}/{new_file}"}), 200
+        return jsonify({"success": True, "url": f"http://localhost/image/{curr_user}/{new_file}"}), 200
     except Exception as e:
         print(f"Rename failed: {str(e)}")
         return jsonify({"success": False, "error": str(e)}), 400
 
+@app.route("/galleryImages", methods=["DELETE"])
+def delete_image():
+    curr_user = "StarsAC"
+    mode = request.args.get("mode", "find_item")
+    data = request.get_json()
+    image_name = data["image_name"]
+    # 查找文件名对应的文件
+    file_to_delete = None
+    if mode == "album":
+        talk_speed_config_path = os.path.join(
+            USER_IMAGE_FOLDER, curr_user, "album", "talk_speed_config.json"
+        )
+        with open(talk_speed_config_path, "r") as f:
+            talk_speed_config = json.load(f)
+        if image_name in talk_speed_config:
+            del talk_speed_config[image_name]
+            with open(talk_speed_config_path, "w") as f:
+                json.dump(talk_speed_config, f)
+        delete_folders = ["album/images", "album/audios", "album/texts"]
+    else:
+        delete_folders = ["item_images"]
+    for folder in delete_folders:
+        user_image_folder = os.path.join(USER_IMAGE_FOLDER, curr_user, folder)
+        for filename in os.listdir(user_image_folder):
+            name_without_ext, ext = os.path.splitext(filename)
+            if name_without_ext == image_name:
+                file_to_delete = filename
+                file_path = os.path.join(user_image_folder, file_to_delete)
+                try:
+                    os.remove(file_path)
+                    break
+                except Exception as e:
+                    return jsonify({"success": False, "error": str(e)}), 400
+    if file_to_delete is None:
+        return jsonify({"success": False, "error": "File not found"}), 400
+    return (
+        jsonify(
+            {"success": True, "url": f"/image/{curr_user}/{file_to_delete}?mode={mode}"}
+        ),
+        200,
+    )
+
+
+
+#endregion 寻物画廊部分
 
 def gen_time_random_name():
     timestamp = time.strftime("%Y%m%d%H%M%S", time.localtime())
     random_number = random.randint(100000, 999999)
     return f"{timestamp}{random_number}"
-
-
-@app.route("/save_item_image", methods=["POST"])
-def save_item_image():
-    curr_user = get_jwt_identity()
-    user_image_folder = os.path.join(
-        USER_IMAGE_FOLDER, curr_user, "item_images")
-
-    if "file" not in request.files:
-        return jsonify({"success": False, "error": "No file part"}), 400
-    file = request.files["file"]
-    filename = file.filename
-    if filename == "":
-        return jsonify({"success": False, "error": "No selected file"}), 400
-    if file:
-        name, ext = os.path.splitext(filename)
-        new_filename = name + ".jpg"
-        if os.path.exists(os.path.join(user_image_folder, new_filename)):
-            return jsonify({"success": False, "error": "该图片已存在！"}), 400
-        try:
-            file.save(os.path.join(user_image_folder, new_filename))
-        except Exception as e:
-            return jsonify({"success": False, "error": "图片保存失败！"}), 400
-        return (
-            jsonify(
-                {
-                    "success": True,
-                    "image_name": name,
-                    "image_url": f"/image/{curr_user}/{new_filename}?mode=find_item",
-                }
-            ),
-            200,
-        )
-    return jsonify({"success": False, "error": "File upload failed"}), 400
 
 
 def describe_image(client, img_path, curr_user):
@@ -631,47 +676,7 @@ def album_talk():
     )
 
 
-@app.route("/delete_image", methods=["POST"])
-def delete_image():
-    curr_user = get_jwt_identity()
-    mode = request.args.get("mode", "find_item")
-    data = request.get_json()
-    image_name = data["image_name"]
-    # 查找文件名对应的文件
-    file_to_delete = None
-    if mode == "album":
-        talk_speed_config_path = os.path.join(
-            USER_IMAGE_FOLDER, curr_user, "album", "talk_speed_config.json"
-        )
-        with open(talk_speed_config_path, "r") as f:
-            talk_speed_config = json.load(f)
-        if image_name in talk_speed_config:
-            del talk_speed_config[image_name]
-            with open(talk_speed_config_path, "w") as f:
-                json.dump(talk_speed_config, f)
-        delete_folders = ["album/images", "album/audios", "album/texts"]
-    else:
-        delete_folders = ["item_images"]
-    for folder in delete_folders:
-        user_image_folder = os.path.join(USER_IMAGE_FOLDER, curr_user, folder)
-        for filename in os.listdir(user_image_folder):
-            name_without_ext, ext = os.path.splitext(filename)
-            if name_without_ext == image_name:
-                file_to_delete = filename
-                file_path = os.path.join(user_image_folder, file_to_delete)
-                try:
-                    os.remove(file_path)
-                    break
-                except Exception as e:
-                    return jsonify({"success": False, "error": str(e)}), 400
-    if file_to_delete is None:
-        return jsonify({"success": False, "error": "File not found"}), 400
-    return (
-        jsonify(
-            {"success": True, "url": f"/image/{curr_user}/{file_to_delete}?mode={mode}"}
-        ),
-        200,
-    )
+
 
 
 # ----- 加载全局变量 -----

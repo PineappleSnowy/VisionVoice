@@ -1,6 +1,6 @@
 <template>
   <HeaderBar return-path="/mine">用户须知</HeaderBar>
-  <div>{{ content }}</div>
+  <div v-html="content"></div>
 </template>
 
 <script setup lang="ts">
@@ -13,9 +13,10 @@ onMounted(() => {
   axios.get('/api/userAgreement').then(
     (response) => {
       content.value = response.data
+      console.log('[UserAgreement]Fetching Agreement Text:', response.data)
     },
     (error) => {
-      console.error('Error fetching agreement text:', error.message)
+      console.error('[UserAgreement]Error Fetching Agreement Text:', error.message)
       content.value = '很抱歉，用户协议获取失败：'+ error.message
     }
   )
