@@ -86,8 +86,6 @@ function handler(agentName:string,isCameraOn?:boolean):void{
 <style scoped>
 .message-list {
   width: 100%;
-  max-width: 800px;
-  margin: 0 auto;
   background-color: #1e1e1e;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }

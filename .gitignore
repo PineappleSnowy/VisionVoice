@@ -48,7 +48,7 @@ verification_code_dict.json
 gunicorn_config.py
 run_forever.sh
 *.pem
-
+.cache
 # ==================== Large Files ====================
 yolo11x-seg.pt
 

@@ -82,7 +82,7 @@ document.getElementById('phone-button').addEventListener('click', function () {
     window.location.href = '/phone';
 });
 
-
+// 改输入框宽度
 setInterval(() => {
     if (document.getElementById('agent-chat-textarea').value.trim() || uploadedImages.length > 0) {
         document.getElementById('send-button').style.display = 'inline-block';
@@ -161,6 +161,7 @@ function addMessage(message) {
                 const reader = new FileReader();
                 reader.onload = function (event) {
                     const imageUrl = event.target.result;
+                    
                     const imageElement = document.createElement('img');
                     imageElement.src = imageUrl;
                     imageElement.style.width = '100%';
@@ -511,11 +512,12 @@ document.getElementById('audio-control').addEventListener('click', function () {
  * - 音频播放模块的起点
  * - 后端会将音频数据分段发送过来，该函数需要将这些音频数据分段存储到队列中，并开始播放
  */
-socket.on('agent_play_audio_chunk', function (data) {
+socket.on('agentAudioChunk', function (data) {
     const user = localStorage.getItem('user');
-    console.log('curr_user', user)
-    console.log('curr_talk_index', curr_talk_index)
-    console.log(data.task_id)
+    // console.log('curr_user', user)
+    // console.log('curr_talk_index', curr_talk_index)
+    // console.log(data.task_id)
+    console.log('@@@@@@@@@@@@@@@@@@@@',data)
     // 如果用户不匹配或者对话序号不匹配，则停止处理
     if (data.user !== user || data.task_id !== curr_talk_index) return;
     if (!isMuted) {

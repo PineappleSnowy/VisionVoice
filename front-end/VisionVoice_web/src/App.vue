@@ -16,7 +16,6 @@ body {
   background-color: @bg-color;
   font-family: Arial, sans-serif;
   color: @font-color;
-  // overflow: hidden;
 }
 #app {
   height: 100vh;

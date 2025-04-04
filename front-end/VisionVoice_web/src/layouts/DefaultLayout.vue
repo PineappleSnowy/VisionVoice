@@ -1,8 +1,6 @@
 <template>
-  <div>
     <RouterView></RouterView>
     <FooterBar></FooterBar>
-  </div>
 </template>
 
 <script setup lang="ts">

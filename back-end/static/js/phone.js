@@ -92,6 +92,7 @@ function finishShutUpStatus() {
     if (vudio.pause()) { vudio.dance() }
 }
 
+//region 麦克风逻辑
 let micClose = localStorage.getItem('micClose');
 if (micClose === null) {
     micClose = false;
@@ -122,7 +123,9 @@ document.getElementById('micButton').addEventListener('click', function () {
         startCheckSilenceTimer();
     }
 });
+//endregion 麦克风逻辑
 
+// 关闭打开字幕
 let captionClose = localStorage.getItem('captionClose');
 if (captionClose === null) {
     captionClose = false;
@@ -989,7 +992,7 @@ window.onload = async () => {
         })
         .catch(error => {
             console.error('Error fetching JSON file:', error);
-        });
+        })
 
     //解析定位结果
     function onComplete(location_data) {

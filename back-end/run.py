@@ -46,7 +46,8 @@ from service.sms.sms import send_verification_code, verify_code, store_verificat
 app = Flask(__name__)
 app.secret_key = "s96cae35ce8a9b0244178bf28e4966c2ce1b83"
 socketio = SocketIO(
-    app, async_mode="threading", ping_timeout=600, ping_interval=300
+    app, async_mode="threading", ping_timeout=600, ping_interval=300, 
+    cors_allowed_origins="*"
 )  # 设置较大的 pingTimeout 和 pingInterval
 JWTManager(app)
 CORS(app)
@@ -141,7 +142,7 @@ def handle_disconnect():
         request.headers = {"Authorization": f"Bearer {token}"}
         try:
             verify_jwt_in_request()
-            user = get_jwt_identity()
+            user = "StarsAC"
             print(f"[run.py][handle_disconnect] User {user} disconnected")
             # 偶尔会发生客户端连接超时导致user被意外删除
             # try:
@@ -260,7 +261,7 @@ def get_user_agreement_text():
 @app.route("/galleryImages", methods=["GET"])
 def get_images():
     images = []
-    # curr_user = get_jwt_identity()
+    # curr_user = "StarsAC"
     curr_user = 'StarsAC'
     user_image_folder = os.path.join(
         USER_IMAGE_FOLDER, curr_user, "item_images")
@@ -480,7 +481,7 @@ def describe_image(client, img_path, curr_user):
 
 @app.route("/save_album_images", methods=["POST"])
 def save_album_images():
-    curr_user = get_jwt_identity()
+    curr_user = "StarsAC"
     user_image_folder = os.path.join(USER_IMAGE_FOLDER, curr_user)
 
     if "files" not in request.files:
@@ -557,7 +558,7 @@ def save_album_images():
 
 @app.route("/get_image_des", methods=["POST"])
 def get_image_des():
-    curr_user = get_jwt_identity()
+    curr_user = "StarsAC"
     user_image_folder = os.path.join(USER_IMAGE_FOLDER, curr_user)
 
     data = request.get_json()
@@ -574,7 +575,7 @@ def get_image_des():
 
 @app.route("/get_audio", methods=["GET"])
 def get_audio():
-    curr_user = get_jwt_identity()
+    curr_user = "StarsAC"
     # 有声相册音频路由
     audio_name = request.args.get("audio_name")
     audio_file = audio_name + ".mp3"
@@ -611,7 +612,7 @@ def get_audio():
 # 构建上下文信息进行照片对话
 @app.route("/album_talk", methods=["POST"])
 def album_talk():
-    curr_user = get_jwt_identity()
+    curr_user = "StarsAC"
     data = request.get_json()
     album_chat_history = data["album_chat_history"]
     image_name = data["image_name"]
@@ -1074,7 +1075,7 @@ def verify_token():
         # 验证 token 是否有效
         verify_jwt_in_request()
         # 获取当前 token 对应的用户
-        current_user = get_jwt_identity()
+        current_user = "StarsAC"
 
         if current_user != "" and token != None:
             logging.success(
@@ -1103,7 +1104,7 @@ def get_chat_history():
     agent_name = request.args.get("agent", "defaultAgent")  # 获取智能体名称
     try:
         verify_jwt_in_request()
-        current_user = get_jwt_identity()
+        current_user = "StarsAC"
         logging.success(
             "run.py",
             "get_chat_history",
@@ -1303,7 +1304,7 @@ def agent_chat_stream():
     multi_image_talk = (
         request.args.get("multi_image_talk", "false") == "true"
     )  # 是否开启多轮对话
-    current_user = get_jwt_identity()
+    current_user = "StarsAC"
 
     try:
         responses, messages = build_response(
@@ -1401,7 +1402,7 @@ def upload_image():
             return jsonify({"message": "No image data in the request"}), 400
 
         image_data = data["image"]
-        current_user = get_jwt_identity()
+        current_user = "StarsAC"
         user_cache_dir = os.path.join(".cache", current_user)
         if not os.path.exists(user_cache_dir):
             os.makedirs(user_cache_dir)
@@ -1485,7 +1486,7 @@ def agent_upload_audio():
     socketio.emit:
         agent_speech_recognition_finished {string} 本次音频数据的完整语音识别结果
     """
-    user = get_jwt_identity()
+    user = "StarsAC"
     user_cache_dir = os.path.join(".cache", user)
     if not os.path.exists(user_cache_dir):
         os.makedirs(user_cache_dir)
@@ -1532,13 +1533,13 @@ def agent_stream_audio(current_token: str, talk_speed: int = 8, task_id : int = 
         current_token {str} 从前端发来的当前 token
         talk_speed {int} 语速，默认 8
     """
-    # 检测socket的token，为了可以调用get_jwt_identity()
+    # 检测socket的token，为了可以调用"StarsAC"
     token = request.args.get("token")
     if token:
         request.headers = {"Authorization": f"Bearer {token}"}
         try:
-            verify_jwt_in_request()
-            user = get_jwt_identity()
+            # verify_jwt_in_request()
+            user = "StarsAC"
             if user not in USER_VAR:
                 print(f"[run.py][agent_stream_audio] user {user} not exist")
                 return
@@ -1564,8 +1565,8 @@ def agent_stream_audio(current_token: str, talk_speed: int = 8, task_id : int = 
             with open(audio_file_path, "rb") as audio_file:
                 audio_chunk = audio_file.read()
             socketio.emit(
-                "agent_play_audio_chunk",
-                {"user": user, "index": 0, "audio_chunk": audio_chunk, "task_id": task_id},
+                "agentAudioChunk",
+                {"user": user, "index": 0, "audioChunk": audio_chunk, "taskId": task_id},
             )
         # 状态2处理
         elif "##<state=2>" in current_token:
@@ -1575,8 +1576,8 @@ def agent_stream_audio(current_token: str, talk_speed: int = 8, task_id : int = 
                 task_id,
             )
             socketio.emit(
-                "agent_play_audio_chunk",
-                {"user": user, "index": 0, "audio_chunk": audio_chunk, "task_id": task_id},
+                "agentAudioChunk",
+                {"user": user, "index": 0, "audioChunk": audio_chunk, "taskId": task_id},
             )
 
     else:
@@ -1642,12 +1643,12 @@ def process_audio_stream(user):
             if audio_chunk is not None:
                 # 发送到前端
                 socketio.emit(
-                    "agent_play_audio_chunk",
+                    "agentAudioChunk",
                     {
                         "user": user,
                         "index": USER_VAR[user]["sentence_index"],
-                        "audio_chunk": audio_chunk,
-                        "task_id": task_id,
+                        "audioChunk": audio_chunk,
+                        "taskId": task_id,
                     },
                 )
                 USER_VAR[user]["sentence_index"] += 1
@@ -1664,12 +1665,10 @@ def process_audio_stream(user):
             break
 
 # 删除聊天记录
-
-
 @app.route("/delete-chat-history", methods=["POST"])
 def delete_chat_history():
     data = request.get_json()
-    curr_user = get_jwt_identity()
+    curr_user = "StarsAC"
     agent_name = data.get("agent_name")
 
     with open("./static/user.json", "r", encoding="utf-8") as f:

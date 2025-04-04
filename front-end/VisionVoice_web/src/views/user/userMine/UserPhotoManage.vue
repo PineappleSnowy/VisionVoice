@@ -148,6 +148,7 @@ function openModal(image: ImageListItem): void {
   width: 100vw;
   justify-content: left;
   overflow: auto;
+  scrollbar-width: none;
 }
 
 .gallery-item {

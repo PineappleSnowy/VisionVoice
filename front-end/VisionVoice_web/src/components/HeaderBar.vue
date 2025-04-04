@@ -4,7 +4,7 @@
       :to="{ path: returnPath }"
       replace
       class="back-button"
-      aria-label="返回我的页面"
+      aria-label="返回按钮"
       v-show="showButton ?? true"
       >&#8592;</RouterLink
     >
@@ -27,6 +27,7 @@ defineProps(['returnPath', 'showButton'])
   font-weight: bold;
   position: relative;
   height: 50px;
+  background-color: #1e1e1e;
 }
 
 .back-button {

@@ -18,7 +18,7 @@
     </div>
 </template>
 
-<script setup lang="ts">
+<script setup lang="ts" name="FooterBar">
 import {RouterLink} from 'vue-router'
 </script>
 
@@ -37,7 +37,7 @@ import {RouterLink} from 'vue-router'
   left: 0;
   right: 0;
   bottom: 0;
-  height: 50px;
+  height: 49px;
   padding: 0;
   display: flex;
   justify-content: space-around;
