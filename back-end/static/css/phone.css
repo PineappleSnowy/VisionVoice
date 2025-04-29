@@ -21,6 +21,7 @@ html body .goBack {
   justify-content: left;
   align-items: center;
   padding: 0 0.2rem;
+  display: none;
 }
 
 html body .toggleCamera {
@@ -316,7 +317,7 @@ html body #container.shifted {
   justify-content: center;
   /* 垂直居中 */
   height: 0.8rem;
-  width: 23.75%;
+  width: 50%;
 }
 
 .captionModal {
