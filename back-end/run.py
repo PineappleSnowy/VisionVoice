@@ -38,9 +38,7 @@ from agent_files.agent_speech_rec import speech_rec
 from agent_files.agent_speech_synthesis import agent_audio_generate
 from lib import logging
 from agent_files.async_task_queue import AsyncTaskQueue
-from agent_files.obstacle_avoid.detect import obstacle_avoid_realize
-from agent_files.vision_seek.detect import detector
-from service.sms.sms import send_verification_code, verify_code, store_verification_code
+from service.sms.sms import send_verification_code, store_verification_code
 
 # ----- 加载全局应用 -----
 app = Flask(__name__)
@@ -1430,40 +1428,6 @@ def upload_image():
             if not img_base:
                 return {"message": "Image url is empty"}, 400
 
-        if "state" in data:
-            state = data["state"]
-        else:
-            return {"message": "Image upload success"}
-
-        try:
-            mat_image = cv2.imread(image_save_path)
-        except Exception:
-            return jsonify({"message": "Image is empty"}), 400
-
-        if state == 1:
-            try:
-                obstacle_info = obstacle_avoid_realize(mat_image)
-                print("[run.py][upload_image] obstacle_info:", obstacle_info)
-                return (
-                    jsonify({"message": "Success",
-                            "obstacle_info": obstacle_info}),
-                    200,
-                )
-            except Exception as e:
-                print("[run.py][upload_image] error:", e)
-                return jsonify({"message": "Error", "obstacle_info": []}), 400
-
-        elif state == 2:
-            try:
-                detect_result = detector.detect_main(mat_image)
-                item_info = [] if detect_result == -1 else detect_result
-                print("[run.py][upload_image] item_info:", item_info)
-                return jsonify({"message": "Success", "item_info": item_info}), 200
-            except Exception as e:
-                print("[run.py][upload_image] error:", e)
-                return jsonify({"message": "Error", "item_info": []}), 400
-
-        return jsonify({"message": "Success"}), 200
     except Exception:
         return jsonify({"message": "Error"}), 400
 
