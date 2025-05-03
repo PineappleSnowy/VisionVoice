@@ -20,7 +20,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {  // 拦截所有以/api开头的请求
-        target: 'http://localhost', // 后端真实地址（如 http://localhost:3000）
+        target: 'http://localhost:8000', // 后端真实地址（如 http://localhost:3000）
         changeOrigin: true,
         rewrite: path => path.replace(/^\/api/, ''), // 去除路径中的/api前缀
       },

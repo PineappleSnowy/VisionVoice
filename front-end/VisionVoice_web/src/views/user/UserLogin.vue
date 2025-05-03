@@ -5,27 +5,29 @@
 
       <h2>欢迎登录</h2>
       <div class="switch">
-        <span class="phone_login" :class="{ active: isPhoneLogin }" @click="isPhoneLogin = true">手机验证码登录</span>
-        <span class="password_login" :class="{ active: !isPhoneLogin }" @click="isPhoneLogin = false">账号密码登录</span>
-        <div class="slider" :class="{pwdLogin: !isPhoneLogin}"></div>
+        <span class="phone_login" :class="{ active: loginType === 'phone' }" @click="loginType = 'phone'">手机验证码登录</span>
+        <span class="password_login" :class="{ active: loginType === 'password' }"
+          @click="loginType = 'password'">账号密码登录</span>
+        <div class="slider" :class="{ pwdLogin: loginType === 'password' }"></div>
       </div>
 
 
-      <div class="login-type-phone" v-show="isPhoneLogin">
+      <div class="login-type-phone" v-show="loginType === 'phone'">
         <div class="input-group">
           <label for="login_phone" aria-label="手机号">手机号:</label>
-          <input type="text" placeholder="请输入手机号" id="login_phone" aria-label="请输入手机号" v-model="phoneNumber">
+          <input type="text" placeholder="请输入手机号" aria-label="请输入手机号" v-model="phoneNumber">
         </div>
         <div class="input-group code">
           <div>
             <label for="phone_code" aria-label="手机验证码">验证码:</label>
-            <input type="text" placeholder="请输入手机验证码" id="phone_code" aria-label="请输入手机验证码">
+            <input type="text" placeholder="请输入手机验证码" aria-label="请输入手机验证码" v-model="verifyCode">
           </div>
-          <button class="getCode">获取验证码</button>
+          <button class="getCode" @click="getCode('login')" :disabled="verifyCodeTimeout !== 0">获取验证码{{
+            codeStatusMessage }}</button>
         </div>
       </div>
 
-      <div class="login-type-password" v-show="!isPhoneLogin">
+      <div class="login-type-password" v-show="loginType === 'password'">
         <div class="input-group">
           <label for="username" aria-label="用户名">用户名:</label>
           <input type="text" placeholder="请输入用户名" aria-label="请输入用户名" v-model="username">
@@ -38,8 +40,9 @@
       </div>
 
 
-      <div class="message">{{ message }}</div>
-      <button aria-label="登录" class="loginbutton">登录</button>
+      <div class="message" :class="{ success: messageType === 'success', error: messageType === 'error' }">{{ message }}
+      </div>
+      <button aria-label="登录" class="loginbutton" @click="login">登录</button>
       <p class="register-link">还没有账号？<a @click="isLogin = false">点击注册</a></p>
     </div>
 
@@ -48,43 +51,45 @@
       <h2>用户注册</h2>
       <div class="input-group">
         <label for="register_username" aria-label="用户名">用户名:</label>
-        <input type="text" placeholder="请输入用于登录的用户名" id="register_username" aria-label="请输入用于登录的用户名">
+        <input type="text" placeholder="请输入用于登录的用户名" aria-label="请输入用于登录的用户名" v-model="username">
       </div>
 
       <div class="input-group">
         <label for="register_nickname" aria-label="昵称">昵称:</label>
-        <input type="text" placeholder="请输入昵称" id="register_nickname" aria-label="请输入昵称">
+        <input type="text" placeholder="请输入昵称" aria-label="请输入昵称" v-model="nickname">
       </div>
 
       <div class="input-group">
         <label for="register_phone" aria-label="手机号">手机号:</label>
-        <input type="text" placeholder="请输入手机号" id="register_phone" aria-label="请输入手机号">
+        <input type="text" placeholder="请输入手机号" aria-label="请输入手机号" v-model="phoneNumber">
       </div>
-
 
 
       <div class="input-group">
         <label for="register_password" aria-label="密码">密码:</label>
-        <input type="password" placeholder="请输入密码" id="register_password" aria-label="请输入密码">
+        <input type="password" placeholder="请输入密码" aria-label="请输入密码" v-model="password">
       </div>
 
       <div class="input-group">
         <label for="register_confirm_password" aria-label="确认密码">确认密码:</label>
-        <input type="password" placeholder="请再次输入密码" id="register_confirm_password" aria-label="请再次输入密码">
+        <input type="password" placeholder="请再次输入密码" aria-label="请再次输入密码" v-model="confirmedPassword">
       </div>
 
       <div class="input-group" style="display: flex; gap: 10px; position: relative;">
         <div style="flex: 1;">
           <label for="register_code" aria-label="验证码">验证码:</label>
-          <input type="text" placeholder="请输入验证码" id="register_code" aria-label="请输入验证码">
+          <input type="text" placeholder="请输入验证码" id="register_code" aria-label="请输入验证码" v-model="verifyCode">
         </div>
-        <button id="get_code_btn_register"
-          style="position: absolute; right: 0; bottom: 0; width: 115px; height: 40px; background: #3eb575; color: white; border: none; border-radius: 5px; cursor: pointer;">获取验证码</button>
+        <button @click="getCode('register')" :disabled="verifyCodeTimeout !== 0"
+          style="position: absolute; right: 0; bottom: 0; width: 115px; height: 40px; background: #3eb575; color: white; border: none; border-radius: 5px; cursor: pointer;">
+          获取验证码 {{ codeStatusMessage }}
+        </button>
       </div>
 
 
-      <div class="message">{{ message }}</div>
-      <button class="register_button" aria-label="注册">注册</button>
+      <div class="message" :class="{ success: messageType === 'success', error: messageType === 'error' }">{{ message }}
+      </div>
+      <button class="register_button" aria-label="注册" @click="register">注册</button>
       <p class="login-link">已有账号？<a @click="isLogin = true">返回登录</a></p>
 
     </div>
@@ -98,19 +103,185 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import axios from '@/libs/axios'
+const router = useRouter()
 let isLogin = ref(true)
-let isPhoneLogin = ref(true)
+let loginType = ref<'password' | 'phone'>('phone')
 let message = ref('')
+let messageType = ref<'success' | 'error' | ''>('')
 let username = ref('')
 let password = ref('')
 let phoneNumber = ref('')
+let confirmedPassword = ref('')
+let verifyCode = ref('')
+let verifyCodeTimeout = ref(0)
+let nickname = ref('')
+
+let timeoutId: number | undefined
+
+let codeStatusMessage = computed(() => {
+  if (verifyCodeTimeout.value) {
+    return `（${verifyCodeTimeout.value}）`
+  } else {
+    return ''
+  }
+})
+
+
+
+function login() {
+  let data = {
+    username: "",
+    password: "",
+    phone: "",
+    code: "",
+    login_type: ""
+  }
+
+  if (loginType.value === 'password') {
+    if (!(username.value && password.value)) {
+      message.value = '您输入的信息不完整'
+      messageType.value = 'error'
+      return
+    }
+    data.login_type = 'password'
+    data.username = username.value
+    data.password = password.value
+  } else if (loginType.value === 'phone') {
+    if (!(phoneNumber.value && verifyCode.value)) {
+      message.value = '您输入的信息不完整'
+      messageType.value = 'error'
+      return
+    }
+    data.login_type = 'phone'
+    data.phone = phoneNumber.value
+    data.code = verifyCode.value
+  } else {
+    message.value = '未知登录模式'
+    messageType.value = 'error'
+    return
+  }
+
+
+
+  axios.post('/user/login', data)
+    .then(({ data }) => {
+      if (data.code === 0) {
+        message.value = data.message
+        localStorage.setItem('token', data.access_token)
+        localStorage.setItem('username', username.value)
+        router.replace('/')
+      }
+    })
+    .catch((error) => {
+      if (error.response.data.message) {
+        message.value = `登录出现错误: ${error.response.data.message}`
+      } else {
+        message.value = `登录出现错误`
+        console.log('[Userlogin][login]', error)
+      }
+      messageType.value = 'error'
+    })
+}
+
+function register() {
+  let data = {
+    username: "",
+    nickname: "",
+    password: "",
+    phone: "",
+    code: "",
+  }
+  data.username = username.value
+  data.nickname = nickname.value
+  data.password = password.value
+  data.phone = phoneNumber.value
+  data.code = verifyCode.value
+  for (let item of Object.values(data)) {
+    if (item === "") {
+      message.value = '您输入的信息不完整'
+      messageType.value = 'error'
+      return
+    }
+  }
+
+  if (password.value !== confirmedPassword.value) {
+    message.value = '您两次输入的密码不一致'
+    messageType.value = 'error'
+    return
+  }
+
+  axios.post('/user/register', data)
+    .then(({ data }) => {
+      if (data.code === 0) {
+        message.value = data.message
+        localStorage.setItem('token', data.access_token)
+        router.replace('/')
+      }
+    })
+    .catch((error) => {
+      if (error.response.data.message) {
+        message.value = `注册出现错误: ${error.response.data.message}`
+      } else {
+        message.value = `注册出现错误`
+        console.log('[Userlogin][register]', error)
+      }
+      messageType.value = 'error'
+    })
+}
+
+function getCode(usage: 'login' | 'register') {
+  let data = {
+    phone: phoneNumber.value,
+    usage
+  }
+  if (data.phone.length !== 11) {
+    message.value = '请输入正确的手机号'
+    messageType.value = 'error'
+    return
+  }
+
+  axios.post('/user/code', data)
+    .then(({ data }) => {
+      if (data.code === 0) {
+        message.value = data.message
+        messageType.value = 'success'
+      }
+      verifyCodeTimeout.value = 60
+      timeoutId = setInterval(() => {
+        if (verifyCodeTimeout.value > 0) {
+          verifyCodeTimeout.value--
+        } else {
+          clearTimeout(timeoutId)
+          timeoutId = undefined
+        }
+      }, 1000)
+
+    })
+    .catch((error) => {
+      if (error.response.data.message) {
+        message.value = `获取验证码出现错误: ${error.response.data.message}`
+      } else {
+        message.value = `获取验证码出现错误`
+        console.log('[Userlogin][getCode]', error)
+      }
+      messageType.value = 'error'
+    })
+
+
+}
+
+
+
 </script>
 
 <style scoped lang="less">
 * {
   box-sizing: border-box;
 }
+
 .container {
   width: 100vw;
   height: 100vh;
@@ -119,7 +290,7 @@ let phoneNumber = ref('')
   justify-content: center;
   align-items: center;
   background-color: #121212;
-  
+
   .input-group {
     margin-bottom: 20px;
 
@@ -154,15 +325,16 @@ let phoneNumber = ref('')
     margin-bottom: 10px;
     padding: 5px;
     border-radius: 4px;
+
+    &.success {
+      color: #297a4f;
+    }
+
+    &.error {
+      color: #f44336;
+    }
   }
 
-  .message.success {
-    color: #297a4f;
-  }
-
-  .message.error {
-    color: #f44336;
-  }
 
   .login {
     background-color: #1e1e1e;

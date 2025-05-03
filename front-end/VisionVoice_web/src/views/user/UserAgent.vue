@@ -77,6 +77,7 @@ import HeaderBar from '@/components/HeaderBar.vue'
 import ChatBubble from '@/components/ChatBubble.vue'
 import AudioPlayer from '@/components/AudioPlayer.vue'
 import type { ChatHistoryItem } from '@/types'
+
 const socket = io('http://localhost', {
   query: {
     token: localStorage.getItem('token')
@@ -93,19 +94,16 @@ const selectedImages = ref<File[]>([])
 const chatContainer = ref()
 const imageInput = ref()
 let talkSpeed = localStorage.getItem('speed') || 8
+const username = localStorage.getItem('username')
 
-// getChatHistory()
 function getChatHistory(): void {
-  axios.get(`/api/chatHistory?agent=${agentType.value}`, {
-    headers: {
-      "Authorization": `Bearer ${localStorage.getItem('token')}`
-    }
-  }).then((response) => {
-    chatHistory.value = response.data
-    console.log('[UserAgent][getChatHistory] Success Getting Chat History: ', response)
-  }, (error) => {
-    console.error('[UserAgent][getChatHistory] Error Getting Chat History: ', error)
-  })
+  axios.get(`/chat/history/${username}`)
+    .then((response) => {
+      chatHistory.value = response.data
+      console.log('[UserAgent][getChatHistory] Success Getting Chat History: ', response)
+    }, (error) => {
+      console.error('[UserAgent][getChatHistory] Error Getting Chat History: ', error)
+    })
 }
 
 //展开更多功能面板之后聊天记录滚动到最底下，待实现
@@ -294,7 +292,7 @@ async function handleRecording() {
     const formData = new FormData()
     const audioContext = new AudioContext()
     console.log(audioBlob);
-    
+
     formData.append("audio_data", audioBlob, "recorded_audio.wav")
     const arrayBuffer = await audioBlob.arrayBuffer()
     const audioBuffer = await audioContext.decodeAudioData(arrayBuffer)
@@ -707,5 +705,4 @@ socket.on('agent_speech_recognition_finished', async function (data) {
   max-width: 100%;
   max-height: 100%;
 }
-
 </style>

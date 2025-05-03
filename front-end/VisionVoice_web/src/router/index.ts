@@ -110,4 +110,15 @@ const router = createRouter({
   ],
 })
 
+
+router.beforeEach((to, from, next) => {
+  const token = localStorage.getItem('token')
+  // 如果目标路由不是登录页且没有 token
+  if (to.path !== '/login' && !token) {
+    next('/login')
+  } else {
+    next()
+  }
+})
+
 export default router
