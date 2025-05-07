@@ -6,8 +6,8 @@
       class="back-button"
       aria-label="返回按钮"
       v-show="showButton ?? true"
-      >&#8592;</RouterLink
-    >
+      >&#8592;
+    </RouterLink>
     <slot>默认内容</slot>
   </div>
 </template>

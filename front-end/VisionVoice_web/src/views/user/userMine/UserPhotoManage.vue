@@ -30,12 +30,11 @@ import ImageUploadPanel from '@/components/ImageUploadPanel.vue'
 import PhotoManageModel from '@/components/PhotoManageModel.vue'
 import { type ImageListItem } from "@/types"
 import axios from 'axios'
-/* 该文件为帮我寻物物品模板管理模块的内容 */
 let imageList = ref<ImageListItem[]>([])
 let isShowModel = ref(false)
 let imageData = ref<ImageListItem>({} as ImageListItem)
 onMounted(() => {
-  getFile()
+  getImage()
 })
 function postFile(file: File): void {
   const formData = new FormData()
@@ -61,15 +60,11 @@ function postFile(file: File): void {
       }
     )
 }
-function getFile(): void {
-  axios.get('/api/galleryImages', {
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem('token')}`,
-    },
-  })
+function getImage(): void {
+  axios.get('/image/list')
     .then(
       response => {
-        imageList.value = response.data
+        imageList.value = response.data.data
         console.log('[UserPhotoManage] Success getting File :', response.data)
       },
       error => {

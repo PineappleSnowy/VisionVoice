@@ -1,7 +1,16 @@
 <template>
   <HeaderBar :show-button="false">生活助手</HeaderBar>
-  <button class="delete-chat-history" aria-label="删除对话记录" @click="deleteChatHistory"></button>
-  <button class="audio-control" aria-label="静音开关" :class="{ mute: isMute }" @click="isMute = !isMute"></button>
+  <div class="topControls">
+
+    <button class="addChatHistory" aria-label="添加新对话" @click="addChatHistory"><i class="fa-solid fa-plus"></i></button>
+
+    <button class="muteControl" :aria-label="`静音开关${isMute ? '当前已静音' : '当前未静音'}`" :class="{ mute: isMute }"
+      @click="isMute = !isMute">
+      <i v-if="isMute" class="fa-solid fa-volume-xmark"></i>
+      <i v-else class="fa-solid fa-volume-high"></i>
+    </button>
+
+  </div>
 
   <div class="container">
 
@@ -71,18 +80,18 @@
 <script setup lang="ts">
 import { ref, nextTick, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import axios from 'axios'
+import axios from '@/libs/axios'
 import { io } from 'socket.io-client'
 import HeaderBar from '@/components/HeaderBar.vue'
 import ChatBubble from '@/components/ChatBubble.vue'
 import AudioPlayer from '@/components/AudioPlayer.vue'
 import type { ChatHistoryItem } from '@/types'
 
-const socket = io('http://localhost', {
-  query: {
-    token: localStorage.getItem('token')
-  }
-})
+// const socket = io('http://localhost', {
+//   query: {
+//     token: localStorage.getItem('token')
+//   }
+// })
 const router = useRouter()
 const agentType = ref('defaultAgent')
 const chatHistory = ref<ChatHistoryItem[]>([])
@@ -96,6 +105,8 @@ const imageInput = ref()
 let talkSpeed = localStorage.getItem('speed') || 8
 const username = localStorage.getItem('username')
 
+// #region 聊天记录回调
+
 function getChatHistory(): void {
   axios.get(`/chat/history/${username}`)
     .then((response) => {
@@ -105,6 +116,34 @@ function getChatHistory(): void {
       console.error('[UserAgent][getChatHistory] Error Getting Chat History: ', error)
     })
 }
+
+function changeChatHistory() {
+  axios.get(`/api/chatHistory?agent=${agentType.value}`, {
+    headers: {
+      "Authorization": `Bearer ${localStorage.getItem('token')}`
+    }
+  }).then((response) => {
+    chatHistory.value = response.data
+  }, (error) => {
+    console.error('[UserAgent][loadChatHistory] Error Loading Chat History: ', error)
+  })
+}
+
+
+function addChatHistory():void{
+  axios.post('/chat/history',{username:username,agentType:agentType.value})
+}
+
+
+
+// #endregion
+
+
+
+
+
+
+
 
 //展开更多功能面板之后聊天记录滚动到最底下，待实现
 // watch(isShowMoreFunctionBoard, (newVal) => {
@@ -123,30 +162,7 @@ watch(chatHistory, () => {
 
 
 
-function changeChatHistory() {
-  axios.get(`/api/chatHistory?agent=${agentType.value}`, {
-    headers: {
-      "Authorization": `Bearer ${localStorage.getItem('token')}`
-    }
-  }).then((response) => {
-    chatHistory.value = response.data
-  }, (error) => {
-    console.error('[UserAgent][loadChatHistory] Error Loading Chat History: ', error)
-  })
-}
 
-function deleteChatHistory() {
-  axios.delete(`chatHistory?agent=${agentType.value}`, {
-    headers: {
-      "Authorization": `Bearer ${localStorage.getItem('token')}`
-    }
-  }).then((response) => {
-    if (response.data.message === 'seccess') chatHistory.value = []
-    console.log('[UserAgent][deleteChatHistory] Success Deleteing Chat History: ', response)
-  }, (error) => {
-    console.error('[UserAgent][deleteChatHistory] Error Deleteing Chat History: ', error)
-  })
-}
 
 function sendMessage() {
   let messageText = message.value.trim()
@@ -205,7 +221,7 @@ function sendMessage() {
           let jsonString = new TextDecoder().decode(value)
           if (!(jsonString.includes("<END>"))) chatHistory.value[chatHistory.value.length - 1].content += jsonString
           if (!isMute.value) {
-            socket.emit("agent_stream_audio", jsonString, talkSpeed, chatHistory.value.length)
+            // socket.emit("agent_stream_audio", jsonString, talkSpeed, chatHistory.value.length)
           }
           return reader.read().then(processText)
         }).catch((error) => {
@@ -314,60 +330,54 @@ async function handleRecording() {
 /**
  * 语音识别结束后，将识别结果发送给后端，并开始语音对话
  */
-socket.on('agent_speech_recognition_finished', async function (data) {
-  const user = localStorage.getItem('user')
-  console.log('curr_user', user)
-  if (data.user !== user) return;
-  const rec_result = data['rec_result'];
+// socket.on('agent_speech_recognition_finished', async function (data) {
+//   const user = localStorage.getItem('user')
+//   console.log('curr_user', user)
+//   if (data.user !== user) return;
+//   const rec_result = data['rec_result'];
 
-  if (!rec_result) {
-    console.log('[agent.js][socket.on][agent_speech_recognition_finished] 音频识别结果为空.');
-    return;
-  }
-  console.log('[agent.js][socket.on][agent_speech_recognition_finished] 音频识别结果:', rec_result);
+//   if (!rec_result) {
+//     console.log('[agent.js][socket.on][agent_speech_recognition_finished] 音频识别结果为空.');
+//     return;
+//   }
+//   console.log('[agent.js][socket.on][agent_speech_recognition_finished] 音频识别结果:', rec_result);
 
-  message.value += rec_result;
-  sendMessage()
-})
+//   message.value += rec_result;
+//   sendMessage()
+// })
 
 //环境噪音分析待添加
 
 </script>
 
 <style scoped lang="less">
-.delete-chat-history {
-  position: absolute;
-  top: 0px;
-  left: 0px;
-  width: 80px;
-  height: 50px;
-  background-image: url('@/assets/icons/delete.png');
-  background-size: 40%;
-  background-repeat: no-repeat;
-  background-position: 10px center;
-  border: none;
-  background-color: transparent;
-  cursor: pointer;
-}
+.topControls {
+  button {
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    width: 50px;
+    height: 50px;
+    padding: 0;
+    position: absolute;
+    top: 0;
 
-.audio-control {
-  position: absolute;
-  top: 0px;
-  right: 0px;
-  width: 80px;
-  height: 50px;
-  background-image: url('@/assets/icons/audio.png');
-  background-size: 40%;
-  background-repeat: no-repeat;
-  background-position: calc(100% - 10px) center;
-  border: none;
-  background-color: transparent;
-  cursor: pointer;
+    i {
+      color: #ffffff;
+      display: block;
+      font-size: 30px;
+    }
+  }
 
-  &.mute {
-    background-image: url('@/assets/icons/audio_mute.png');
+  .addChatHistory {
+    left: 0;
+  }
+
+  .muteControl {
+    right: 0;
   }
 }
+
 
 .container {
   position: relative;
@@ -558,7 +568,7 @@ socket.on('agent_speech_recognition_finished', async function (data) {
       color: #ffffff;
       border-radius: 10px;
       padding: 10px 0.5rem 10px 0.5rem;
-      font-size: 16px;
+      font-size: 15px;
       border: 1px solid rgba(255, 255, 255, 0.1);
       transition: all 0.1s ease;
       box-sizing: border-box;
