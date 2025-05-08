@@ -298,7 +298,7 @@ function captureAndSendFrame() {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}` // 添加 token 到请求头
             },
-            body: JSON.stringify({ "image": imageData, "state": state })
+            body: JSON.stringify({ "image": imageData})
         })
             .then(response => response.json())
             .then(data => {

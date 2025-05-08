@@ -1422,46 +1422,15 @@ def upload_image():
         else:
             image_save_path = os.path.join(user_cache_dir, IMAGE_SAVE_NAME)
 
-        # 将图片保存为文件
+        if not image_data:
+            return {"message": "Image is empty"}, 400
         with open(image_save_path, "wb") as f:
             f.write(base64.b64decode(image_data))
-        with open(image_save_path, "rb") as img_file:
-            img_base = base64.b64encode(img_file.read()).decode("utf-8")
-            if not img_base:
-                return {"message": "Image url is empty"}, 400
-
-        if "state" in data:
-            state = data["state"]
-        else:
-            return {"message": "Image upload success"}
-
+        # 再次检测图片是否为空
         try:
             mat_image = cv2.imread(image_save_path)
         except Exception:
-            return jsonify({"message": "Image is empty"}), 400
-
-        if state == 1:
-            try:
-                obstacle_info = obstacle_avoid_realize(mat_image)
-                print("[run.py][upload_image] obstacle_info:", obstacle_info)
-                return (
-                    jsonify({"message": "Success",
-                            "obstacle_info": obstacle_info}),
-                    200,
-                )
-            except Exception as e:
-                print("[run.py][upload_image] error:", e)
-                return jsonify({"message": "Error", "obstacle_info": []}), 400
-
-        elif state == 2:
-            try:
-                detect_result = detector.detect_main(mat_image)
-                item_info = [] if detect_result == -1 else detect_result
-                print("[run.py][upload_image] item_info:", item_info)
-                return jsonify({"message": "Success", "item_info": item_info}), 200
-            except Exception as e:
-                print("[run.py][upload_image] error:", e)
-                return jsonify({"message": "Error", "item_info": []}), 400
+            return jsonify({"message": "Image is empty again"}), 400
 
         return jsonify({"message": "Success"}), 200
     except Exception:
