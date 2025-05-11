@@ -46,19 +46,27 @@
 
     <div class="chat-history-view" v-show="view === 'chatHistory'">
       <HeaderBar :show-button="false">聊天记录列表</HeaderBar>
-      <button class="nav"><i class="fa-solid fa-arrow-left" @click="view = 'agent'"></i></button>
+      <button class="nav left"><i class="fa-solid fa-arrow-left" @click="view = 'agent'"></i></button>
+      <button class="nav right"><i class="fa-solid fa-plus" @click="addSession"></i></button>
 
       <div class="chat-history-list" role="list">
 
-        <div class="chat-history-item" role="listitem" aria-label="聊天记录列表项" v-for="item in chatHistoryList" :key="item.session_id">
+        <div class="chat-history-item" role="listitem" aria-label="聊天记录列表项" v-for="item in sessionList"
+          :key="item.session_id">
           <div class="content">
             <!-- <div class="detail" aria-label="聊天记录内容">{{item.content[-1].content.slice(0,20)}}</div> -->
-            <div class="detail" aria-label="聊天记录内容">{{item.content[item.content.length-1].content.slice(0,18)+'...'}}</div>
-            <div class="time" aria-label="时间">{{ dateFormatter(new Date(item.content[item.content.length-1].timestamp)) }}</div>
+            <div class="detail" aria-label="聊天记录内容">{{ item.content[item.content.length - 1].content.slice(0, 18) +
+              '...' }}
+            </div>
+            <div class="time" aria-label="时间">{{ dateFormatter(new Date(item.content[item.content.length -
+              1].timestamp))
+              }}</div>
           </div>
           <div class="controls">
-            <button aria-label="选择该会话" @click="router.replace('/agent')"><i class="fa-solid fa-arrow-right-to-bracket"></i></button>
-            <button aria-label="删除该对话" @click="deleteChatHistory(item.session_id)"><i class="fa-solid fa-trash"></i></button>
+            <button aria-label="选择该会话" @click="selectSession(item.session_id)"><i
+                class="fa-solid fa-arrow-right-to-bracket"></i></button>
+            <button aria-label="删除该对话" @click="deleteChatHistory(item.session_id)"><i
+                class="fa-solid fa-trash"></i></button>
           </div>
         </div>
         <!-- 可以继续添加更多消息 -->
@@ -78,40 +86,49 @@ import { useUserStore } from '@/stores/user'
 const router = useRouter()
 const userStore = useUserStore()
 const view = ref<'agent' | 'chatHistory'>('agent')
-const username = localStorage.getItem('username')
-
-const chatHistoryList:any = ref([])
+const sessionList: any = ref([])
 
 
 
-let selectedAgent :string
-
-onMounted(() => {
-  selectedAgent = localStorage.getItem('selectedAgent') || 'defaultAgent'; // 从本地存储中获取选择的智能体
-})
-
-
-function agentHandler(agentName: string, isCameraOn?: boolean): void {
-  selectedAgent = agentName
-  localStorage.setItem('selectedAgent', selectedAgent); // 将选择的智能体存储到本地存储
+function agentHandler(agentType: string, isCameraOn?: boolean): void {
+  userStore.selectedAgent = agentType
   isCameraOn ? router.replace('/phone') : router.replace('/phone?camera=on')
 }
 
 
-async function chatHistoryHandler(agentType:string) {
+async function chatHistoryHandler(agentType: string) {
+  userStore.selectedAgent = agentType
   view.value = 'chatHistory'
-  chatHistoryList.value = []
+  sessionList.value = []
   const history = await getChatHistory()
-  history.forEach((item:any) => {
-    console.log('AAAAA',item)
-    if(item.agent_type === agentType) {
-      chatHistoryList.value.push(item)
+  history.forEach((item: any) => {
+    if (item.agent_type === agentType) {
+      sessionList.value.push(item)
     }
   })
 }
 
-function dateFormatter(date:Date){
-  return `${date.getFullYear()}年${date.getMonth()+1}月${date.getDate()}日 ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`
+function selectSession(sessionId: string) {
+  userStore.currentSessionId = sessionId
+  router.replace('/agent')
+}
+
+function addSession() {
+  axios.post('/chat/history', { username: userStore.username, agent_type: userStore.selectedAgent })
+    .then(({ data }) => {
+      userStore.currentSessionId = data.session_id
+      chatHistoryHandler(userStore.selectedAgent)
+    })
+    .catch((error) => {
+      alert(error.message)
+    })
+}
+
+
+
+
+function dateFormatter(date: Date) {
+  return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日 ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`
 }
 
 
@@ -120,29 +137,25 @@ function dateFormatter(date:Date){
 
 async function getChatHistory(): Promise<any> {
   try {
-    const response = await axios.get(`/chat/history/${username}`);
-    userStore.chatHistory = response.data.history;
-    return response.data.history;
+    const response = await axios.get(`/chat/history/list?username=${userStore.username}`)
+    userStore.chatHistory = response.data.history
+    return response.data.history
   } catch (error) {
-    alert(error);
-    throw error;
+    alert(error)
   }
 }
 
-function deleteChatHistory(sessionId:string) {
-  // axios.delete(`chatHistory?agent=${agentType.value}`, {
-  //   headers: {
-  //     "Authorization": `Bearer ${localStorage.getItem('token')}`
-  //   }
-  // }).then((response) => {
-  //   if (response.data.message === 'seccess') chatHistory.value = []
-  //   console.log('[UserAgent][deleteChatHistory] Success Deleteing Chat History: ', response)
-  // }, (error) => {
-  //   console.error('[UserAgent][deleteChatHistory] Error Deleteing Chat History: ', error)
-  // })
+function deleteChatHistory(sessionId: string) {
+  axios.delete(`/chat/history?username=${userStore.username}&session_id=${sessionId}`)
+    .then(({ data }) => {
+      console.log('[UserChat][deleteChatHistory] Success Deleteing Chat History: ', data)
+      chatHistoryHandler(userStore.selectedAgent)
+    }, (error) => {
+      console.error('[UserChat][deleteChatHistory] Error Deleteing Chat History: ', error)
+    })
 }
 
-// #endregion 
+// #endregion 聊天记录CRUD
 
 </script>
 
@@ -155,7 +168,14 @@ button.nav {
   padding: 0;
   position: absolute;
   top: 0;
-  left: 0;
+
+  &.left {
+    left: 0;
+  }
+
+  &.right {
+    right: 0;
+  }
 
   i {
     color: #ffffff;

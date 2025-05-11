@@ -4,8 +4,8 @@
     <div class="chat-image-user" aria-label="用户头像"></div>
   </div>
   <div class="chat-messages-bot" v-else-if="chatItem.role === 'assistant'">
-    <div class="chat-image-bot psychological" v-if="agentType === 'psychologicalAgent'" aria-label="智能体头像"></div>
-    <div class="chat-image-bot default" v-if="agentType === 'defaultAgent'" aria-label="智能体头像"></div>
+    <div class="chat-image-bot psychological" v-if="agentType === 'psychologist'" aria-label="智能体头像"></div>
+    <div class="chat-image-bot default" v-if="agentType === 'lifeAssistant'" aria-label="智能体头像"></div>
     <div class="chat-bubble-bot">{{ chatItem.content }}</div>
   </div>
 </template>

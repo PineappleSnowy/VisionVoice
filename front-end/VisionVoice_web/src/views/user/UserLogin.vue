@@ -14,13 +14,13 @@
 
       <div class="login-type-phone" v-show="loginType === 'phone'">
         <div class="input-group">
-          <label for="login_phone" aria-label="手机号">手机号:</label>
-          <input type="text" placeholder="请输入手机号" aria-label="请输入手机号" v-model="phoneNumber">
+          <label for="loginPhone" aria-label="手机号">手机号:</label>
+          <input id="loginPhone" type="text" placeholder="请输入手机号" aria-label="请输入手机号" v-model="phoneNumber">
         </div>
         <div class="input-group code">
           <div>
-            <label for="phone_code" aria-label="手机验证码">验证码:</label>
-            <input type="text" placeholder="请输入手机验证码" aria-label="请输入手机验证码" v-model="verifyCode">
+            <label for="phoneCode" aria-label="手机验证码">验证码:</label>
+            <input id="phoneCode" type="text" placeholder="请输入手机验证码" aria-label="请输入手机验证码" v-model="verifyCode">
           </div>
           <button class="getCode" @click="getCode('login')" :disabled="verifyCodeTimeout !== 0">获取验证码{{
             codeStatusMessage }}</button>
@@ -30,12 +30,12 @@
       <div class="login-type-password" v-show="loginType === 'password'">
         <div class="input-group">
           <label for="username" aria-label="用户名">用户名:</label>
-          <input type="text" placeholder="请输入用户名" aria-label="请输入用户名" v-model="username">
+          <input id="username" type="text" placeholder="请输入用户名" aria-label="请输入用户名" v-model="username" autocomplete="username">
         </div>
 
         <div class="input-group password">
           <label for="password" aria-label="密码">密码:</label>
-          <input type="password" placeholder="请输入密码" id="password" aria-label="请输入密码" v-model="password">
+          <input id="password" type="password" placeholder="请输入密码"  aria-label="请输入密码" v-model="password">
         </div>
       </div>
 
@@ -50,35 +50,34 @@
     <div class="register" role="form" aria-label="注册表单" v-show="!isLogin">
       <h2>用户注册</h2>
       <div class="input-group">
-        <label for="register_username" aria-label="用户名">用户名:</label>
-        <input type="text" placeholder="请输入用于登录的用户名" aria-label="请输入用于登录的用户名" v-model="username">
+        <label for="registerUsername" aria-label="用户名">用户名:</label>
+        <input id="registerUsername" type="text" placeholder="请输入用于登录的用户名" aria-label="请输入用于登录的用户名" v-model="username">
       </div>
 
       <div class="input-group">
-        <label for="register_nickname" aria-label="昵称">昵称:</label>
-        <input type="text" placeholder="请输入昵称" aria-label="请输入昵称" v-model="nickname">
+        <label for="registerNickname" aria-label="昵称">昵称:</label>
+        <input id="registerNickname" type="text" placeholder="请输入昵称" aria-label="请输入昵称" v-model="nickname">
       </div>
 
       <div class="input-group">
-        <label for="register_phone" aria-label="手机号">手机号:</label>
-        <input type="text" placeholder="请输入手机号" aria-label="请输入手机号" v-model="phoneNumber">
-      </div>
-
-
-      <div class="input-group">
-        <label for="register_password" aria-label="密码">密码:</label>
-        <input type="password" placeholder="请输入密码" aria-label="请输入密码" v-model="password">
+        <label for="registerPhone" aria-label="手机号">手机号:</label>
+        <input id="registerPhone" type="text" placeholder="请输入手机号" aria-label="请输入手机号" v-model="phoneNumber">
       </div>
 
       <div class="input-group">
-        <label for="register_confirm_password" aria-label="确认密码">确认密码:</label>
-        <input type="password" placeholder="请再次输入密码" aria-label="请再次输入密码" v-model="confirmedPassword">
+        <label for="registerPassword" aria-label="密码">密码:</label>
+        <input id="registerPassword" type="password" placeholder="请输入密码" aria-label="请输入密码" v-model="password">
+      </div>
+
+      <div class="input-group">
+        <label for="registerConfirmPassword" aria-label="确认密码">确认密码:</label>
+        <input id="registerConfirmPassword" type="password" placeholder="请再次输入密码" aria-label="请再次输入密码" v-model="confirmedPassword">
       </div>
 
       <div class="input-group" style="display: flex; gap: 10px; position: relative;">
         <div style="flex: 1;">
-          <label for="register_code" aria-label="验证码">验证码:</label>
-          <input type="text" placeholder="请输入验证码" id="register_code" aria-label="请输入验证码" v-model="verifyCode">
+          <label for="registerCode" aria-label="验证码">验证码:</label>
+          <input id="registerCode" type="text" placeholder="请输入验证码"  aria-label="请输入验证码" v-model="verifyCode">
         </div>
         <button @click="getCode('register')" :disabled="verifyCodeTimeout !== 0"
           style="position: absolute; right: 0; bottom: 0; width: 115px; height: 40px; background: #3eb575; color: white; border: none; border-radius: 5px; cursor: pointer;">
@@ -105,8 +104,10 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useUserStore } from '@/stores/user'
 import axios from '@/libs/axios'
 const router = useRouter()
+const userStore = useUserStore()
 let isLogin = ref(true)
 let loginType = ref<'password' | 'phone'>('phone')
 let message = ref('')
@@ -171,7 +172,8 @@ function login() {
       if (data.code === 0) {
         message.value = data.message
         localStorage.setItem('token', data.access_token)
-        localStorage.setItem('username', username.value)
+        userStore.username = data.user_info.username
+        userStore.nickname = data.user_info.nickname
         router.replace('/')
       }
     })
@@ -218,6 +220,8 @@ function register() {
       if (data.code === 0) {
         message.value = data.message
         localStorage.setItem('token', data.access_token)
+        userStore.username = username.value
+        userStore.nickname = nickname.value
         router.replace('/')
       }
     })

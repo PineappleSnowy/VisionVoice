@@ -3,8 +3,8 @@
     <div class="profile" aria-label="用户资料">
       <img src="@/assets/icons/user.jpg" alt="用户头像" class="avatar" id="avatar" />
       <div class="user-info">
-        <div class="username" id="username" :aria-label="`用户名称：${nickName}`">{{ nickName }}</div>
-        <div class="user-account" id="user-account" :aria-label="`账号：${userName}`">账号: {{ userName }}</div>
+        <div class="username" id="username" :aria-label="`用户名称：${nickname}`">{{ nickname }}</div>
+        <div class="user-account" id="user-account" :aria-label="`账号：${username}`">账号: {{ username }}</div>
       </div>
     </div>
 
@@ -19,9 +19,20 @@
 </template>
 
 <script setup lang="ts">
+import { onMounted, ref } from 'vue'
+import { useUserStore } from '@/stores/user'
 import { RouterLink, onBeforeRouteLeave } from 'vue-router'
-const userName = localStorage.getItem('username') ?? '获取失败'
-const nickName = localStorage.getItem('nickname') ?? '不知名的大侠'
+
+const userStore = useUserStore()
+
+const username = ref('获取失败')
+const nickname = ref('不知名的大侠')
+
+onMounted(() => {
+  username.value = userStore.username
+  nickname.value = userStore.nickname
+})
+
 
 onBeforeRouteLeave((to, from, next) => {
   if (to.path === '/login') {
