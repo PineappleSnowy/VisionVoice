@@ -16,6 +16,7 @@ body {
   background-color: @bg-color;
   font-family: Arial, sans-serif;
   color: @font-color;
+  scrollbar-width: none;
 }
 #app {
   height: 100vh;

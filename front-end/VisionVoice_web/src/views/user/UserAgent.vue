@@ -89,14 +89,14 @@ import { io } from 'socket.io-client'
 import HeaderBar from '@/components/HeaderBar.vue'
 import ChatBubble from '@/components/ChatBubble.vue'
 import AudioPlayer from '@/components/AudioPlayer.vue'
-import { agentNameDict, type ChatHistoryItem } from '@/types'
+import { type ChatHistoryItem } from '@/types'
 
 
 const router = useRouter()
 const userStore = useUserStore()
 const agentName = computed(() => {
-  if (userStore.selectedAgent === 'lifeAssistant') return '生活助手'
-  else if (userStore.selectedAgent === 'psychologist') return '情感陪护(小天)'
+  if (userStore.selectedAgent === 'LIFE_ASSISTANT') return '生活助手'
+  else if (userStore.selectedAgent === 'PSYCHOLOGIST') return '情感陪护(小天)'
 })
 
 
@@ -117,24 +117,31 @@ const audioPlayer = ref()
 
 
 
-onMounted(() => {
-  getChatHistory()
+onMounted(async () => {
+  if (userStore.currentSessionId === '') {
+    addSession()
+  }else{
+    getChatHistory()
+  }
 })
 
 
 
 // #region 聊天记录回调
 
-function addSession() {
-  axios.post('/chat/history', { username: userStore.username, agent_type: agentNameDict[userStore.selectedAgent] })
+/** 
+ * 添加会话回调
+ */
+async function addSession() {
+  axios.post('/chat/history', { username: userStore.username, agent_type: userStore.selectedAgent })
     .then(({ data }) => {
       userStore.currentSessionId = data.session_id
+      getChatHistory()
     })
     .catch((error) => {
       alert(error.message)
     })
 }
-
 /**
  * 获取当前会话id的聊天记录
  */
@@ -160,20 +167,26 @@ function sendMessage() {
 
     socket.emit("completion", {
       query: message.value.trim(),
-      agent_type: agentNameDict[userStore.selectedAgent],
+      agent_type: userStore.selectedAgent,
       session_id: userStore.currentSessionId,
       token: localStorage.getItem('token')
     })
 
     chatHistory.value.push({
+      "role": "user",
+      "content": message.value,
+      timestamp: new Date().toISOString()
+    })
+    message.value = ''
+    chatHistory.value.push({
       "role": "assistant",
       "content": '',
-      timestamp: Date.now().toString()
+      timestamp: new Date().toISOString()
     })
 
     console.log('[UserAgent][sendMessage]Success sending message: ', message.value.trim())
 
-    message.value = ''
+    
 
   } catch (error) {
     console.error('[UserAgent][sendMessage]Error sending message: ', error)
@@ -184,7 +197,6 @@ function sendMessage() {
  * 接收消息
  */
 socket.on("text", (data: string) => {
-  console.log('收到消息：', data)
   chatHistory.value[chatHistory.value.length - 1].content += data
 })
 
@@ -207,10 +219,6 @@ socket.on("error", (err) => {
 })
 
 
-
-
-
-
 // #endregion
 
 
@@ -230,6 +238,7 @@ watch(chatHistory, () => {
 }, { deep: true })
 
 
+// #region 发送图片相关回调
 /**
  * 触发input元素的点击事件
  * @param capture 指定是否使用相机，默认为false
@@ -257,6 +266,8 @@ function handleImage(e: Event): void {
 function createURL(data: Blob): string {
   return window.URL.createObjectURL(data)
 }
+// #endregion 发送图片相关回调
+
 
 let mediaRecorder: MediaRecorder
 let audioStream: MediaStream

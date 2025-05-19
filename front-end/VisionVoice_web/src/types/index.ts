@@ -17,7 +17,7 @@ export interface DetectResultItem {
   top: number
 }
 
-export const agentNameDict = {
-  lifeAssistant: "LIFE_ASSISTANT",
-  psychologist: "PSYCHOLOGIST",
+export enum AgentType {
+  LIFE_ASSISTANT = 'LIFE_ASSISTANT',
+  PSYCHOLOGIST = 'PSYCHOLOGIST'
 }
