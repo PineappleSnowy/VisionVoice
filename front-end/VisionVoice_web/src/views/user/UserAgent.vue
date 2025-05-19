@@ -1,12 +1,13 @@
 <template>
-  <HeaderBar :show-button="false">生活助手</HeaderBar>
+  <!-- 大模型对话页面 -->
+  <HeaderBar :show-button="false">{{ agentName }}</HeaderBar>
   <div class="topControls">
 
-    <button class="addChatHistory" aria-label="添加新对话" @click="addChatHistory"><i class="fa-solid fa-plus"></i></button>
+    <button class="addChatHistory" aria-label="添加新对话" @click="addSession"><i class="fa-solid fa-plus"></i></button>
 
-    <button class="muteControl" :aria-label="`静音开关${isMute ? '当前已静音' : '当前未静音'}`" :class="{ mute: isMute }"
-      @click="isMute = !isMute">
-      <i v-if="isMute" class="fa-solid fa-volume-xmark"></i>
+    <button class="muteControl" :aria-label="`静音开关${isMute ? '当前已静音' : '当前未静音'}`" :class="{ mute: userStore.isMuted }"
+      @click="userStore.isMuted = !userStore.isMuted">
+      <i v-if="userStore.isMuted" class="fa-solid fa-volume-xmark"></i>
       <i v-else class="fa-solid fa-volume-high"></i>
     </button>
 
@@ -19,7 +20,8 @@
     <!-- 聊天消息显示区域 -->
     <div ref="chatContainer" class="chat-container" aria-live="polite" aria-atomic="true"
       :class="{ expand: isShowMoreFunctionBoard }">
-      <ChatBubble v-for="(chatItem, index) in chatHistory" :key="index" :chat-item="chatItem" :agent-type="agentType">
+      <ChatBubble v-for="(chatItem, index) in chatHistory" :key="index" :chat-item="chatItem"
+        :agent-type="userStore.selectedAgent">
       </ChatBubble>
     </div>
 
@@ -74,74 +76,142 @@
       <div class="camera" aria-label="使用相机上传图片" @click="selectImage(true)"><i class="fa-solid fa-camera"></i></div>
     </div>
   </div>
-  <AudioPlayer></AudioPlayer>
+  <AudioPlayer ref="audioPlayer"></AudioPlayer>
 </template>
 
 <script setup lang="ts">
-import { ref, nextTick, watch } from 'vue'
+import { ref, nextTick, watch, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useUserStore } from '@/stores/user'
 import axios from '@/libs/axios'
 import { io } from 'socket.io-client'
+
 import HeaderBar from '@/components/HeaderBar.vue'
 import ChatBubble from '@/components/ChatBubble.vue'
 import AudioPlayer from '@/components/AudioPlayer.vue'
-import type { ChatHistoryItem } from '@/types'
+import { agentNameDict, type ChatHistoryItem } from '@/types'
 
-// const socket = io('http://localhost', {
-//   query: {
-//     token: localStorage.getItem('token')
-//   }
-// })
+
 const router = useRouter()
-const agentType = ref('defaultAgent')
+const userStore = useUserStore()
+const agentName = computed(() => {
+  if (userStore.selectedAgent === 'lifeAssistant') return '生活助手'
+  else if (userStore.selectedAgent === 'psychologist') return '情感陪护(小天)'
+})
+
+
 const chatHistory = ref<ChatHistoryItem[]>([])
 const message = ref('')
+
 const isShowMoreFunctionBoard = ref(false)
 const isMute = ref(false)
 const isRecording = ref(false)
+
 const selectedImages = ref<File[]>([])
+
+
 const chatContainer = ref()
 const imageInput = ref()
-let talkSpeed = localStorage.getItem('speed') || 8
-const username = localStorage.getItem('username')
+
+const audioPlayer = ref()
+
+
+
+onMounted(() => {
+  getChatHistory()
+})
+
+
 
 // #region 聊天记录回调
 
-function getChatHistory(): void {
-  axios.get(`/chat/history/${username}`)
-    .then((response) => {
-      chatHistory.value = response.data
-      console.log('[UserAgent][getChatHistory] Success Getting Chat History: ', response)
+function addSession() {
+  axios.post('/chat/history', { username: userStore.username, agent_type: agentNameDict[userStore.selectedAgent] })
+    .then(({ data }) => {
+      userStore.currentSessionId = data.session_id
+    })
+    .catch((error) => {
+      alert(error.message)
+    })
+}
+
+/**
+ * 获取当前会话id的聊天记录
+ */
+function getChatHistory() {
+  axios.get(`/chat/history?username=${userStore.username}&session_id=${userStore.currentSessionId}`)
+    .then(({ data }) => {
+      chatHistory.value = data.history
+      console.log('[UserAgent][getChatHistory] Success Getting Chat History: ', data)
     }, (error) => {
       console.error('[UserAgent][getChatHistory] Error Getting Chat History: ', error)
     })
 }
 
-function changeChatHistory() {
-  axios.get(`/api/chatHistory?agent=${agentType.value}`, {
-    headers: {
-      "Authorization": `Bearer ${localStorage.getItem('token')}`
-    }
-  }).then((response) => {
-    chatHistory.value = response.data
-  }, (error) => {
-    console.error('[UserAgent][loadChatHistory] Error Loading Chat History: ', error)
-  })
+// 创建SocketIO连接
+const socket = io('http://localhost:8000')
+/**
+ * 发送消息回调
+ */
+function sendMessage() {
+  try {
+    let messageText = message.value.trim()
+    if (messageText.length === 0 && selectedImages.value.length === 0) return
+
+    socket.emit("completion", {
+      query: message.value.trim(),
+      agent_type: agentNameDict[userStore.selectedAgent],
+      session_id: userStore.currentSessionId,
+      token: localStorage.getItem('token')
+    })
+
+    chatHistory.value.push({
+      "role": "assistant",
+      "content": '',
+      timestamp: Date.now().toString()
+    })
+
+    console.log('[UserAgent][sendMessage]Success sending message: ', message.value.trim())
+
+    message.value = ''
+
+  } catch (error) {
+    console.error('[UserAgent][sendMessage]Error sending message: ', error)
+  }
 }
 
+/**
+ * 接收消息
+ */
+socket.on("text", (data: string) => {
+  console.log('收到消息：', data)
+  chatHistory.value[chatHistory.value.length - 1].content += data
+})
 
-function addChatHistory():void{
-  axios.post('/chat/history',{username:username,agentType:agentType.value})
-}
+/**
+ * 接收音频
+ */
+socket.on("audio", (audioBuffer: ArrayBuffer) => {
+  const blob = new Blob([audioBuffer], { type: "audio/wav" })
+  // 播放 blob
+  console.log('[UserAgent]收到audio blob:', blob)
+  if (!userStore.isMuted) {
+    // 将音频数据添加到队列中
+    audioPlayer.value.audioQueue.push(blob)
+  }
+})
+
+
+socket.on("error", (err) => {
+  alert(err.message)
+})
+
+
+
 
 
 
 // #endregion
-
-
-
-
-
 
 
 
@@ -157,89 +227,9 @@ watch(chatHistory, () => {
   nextTick(() => {
     chatContainer.value.scrollTop = chatContainer.value.scrollHeight
   })
-  localStorage.setItem('chatHistory', JSON.stringify(chatHistory.value))
 }, { deep: true })
 
 
-
-
-
-function sendMessage() {
-  let messageText = message.value.trim()
-  if (messageText.length === 0 && selectedImages.value.length === 0) return
-
-  chatHistory.value.push({
-    "role": "user",
-    "content": messageText,
-  })
-  message.value = ''
-
-  const uploadStatus = selectedImages.value.map((image, index) => {
-    return new Promise((resolve, reject) => {
-      selectedImages.value.forEach((item, index) => {
-        let imageURL = ''
-        const reader = new FileReader()
-        reader.readAsDataURL(item)
-        reader.onload = function (e) {
-          imageURL = e.target?.result as string
-
-          axios.post('/api/agent/upload_image', { image: imageURL, multi_image_index: index }, {
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${localStorage.getItem('token')}`
-            }
-          }).then((response) => {
-            console.log('[UserAgent][sendMessage] Success Sending Image, Response: ', response)
-            resolve(response.data)
-          }).catch((error) => {
-            console.error('[UserAgent][sendMessage] Error Sending Image', error)
-            reject(error)
-          })
-        }
-      })
-    })
-  })
-
-  Promise.all(uploadStatus).then(() => {
-    //浏览器端axios基于XMLHttpRequest，不支持流式，故使用fetch
-    fetch(`/api/agent/chat_stream?query=${messageText}&agent=${agentType.value}&multi_image_talk=${Boolean(selectedImages.value.length)}`, {
-      headers: {
-        "Authorization": `Bearer ${localStorage.getItem('token')}`
-      }
-    })
-      .then(response => {
-        let reader = (response.body as ReadableStream).getReader()
-
-        selectedImages.value = []
-        chatHistory.value.push({
-          "role": "assistant",
-          "content": '',
-        })
-
-        reader.read().then(function processText({ done, value }): Promise<void> {
-          if (done) return Promise.resolve()
-          let jsonString = new TextDecoder().decode(value)
-          if (!(jsonString.includes("<END>"))) chatHistory.value[chatHistory.value.length - 1].content += jsonString
-          if (!isMute.value) {
-            // socket.emit("agent_stream_audio", jsonString, talkSpeed, chatHistory.value.length)
-          }
-          return reader.read().then(processText)
-        }).catch((error) => {
-          console.error('[UserAgent][sendMessage] Error Reading Message', error)
-        })
-
-      })
-      .catch((error) => {
-        console.error('[UserAgent][sendMessage] Error Sending Message', error)
-      })
-  })
-
-
-
-
-
-
-}
 /**
  * 触发input元素的点击事件
  * @param capture 指定是否使用相机，默认为false

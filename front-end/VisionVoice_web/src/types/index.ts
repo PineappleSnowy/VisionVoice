@@ -3,16 +3,11 @@ export interface ImageListItem {
   name: string
   url: string
 }
-export interface AudioChunk {
-  user: string
-  index: number
-  audioChunk: ArrayBuffer
-  taskId: number
-}
 
 export interface ChatHistoryItem {
-  role: 'user' | 'assistant'
+  role: 'user' | 'assistant' | 'system'
   content: string
+  timestamp:string
 }
 
 export interface DetectResultItem {
@@ -20,4 +15,9 @@ export interface DetectResultItem {
   distance: number
   left: number
   top: number
+}
+
+export const agentNameDict = {
+  lifeAssistant: "LIFE_ASSISTANT",
+  psychologist: "PSYCHOLOGIST",
 }
