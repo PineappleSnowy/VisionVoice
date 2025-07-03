@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="../../css/common.css">
     <link rel="stylesheet" href="../../css.child/盲人故事.css">
     <link rel="stylesheet" href="../../iconfont/arrow.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.1/github-markdown.min.css">
     <style>
         body::after {
             content: "";
@@ -26,8 +27,6 @@
         }
 
         .text {
-            display: flex;
-            justify-content: center;
             position: relative;
             background-color: white;
             opacity: 1;
@@ -44,6 +43,42 @@
             top: 45px;
         }
 
+        .bbb.github-button {
+            border-radius: 8px !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            background: linear-gradient(90deg, #24292f 0%, #586069 100%);
+            color: #fff !important;
+            font-weight: bold;
+            padding: 8px 24px !important;
+            font-size: 18px !important;
+            transition: background 0.3s, box-shadow 0.3s;
+            border: none !important;
+            margin: 20px 0;
+            display: inline-block;
+        }
+        .bbb.github-button:hover {
+            background: linear-gradient(90deg, #586069 0%, #24292f 100%);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+            color: #ffd33d !important;
+        }
+
+        .markdown-body {
+            background: #fff !important;
+            color: #24292f !important;
+        }
+        .markdown-body table {
+            background: #fff !important;
+            color: #24292f !important;
+            border-collapse: collapse;
+        }
+        .markdown-body th, .markdown-body td {
+            background: #fff !important;
+            color: #24292f !important;
+            border: 1px solid #d0d7de !important;
+        }
+        .markdown-body tr {
+            background: #fff !important;
+        }
     </style>
     <script>
         function toggleDropdown(navtog) { navtog.classList.toggle('active'); }
@@ -120,16 +155,36 @@
             </ul>
         </div>
         <!-- gradio -->
-        <div class="text">
-
-            <!--github按钮和swanhub -->
-            <a class="github-button bbb" href="https://github.com/PineappleSnowy/visionvoice" data-icon="star" data-show-count="false" data-size="large"  aria-label="Star user/repository on GitHub">Welcome to our repository!</a>
-            <script async defer src="https://buttons.github.io/buttons.js"></script>
-
-            <iframe src="https://swanhub.co/Dawn/visionvoice"></iframe>
-            
+         <!-- 自动根据系统主题切换 markdown 样式 -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.1/github-markdown.min.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.1/github-markdown-dark.min.css" media="(prefers-color-scheme: dark)">
+        <div class="text markdown-body" style="padding: 40px 0;">
+            <div style="width:100%; display:flex; justify-content:center; margin-bottom: 24px;">
+                <a class="github-button bbb"
+                   href="https://github.com/PineappleSnowy/visionvoice"
+                   data-icon="octicon-star"
+                   data-size="large"
+                   aria-label="Star PineappleSnowy/visionvoice on GitHub">
+                   Star VisionVoice
+                </a>
+            </div>
+            <div id="readme" style="width: 100%; max-width: 800px; margin: 100px auto 0; text-align: left;"></div>
         </div>
+
     </div>
+
+    <script src="https://unpkg.com/markdown-it@12/dist/markdown-it.min.js"></script>
+    <script>
+    fetch('https://raw.githubusercontent.com/PineappleSnowy/VisionVoice/main/README.md')
+      .then(response => response.text())
+      .then(text => {
+        const md = markdownit();
+        document.getElementById('readme').innerHTML = md.render(text);
+      })
+      .catch(err => {
+        document.getElementById('readme').innerHTML = "<p style='color:red;'>README.md 加载失败，请稍后重试。</p>";
+      });
+    </script>
 </body>
 
 </html>
