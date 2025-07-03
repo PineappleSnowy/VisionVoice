@@ -82,6 +82,14 @@
     </style>
     <script>
         function toggleDropdown(navtog) { navtog.classList.toggle('active'); }
+        fetch('README.md')
+          .then(response => response.text())
+          .then(text => {
+            document.getElementById('readme').innerText = text;
+          })
+          .catch(err => {
+            document.getElementById('readme').innerText = "README.md 加载失败，请稍后重试。";
+          });
     </script>
 </head>
 
@@ -168,17 +176,17 @@
                    Star VisionVoice
                 </a>
             </div>
-            <div id="readme" style="width: 100%; max-width: 800px; margin: 100px auto 0; text-align: left;"></div>
+            <div class="markdown-body" id="readme" style="width: 100%; max-width: 800px; margin: 100px auto 0; text-align: left;"></div>
         </div>
 
     </div>
 
     <script src="https://unpkg.com/markdown-it@12/dist/markdown-it.min.js"></script>
     <script>
-    fetch('https://raw.githubusercontent.com/PineappleSnowy/VisionVoice/main/README.md')
+    fetch('README.md')
       .then(response => response.text())
       .then(text => {
-        const md = markdownit();
+        const md = window.markdownit({ html: true });
         document.getElementById('readme').innerHTML = md.render(text);
       })
       .catch(err => {
