@@ -1424,13 +1424,11 @@ def upload_image():
             return {"message": "Image is empty"}, 400
         with open(image_save_path, "wb") as f:
             f.write(base64.b64decode(image_data))
-        # 再次检测图片是否为空
-        try:
-            mat_image = cv2.imread(image_save_path)
-        except Exception:
-            return jsonify({"message": "Image is empty again"}), 400
+        with open(image_save_path, "rb") as img_file:
+            img_base = base64.b64encode(img_file.read()).decode("utf-8")
+            if not img_base:
+                return {"message": "Image url is empty"}, 400
 
-        return jsonify({"message": "Success"}), 200
     except Exception:
         return jsonify({"message": "Error"}), 400
 
