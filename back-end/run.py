@@ -1428,7 +1428,7 @@ def upload_image():
             img_base = base64.b64encode(img_file.read()).decode("utf-8")
             if not img_base:
                 return {"message": "Image url is empty"}, 400
-
+        return jsonify({"message": "Success"}), 200
     except Exception:
         return jsonify({"message": "Error"}), 400
 
