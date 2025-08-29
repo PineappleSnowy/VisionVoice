@@ -1420,7 +1420,8 @@ def upload_image():
         else:
             image_save_path = os.path.join(user_cache_dir, IMAGE_SAVE_NAME)
 
-        # 将图片保存为文件
+        if not image_data:
+            return {"message": "Image is empty"}, 400
         with open(image_save_path, "wb") as f:
             f.write(base64.b64decode(image_data))
         with open(image_save_path, "rb") as img_file:
